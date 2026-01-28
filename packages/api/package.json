@@ -3,38 +3,38 @@
   "version": "1.0.1",
   "name": "@portfolio/api",
   "type": "module",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js",
+      "require": "./dist/src/index.js"
     },
     "./generated/api": {
-      "types": "./dist/api.schemas.d.ts",
-      "import": "./dist/api.schemas.js",
-      "require": "./dist/api.schemas.js"
+      "types": "./dist/generated/api.schemas.d.ts",
+      "import": "./dist/generated/api.schemas.js",
+      "require": "./dist/generated/api.schemas.js"
     },
     "./generated/mutator": {
-      "types": "./dist/mutator.d.ts",
-      "import": "./dist/mutator.js",
-      "require": "./dist/mutator.js"
+      "types": "./dist/generated/mutator.d.ts",
+      "import": "./dist/generated/mutator.js",
+      "require": "./dist/generated/mutator.js"
     },
     "./generated/portfolios/portfolios": {
-      "types": "./dist/portfolios.d.ts",
-      "import": "./dist/portfolios.js",
-      "require": "./dist/portfolios.js"
+      "types": "./dist/generated/portfolios/portfolios.d.ts",
+      "import": "./dist/generated/portfolios/portfolios.js",
+      "require": "./dist/generated/portfolios/portfolios.js"
     },
     "./generated/posts/posts": {
-      "types": "./dist/posts.d.ts",
-      "import": "./dist/posts.js",
-      "require": "./dist/posts.js"
+      "types": "./dist/generated/posts/posts.d.ts",
+      "import": "./dist/generated/posts/posts.js",
+      "require": "./dist/generated/posts/posts.js"
     }
   },
-  "main": "./dist/index.js",
+  "main": "./dist/src/index.js",
   "scripts": {
     "build": "bun run build:js && bun run build:types",
-    "build:js": "bun build ./src/index.ts ./generated/api.schemas.ts ./generated/mutator.ts ./generated/portfolios/portfolios.ts ./generated/posts/posts.ts --outdir dist --target node --format esm --splitting",
+    "build:js": "bun build ./src/index.ts ./generated/api.schemas.ts ./generated/mutator.ts ./generated/portfolios/portfolios.ts ./generated/posts/posts.ts --outdir dist --target node --format esm",
     "build:types": "git clean -xdf .cache/tsbuildinfo.json && tsc --emitDeclarationOnly --declaration --outDir dist",
     "build:ui": "redoc-cli bundle openapi.yaml --output ../../apps/wiki/reference/index.html",
     "clean:cache": "git clean -xdf .cache .turbo",
