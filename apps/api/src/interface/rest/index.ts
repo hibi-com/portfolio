@@ -27,6 +27,17 @@ import {
 } from "./crm";
 import { getPortfolioBySlug, getPortfolios, uploadPortfolioImage } from "./portfolios";
 import { getPostBySlug, getPosts } from "./posts";
+import {
+    addInquiryResponse,
+    closeInquiry,
+    createInquiry,
+    deleteInquiry,
+    getInquiries,
+    getInquiryById,
+    getInquiryResponses,
+    resolveInquiry,
+    updateInquiry,
+} from "./support";
 
 const uploadRateLimiter = createRateLimiter({
     maxRequests: 10,
@@ -228,4 +239,76 @@ restRouter.delete("/crm/pipelines/:id", crmRateLimiter, async (c) => {
         return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
     }
     return deletePipeline(c);
+});
+
+restRouter.get("/support/inquiries", crmRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getInquiries(c);
+});
+
+restRouter.get("/support/inquiries/:id", crmRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getInquiryById(c);
+});
+
+restRouter.post("/support/inquiries", crmRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return createInquiry(c);
+});
+
+restRouter.put("/support/inquiries/:id", crmRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return updateInquiry(c);
+});
+
+restRouter.delete("/support/inquiries/:id", crmRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return deleteInquiry(c);
+});
+
+restRouter.post("/support/inquiries/:id/resolve", crmRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return resolveInquiry(c);
+});
+
+restRouter.post("/support/inquiries/:id/close", crmRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return closeInquiry(c);
+});
+
+restRouter.get("/support/inquiries/:id/responses", crmRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getInquiryResponses(c);
+});
+
+restRouter.post("/support/inquiries/:id/responses", crmRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return addInquiryResponse(c);
 });

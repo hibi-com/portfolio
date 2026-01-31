@@ -1,0 +1,9 @@
+export { AddInquiryResponseUseCase } from "./addInquiryResponse";
+export { CloseInquiryUseCase } from "./closeInquiry";
+export { CreateInquiryUseCase } from "./createInquiry";
+export { DeleteInquiryUseCase } from "./deleteInquiry";
+export { GetInquiriesUseCase } from "./getInquiries";
+export { GetInquiryByIdUseCase } from "./getInquiryById";
+export { GetInquiryResponsesUseCase } from "./getInquiryResponses";
+export { ResolveInquiryUseCase } from "./resolveInquiry";
+export { UpdateInquiryUseCase } from "./updateInquiry";

@@ -3,6 +3,7 @@ import { CachedPortfolioRepository } from "~/infra/cached-portfolio.repository";
 import { CachedPostRepository } from "~/infra/cached-post.repository";
 import { CustomerRepositoryImpl } from "~/infra/customer.repository";
 import { DealRepositoryImpl } from "~/infra/deal.repository";
+import { InquiryRepositoryImpl } from "~/infra/inquiry.repository";
 import { LeadRepositoryImpl } from "~/infra/lead.repository";
 import { PipelineRepositoryImpl } from "~/infra/pipeline.repository";
 import {
@@ -24,6 +25,17 @@ import { GetPortfolioBySlugUseCase } from "~/usecase/getPortfolioBySlug";
 import { GetPortfoliosUseCase } from "~/usecase/getPortfolios";
 import { GetPostBySlugUseCase } from "~/usecase/getPostBySlug";
 import { GetPostsUseCase } from "~/usecase/getPosts";
+import {
+    AddInquiryResponseUseCase,
+    CloseInquiryUseCase,
+    CreateInquiryUseCase,
+    DeleteInquiryUseCase,
+    GetInquiriesUseCase,
+    GetInquiryByIdUseCase,
+    GetInquiryResponsesUseCase,
+    ResolveInquiryUseCase,
+    UpdateInquiryUseCase,
+} from "~/usecase/inquiry";
 import {
     ConvertLeadToDealUseCase,
     CreateLeadUseCase,
@@ -48,6 +60,7 @@ export class DIContainer {
     private readonly leadRepository: LeadRepositoryImpl;
     private readonly dealRepository: DealRepositoryImpl;
     private readonly pipelineRepository: PipelineRepositoryImpl;
+    private readonly inquiryRepository: InquiryRepositoryImpl;
 
     constructor(
         readonly databaseUrl?: string,
@@ -61,9 +74,9 @@ export class DIContainer {
         this.leadRepository = new LeadRepositoryImpl(databaseUrl);
         this.dealRepository = new DealRepositoryImpl(databaseUrl);
         this.pipelineRepository = new PipelineRepositoryImpl(databaseUrl);
+        this.inquiryRepository = new InquiryRepositoryImpl(databaseUrl);
     }
 
-    // Repository getters
     getPostRepository() {
         return this.postRepository;
     }
@@ -88,7 +101,6 @@ export class DIContainer {
         return this.pipelineRepository;
     }
 
-    // Post UseCases
     getGetPostsUseCase() {
         return new GetPostsUseCase(this.postRepository);
     }
@@ -97,7 +109,6 @@ export class DIContainer {
         return new GetPostBySlugUseCase(this.postRepository);
     }
 
-    // Portfolio UseCases
     getGetPortfoliosUseCase() {
         return new GetPortfoliosUseCase(this.portfolioRepository);
     }
@@ -113,7 +124,6 @@ export class DIContainer {
         return new UploadPortfolioImageUseCase(this.portfolioRepository, this.r2Bucket, this.r2PublicUrl);
     }
 
-    // Customer UseCases
     getGetCustomersUseCase() {
         return new GetCustomersUseCase(this.customerRepository);
     }
@@ -134,7 +144,6 @@ export class DIContainer {
         return new DeleteCustomerUseCase(this.customerRepository);
     }
 
-    // Lead UseCases
     getGetLeadsUseCase() {
         return new GetLeadsUseCase(this.leadRepository);
     }
@@ -159,7 +168,6 @@ export class DIContainer {
         return new ConvertLeadToDealUseCase(this.leadRepository);
     }
 
-    // Deal UseCases
     getGetDealsUseCase() {
         return new GetDealsUseCase(this.dealRepository);
     }
@@ -184,7 +192,6 @@ export class DIContainer {
         return new MoveDealToStageUseCase(this.dealRepository);
     }
 
-    // Pipeline UseCases
     getGetPipelinesUseCase() {
         return new GetPipelinesUseCase(this.pipelineRepository);
     }
@@ -203,5 +210,45 @@ export class DIContainer {
 
     getDeletePipelineUseCase() {
         return new DeletePipelineUseCase(this.pipelineRepository);
+    }
+
+    getInquiryRepository() {
+        return this.inquiryRepository;
+    }
+
+    getGetInquiriesUseCase() {
+        return new GetInquiriesUseCase(this.inquiryRepository);
+    }
+
+    getGetInquiryByIdUseCase() {
+        return new GetInquiryByIdUseCase(this.inquiryRepository);
+    }
+
+    getCreateInquiryUseCase() {
+        return new CreateInquiryUseCase(this.inquiryRepository);
+    }
+
+    getUpdateInquiryUseCase() {
+        return new UpdateInquiryUseCase(this.inquiryRepository);
+    }
+
+    getDeleteInquiryUseCase() {
+        return new DeleteInquiryUseCase(this.inquiryRepository);
+    }
+
+    getResolveInquiryUseCase() {
+        return new ResolveInquiryUseCase(this.inquiryRepository);
+    }
+
+    getCloseInquiryUseCase() {
+        return new CloseInquiryUseCase(this.inquiryRepository);
+    }
+
+    getAddInquiryResponseUseCase() {
+        return new AddInquiryResponseUseCase(this.inquiryRepository);
+    }
+
+    getGetInquiryResponsesUseCase() {
+        return new GetInquiryResponsesUseCase(this.inquiryRepository);
     }
 }
