@@ -1,0 +1,94 @@
+// Chat (Real-time Communication) Schema
+
+// チャットルームステータス
+enum ChatRoomStatus {
+    ACTIVE
+    ARCHIVED
+    CLOSED
+
+    @@map("chat_room_status")
+}
+
+// チャット参加者ロール
+enum ChatParticipantRole {
+    CUSTOMER
+    AGENT
+    OBSERVER
+
+    @@map("chat_participant_role")
+}
+
+// メッセージタイプ
+enum ChatMessageType {
+    TEXT
+    IMAGE
+    FILE
+    SYSTEM
+
+    @@map("chat_message_type")
+}
+
+// チャットルーム
+model ChatRoom {
+    id          String         @id @default(uuid())
+    customerId  String?        @map("customer_id")
+    inquiryId   String?        @unique @map("inquiry_id")
+    name        String?
+    status      ChatRoomStatus @default(ACTIVE)
+    metadata    String?        @db.Text // JSON object as string
+    closedAt    DateTime?      @map("closed_at")
+    createdAt   DateTime       @default(now()) @map("created_at")
+    updatedAt   DateTime       @updatedAt @map("updated_at")
+
+    customer     Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+    inquiry      Inquiry?          @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+    participants ChatParticipant[]
+    messages     ChatMessage[]
+
+    @@index([customerId])
+    @@index([status])
+    @@map("chat_rooms")
+}
+
+// チャット参加者
+model ChatParticipant {
+    id         String              @id @default(uuid())
+    chatRoomId String              @map("chat_room_id")
+    userId     String?             @map("user_id")
+    name       String              // 表示名
+    role       ChatParticipantRole @default(CUSTOMER)
+    isOnline   Boolean             @default(false) @map("is_online")
+    lastSeenAt DateTime?           @map("last_seen_at")
+    joinedAt   DateTime            @default(now()) @map("joined_at")
+    leftAt     DateTime?           @map("left_at")
+    createdAt  DateTime            @default(now()) @map("created_at")
+    updatedAt  DateTime            @updatedAt @map("updated_at")
+
+    chatRoom ChatRoom      @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+    user     User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+    messages ChatMessage[]
+
+    @@unique([chatRoomId, userId])
+    @@index([chatRoomId])
+    @@map("chat_participants")
+}
+
+// チャットメッセージ
+model ChatMessage {
+    id            String          @id @default(uuid())
+    chatRoomId    String          @map("chat_room_id")
+    participantId String          @map("participant_id")
+    type          ChatMessageType @default(TEXT)
+    content       String          @db.Text
+    metadata      String?         @db.Text // JSON object as string (file info, etc.)
+    readBy        String?         @map("read_by") // JSON array of participant IDs
+    createdAt     DateTime        @default(now()) @map("created_at")
+    updatedAt     DateTime        @updatedAt @map("updated_at")
+
+    chatRoom    ChatRoom        @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+    participant ChatParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+    @@index([chatRoomId])
+    @@index([createdAt])
+    @@map("chat_messages")
+}

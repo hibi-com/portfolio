@@ -8,10 +8,8 @@
         "@commitlint/config-conventional": "20.3.0",
         "@portfolio/changelog-config": "tooling/changelog-config",
         "@portfolio/scripts-check": "scripts/check",
-        "@portfolio/scripts-env": "scripts/env",
         "@portfolio/scripts-workspace": "scripts/workspace",
         "concurrently": "9.2.1",
-        "dotenv-cli": "11.0.0",
         "knip": "5.79.0",
         "lefthook": "2.0.13",
         "renovate": "41.0.0",
@@ -393,17 +391,6 @@
         "@types/node": "25.0.3",
         "cac": "6.7.14",
         "picocolors": "1.1.1",
-        "typescript": "5.9.3",
-      },
-    },
-    "scripts/env": {
-      "name": "@portfolio/scripts-env",
-      "version": "1.0.1",
-      "devDependencies": {
-        "@portfolio/biome-config": "tooling/biome-config",
-        "@portfolio/tsconfig": "tooling/tsconfig",
-        "@types/bun": "1.3.5",
-        "@types/node": "25.0.3",
         "typescript": "5.9.3",
       },
     },
@@ -1618,11 +1605,9 @@
 
     "@portfolio/prisma-markdown": ["@portfolio/prisma-markdown@workspace:tooling/prisma-markdown", { "dependencies": { "@prisma/generator-helper": "7.3.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "typescript": "5.9.3" }, "bin": { "prisma-markdown": "./dist/cmd/main.js" } }],
 
-    "@portfolio/scripts-check": ["@portfolio/scripts-check@workspace:scripts/check", { "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "@types/node": "25.0.3", "cac": "6.7.14", "picocolors": "1.1.1", "typescript": "5.9.3" }, "bin": { "check": "./dist/cmd/main.js" } }],
+    "@portfolio/scripts-check": ["@portfolio/scripts-check@workspace:scripts/check", { "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "@types/node": "25.0.3", "cac": "6.7.14", "picocolors": "1.1.1", "typescript": "5.9.3" }, "bin": { "check": "./bin/main.js" } }],
 
-    "@portfolio/scripts-env": ["@portfolio/scripts-env@workspace:scripts/env", { "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "@types/node": "25.0.3", "typescript": "5.9.3" }, "bin": { "env": "./dist/cmd/main.js" } }],
-
-    "@portfolio/scripts-workspace": ["@portfolio/scripts-workspace@workspace:scripts/workspace", { "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "@types/node": "25.0.3", "cac": "6.7.14", "picocolors": "1.1.1", "typescript": "5.9.3", "vitest": "3.2.4" }, "bin": { "workspace": "./dist/cmd/main.js" } }],
+    "@portfolio/scripts-workspace": ["@portfolio/scripts-workspace@workspace:scripts/workspace", { "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "@types/node": "25.0.3", "cac": "6.7.14", "picocolors": "1.1.1", "typescript": "5.9.3", "vitest": "3.2.4" }, "bin": { "workspace": "./bin/main.js" } }],
 
     "@portfolio/storybook-config": ["@portfolio/storybook-config@workspace:tooling/storybook-config", { "dependencies": { "@storybook/addon-a11y": "8.6.14", "@storybook/addon-essentials": "8.6.14", "@storybook/addon-interactions": "8.6.14", "@storybook/addon-links": "8.6.14", "@storybook/react": "8.6.14", "@storybook/react-vite": "8.6.14", "@storybook/test": "8.6.15", "@storybook/theming": "8.6.14", "react": "18.3.1", "react-dom": "18.3.1", "react-router": "7.11.0", "vite": "6.1.0", "vite-tsconfig-paths": "6.0.3" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "storybook": "8.6.14", "typescript": "5.9.3" } }],
 
@@ -3283,10 +3268,6 @@
     "dot-prop": ["dot-prop@5.3.0", "", { "dependencies": { "is-obj": "^2.0.0" } }, "sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q=="],
 
     "dotenv": ["dotenv@17.2.3", "", {}, "sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w=="],
-
-    "dotenv-cli": ["dotenv-cli@11.0.0", "", { "dependencies": { "cross-spawn": "^7.0.6", "dotenv": "^17.1.0", "dotenv-expand": "^12.0.0", "minimist": "^1.2.6" }, "bin": { "dotenv": "cli.js" } }, "sha512-r5pA8idbk7GFWuHEU7trSTflWcdBpQEK+Aw17UrSHjS6CReuhrrPcyC3zcQBPQvhArRHnBo/h6eLH1fkCvNlww=="],
-
-    "dotenv-expand": ["dotenv-expand@12.0.3", "", { "dependencies": { "dotenv": "^16.4.5" } }, "sha512-uc47g4b+4k/M/SeaW1y4OApx+mtLWl92l5LMPP0GNXctZqELk+YGgOPIIC5elYmUH4OuoK3JLhuRUYegeySiFA=="],
 
     "doublearray": ["doublearray@0.0.2", "", {}, "sha512-aw55FtZzT6AmiamEj2kvmR6BuFqvYgKZUkfQ7teqVRNqD5UE0rw8IeW/3gieHNKQ5sPuDKlljWEn4bzv5+1bHw=="],
 
@@ -7073,8 +7054,6 @@
     "diffie-hellman/bn.js": ["bn.js@4.12.2", "", {}, "sha512-n4DSx829VRTRByMRGdjQ9iqsN0Bh4OolPsFnaZBLcbi8iXcB+kJ9s7EnRt4wILZNV3kPLHkRVfOc/HvhC3ovDw=="],
 
     "dir-glob/path-type": ["path-type@4.0.0", "", {}, "sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw=="],
-
-    "dotenv-expand/dotenv": ["dotenv@16.6.1", "", {}, "sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow=="],
 
     "duplexify/readable-stream": ["readable-stream@2.3.8", "", { "dependencies": { "core-util-is": "~1.0.0", "inherits": "~2.0.3", "isarray": "~1.0.0", "process-nextick-args": "~2.0.0", "safe-buffer": "~5.1.1", "string_decoder": "~1.1.1", "util-deprecate": "~1.0.1" } }, "sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA=="],
 

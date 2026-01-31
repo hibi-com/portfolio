@@ -1,0 +1,83 @@
+// Inquiry (Support Ticket) Schema
+
+// 問い合わせステータス
+enum InquiryStatus {
+    OPEN
+    IN_PROGRESS
+    WAITING_CUSTOMER
+    RESOLVED
+    CLOSED
+
+    @@map("inquiry_status")
+}
+
+// 問い合わせ優先度
+enum InquiryPriority {
+    LOW
+    MEDIUM
+    HIGH
+    URGENT
+
+    @@map("inquiry_priority")
+}
+
+// 問い合わせカテゴリ
+enum InquiryCategory {
+    GENERAL
+    TECHNICAL
+    BILLING
+    SALES
+    COMPLAINT
+    FEATURE_REQUEST
+    OTHER
+
+    @@map("inquiry_category")
+}
+
+// 問い合わせ
+model Inquiry {
+    id          String          @id @default(uuid())
+    customerId  String?         @map("customer_id")
+    assigneeId  String?         @map("assignee_id") // 担当者
+    subject     String
+    content     String          @db.Text
+    status      InquiryStatus   @default(OPEN)
+    priority    InquiryPriority @default(MEDIUM)
+    category    InquiryCategory @default(GENERAL)
+    tags        String?         // JSON array as string
+    source      String?         // 流入元 (web, email, chat, phone)
+    metadata    String?         @db.Text // JSON object as string
+    resolvedAt  DateTime?       @map("resolved_at")
+    closedAt    DateTime?       @map("closed_at")
+    createdAt   DateTime        @default(now()) @map("created_at")
+    updatedAt   DateTime        @updatedAt @map("updated_at")
+
+    customer  Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+    assignee  User?             @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+    responses InquiryResponse[]
+    chatRoom  ChatRoom?
+
+    @@index([customerId])
+    @@index([assigneeId])
+    @@index([status])
+    @@index([priority])
+    @@map("inquiries")
+}
+
+// 問い合わせ返信
+model InquiryResponse {
+    id          String   @id @default(uuid())
+    inquiryId   String   @map("inquiry_id")
+    userId      String?  @map("user_id") // 返信者 (null = 顧客からの返信)
+    content     String   @db.Text
+    isInternal  Boolean  @default(false) @map("is_internal") // 内部メモ
+    attachments String?  // JSON array as string (ファイルURL)
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    inquiry Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+    user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    @@index([inquiryId])
+    @@map("inquiry_responses")
+}

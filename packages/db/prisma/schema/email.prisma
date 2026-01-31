@@ -1,0 +1,77 @@
+// Email Schema (Resend Integration)
+
+// メール送信ステータス
+enum EmailStatus {
+    PENDING
+    SENT
+    DELIVERED
+    BOUNCED
+    FAILED
+
+    @@map("email_status")
+}
+
+// メールテンプレートカテゴリ
+enum EmailTemplateCategory {
+    MARKETING
+    TRANSACTIONAL
+    SUPPORT
+    NOTIFICATION
+
+    @@map("email_template_category")
+}
+
+// メール送信ログ
+model EmailLog {
+    id           String      @id @default(uuid())
+    customerId   String?     @map("customer_id")
+    templateId   String?     @map("template_id")
+    resendId     String?     @map("resend_id") // Resend API response ID
+    fromEmail    String      @map("from_email")
+    toEmail      String      @map("to_email")
+    ccEmail      String?     @map("cc_email")
+    bccEmail     String?     @map("bcc_email")
+    subject      String
+    htmlContent  String?     @map("html_content") @db.Text
+    textContent  String?     @map("text_content") @db.Text
+    status       EmailStatus @default(PENDING)
+    errorMessage String?     @map("error_message") @db.Text
+    sentAt       DateTime?   @map("sent_at")
+    deliveredAt  DateTime?   @map("delivered_at")
+    openedAt     DateTime?   @map("opened_at")
+    clickedAt    DateTime?   @map("clicked_at")
+    bouncedAt    DateTime?   @map("bounced_at")
+    metadata     String?     @db.Text // JSON object as string
+    createdAt    DateTime    @default(now()) @map("created_at")
+    updatedAt    DateTime    @updatedAt @map("updated_at")
+
+    customer Customer?      @relation(fields: [customerId], references: [id], onDelete: SetNull)
+    template EmailTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+    @@index([customerId])
+    @@index([status])
+    @@index([createdAt])
+    @@map("email_logs")
+}
+
+// メールテンプレート
+model EmailTemplate {
+    id           String                @id @default(uuid())
+    name         String
+    slug         String                @unique
+    description  String?               @db.Text
+    category     EmailTemplateCategory @default(TRANSACTIONAL)
+    subject      String
+    htmlContent  String                @map("html_content") @db.Text
+    textContent  String?               @map("text_content") @db.Text
+    variables    String?               // JSON array of variable names
+    isActive     Boolean               @default(true) @map("is_active")
+    createdAt    DateTime              @default(now()) @map("created_at")
+    updatedAt    DateTime              @updatedAt @map("updated_at")
+
+    emailLogs EmailLog[]
+
+    @@index([category])
+    @@index([isActive])
+    @@map("email_templates")
+}

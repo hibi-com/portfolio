@@ -1,0 +1,177 @@
+// CRM (Customer Relationship Management) Schema
+
+// 顧客ステータス
+enum CustomerStatus {
+    ACTIVE
+    INACTIVE
+    PROSPECT
+    CHURNED
+
+    @@map("customer_status")
+}
+
+// リードステータス
+enum LeadStatus {
+    NEW
+    CONTACTED
+    QUALIFIED
+    UNQUALIFIED
+    CONVERTED
+
+    @@map("lead_status")
+}
+
+// 商談ステータス
+enum DealStatus {
+    OPEN
+    WON
+    LOST
+    STALLED
+
+    @@map("deal_status")
+}
+
+// コンタクト種別
+enum ContactType {
+    EMAIL
+    PHONE
+    MEETING
+    CHAT
+    NOTE
+    OTHER
+
+    @@map("contact_type")
+}
+
+// 顧客
+model Customer {
+    id             String         @id @default(uuid())
+    name           String
+    email          String?
+    phone          String?
+    company        String?
+    website        String?
+    address        String?        @db.Text
+    notes          String?        @db.Text
+    status         CustomerStatus @default(PROSPECT)
+    tags           String?        // JSON array as string
+    customFields   String?        @map("custom_fields") @db.Text // JSON object as string
+    createdAt      DateTime       @default(now()) @map("created_at")
+    updatedAt      DateTime       @updatedAt @map("updated_at")
+
+    leads           Lead[]
+    deals           Deal[]
+    contactHistory  ContactHistory[]
+    inquiries       Inquiry[]
+    chatRooms       ChatRoom[]
+    emailLogs       EmailLog[]
+    freeeMappings   CustomerFreeeMapping[]
+
+    @@index([email])
+    @@index([status])
+    @@map("customers")
+}
+
+// リード（見込み客）
+model Lead {
+    id           String     @id @default(uuid())
+    customerId   String?    @map("customer_id")
+    name         String
+    email        String?
+    phone        String?
+    company      String?
+    source       String?    // 流入元 (web, referral, ad, etc.)
+    status       LeadStatus @default(NEW)
+    score        Int?       // リードスコア
+    notes        String?    @db.Text
+    convertedAt  DateTime?  @map("converted_at")
+    createdAt    DateTime   @default(now()) @map("created_at")
+    updatedAt    DateTime   @updatedAt @map("updated_at")
+
+    customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+    deal     Deal?
+
+    @@index([email])
+    @@index([status])
+    @@map("leads")
+}
+
+// パイプライン
+model Pipeline {
+    id          String   @id @default(uuid())
+    name        String
+    description String?  @db.Text
+    isDefault   Boolean  @default(false) @map("is_default")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    stages PipelineStage[]
+
+    @@map("pipelines")
+}
+
+// パイプラインステージ
+model PipelineStage {
+    id          String   @id @default(uuid())
+    pipelineId  String   @map("pipeline_id")
+    name        String
+    order       Int
+    probability Int?     // 成約確率 (0-100)
+    color       String?  // ステージの色 (hex)
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+    deals    Deal[]
+
+    @@index([pipelineId, order])
+    @@map("pipeline_stages")
+}
+
+// 商談
+model Deal {
+    id             String     @id @default(uuid())
+    customerId     String?    @map("customer_id")
+    leadId         String?    @unique @map("lead_id")
+    stageId        String     @map("stage_id")
+    name           String
+    value          Decimal?   @db.Decimal(15, 2) // 商談金額
+    currency       String     @default("JPY")
+    expectedCloseDate DateTime? @map("expected_close_date")
+    actualCloseDate DateTime? @map("actual_close_date")
+    status         DealStatus @default(OPEN)
+    notes          String?    @db.Text
+    lostReason     String?    @map("lost_reason") @db.Text
+    createdAt      DateTime   @default(now()) @map("created_at")
+    updatedAt      DateTime   @updatedAt @map("updated_at")
+
+    customer      Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+    lead          Lead?             @relation(fields: [leadId], references: [id], onDelete: SetNull)
+    stage         PipelineStage     @relation(fields: [stageId], references: [id])
+    freeeMappings DealFreeeMapping[]
+
+    @@index([customerId])
+    @@index([stageId])
+    @@index([status])
+    @@map("deals")
+}
+
+// コンタクト履歴
+model ContactHistory {
+    id          String      @id @default(uuid())
+    customerId  String      @map("customer_id")
+    userId      String?     @map("user_id") // 担当者
+    type        ContactType
+    subject     String?
+    content     String?     @db.Text
+    contactedAt DateTime    @default(now()) @map("contacted_at")
+    createdAt   DateTime    @default(now()) @map("created_at")
+    updatedAt   DateTime    @updatedAt @map("updated_at")
+
+    customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+    user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    @@index([customerId])
+    @@index([contactedAt])
+    @@map("contact_histories")
+}

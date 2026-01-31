@@ -13,6 +13,13 @@ model User {
   experiences   UserExperience[]
   socials       UserSocial[]
 
+  // CRM Relations
+  contactHistories   ContactHistory[]
+  assignedInquiries  Inquiry[]
+  inquiryResponses   InquiryResponse[]
+  chatParticipations ChatParticipant[]
+  freeeIntegrations  FreeeIntegration[]
+
   @@unique([email])
   @@map("user")
 }
