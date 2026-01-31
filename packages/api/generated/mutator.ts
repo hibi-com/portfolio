@@ -17,6 +17,7 @@ export const customInstance = <T>(config: AxiosRequestConfig, options?: AxiosReq
         ...options,
         baseURL: getBaseUrl(),
         cancelToken: source.token,
+        withCredentials: true,
     }).then(({ data }: AxiosResponse<T>) => data);
 
     // @ts-expect-error - CancelToken is deprecated but we need it for compatibility

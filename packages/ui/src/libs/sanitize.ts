@@ -1,3 +1,5 @@
+import DOMPurify from "isomorphic-dompurify";
+
 const SANITIZE_CONFIG = {
     ALLOWED_TAGS: [
         "p",
@@ -35,15 +37,10 @@ const SANITIZE_CONFIG = {
 
 /**
  * HTMLコンテンツをサニタイズする
- * サーバーサイド（Cloudflare Workers）ではそのまま返し、クライアントサイドでのみサニタイズする
+ * サーバーサイドとクライアントサイドの両方でサニタイズを実行し、XSSを防止する
  * @param html - サニタイズするHTML文字列
  * @returns サニタイズされたHTML文字列
  */
 export const sanitizeHtml = (html: string): string => {
-    if (typeof window === "undefined") {
-        return html;
-    }
-
-    const DOMPurify = require("isomorphic-dompurify").default;
     return DOMPurify.sanitize(html, SANITIZE_CONFIG);
 };

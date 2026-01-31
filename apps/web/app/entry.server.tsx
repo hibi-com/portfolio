@@ -40,6 +40,12 @@ async function handleRequest(
     }
 
     responseHeaders.set("Content-Type", "text/html");
+    responseHeaders.set("X-Frame-Options", "SAMEORIGIN");
+    responseHeaders.set("X-Content-Type-Options", "nosniff");
+    responseHeaders.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    responseHeaders.set("X-XSS-Protection", "1; mode=block");
+    responseHeaders.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+
     return new Response(body, {
         headers: responseHeaders,
         status: statusCode,
