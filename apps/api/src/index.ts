@@ -23,6 +23,8 @@ type Env = {
     RESEND_API_KEY?: string;
     RESEND_FROM_EMAIL?: string;
     CHAT_ROOMS?: DurableObjectNamespace;
+    FREEE_CLIENT_ID?: string;
+    FREEE_CLIENT_SECRET?: string;
 };
 
 const app = new Hono<{ Bindings: Env }>();

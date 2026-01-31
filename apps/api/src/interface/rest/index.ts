@@ -2,6 +2,16 @@ import { Hono } from "hono";
 import { authenticate } from "../middleware/auth";
 import { createRateLimiter } from "../middleware/rateLimit";
 import {
+    addChatParticipant,
+    closeChatRoom,
+    createChatRoom,
+    getChatMessages,
+    getChatRoomById,
+    getChatRooms,
+    handleChatWebSocket,
+    sendChatMessage,
+} from "./chat";
+import {
     convertLeadToDeal,
     createCustomer,
     createDeal,
@@ -36,18 +46,17 @@ import {
     sendEmailWithTemplate,
     updateEmailTemplate,
 } from "./email";
+import {
+    disconnectFreee,
+    getFreeeAuthUrl,
+    getFreeeIntegration,
+    getSyncLogs,
+    handleFreeeCallback,
+    syncPartnersFromFreee,
+    syncPartnersToFreee,
+} from "./freee";
 import { getPortfolioBySlug, getPortfolios, uploadPortfolioImage } from "./portfolios";
 import { getPostBySlug, getPosts } from "./posts";
-import {
-    addChatParticipant,
-    closeChatRoom,
-    createChatRoom,
-    getChatMessages,
-    getChatRoomById,
-    getChatRooms,
-    handleChatWebSocket,
-    sendChatMessage,
-} from "./chat";
 import {
     addInquiryResponse,
     closeInquiry,
@@ -473,3 +482,64 @@ restRouter.post("/chat/rooms/:id/messages", chatRateLimiter, async (c) => {
 });
 
 restRouter.get("/chat/rooms/:id/ws", handleChatWebSocket);
+
+const freeeRateLimiter = createRateLimiter({
+    maxRequests: 30,
+    windowMs: 60000,
+});
+
+restRouter.get("/freee/auth", freeeRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getFreeeAuthUrl(c);
+});
+
+restRouter.post("/freee/callback", freeeRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return handleFreeeCallback(c);
+});
+
+restRouter.get("/freee/integration", freeeRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getFreeeIntegration(c);
+});
+
+restRouter.post("/freee/:id/disconnect", freeeRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return disconnectFreee(c);
+});
+
+restRouter.post("/freee/:id/sync/partners/import", freeeRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return syncPartnersFromFreee(c);
+});
+
+restRouter.post("/freee/:id/sync/partners/export", freeeRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return syncPartnersToFreee(c);
+});
+
+restRouter.get("/freee/:id/sync/logs", freeeRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getSyncLogs(c);
+});

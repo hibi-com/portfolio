@@ -6,6 +6,9 @@ import { CustomerRepositoryImpl } from "~/infra/customer.repository";
 import { DealRepositoryImpl } from "~/infra/deal.repository";
 import { EmailRepositoryImpl } from "~/infra/email.repository";
 import { ResendEmailService } from "~/infra/email.service";
+import { FreeeRepositoryImpl } from "~/infra/freee.repository";
+import { FreeeOAuthServiceImpl } from "~/infra/freee-oauth.service";
+import { FreeeSyncServiceImpl } from "~/infra/freee-sync.service";
 import { InquiryRepositoryImpl } from "~/infra/inquiry.repository";
 import { LeadRepositoryImpl } from "~/infra/lead.repository";
 import { PipelineRepositoryImpl } from "~/infra/pipeline.repository";
@@ -44,6 +47,15 @@ import {
     SendEmailWithTemplateUseCase,
     UpdateEmailTemplateUseCase,
 } from "~/usecase/email";
+import {
+    DisconnectFreeeUseCase,
+    GetFreeeAuthUrlUseCase,
+    GetFreeeIntegrationUseCase,
+    GetSyncLogsUseCase,
+    HandleFreeeCallbackUseCase,
+    SyncPartnersFromFreeeUseCase,
+    SyncPartnersToFreeeUseCase,
+} from "~/usecase/freee";
 import { GetPortfolioBySlugUseCase } from "~/usecase/getPortfolioBySlug";
 import { GetPortfoliosUseCase } from "~/usecase/getPortfolios";
 import { GetPostBySlugUseCase } from "~/usecase/getPostBySlug";
@@ -86,6 +98,7 @@ export class DIContainer {
     private readonly inquiryRepository: InquiryRepositoryImpl;
     private readonly emailRepository: EmailRepositoryImpl;
     private readonly chatRepository: ChatRepositoryImpl;
+    private readonly freeeRepository: FreeeRepositoryImpl;
 
     constructor(
         readonly databaseUrl?: string,
@@ -102,6 +115,7 @@ export class DIContainer {
         this.inquiryRepository = new InquiryRepositoryImpl(databaseUrl);
         this.emailRepository = new EmailRepositoryImpl(databaseUrl);
         this.chatRepository = new ChatRepositoryImpl(databaseUrl);
+        this.freeeRepository = new FreeeRepositoryImpl(databaseUrl);
     }
 
     getPostRepository() {
@@ -351,5 +365,43 @@ export class DIContainer {
 
     getSendChatMessageUseCase() {
         return new SendChatMessageUseCase(this.chatRepository);
+    }
+
+    getFreeeRepository() {
+        return this.freeeRepository;
+    }
+
+    getGetFreeeAuthUrlUseCase(clientId: string, clientSecret: string) {
+        const oauthService = new FreeeOAuthServiceImpl(clientId, clientSecret);
+        return new GetFreeeAuthUrlUseCase(oauthService);
+    }
+
+    getHandleFreeeCallbackUseCase(clientId: string, clientSecret: string) {
+        const oauthService = new FreeeOAuthServiceImpl(clientId, clientSecret);
+        return new HandleFreeeCallbackUseCase(this.freeeRepository, oauthService);
+    }
+
+    getGetFreeeIntegrationUseCase() {
+        return new GetFreeeIntegrationUseCase(this.freeeRepository);
+    }
+
+    getDisconnectFreeeUseCase() {
+        return new DisconnectFreeeUseCase(this.freeeRepository);
+    }
+
+    getSyncPartnersFromFreeeUseCase(clientId: string, clientSecret: string) {
+        const oauthService = new FreeeOAuthServiceImpl(clientId, clientSecret);
+        const syncService = new FreeeSyncServiceImpl(this.freeeRepository, this.customerRepository, oauthService);
+        return new SyncPartnersFromFreeeUseCase(syncService);
+    }
+
+    getSyncPartnersToFreeeUseCase(clientId: string, clientSecret: string) {
+        const oauthService = new FreeeOAuthServiceImpl(clientId, clientSecret);
+        const syncService = new FreeeSyncServiceImpl(this.freeeRepository, this.customerRepository, oauthService);
+        return new SyncPartnersToFreeeUseCase(syncService);
+    }
+
+    getGetSyncLogsUseCase() {
+        return new GetSyncLogsUseCase(this.freeeRepository);
     }
 }
