@@ -3,6 +3,8 @@ import { CachedPortfolioRepository } from "~/infra/cached-portfolio.repository";
 import { CachedPostRepository } from "~/infra/cached-post.repository";
 import { CustomerRepositoryImpl } from "~/infra/customer.repository";
 import { DealRepositoryImpl } from "~/infra/deal.repository";
+import { EmailRepositoryImpl } from "~/infra/email.repository";
+import { ResendEmailService } from "~/infra/email.service";
 import { InquiryRepositoryImpl } from "~/infra/inquiry.repository";
 import { LeadRepositoryImpl } from "~/infra/lead.repository";
 import { PipelineRepositoryImpl } from "~/infra/pipeline.repository";
@@ -21,6 +23,17 @@ import {
     MoveDealToStageUseCase,
     UpdateDealUseCase,
 } from "~/usecase/deal";
+import {
+    CreateEmailTemplateUseCase,
+    DeleteEmailTemplateUseCase,
+    GetEmailLogByIdUseCase,
+    GetEmailLogsUseCase,
+    GetEmailTemplateByIdUseCase,
+    GetEmailTemplatesUseCase,
+    SendEmailUseCase,
+    SendEmailWithTemplateUseCase,
+    UpdateEmailTemplateUseCase,
+} from "~/usecase/email";
 import { GetPortfolioBySlugUseCase } from "~/usecase/getPortfolioBySlug";
 import { GetPortfoliosUseCase } from "~/usecase/getPortfolios";
 import { GetPostBySlugUseCase } from "~/usecase/getPostBySlug";
@@ -61,6 +74,7 @@ export class DIContainer {
     private readonly dealRepository: DealRepositoryImpl;
     private readonly pipelineRepository: PipelineRepositoryImpl;
     private readonly inquiryRepository: InquiryRepositoryImpl;
+    private readonly emailRepository: EmailRepositoryImpl;
 
     constructor(
         readonly databaseUrl?: string,
@@ -75,6 +89,7 @@ export class DIContainer {
         this.dealRepository = new DealRepositoryImpl(databaseUrl);
         this.pipelineRepository = new PipelineRepositoryImpl(databaseUrl);
         this.inquiryRepository = new InquiryRepositoryImpl(databaseUrl);
+        this.emailRepository = new EmailRepositoryImpl(databaseUrl);
     }
 
     getPostRepository() {
@@ -250,5 +265,47 @@ export class DIContainer {
 
     getGetInquiryResponsesUseCase() {
         return new GetInquiryResponsesUseCase(this.inquiryRepository);
+    }
+
+    getEmailRepository() {
+        return this.emailRepository;
+    }
+
+    getGetEmailLogsUseCase() {
+        return new GetEmailLogsUseCase(this.emailRepository);
+    }
+
+    getGetEmailLogByIdUseCase() {
+        return new GetEmailLogByIdUseCase(this.emailRepository);
+    }
+
+    getGetEmailTemplatesUseCase() {
+        return new GetEmailTemplatesUseCase(this.emailRepository);
+    }
+
+    getGetEmailTemplateByIdUseCase() {
+        return new GetEmailTemplateByIdUseCase(this.emailRepository);
+    }
+
+    getCreateEmailTemplateUseCase() {
+        return new CreateEmailTemplateUseCase(this.emailRepository);
+    }
+
+    getUpdateEmailTemplateUseCase() {
+        return new UpdateEmailTemplateUseCase(this.emailRepository);
+    }
+
+    getDeleteEmailTemplateUseCase() {
+        return new DeleteEmailTemplateUseCase(this.emailRepository);
+    }
+
+    getSendEmailUseCase(resendApiKey: string, defaultFromEmail: string) {
+        const emailService = new ResendEmailService(this.emailRepository, resendApiKey, defaultFromEmail);
+        return new SendEmailUseCase(emailService);
+    }
+
+    getSendEmailWithTemplateUseCase(resendApiKey: string, defaultFromEmail: string) {
+        const emailService = new ResendEmailService(this.emailRepository, resendApiKey, defaultFromEmail);
+        return new SendEmailWithTemplateUseCase(emailService);
     }
 }

@@ -25,6 +25,17 @@ import {
     updateLead,
     updatePipeline,
 } from "./crm";
+import {
+    createEmailTemplate,
+    deleteEmailTemplate,
+    getEmailLogById,
+    getEmailLogs,
+    getEmailTemplateById,
+    getEmailTemplates,
+    sendEmail,
+    sendEmailWithTemplate,
+    updateEmailTemplate,
+} from "./email";
 import { getPortfolioBySlug, getPortfolios, uploadPortfolioImage } from "./portfolios";
 import { getPostBySlug, getPosts } from "./posts";
 import {
@@ -311,4 +322,81 @@ restRouter.post("/support/inquiries/:id/responses", crmRateLimiter, async (c) =>
         return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
     }
     return addInquiryResponse(c);
+});
+
+const emailRateLimiter = createRateLimiter({
+    maxRequests: 50,
+    windowMs: 60000,
+});
+
+restRouter.get("/email/logs", emailRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getEmailLogs(c);
+});
+
+restRouter.get("/email/logs/:id", emailRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getEmailLogById(c);
+});
+
+restRouter.get("/email/templates", emailRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getEmailTemplates(c);
+});
+
+restRouter.get("/email/templates/:id", emailRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getEmailTemplateById(c);
+});
+
+restRouter.post("/email/templates", emailRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return createEmailTemplate(c);
+});
+
+restRouter.put("/email/templates/:id", emailRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return updateEmailTemplate(c);
+});
+
+restRouter.delete("/email/templates/:id", emailRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return deleteEmailTemplate(c);
+});
+
+restRouter.post("/email/send", emailRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return sendEmail(c);
+});
+
+restRouter.post("/email/send-with-template", emailRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return sendEmailWithTemplate(c);
 });
