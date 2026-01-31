@@ -1,9 +1,13 @@
+import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { createPrismaClient } from "@portfolio/db";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 import { restRouter } from "./interface/rest";
+import { ChatRoomDO } from "./interface/websocket/ChatRoomDO";
 import { getLogger, initLogger } from "./lib/logger";
+
+export { ChatRoomDO };
 
 type Env = {
     DATABASE_URL: string;
@@ -16,6 +20,9 @@ type Env = {
     GOOGLE_CLIENT_ID?: string;
     GOOGLE_CLIENT_SECRET?: string;
     CORS_ORIGINS?: string;
+    RESEND_API_KEY?: string;
+    RESEND_FROM_EMAIL?: string;
+    CHAT_ROOMS?: DurableObjectNamespace;
 };
 
 const app = new Hono<{ Bindings: Env }>();

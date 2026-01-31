@@ -1,6 +1,7 @@
 import type { R2Bucket } from "@cloudflare/workers-types";
 import { CachedPortfolioRepository } from "~/infra/cached-portfolio.repository";
 import { CachedPostRepository } from "~/infra/cached-post.repository";
+import { ChatRepositoryImpl } from "~/infra/chat.repository";
 import { CustomerRepositoryImpl } from "~/infra/customer.repository";
 import { DealRepositoryImpl } from "~/infra/deal.repository";
 import { EmailRepositoryImpl } from "~/infra/email.repository";
@@ -8,6 +9,15 @@ import { ResendEmailService } from "~/infra/email.service";
 import { InquiryRepositoryImpl } from "~/infra/inquiry.repository";
 import { LeadRepositoryImpl } from "~/infra/lead.repository";
 import { PipelineRepositoryImpl } from "~/infra/pipeline.repository";
+import {
+    AddChatParticipantUseCase,
+    CloseChatRoomUseCase,
+    CreateChatRoomUseCase,
+    GetChatMessagesUseCase,
+    GetChatRoomByIdUseCase,
+    GetChatRoomsUseCase,
+    SendChatMessageUseCase,
+} from "~/usecase/chat";
 import {
     CreateCustomerUseCase,
     DeleteCustomerUseCase,
@@ -75,6 +85,7 @@ export class DIContainer {
     private readonly pipelineRepository: PipelineRepositoryImpl;
     private readonly inquiryRepository: InquiryRepositoryImpl;
     private readonly emailRepository: EmailRepositoryImpl;
+    private readonly chatRepository: ChatRepositoryImpl;
 
     constructor(
         readonly databaseUrl?: string,
@@ -90,6 +101,7 @@ export class DIContainer {
         this.pipelineRepository = new PipelineRepositoryImpl(databaseUrl);
         this.inquiryRepository = new InquiryRepositoryImpl(databaseUrl);
         this.emailRepository = new EmailRepositoryImpl(databaseUrl);
+        this.chatRepository = new ChatRepositoryImpl(databaseUrl);
     }
 
     getPostRepository() {
@@ -307,5 +319,37 @@ export class DIContainer {
     getSendEmailWithTemplateUseCase(resendApiKey: string, defaultFromEmail: string) {
         const emailService = new ResendEmailService(this.emailRepository, resendApiKey, defaultFromEmail);
         return new SendEmailWithTemplateUseCase(emailService);
+    }
+
+    getChatRepository() {
+        return this.chatRepository;
+    }
+
+    getGetChatRoomsUseCase() {
+        return new GetChatRoomsUseCase(this.chatRepository);
+    }
+
+    getGetChatRoomByIdUseCase() {
+        return new GetChatRoomByIdUseCase(this.chatRepository);
+    }
+
+    getCreateChatRoomUseCase() {
+        return new CreateChatRoomUseCase(this.chatRepository);
+    }
+
+    getCloseChatRoomUseCase() {
+        return new CloseChatRoomUseCase(this.chatRepository);
+    }
+
+    getAddChatParticipantUseCase() {
+        return new AddChatParticipantUseCase(this.chatRepository);
+    }
+
+    getGetChatMessagesUseCase() {
+        return new GetChatMessagesUseCase(this.chatRepository);
+    }
+
+    getSendChatMessageUseCase() {
+        return new SendChatMessageUseCase(this.chatRepository);
     }
 }

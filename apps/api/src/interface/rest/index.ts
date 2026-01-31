@@ -39,6 +39,16 @@ import {
 import { getPortfolioBySlug, getPortfolios, uploadPortfolioImage } from "./portfolios";
 import { getPostBySlug, getPosts } from "./posts";
 import {
+    addChatParticipant,
+    closeChatRoom,
+    createChatRoom,
+    getChatMessages,
+    getChatRoomById,
+    getChatRooms,
+    handleChatWebSocket,
+    sendChatMessage,
+} from "./chat";
+import {
     addInquiryResponse,
     closeInquiry,
     createInquiry,
@@ -400,3 +410,66 @@ restRouter.post("/email/send-with-template", emailRateLimiter, async (c) => {
     }
     return sendEmailWithTemplate(c);
 });
+
+const chatRateLimiter = createRateLimiter({
+    maxRequests: 100,
+    windowMs: 60000,
+});
+
+restRouter.get("/chat/rooms", chatRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getChatRooms(c);
+});
+
+restRouter.get("/chat/rooms/:id", chatRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getChatRoomById(c);
+});
+
+restRouter.post("/chat/rooms", chatRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return createChatRoom(c);
+});
+
+restRouter.post("/chat/rooms/:id/close", chatRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return closeChatRoom(c);
+});
+
+restRouter.post("/chat/rooms/:id/participants", chatRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return addChatParticipant(c);
+});
+
+restRouter.get("/chat/rooms/:id/messages", chatRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return getChatMessages(c);
+});
+
+restRouter.post("/chat/rooms/:id/messages", chatRateLimiter, async (c) => {
+    const user = await authenticate(c);
+    if (!user) {
+        return c.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, 401);
+    }
+    return sendChatMessage(c);
+});
+
+restRouter.get("/chat/rooms/:id/ws", handleChatWebSocket);
