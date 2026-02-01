@@ -5,3 +5,12 @@ main = "src/index.ts"
 
 [vars]
 NODE_ENV = "development"
+
+[durable_objects]
+bindings = [
+    { name = "CHAT_ROOMS", class_name = "ChatRoomDO" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["ChatRoomDO"]

@@ -9,7 +9,7 @@ interface ImportMetaEnv {
     readonly VITE_GOOGLE_ANALYTICS_ENABLED: "true" | "false";
     readonly VITE_GOOGLE_TAG_MANAGER_ENABLED: "true" | "false";
     readonly VITE_XSTATE_INSPECTOR_ENABLED: "true" | "false";
-    readonly VITE_SENTRY_DSN: string;
+    readonly SENTRY_DSN: string;
     readonly VITE_SENTRY_ENVIRONMENT: "production" | "development";
     readonly VITE_SENTRY_TRACES_SAMPLE_RATE: string;
     readonly VITE_SENTRY_REPLAY_SAMPLE_RATE: string;

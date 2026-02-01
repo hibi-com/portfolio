@@ -1,0 +1,27 @@
+{
+  "private": true,
+  "version": "0.1.0",
+  "name": "@portfolio/mock-apis",
+  "type": "module",
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir dist --target node --minify",
+    "clean:cache": "git clean -xdf .cache .turbo",
+    "clean:pkg": "git clean -xdf node_modules dist",
+    "dev": "bun run src/index.ts",
+    "fmt": "biome format --write .",
+    "fmt:check": "biome format .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "start": "bun run dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "4.6.14"
+  },
+  "devDependencies": {
+    "@portfolio/biome-config": "workspace:*",
+    "@portfolio/tsconfig": "workspace:*",
+    "@types/bun": "1.1.14",
+    "typescript": "5.9.3"
+  }
+}

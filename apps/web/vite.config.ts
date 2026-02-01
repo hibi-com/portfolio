@@ -26,6 +26,9 @@ const baseConfig = createViteConfig({
 export default mergeConfig(
     baseConfig,
     defineConfig({
+        define: {
+            "import.meta.env.SENTRY_DSN": JSON.stringify(process.env.SENTRY_DSN ?? "__undefined__"),
+        },
         assetsInclude: ["**/*.glb", "**/*.hdr", "**/*.glsl"],
         ssr: {
             external: ["@sentry/node"],

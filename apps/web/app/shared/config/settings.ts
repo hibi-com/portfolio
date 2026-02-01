@@ -6,7 +6,7 @@ export const GOOGLE_TAG_MANAGER_ENABLED = import.meta.env.VITE_GOOGLE_TAG_MANAGE
 
 export const XSTATE_INSPECTOR_ENABLED = import.meta.env.VITE_XSTATE_INSPECTOR_ENABLED === "true";
 
-export const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN ?? "__undefined__";
+export const SENTRY_DSN = import.meta.env.SENTRY_DSN ?? "__undefined__";
 export const SENTRY_ENVIRONMENT = import.meta.env.VITE_SENTRY_ENVIRONMENT ?? "development";
 export const SENTRY_TRACES_SAMPLE_RATE = import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE
     ? Number.parseFloat(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE)

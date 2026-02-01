@@ -9,13 +9,12 @@ FROM oven/bun:1.1.43-alpine
 
 WORKDIR /app
 
-COPY apps/api/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+COPY apps/api/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# 開発時は compose の volume で . が /app にマウントされ、ホストのソースで動く
 WORKDIR /app/apps/api
 
 EXPOSE 8787
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["bunx", "wrangler", "dev"]

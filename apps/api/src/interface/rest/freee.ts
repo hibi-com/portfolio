@@ -29,7 +29,14 @@ export async function getFreeeAuthUrl(c: Context) {
 
         const state = crypto.randomUUID();
 
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.REDIS_URL);
+        const container = new DIContainer(
+            c.env.DATABASE_URL,
+            c.env.REDIS_URL,
+            undefined,
+            undefined,
+            c.env.FREEE_AUTH_BASE_URL,
+            c.env.FREEE_API_BASE_URL,
+        );
         const useCase = container.getGetFreeeAuthUrlUseCase(freeeClientId, freeeClientSecret);
         const authUrl = useCase.execute(state, redirectUri);
 
@@ -85,7 +92,14 @@ export async function handleFreeeCallback(c: Context) {
             return c.json(validationError.toJSON(), validationError.httpStatus as StatusCode);
         }
 
-        const container = new DIContainer(databaseUrl, redisUrl);
+        const container = new DIContainer(
+            databaseUrl,
+            redisUrl,
+            undefined,
+            undefined,
+            c.env.FREEE_AUTH_BASE_URL,
+            c.env.FREEE_API_BASE_URL,
+        );
         const useCase = container.getHandleFreeeCallbackUseCase(freeeClientId, freeeClientSecret);
         const integration = await useCase.execute(code, redirectUri, userId);
 
@@ -127,7 +141,14 @@ export async function getFreeeIntegration(c: Context) {
     }
 
     try {
-        const container = new DIContainer(databaseUrl, redisUrl);
+        const container = new DIContainer(
+            databaseUrl,
+            redisUrl,
+            undefined,
+            undefined,
+            c.env.FREEE_AUTH_BASE_URL,
+            c.env.FREEE_API_BASE_URL,
+        );
         const useCase = container.getGetFreeeIntegrationUseCase();
         const integration = await useCase.execute(userId);
 
@@ -179,7 +200,14 @@ export async function disconnectFreee(c: Context) {
     }
 
     try {
-        const container = new DIContainer(databaseUrl, redisUrl);
+        const container = new DIContainer(
+            databaseUrl,
+            redisUrl,
+            undefined,
+            undefined,
+            c.env.FREEE_AUTH_BASE_URL,
+            c.env.FREEE_API_BASE_URL,
+        );
         const useCase = container.getDisconnectFreeeUseCase();
         await useCase.execute(id);
 
@@ -229,7 +257,14 @@ export async function syncPartnersFromFreee(c: Context) {
     }
 
     try {
-        const container = new DIContainer(databaseUrl, redisUrl);
+        const container = new DIContainer(
+            databaseUrl,
+            redisUrl,
+            undefined,
+            undefined,
+            c.env.FREEE_AUTH_BASE_URL,
+            c.env.FREEE_API_BASE_URL,
+        );
         const useCase = container.getSyncPartnersFromFreeeUseCase(freeeClientId, freeeClientSecret);
         const syncLog = await useCase.execute(id);
 
@@ -279,7 +314,14 @@ export async function syncPartnersToFreee(c: Context) {
     }
 
     try {
-        const container = new DIContainer(databaseUrl, redisUrl);
+        const container = new DIContainer(
+            databaseUrl,
+            redisUrl,
+            undefined,
+            undefined,
+            c.env.FREEE_AUTH_BASE_URL,
+            c.env.FREEE_API_BASE_URL,
+        );
         const useCase = container.getSyncPartnersToFreeeUseCase(freeeClientId, freeeClientSecret);
         const syncLog = await useCase.execute(id);
 
@@ -322,7 +364,14 @@ export async function getSyncLogs(c: Context) {
     try {
         const limit = c.req.query("limit") ? Number.parseInt(c.req.query("limit") as string, 10) : undefined;
 
-        const container = new DIContainer(databaseUrl, redisUrl);
+        const container = new DIContainer(
+            databaseUrl,
+            redisUrl,
+            undefined,
+            undefined,
+            c.env.FREEE_AUTH_BASE_URL,
+            c.env.FREEE_API_BASE_URL,
+        );
         const useCase = container.getGetSyncLogsUseCase();
         const logs = await useCase.execute(id, limit);
 

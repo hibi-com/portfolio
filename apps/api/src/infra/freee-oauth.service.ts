@@ -1,14 +1,21 @@
 import type { FreeeCompany, FreeeOAuthService, FreeeOAuthTokens } from "~/domain/freee";
 
-const FREEE_AUTH_URL = "https://accounts.secure.freee.co.jp/public_api/authorize";
-const FREEE_TOKEN_URL = "https://accounts.secure.freee.co.jp/public_api/token";
-const FREEE_API_URL = "https://api.freee.co.jp";
+const DEFAULT_FREEE_AUTH_BASE = "https://accounts.secure.freee.co.jp";
+const DEFAULT_FREEE_API_BASE = "https://api.freee.co.jp";
 
 export class FreeeOAuthServiceImpl implements FreeeOAuthService {
+    private readonly authBase: string;
+    private readonly apiBase: string;
+
     constructor(
         private readonly clientId: string,
         private readonly clientSecret: string,
-    ) {}
+        freeeAuthBaseUrl?: string,
+        freeeApiBaseUrl?: string,
+    ) {
+        this.authBase = freeeAuthBaseUrl?.replace(/\/$/, "") ?? DEFAULT_FREEE_AUTH_BASE;
+        this.apiBase = freeeApiBaseUrl?.replace(/\/$/, "") ?? DEFAULT_FREEE_API_BASE;
+    }
 
     getAuthorizationUrl(state: string, redirectUri: string): string {
         const params = new URLSearchParams({
@@ -18,11 +25,12 @@ export class FreeeOAuthServiceImpl implements FreeeOAuthService {
             state,
         });
 
-        return `${FREEE_AUTH_URL}?${params.toString()}`;
+        return `${this.authBase}/public_api/authorize?${params.toString()}`;
     }
 
     async exchangeCodeForTokens(code: string, redirectUri: string): Promise<FreeeOAuthTokens> {
-        const response = await fetch(FREEE_TOKEN_URL, {
+        const tokenUrl = `${this.authBase}/public_api/token`;
+        const response = await fetch(tokenUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -61,7 +69,8 @@ export class FreeeOAuthServiceImpl implements FreeeOAuthService {
     }
 
     async refreshTokens(refreshToken: string): Promise<FreeeOAuthTokens> {
-        const response = await fetch(FREEE_TOKEN_URL, {
+        const tokenUrl = `${this.authBase}/public_api/token`;
+        const response = await fetch(tokenUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -99,7 +108,7 @@ export class FreeeOAuthServiceImpl implements FreeeOAuthService {
     }
 
     async getCompanies(accessToken: string): Promise<FreeeCompany[]> {
-        const response = await fetch(`${FREEE_API_URL}/api/1/companies`, {
+        const response = await fetch(`${this.apiBase}/api/1/companies`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",

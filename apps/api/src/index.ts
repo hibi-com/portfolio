@@ -25,6 +25,8 @@ type Env = {
     CHAT_ROOMS?: DurableObjectNamespace;
     FREEE_CLIENT_ID?: string;
     FREEE_CLIENT_SECRET?: string;
+    FREEE_AUTH_BASE_URL?: string;
+    FREEE_API_BASE_URL?: string;
 };
 
 const app = new Hono<{ Bindings: Env }>();

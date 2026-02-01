@@ -57,12 +57,6 @@ import {
     SyncPartnersToFreeeUseCase,
 } from "~/usecase/freee";
 import {
-    GetPortfolioBySlugUseCase,
-    GetPortfoliosUseCase,
-    UploadPortfolioImageUseCase,
-} from "~/usecase/portfolio";
-import { GetPostBySlugUseCase, GetPostsUseCase } from "~/usecase/post";
-import {
     AddInquiryResponseUseCase,
     CloseInquiryUseCase,
     CreateInquiryUseCase,
@@ -88,6 +82,8 @@ import {
     GetPipelinesUseCase,
     UpdatePipelineUseCase,
 } from "~/usecase/pipeline";
+import { GetPortfolioBySlugUseCase, GetPortfoliosUseCase, UploadPortfolioImageUseCase } from "~/usecase/portfolio";
+import { GetPostBySlugUseCase, GetPostsUseCase } from "~/usecase/post";
 
 export class DIContainer {
     private readonly postRepository: CachedPostRepository;
@@ -106,6 +102,8 @@ export class DIContainer {
         readonly redisUrl?: string,
         private readonly r2Bucket?: R2Bucket,
         private readonly r2PublicUrl?: string,
+        private readonly freeeAuthBaseUrl?: string,
+        private readonly freeeApiBaseUrl?: string,
     ) {
         this.postRepository = new CachedPostRepository(databaseUrl, redisUrl);
         this.portfolioRepository = new CachedPortfolioRepository(databaseUrl, redisUrl);
@@ -373,12 +371,22 @@ export class DIContainer {
     }
 
     getGetFreeeAuthUrlUseCase(clientId: string, clientSecret: string) {
-        const oauthService = new FreeeOAuthServiceImpl(clientId, clientSecret);
+        const oauthService = new FreeeOAuthServiceImpl(
+            clientId,
+            clientSecret,
+            this.freeeAuthBaseUrl,
+            this.freeeApiBaseUrl,
+        );
         return new GetFreeeAuthUrlUseCase(oauthService);
     }
 
     getHandleFreeeCallbackUseCase(clientId: string, clientSecret: string) {
-        const oauthService = new FreeeOAuthServiceImpl(clientId, clientSecret);
+        const oauthService = new FreeeOAuthServiceImpl(
+            clientId,
+            clientSecret,
+            this.freeeAuthBaseUrl,
+            this.freeeApiBaseUrl,
+        );
         return new HandleFreeeCallbackUseCase(this.freeeRepository, oauthService);
     }
 
@@ -391,14 +399,34 @@ export class DIContainer {
     }
 
     getSyncPartnersFromFreeeUseCase(clientId: string, clientSecret: string) {
-        const oauthService = new FreeeOAuthServiceImpl(clientId, clientSecret);
-        const syncService = new FreeeSyncServiceImpl(this.freeeRepository, this.customerRepository, oauthService);
+        const oauthService = new FreeeOAuthServiceImpl(
+            clientId,
+            clientSecret,
+            this.freeeAuthBaseUrl,
+            this.freeeApiBaseUrl,
+        );
+        const syncService = new FreeeSyncServiceImpl(
+            this.freeeRepository,
+            this.customerRepository,
+            oauthService,
+            this.freeeApiBaseUrl,
+        );
         return new SyncPartnersFromFreeeUseCase(syncService);
     }
 
     getSyncPartnersToFreeeUseCase(clientId: string, clientSecret: string) {
-        const oauthService = new FreeeOAuthServiceImpl(clientId, clientSecret);
-        const syncService = new FreeeSyncServiceImpl(this.freeeRepository, this.customerRepository, oauthService);
+        const oauthService = new FreeeOAuthServiceImpl(
+            clientId,
+            clientSecret,
+            this.freeeAuthBaseUrl,
+            this.freeeApiBaseUrl,
+        );
+        const syncService = new FreeeSyncServiceImpl(
+            this.freeeRepository,
+            this.customerRepository,
+            oauthService,
+            this.freeeApiBaseUrl,
+        );
         return new SyncPartnersToFreeeUseCase(syncService);
     }
 

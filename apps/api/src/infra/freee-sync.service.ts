@@ -2,14 +2,19 @@ import { createHash } from "node:crypto";
 import type { CustomerRepository } from "~/domain/customer";
 import type { FreeeOAuthService, FreeePartner, FreeeRepository, FreeeSyncLog, FreeeSyncService } from "~/domain/freee";
 
-const FREEE_API_URL = "https://api.freee.co.jp";
+const DEFAULT_FREEE_API_BASE = "https://api.freee.co.jp";
 
 export class FreeeSyncServiceImpl implements FreeeSyncService {
+    private readonly apiBase: string;
+
     constructor(
         private readonly freeeRepository: FreeeRepository,
         private readonly customerRepository: CustomerRepository,
         private readonly oauthService: FreeeOAuthService,
-    ) {}
+        freeeApiBaseUrl?: string,
+    ) {
+        this.apiBase = freeeApiBaseUrl?.replace(/\/$/, "") ?? DEFAULT_FREEE_API_BASE;
+    }
 
     private async ensureValidToken(integrationId: string): Promise<string> {
         const integration = await this.freeeRepository.findIntegrationById(integrationId);
@@ -80,7 +85,7 @@ export class FreeeSyncServiceImpl implements FreeeSyncService {
             const accessToken = await this.ensureValidToken(integrationId);
 
             const response = await fetch(
-                `${FREEE_API_URL}/api/1/partners?company_id=${integration.companyId}&limit=100`,
+                `${this.apiBase}/api/1/partners?company_id=${integration.companyId}&limit=100`,
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -239,7 +244,7 @@ export class FreeeSyncServiceImpl implements FreeeSyncService {
                     if (existingMapping) {
                         if (existingMapping.syncHash !== newHash) {
                             const response = await fetch(
-                                `${FREEE_API_URL}/api/1/partners/${existingMapping.freeePartnerId}`,
+                                `${this.apiBase}/api/1/partners/${existingMapping.freeePartnerId}`,
                                 {
                                     method: "PUT",
                                     headers: {
@@ -262,7 +267,7 @@ export class FreeeSyncServiceImpl implements FreeeSyncService {
                             await this.freeeRepository.updateCustomerMappingSyncHash(existingMapping.id, newHash);
                         }
                     } else {
-                        const response = await fetch(`${FREEE_API_URL}/api/1/partners`, {
+                        const response = await fetch(`${this.apiBase}/api/1/partners`, {
                             method: "POST",
                             headers: {
                                 Authorization: `Bearer ${accessToken}`,
