@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 input=$(cat)
 
 CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size')

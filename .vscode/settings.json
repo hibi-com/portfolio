@@ -31,13 +31,16 @@
     "[markdown]": {
         "diffEditor.ignoreTrimWhitespace": false,
         "editor.quickSuggestions": {
-            "comments": "off",
-            "other": "off",
-            "strings": "off"
+            "comments": "on",
+            "other": "on",
+            "strings": "on"
         },
+        "editor.snippetSuggestions": "top",
         "editor.unicodeHighlight.ambiguousCharacters": true,
         "editor.unicodeHighlight.invisibleCharacters": true,
-        "editor.wordWrap": "on"
+        "editor.wordWrap": "on",
+        "files.insertFinalNewline": false,
+        "files.trimTrailingWhitespace": false
     },
     "[toml]": {
         "editor.defaultFormatter": "tamasfe.even-better-toml"
@@ -123,14 +126,14 @@
     "search.seedWithNearestWord": true,
     "search.smartCase": true,
     "search.useIgnoreFiles": true,
+    "sonarlint.connectedMode.project": {
+        "connectionId": "ageha734",
+        "projectKey": "ageha734_portfolio"
+    },
     "typescript.enablePromptUseWorkspaceTsdk": true,
     "typescript.preferences.importModuleSpecifier": "relative",
     "typescript.suggest.autoImports": true,
     "typescript.tsdk": "node_modules/typescript/lib",
     "typescript.workspaceSymbols.scope": "allOpenProjects",
-    "vitest.maximumConfigs": 15,
-    "sonarlint.connectedMode.project": {
-        "connectionId": "ageha734",
-        "projectKey": "ageha734_portfolio"
-    }
+    "vitest.maximumConfigs": 15
 }

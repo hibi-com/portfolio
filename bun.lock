@@ -291,6 +291,7 @@
       "devDependencies": {
         "@portfolio/biome-config": "tooling/biome-config",
         "@portfolio/prisma-markdown": "tooling/prisma-markdown",
+        "@portfolio/prisma-migration": "tooling/prisma-migration",
         "@portfolio/tsconfig": "tooling/tsconfig",
         "@portfolio/vitest-config": "tooling/vitest-config",
         "prisma": "5.22.0",
@@ -410,6 +411,19 @@
         "vitest": "3.2.4",
       },
     },
+    "testing/mock-apis": {
+      "name": "@portfolio/mock-apis",
+      "version": "0.1.0",
+      "dependencies": {
+        "hono": "4.6.14",
+      },
+      "devDependencies": {
+        "@portfolio/biome-config": "tooling/biome-config",
+        "@portfolio/tsconfig": "tooling/tsconfig",
+        "@types/bun": "1.1.14",
+        "typescript": "5.9.3",
+      },
+    },
     "testing/mocks": {
       "name": "@portfolio/testing-mocks",
       "version": "1.0.1",
@@ -490,6 +504,19 @@
     },
     "tooling/prisma-markdown": {
       "name": "@portfolio/prisma-markdown",
+      "version": "1.0.1",
+      "dependencies": {
+        "@prisma/generator-helper": "7.3.0",
+      },
+      "devDependencies": {
+        "@portfolio/biome-config": "tooling/biome-config",
+        "@portfolio/tsconfig": "tooling/tsconfig",
+        "@types/node": "25.0.3",
+        "typescript": "5.9.3",
+      },
+    },
+    "tooling/prisma-migration": {
+      "name": "@portfolio/prisma-migration",
       "version": "1.0.1",
       "dependencies": {
         "@prisma/generator-helper": "7.3.0",
@@ -1593,7 +1620,7 @@
 
     "@portfolio/cms": ["@portfolio/cms@workspace:apps/api", { "dependencies": { "@portfolio/api": "packages/api", "@portfolio/auth": "packages/auth", "@portfolio/cache": "packages/cache", "@portfolio/db": "packages/db", "@portfolio/log": "packages/log", "hono": "4.6.11" }, "devDependencies": { "@cloudflare/vite-plugin": "1.12.3", "@cloudflare/workers-types": "4.20260101.0", "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@portfolio/vitest-config": "tooling/vitest-config", "dotenv": "17.2.3", "typescript": "5.9.3", "vite": "6.1.0", "vitest": "3.2.4", "vitest-environment-miniflare": "2.14.4", "wrangler": "4.54.0" }, "peerDependencies": { "wrangler": "4.54.0" } }],
 
-    "@portfolio/db": ["@portfolio/db@workspace:packages/db", { "dependencies": { "@prisma/client": "5.22.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/prisma-markdown": "tooling/prisma-markdown", "@portfolio/tsconfig": "tooling/tsconfig", "@portfolio/vitest-config": "tooling/vitest-config", "prisma": "5.22.0", "typescript": "5.9.3", "vitest": "3.2.4", "vitest-environment-miniflare": "2.14.4" } }],
+    "@portfolio/db": ["@portfolio/db@workspace:packages/db", { "dependencies": { "@prisma/client": "5.22.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/prisma-markdown": "tooling/prisma-markdown", "@portfolio/prisma-migration": "tooling/prisma-migration", "@portfolio/tsconfig": "tooling/tsconfig", "@portfolio/vitest-config": "tooling/vitest-config", "prisma": "5.22.0", "typescript": "5.9.3", "vitest": "3.2.4", "vitest-environment-miniflare": "2.14.4" } }],
 
     "@portfolio/generators": ["@portfolio/generators@workspace:generators", { "dependencies": { "plop": "4.0.1" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "typescript": "5.9.3" } }],
 
@@ -1601,11 +1628,15 @@
 
     "@portfolio/log": ["@portfolio/log@workspace:packages/log", { "dependencies": { "@sentry/node": "8.48.0", "prom-client": "15.1.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@portfolio/vitest-config": "tooling/vitest-config", "@types/node": "25.0.3", "typescript": "5.9.3", "vitest": "3.2.4" } }],
 
+    "@portfolio/mock-apis": ["@portfolio/mock-apis@workspace:testing/mock-apis", { "dependencies": { "hono": "4.6.14" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.1.14", "typescript": "5.9.3" } }],
+
     "@portfolio/playwright-config": ["@portfolio/playwright-config@workspace:tooling/playwright-config", { "dependencies": { "@playwright/test": "1.57.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "typescript": "5.9.3" } }],
 
     "@portfolio/playwright-reporter": ["@portfolio/playwright-reporter@workspace:tooling/playwright-reporter", { "dependencies": { "@playwright/test": "1.57.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "typescript": "5.9.3" } }],
 
     "@portfolio/prisma-markdown": ["@portfolio/prisma-markdown@workspace:tooling/prisma-markdown", { "dependencies": { "@prisma/generator-helper": "7.3.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "typescript": "5.9.3" }, "bin": { "prisma-markdown": "./dist/cmd/main.js" } }],
+
+    "@portfolio/prisma-migration": ["@portfolio/prisma-migration@workspace:tooling/prisma-migration", { "dependencies": { "@prisma/generator-helper": "7.3.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "typescript": "5.9.3" }, "bin": { "prisma-migration": "./dist/cmd/main.js" } }],
 
     "@portfolio/scripts-check": ["@portfolio/scripts-check@workspace:scripts/check", { "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "@types/node": "25.0.3", "cac": "6.7.14", "picocolors": "1.1.1", "typescript": "5.9.3" }, "bin": { "check": "./bin/main.js" } }],
 
@@ -2341,7 +2372,7 @@
 
     "@types/better-sqlite3": ["@types/better-sqlite3@7.6.13", "", { "dependencies": { "@types/node": "*" } }, "sha512-NMv9ASNARoKksWtsq/SHakpYAYnhBrQgGD8zkLYk/jaK8jUGn08CfEdTRgYhMypUQAfzSP8W6gNLe0q19/t4VA=="],
 
-    "@types/bun": ["@types/bun@1.3.5", "", { "dependencies": { "bun-types": "1.3.5" } }, "sha512-RnygCqNrd3srIPEWBd5LFeUYG7plCoH2Yw9WaZGyNmdTEei+gWaHqydbaIRkIkcbXwhBT94q78QljxN0Sk838w=="],
+    "@types/bun": ["@types/bun@1.1.14", "", { "dependencies": { "bun-types": "1.1.37" } }, "sha512-opVYiFGtO2af0dnWBdZWlioLBoxSdDO5qokaazLhq8XQtGZbY4pY3/JxY8Zdf/hEwGubbp7ErZXoN1+h2yesxA=="],
 
     "@types/bunyan": ["@types/bunyan@1.8.11", "", { "dependencies": { "@types/node": "*" } }, "sha512-758fRH7umIMk5qt5ELmRMff4mLDlN+xyYzC+dkPTdKwbSkJFvz6xwyScrytPU0QIBbRRwbiE8/BIg8bpajerNQ=="],
 
@@ -2470,6 +2501,8 @@
     "@types/urijs": ["@types/urijs@1.19.26", "", {}, "sha512-wkXrVzX5yoqLnndOwFsieJA7oKM8cNkOKJtf/3vVGSUFkWDKZvFHpIl9Pvqb/T9UsawBBFMTTD8xu7sK5MWuvg=="],
 
     "@types/uuid": ["@types/uuid@9.0.8", "", {}, "sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA=="],
+
+    "@types/ws": ["@types/ws@8.5.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-bd/YFLW+URhBzMXurx7lWByOu+xzU9+kb3RboOteXYDfW+tr+JZa99OyNmPINEGB/ahzKrEuc8rcv4gnpJmxTw=="],
 
     "@types/yauzl": ["@types/yauzl@2.10.3", "", { "dependencies": { "@types/node": "*" } }, "sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q=="],
 
@@ -2821,7 +2854,7 @@
 
     "builtins": ["builtins@5.1.0", "", { "dependencies": { "semver": "^7.0.0" } }, "sha512-SW9lzGTLvWTP1AY8xeAMZimqDrIaSdLQUcVr9DMef51niJ022Ri87SwRRKYm4A6iHfkPaiVUu/Duw2Wc4J7kKg=="],
 
-    "bun-types": ["bun-types@1.3.5", "", { "dependencies": { "@types/node": "*" } }, "sha512-inmAYe2PFLs0SUbFOWSVD24sg1jFlMPxOjOSSCYqUgn4Hsc3rDc7dFvfVYjFPNHtov6kgUeulV4SxbuIV/stPw=="],
+    "bun-types": ["bun-types@1.1.37", "", { "dependencies": { "@types/node": "~20.12.8", "@types/ws": "~8.5.10" } }, "sha512-C65lv6eBr3LPJWFZ2gswyrGZ82ljnH8flVE03xeXxKhi2ZGtFiO4isRKTKnitbSqtRAcaqYSR6djt1whI66AbA=="],
 
     "bundle-name": ["bundle-name@4.1.0", "", { "dependencies": { "run-applescript": "^7.0.0" } }, "sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q=="],
 
@@ -6633,6 +6666,12 @@
 
     "@poppinss/dumper/supports-color": ["supports-color@10.2.2", "", {}, "sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g=="],
 
+    "@portfolio/mock-apis/hono": ["hono@4.6.14", "", {}, "sha512-j4VkyUp2xazGJ8eCCLN1Vm/bxdvm/j5ZuU9AIjLu9vapn2M44p9L3Ktr9Vnb2RN2QtcR/wVjZVMlT5k7GJQgPw=="],
+
+    "@portfolio/scripts-check/@types/bun": ["@types/bun@1.3.5", "", { "dependencies": { "bun-types": "1.3.5" } }, "sha512-RnygCqNrd3srIPEWBd5LFeUYG7plCoH2Yw9WaZGyNmdTEei+gWaHqydbaIRkIkcbXwhBT94q78QljxN0Sk838w=="],
+
+    "@portfolio/scripts-workspace/@types/bun": ["@types/bun@1.3.5", "", { "dependencies": { "bun-types": "1.3.5" } }, "sha512-RnygCqNrd3srIPEWBd5LFeUYG7plCoH2Yw9WaZGyNmdTEei+gWaHqydbaIRkIkcbXwhBT94q78QljxN0Sk838w=="],
+
     "@prisma/engines/@prisma/debug": ["@prisma/debug@5.22.0", "", {}, "sha512-AUt44v3YJeggO2ZU5BkXI7M4hu9BF2zzH2iF2V5pyXT/lRTyWiElZ7It+bRH1EshoMRxHgpYg4VB6rCM+mG5jQ=="],
 
     "@prisma/fetch-engine/@prisma/debug": ["@prisma/debug@5.22.0", "", {}, "sha512-AUt44v3YJeggO2ZU5BkXI7M4hu9BF2zzH2iF2V5pyXT/lRTyWiElZ7It+bRH1EshoMRxHgpYg4VB6rCM+mG5jQ=="],
@@ -7008,6 +7047,8 @@
     "boxen/type-fest": ["type-fest@0.20.2", "", {}, "sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ=="],
 
     "browserify-sign/readable-stream": ["readable-stream@2.3.8", "", { "dependencies": { "core-util-is": "~1.0.0", "inherits": "~2.0.3", "isarray": "~1.0.0", "process-nextick-args": "~2.0.0", "safe-buffer": "~5.1.1", "string_decoder": "~1.1.1", "util-deprecate": "~1.0.1" } }, "sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA=="],
+
+    "bun-types/@types/node": ["@types/node@20.12.14", "", { "dependencies": { "undici-types": "~5.26.4" } }, "sha512-scnD59RpYD91xngrQQLGkE+6UrHUPzeKZWhhjBSa3HSkwjbQc38+q3RoIVEwxQGRw3M+j5hpNAM+lgV3cVormg=="],
 
     "c12/chokidar": ["chokidar@5.0.0", "", { "dependencies": { "readdirp": "^5.0.0" } }, "sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw=="],
 
@@ -8169,6 +8210,10 @@
 
     "@pnpm/read-project-manifest/@pnpm/error/@pnpm/constants": ["@pnpm/constants@6.1.0", "", {}, "sha512-L6AiU3OXv9kjKGTJN9j8n1TeJGDcLX9atQlZvAkthlvbXjvKc5SKNWESc/eXhr5nEfuMWhQhiKHDJCpYejmeCQ=="],
 
+    "@portfolio/scripts-check/@types/bun/bun-types": ["bun-types@1.3.5", "", { "dependencies": { "@types/node": "*" } }, "sha512-inmAYe2PFLs0SUbFOWSVD24sg1jFlMPxOjOSSCYqUgn4Hsc3rDc7dFvfVYjFPNHtov6kgUeulV4SxbuIV/stPw=="],
+
+    "@portfolio/scripts-workspace/@types/bun/bun-types": ["bun-types@1.3.5", "", { "dependencies": { "@types/node": "*" } }, "sha512-inmAYe2PFLs0SUbFOWSVD24sg1jFlMPxOjOSSCYqUgn4Hsc3rDc7dFvfVYjFPNHtov6kgUeulV4SxbuIV/stPw=="],
+
     "@prisma/instrumentation/@opentelemetry/instrumentation/@opentelemetry/api-logs": ["@opentelemetry/api-logs@0.52.1", "", { "dependencies": { "@opentelemetry/api": "^1.0.0" } }, "sha512-qnSqB2DQ9TPP96dl8cDubDvrUyWc0/sK81xHTK8eSUspzDM3bsewX903qclQFvVhgStjRWdC5bLb3kQqMkfV5A=="],
 
     "@prisma/instrumentation/@opentelemetry/sdk-trace-base/@opentelemetry/resources": ["@opentelemetry/resources@1.30.1", "", { "dependencies": { "@opentelemetry/core": "1.30.1", "@opentelemetry/semantic-conventions": "1.28.0" }, "peerDependencies": { "@opentelemetry/api": ">=1.0.0 <1.10.0" } }, "sha512-5UxZqiAgLYGFjS4s9qm5mBVo433u+dSPUFWVWXmLAD4wB65oMCoXaJP1KJa9DIYYMeHu3z4BZcStG3LC593cWA=="],
@@ -8692,6 +8737,8 @@
     "browserify-sign/readable-stream/safe-buffer": ["safe-buffer@5.1.2", "", {}, "sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g=="],
 
     "browserify-sign/readable-stream/string_decoder": ["string_decoder@1.1.1", "", { "dependencies": { "safe-buffer": "~5.1.0" } }, "sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg=="],
+
+    "bun-types/@types/node/undici-types": ["undici-types@5.26.5", "", {}, "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA=="],
 
     "c12/chokidar/readdirp": ["readdirp@5.0.0", "", {}, "sha512-9u/XQ1pvrQtYyMpZe7DXKv2p5CNvyVwzUB6uhLAnQwHMSgKMBR62lc7AHljaeteeHXn11XTAaLLUVZYVZyuRBQ=="],
 
