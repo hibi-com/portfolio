@@ -149,9 +149,11 @@ export function getDopplerProjectStructure() {
             { name: "VITE_BASE_URL", description: "ViteベースURL（DNS登録後に自動設定）" },
             { name: "VITE_GOOGLE_ANALYTICS_ENABLED", description: "Google Analytics有効化フラグ" },
             { name: "VITE_GOOGLE_TAG_MANAGER_ENABLED", description: "Google Tag Manager有効化フラグ" },
-            { name: "VITE_SENTRY_DSN", description: "Vite用Sentry DSN" },
             { name: "VITE_SENTRY_ENVIRONMENT", description: "Vite用Sentry環境" },
-            { name: "VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE", description: "Vite用Sentry Replay On Errorサンプルレート" },
+            {
+                name: "VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE",
+                description: "Vite用Sentry Replay On Errorサンプルレート",
+            },
             { name: "VITE_SENTRY_REPLAY_SAMPLE_RATE", description: "Vite用Sentry Replayサンプルレート" },
             { name: "VITE_SENTRY_TRACES_SAMPLE_RATE", description: "Vite用Sentry Tracesサンプルレート" },
             { name: "VITE_XSTATE_INSPECTOR_ENABLED", description: "XState Inspector有効化フラグ" },
@@ -160,6 +162,95 @@ export function getDopplerProjectStructure() {
 }
 
 export const DOPPLER_PROJECT_STRUCTURE = getDopplerProjectStructure();
+
+/** infra 専用の環境変数キー（environment.yaml で管理、.docker/secrets には載せない） */
+export const INFRA_ONLY_ENV_KEYS = [
+    "CLOUDFLARE_ACCOUNT_ID",
+    "CLOUDFLARE_API_TOKEN",
+    "CLOUDFLARE_ZONE_ID",
+    "GRAFANA_API_KEY",
+    "GRAFANA_ORG_SLUG",
+    "REDISCLOUD_ACCESS_KEY",
+    "REDISCLOUD_DATABASE_ID",
+    "REDISCLOUD_SECRET_KEY",
+    "REDISCLOUD_SUBSCRIPTION_ID",
+    "SENTRY_AUTH_TOKEN",
+    "TIDBCLOUD_PRIVATE_KEY",
+    "TIDBCLOUD_PUBLIC_KEY",
+] as const;
+
+/** compose の secret ファイル名 → Doppler/環境変数キー（.docker/secrets のファイルのみ Doppler 同期対象。infra 専用は environment.yaml） */
+export const COMPOSE_SECRET_KEY_MAP: Record<string, string> = {
+    database_url: "DATABASE_URL",
+    redis_url: "REDIS_URL",
+    node_env: "NODE_ENV",
+    api_base_url: "API_BASE_URL",
+    better_auth_secret: "BETTER_AUTH_SECRET",
+    better_auth_url: "BETTER_AUTH_URL",
+    google_client_id: "GOOGLE_CLIENT_ID",
+    google_client_secret: "GOOGLE_CLIENT_SECRET",
+    vite_base_url: "VITE_BASE_URL",
+    sentry_dsn: "SENTRY_DSN",
+    sentry_org: "SENTRY_ORG",
+    sentry_project: "SENTRY_PROJECT",
+    app_version: "APP_VERSION",
+};
+
+/**
+ * compose の secrets ディレクトリ（.docker/secrets）から KEY=value のレコードを構築する。
+ * Doppler 同期のソースとして利用する。
+ */
+export function parseComposeSecretsDir(composeSecretsDir: string): Record<string, string> {
+    const result: Record<string, string> = {};
+    if (!fs.existsSync(composeSecretsDir) || !fs.statSync(composeSecretsDir).isDirectory()) {
+        return result;
+    }
+    for (const [fileName, envKey] of Object.entries(COMPOSE_SECRET_KEY_MAP)) {
+        const filePath = path.join(composeSecretsDir, fileName);
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            const value = fs.readFileSync(filePath, "utf-8").trim();
+            if (value) result[envKey] = value;
+        }
+    }
+    return result;
+}
+
+/** モノレポルート基準の compose secrets ディレクトリパス（.docker/secrets） */
+export function getComposeSecretsDir(): string {
+    return path.join(findProjectRoot(), ".docker", "secrets");
+}
+
+/** infra パッケージ内の environment.yaml のパス（infra 専用キーを管理） */
+export function getEnvironmentYamlPath(): string {
+    return path.join(findProjectRoot(), "infra", "environment.yaml");
+}
+
+/**
+ * environment.yaml から KEY: value を読み取り、INFRA_ONLY_ENV_KEYS に含まれるキーのみ返す。
+ * 簡易パース: 1 行 1 キー、KEY: value または KEY: "value" 形式。
+ */
+export function parseEnvironmentYaml(environmentYamlPath?: string): Record<string, string> {
+    const filePath = environmentYamlPath ?? getEnvironmentYamlPath();
+    if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+        return {};
+    }
+    const content = fs.readFileSync(filePath, "utf-8");
+    const result: Record<string, string> = {};
+    const keySet = new Set<string>(INFRA_ONLY_ENV_KEYS);
+    for (const line of content.split("\n")) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) continue;
+        const match = trimmed.match(/^([A-Z][A-Z0-9_]*):\s*(.*)$/);
+        const key = match?.[1];
+        if (!key || !keySet.has(key)) continue;
+        let value = (match[2] ?? "").trim();
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.slice(1, -1);
+        }
+        result[key] = value;
+    }
+    return result;
+}
 
 export interface DopplerProjectOutputs {
     project: doppler.Project;
@@ -287,12 +378,35 @@ export function createDopplerSecrets(
     return dopplerSecrets;
 }
 
-export function createDopplerSecretsOnly(projectName?: string, envFilePath?: string): Record<string, doppler.Secret> {
+export interface DopplerSyncSource {
+    envFilePath?: string;
+    composeSecretsDir?: string;
+    /** infra 専用キーを読む environment.yaml のパス（composeSecretsDir 指定時はマージされる） */
+    environmentYamlPath?: string;
+}
+
+/**
+ * Doppler に同期するシークレットを Pulumi リソースとして作成する。
+ * - composeSecretsDir 指定時: .docker/secrets から読み、environmentYamlPath があれば infra 専用キーをマージして同期
+ * - envFilePath 指定時: 従来どおり .env から読み、DOPPLER_PROJECT_STRUCTURE の全キーを対象に同期
+ */
+export function createDopplerSecretsOnly(
+    projectName?: string,
+    source?: DopplerSyncSource,
+): Record<string, doppler.Secret> {
     const actualProjectName = projectName || getProjectName();
 
-    const envVars = parseEnvFile(envFilePath);
-    const requiredKeys = DOPPLER_PROJECT_STRUCTURE.secrets.map((s) => s.name);
-    const secretsMap = extractSecretsFromEnv(envVars, requiredKeys);
+    let secretsMap: Record<string, string>;
+    if (source?.composeSecretsDir) {
+        secretsMap = {
+            ...parseComposeSecretsDir(source.composeSecretsDir),
+            ...parseEnvironmentYaml(source.environmentYamlPath),
+        };
+    } else {
+        const envVars = parseEnvFile(source?.envFilePath);
+        const requiredKeys = DOPPLER_PROJECT_STRUCTURE.secrets.map((s) => s.name);
+        secretsMap = extractSecretsFromEnv(envVars, requiredKeys);
+    }
 
     validateNoLocalhost(secretsMap);
 

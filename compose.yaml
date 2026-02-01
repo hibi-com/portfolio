@@ -6,10 +6,28 @@ secrets:
     file: ./.docker/secrets/database_url
   redis_url:
     file: ./.docker/secrets/redis_url
-  api_url:
-    file: ./.docker/secrets/api_url
   node_env:
     file: ./.docker/secrets/node_env
+  api_base_url:
+    file: ./.docker/secrets/api_base_url
+  better_auth_secret:
+    file: ./.docker/secrets/better_auth_secret
+  better_auth_url:
+    file: ./.docker/secrets/better_auth_url
+  google_client_id:
+    file: ./.docker/secrets/google_client_id
+  google_client_secret:
+    file: ./.docker/secrets/google_client_secret
+  vite_base_url:
+    file: ./.docker/secrets/vite_base_url
+  sentry_dsn:
+    file: ./.docker/secrets/sentry_dsn
+  sentry_org:
+    file: ./.docker/secrets/sentry_org
+  sentry_project:
+    file: ./.docker/secrets/sentry_project
+  app_version:
+    file: ./.docker/secrets/app_version
 
 networks:
   default:
@@ -53,11 +71,34 @@ services:
         published: 3001
         protocol: tcp
     environment:
-      API_URL: ${API_URL:-}
-      NODE_ENV: ${NODE_ENV:-}
+      API_URL: ${API_URL:-http://localhost:8787}
+      NODE_ENV: ${NODE_ENV:-development}
+      VITE_GOOGLE_ANALYTICS_ENABLED: "false"
+      VITE_GOOGLE_TAG_MANAGER_ENABLED: "false"
+      VITE_XSTATE_INSPECTOR_ENABLED: "true"
+      VITE_SENTRY_ENVIRONMENT: "development"
+      VITE_SENTRY_TRACES_SAMPLE_RATE: "1"
+      VITE_SENTRY_REPLAY_SAMPLE_RATE: "0"
+      VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: "0"
     secrets:
-      - api_url
+      - api_base_url
       - node_env
+    restart: unless-stopped
+
+  mock-apis:
+    build:
+      context: .
+      dockerfile: testing/mock-apis/Dockerfile
+    image: portfolio-mock-apis:local
+    container_name: mock-apis
+    networks:
+      - default
+    ports:
+      - target: 3920
+        published: 3920
+        protocol: tcp
+    environment:
+      PORT: "3920"
     restart: unless-stopped
 
   api:
@@ -79,15 +120,33 @@ services:
       DATABASE_URL: ${DATABASE_URL:-}
       REDIS_URL: ${REDIS_URL:-}
       NODE_ENV: ${NODE_ENV:-}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      APP_VERSION: ${APP_VERSION:-}
+      FREEE_CLIENT_ID: ${FREEE_CLIENT_ID:-mock-client-id}
+      FREEE_CLIENT_SECRET: ${FREEE_CLIENT_SECRET:-mock-client-secret}
+      FREEE_AUTH_BASE_URL: ${FREEE_AUTH_BASE_URL:-http://mock-apis:3920}
+      FREEE_API_BASE_URL: ${FREEE_API_BASE_URL:-http://mock-apis:3920}
     secrets:
       - database_url
       - redis_url
       - node_env
+      - better_auth_secret
+      - better_auth_url
+      - google_client_id
+      - google_client_secret
+      - sentry_dsn
+      - app_version
     depends_on:
       setup-db:
         condition: service_completed_successfully
       cache:
         condition: service_healthy
+      mock-apis:
+        condition: service_started
     restart: unless-stopped
 
   web:
@@ -105,11 +164,22 @@ services:
         published: 5173
         protocol: tcp
     environment:
-      API_URL: ${API_URL:-}
-      NODE_ENV: ${NODE_ENV:-}
+      API_URL: ${API_BASE_URL:-http://localhost:8787}
+      NODE_ENV: ${NODE_ENV:-development}
+      VITE_BASE_URL: ${VITE_BASE_URL:-http://localhost:5173}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      VITE_GOOGLE_ANALYTICS_ENABLED: "false"
+      VITE_GOOGLE_TAG_MANAGER_ENABLED: "false"
+      VITE_XSTATE_INSPECTOR_ENABLED: "true"
+      VITE_SENTRY_ENVIRONMENT: "development"
+      VITE_SENTRY_TRACES_SAMPLE_RATE: "1"
+      VITE_SENTRY_REPLAY_SAMPLE_RATE: "0"
+      VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: "0"
     secrets:
-      - api_url
+      - api_base_url
       - node_env
+      - vite_base_url
+      - sentry_dsn
     restart: unless-stopped
 
   wiki:
@@ -125,7 +195,7 @@ services:
         published: 3002
         protocol: tcp
     environment:
-      NODE_ENV: ${NODE_ENV:-}
+      NODE_ENV: ${NODE_ENV:-development}
     secrets:
       - node_env
     restart: unless-stopped

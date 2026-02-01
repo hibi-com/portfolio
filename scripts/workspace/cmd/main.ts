@@ -1,15 +1,14 @@
 #!/usr/bin/env bun
 
 import { cac } from "cac";
-import { findRootDir, runWorkspace, type SetupOptions } from "~/workspace";
-import { runSeed } from "~/seed";
 import { checkAndInstallCommands } from "~/check";
+import { runSeed } from "~/seed";
+import { findRootDir, runWorkspace, type SetupOptions } from "~/workspace";
 
 const cli = cac("workspace");
 
-cli
-    .command("setup", "開発環境のセットアップを実行します")
-    .option("--env", "環境設定のみ実行")
+cli.command("setup", "開発環境のセットアップを実行します")
+    .option("--env", "compose 用シークレット（.docker/secrets/）のセットアップのみ実行")
     .option("--install", "依存関係のインストールのみ実行")
     .option("--schema", "Prismaスキーマの生成のみ実行")
     .option("--docker", "Dockerイメージのビルドのみ実行")
@@ -27,18 +26,14 @@ cli
         await runWorkspace(setupOptions);
     });
 
-cli
-    .command("seed", "シードデータを投入します")
-    .action(async () => {
-        const rootDir = findRootDir();
-        await runSeed(rootDir);
-    });
+cli.command("seed", "シードデータを投入します").action(async () => {
+    const rootDir = findRootDir();
+    await runSeed(rootDir);
+});
 
-cli
-    .command("check", "必要なコマンドのインストール確認と対話的インストールを実行します")
-    .action(async () => {
-        await checkAndInstallCommands();
-    });
+cli.command("check", "必要なコマンドのインストール確認と対話的インストールを実行します").action(async () => {
+    await checkAndInstallCommands();
+});
 
 cli.command("*", "開発環境のセットアップを実行します").action(async () => {
     const { runWorkspace } = await import("~/workspace");

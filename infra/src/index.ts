@@ -20,6 +20,8 @@ import {
     createDopplerSecretsOnly,
     type DopplerProjectOutputs,
     getCloudflareEnvVars,
+    getComposeSecretsDir,
+    getEnvironmentYamlPath,
     getSecretsFromCreatedResources,
 } from "./resources/secrets.js";
 import { createPortfolioApiWorker } from "./resources/workers.js";
@@ -36,7 +38,10 @@ if (shouldCreateDopplerProject) {
     const projectName = getProjectName();
     dopplerProjectResources = createDopplerProject(projectName, `${projectName} infrastructure project`);
 } else if (shouldSyncDopplerSecrets) {
-    dopplerSecretsResources = createDopplerSecretsOnly();
+    dopplerSecretsResources = createDopplerSecretsOnly(getProjectName(), {
+        composeSecretsDir: getComposeSecretsDir(),
+        environmentYamlPath: getEnvironmentYamlPath(),
+    });
 }
 
 export const dopplerProjectId = dopplerProjectResources?.project.id;
@@ -77,7 +82,6 @@ if (shouldCreateDopplerProject && dopplerProjectResources) {
         VITE_BASE_URL: createdSecrets.VITE_BASE_URL ?? pulumi.output(""),
         VITE_GOOGLE_ANALYTICS_ENABLED: createdSecrets.VITE_GOOGLE_ANALYTICS_ENABLED ?? pulumi.output(""),
         VITE_GOOGLE_TAG_MANAGER_ENABLED: createdSecrets.VITE_GOOGLE_TAG_MANAGER_ENABLED ?? pulumi.output(""),
-        VITE_SENTRY_DSN: createdSecrets.VITE_SENTRY_DSN ?? pulumi.output(""),
         VITE_SENTRY_ENVIRONMENT: createdSecrets.VITE_SENTRY_ENVIRONMENT ?? pulumi.output(""),
         VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE:
             createdSecrets.VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE ?? pulumi.output(""),
@@ -118,7 +122,6 @@ if (shouldCreateDopplerProject && dopplerProjectResources) {
         VITE_BASE_URL: createdSecrets.VITE_BASE_URL ?? pulumi.output(""),
         VITE_GOOGLE_ANALYTICS_ENABLED: createdSecrets.VITE_GOOGLE_ANALYTICS_ENABLED ?? pulumi.output(""),
         VITE_GOOGLE_TAG_MANAGER_ENABLED: createdSecrets.VITE_GOOGLE_TAG_MANAGER_ENABLED ?? pulumi.output(""),
-        VITE_SENTRY_DSN: createdSecrets.VITE_SENTRY_DSN ?? pulumi.output(""),
         VITE_SENTRY_ENVIRONMENT: createdSecrets.VITE_SENTRY_ENVIRONMENT ?? pulumi.output(""),
         VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE:
             createdSecrets.VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE ?? pulumi.output(""),
@@ -234,7 +237,6 @@ const secrets = {
     VITE_BASE_URL: dopplerSecrets.VITE_BASE_URL,
     VITE_GOOGLE_ANALYTICS_ENABLED: dopplerSecrets.VITE_GOOGLE_ANALYTICS_ENABLED,
     VITE_GOOGLE_TAG_MANAGER_ENABLED: dopplerSecrets.VITE_GOOGLE_TAG_MANAGER_ENABLED,
-    VITE_SENTRY_DSN: dopplerSecrets.VITE_SENTRY_DSN,
     VITE_SENTRY_ENVIRONMENT: dopplerSecrets.VITE_SENTRY_ENVIRONMENT,
     VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: dopplerSecrets.VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE,
     VITE_SENTRY_REPLAY_SAMPLE_RATE: dopplerSecrets.VITE_SENTRY_REPLAY_SAMPLE_RATE,

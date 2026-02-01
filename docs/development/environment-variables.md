@@ -272,6 +272,40 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 - `VITE_XSTATE_INSPECTOR_ENABLED`: XState Inspector有効化フラグ
 
+### freee 連携（API）
+
+- `FREEE_CLIENT_ID`: freee OAuth クライアントID（freee 連携利用時）
+- `FREEE_CLIENT_SECRET`: freee OAuth クライアントシークレット（freee 連携利用時）
+- `FREEE_AUTH_BASE_URL`: freee 認証サーバー基底URL（未設定時は本番 `https://accounts.secure.freee.co.jp`。開発で mock-apis 利用時は `http://mock-apis:3920` など）
+- `FREEE_API_BASE_URL`: freee API サーバー基底URL（未設定時は本番 `https://api.freee.co.jp`。開発で mock-apis 利用時は `http://mock-apis:3920` など）
+
+### メール送信（Resend）
+
+- `RESEND_API_KEY`: Resend API キー（メール送信利用時）
+- `RESEND_FROM_EMAIL`: 送信元メールアドレス（未設定時は `noreply@example.com`）
+
+### ストレージ（Cloudflare R2）
+
+- `R2_BUCKET`: R2 バケットバインディング名（ポートフォリオファイル等。Workers の R2 バインド名）
+- `R2_PUBLIC_URL`: R2 公開URL（未設定時は R2 経由の公開URL は利用不可）
+
+### API 共通
+
+- `CORS_ORIGINS`: 許可するオリジン（カンマ区切り）。未設定時は `http://localhost:3000`, `http://localhost:5173`, `http://localhost:8787`
+- `VITE_API_URL`: フロント／E2E から参照する API の URL（admin の `VITE_API_URL`、E2E の `VITE_API_URL`。未設定時は `http://localhost:8787`）
+
+### Workers 専用（compose では未使用）
+
+- `CHAT_ROOMS`: Durable Object の ChatRoom バインディング（wrangler.toml で定義）
+
+## 開発環境での freee 擬似 API（mock-apis）
+
+docker compose で開発するとき、freee の代わりに `@portfolio/mock-apis` を使うと、本番の freee アカウントなしで連携フローをテストできる。
+
+- compose に `mock-apis` サービスが含まれており、api はデフォルトで `FREEE_AUTH_BASE_URL` / `FREEE_API_BASE_URL` を `http://mock-apis:3920` に設定する。
+- freee 連携用の `FREEE_CLIENT_ID` / `FREEE_CLIENT_SECRET` は未設定でも mock 利用時は `mock-client-id` / `mock-client-secret` がデフォルトで入る。
+- 本番の freee に接続したい場合は、`.env` や compose の `environment` で `FREEE_AUTH_BASE_URL` と `FREEE_API_BASE_URL` を未設定（または本番 URL）にし、`FREEE_CLIENT_ID` / `FREEE_CLIENT_SECRET` に本番の値を設定する。
+
 ## トラブルシューティング
 
 ### 環境変数が読み込まれない

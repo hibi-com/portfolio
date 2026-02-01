@@ -130,9 +130,6 @@ export function getDopplerSecrets() {
         VITE_GOOGLE_TAG_MANAGER_ENABLED: secrets.apply((s) => {
             return s.map.VITE_GOOGLE_TAG_MANAGER_ENABLED || "";
         }),
-        VITE_SENTRY_DSN: secrets.apply((s) => {
-            return s.map.VITE_SENTRY_DSN || "";
-        }),
         VITE_SENTRY_ENVIRONMENT: secrets.apply((s) => {
             return s.map.VITE_SENTRY_ENVIRONMENT || "";
         }),

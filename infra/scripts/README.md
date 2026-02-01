@@ -2,6 +2,12 @@
 
 このプロジェクトで必要な各種APIキー・トークンの発行手順をまとめています。
 
+## 環境変数・Doppler の管理
+
+- **compose で使う値**: `.docker/secrets/` で管理（`database_url`, `redis_url`, `api_url`, `node_env`）。詳細はリポジトリルートの `.docker/secrets/README.md` を参照。
+- **Doppler への同期**: `syncDopplerSecrets: true` のとき、`pulumi up` が `.docker/secrets/` の内容を Doppler に反映する（compose がソース）。
+- **その他の infra 用シークレット**（Cloudflare, Sentry, Grafana 等）: Doppler ダッシュボードで設定するか、`bun run verify` 用に一時的に `.env` に設定してから Doppler に手動で反映してもよい。
+
 ## 目次
 
 1. [Cloudflare APIトークン](#cloudflare-apiトークン)
@@ -104,7 +110,6 @@ CLOUDFLARE_ZONE_ID="your-zone-id"
 SENTRY_AUTH_TOKEN="your-auth-token"
 SENTRY_ORG="your-org-slug"
 SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
-VITE_SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
 ```
 
 ### Sentry - トラブルシューティング
@@ -547,7 +552,6 @@ CLOUDFLARE_ZONE_ID="your-zone-id"
 SENTRY_AUTH_TOKEN="your-token"
 SENTRY_ORG="your-org-slug"
 SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
-VITE_SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
 
 # Grafana
 GRAFANA_API_KEY="glsa_xxxxx"

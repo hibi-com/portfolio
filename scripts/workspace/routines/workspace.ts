@@ -1,15 +1,15 @@
 #!/usr/bin/env bun
 
-import { $ } from "bun";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { $ } from "bun";
 import pc from "picocolors";
+import { checkAndInstallCommands } from "./check";
 import { buildDockerImages } from "./docker";
-import { logStep, setupEnvFile } from "./env";
+import { logStep, setupComposeSecrets } from "./env";
 import { installDependencies } from "./install";
 import { runDatabaseMigrations } from "./migrate";
 import { generatePrismaSchema } from "./schema";
-import { checkAndInstallCommands } from "./check";
 
 export function findRootDir(startDir: string = process.cwd()): string {
     let currentDir = resolve(startDir);
@@ -92,8 +92,8 @@ function printSuccessMessage(): void {
     console.log(pc.bold(pc.green("  ╰─────────────────────────────────────────────╯")));
     console.log();
     console.log(pc.bold("  次のステップ:"));
-    console.log(pc.dim("    • .envファイルを編集して環境変数を設定してください"));
-    console.log(pc.dim("    • bun run dev で開発サーバーを起動できます"));
+    console.log(pc.dim("    • 必要に応じて .docker/secrets/ の値を編集してください"));
+    console.log(pc.dim("    • bun run dev で開発サーバー（docker compose up）を起動できます"));
     console.log();
 }
 
@@ -171,7 +171,7 @@ export async function runWorkspace(options: SetupOptions = {}): Promise<void> {
         await checkAndInstallCommands();
 
         if (resolved.runEnv) {
-            await setupEnvFile(rootDir);
+            await setupComposeSecrets(rootDir);
         }
 
         await handleInstallStep(rootDir, resolved.runInstall);
