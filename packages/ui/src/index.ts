@@ -1,8 +1,14 @@
 export { cn } from "./libs/cn";
 export { sanitizeHtml } from "./libs/sanitize";
+export * from "./components/Badge";
 export * from "./components/Button";
 export * from "./components/Card";
 export * from "./components/DropdownMenu";
+export * from "./components/Input";
+export * from "./components/Label";
+export * from "./components/Select";
+export * from "./components/Table";
+export * from "./components/Textarea";
 export type { LogoProps } from "./components/Logo";
 export { Logo } from "./components/Logo";
 export * from "./components/NavigationMenu";
