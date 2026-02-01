@@ -366,6 +366,59 @@ wrangler d1 execute portfolio-db --command "SELECT 1"
 - APIエンドポイントの認証を実装
 - 適切なCORS設定を適用
 
+## Docker / K8s 向けイメージビルド
+
+本番が Kubernetes の場合は、**イメージ内でビルドせず・turbo は使わない**方針です。ビルドは CI（またはホスト）で行い、イメージには成果物のみを載せます。アプリのソース変更時も、パッケージを再ビルドしないためビルド時間を抑えられます。
+
+### 構成のポイント
+
+- **イメージ内**: turbo なし。COPY のみでランタイムを構成。
+- **admin / wiki**: 単一ステージの nginx。ビルドコンテキスト = **CI が出力した静的 dist の中身**（index.html, assets/ 等）。CI で `turbo run build --filter=@portfolio/admin` 等を実行し、その出力をコンテキストにして `docker build` する。
+- **api / web（開発・compose）**: イメージは bun + entrypoint のみ。compose で **volume マウント `.:/app`** し、ホストのソースで wrangler dev / remix vite:dev を実行。ホストで `bun install` と必要に応じてパッケージビルドを済ませておく。
+- **api / web（本番・K8s）**: CI がビルドした成果物ディレクトリをコンテキストに渡して `docker build` する。成果物の形は CI に依存（worker バンドルや build/ など）。
+
+### CI でのビルド手順（例）
+
+1. **パッケージ・アプリをビルド**（リポジトリルートで）:
+   ```bash
+   bun install --frozen-lockfile
+   bunx turbo run build --filter=@portfolio/admin   # admin 用
+   # または --filter=@portfolio/wiki など
+   ```
+2. **Docker イメージをビルド**（成果物をコンテキストに）:
+   ```bash
+   # admin: コンテキスト = apps/admin/dist の中身
+   docker build -f apps/admin/Dockerfile -t portfolio-admin:local apps/admin/dist
+
+   # wiki: コンテキスト = apps/wiki/dist の中身
+   docker build -f apps/wiki/Dockerfile -t portfolio-wiki:local apps/wiki/dist
+   ```
+
+### compose での利用
+
+- **admin / wiki**: `apps/admin/dist` および `apps/wiki/dist` が存在する必要がある。事前に `turbo run build --filter=@portfolio/admin` 等で生成してから `docker compose up` する。
+- **api / web**: volume で `.:/app` をマウントしているため、ホストで `bun install` と（必要なら）`turbo run build --filter='./packages/*'` を実行したうえで compose を起動する。
+
+### 本番環境での Secret Manager（例: AWS Secrets Manager）
+
+環境変数の優先順位は **既存の環境変数 > Secret Manager 由来の environment > /run/secrets ファイル** です。
+
+- **ローカル / compose**: `secrets/` のファイルを `/run/secrets/*` でマウントし、entrypoint が未設定の変数のみファイルから読む。
+- **本番**: Secret Manager（例: AWS Secrets Manager）から取得した値を `environment` で渡す。compose の `api` / `web` には `environment: DATABASE_URL: ${DATABASE_URL:-}` 等を定義してあり、`--env-file` で渡した値がコンテナに注入される。
+
+本番起動の流れ（例）:
+
+1. AWS Secrets Manager にシークレットを JSON で登録（例: `{"DATABASE_URL":"...","REDIS_URL":"...","NODE_ENV":"production"}`）。
+2. `scripts/secrets/fetch-aws-secrets.sh` で env 形式に変換し、`.env.production` に出力。
+3. `docker compose --env-file .env.production up -d` で起動。entrypoint は既に設定された環境変数を優先するため、Secret Manager 由来の値が使われる。
+
+```bash
+./scripts/secrets/fetch-aws-secrets.sh portfolio/production --region ap-northeast-1 > .env.production
+docker compose --env-file .env.production up -d
+```
+
+- 前提: aws CLI と jq がインストールされていること。詳細は `secrets/README.md` を参照。
+
 ## 参考資料
 
 - [Cloudflare Pages ドキュメント](https://developers.cloudflare.com/pages/)

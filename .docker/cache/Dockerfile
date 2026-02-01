@@ -17,6 +17,6 @@ RUN chmod 644 /usr/local/etc/redis/redis.conf && \
 EXPOSE 6379
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD redis-cli -a ${REDIS_PASSWORD} ping || exit 1
+    CMD redis-cli -a "${REDIS_PASSWORD}" ping || exit 1
 
 CMD ["redis-server", "/usr/local/etc/redis/redis.conf"]

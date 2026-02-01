@@ -1,0 +1,20 @@
+host = "0.0.0.0"
+port = 4000
+store = "tikv"
+path = "pd:2379"
+run-ddl = true
+split-table = true
+lower-case-table-names = 2
+
+[log]
+level = "warn"
+
+[status]
+report-status = true
+status-port = 10080
+metrics-addr = ""
+metrics-interval = 0
+
+[tikv-client]
+grpc-connection-count = 4
+commit-timeout = "41s"

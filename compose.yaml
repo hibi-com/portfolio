@@ -1,0 +1,136 @@
+include:
+  - .docker/db/compose.yml
+
+secrets:
+  database_url:
+    file: ./.docker/secrets/database_url
+  redis_url:
+    file: ./.docker/secrets/redis_url
+  api_url:
+    file: ./.docker/secrets/api_url
+  node_env:
+    file: ./.docker/secrets/node_env
+
+networks:
+  default:
+    name: portfolio_default
+
+services:
+  cache:
+    build:
+      context: .docker/cache
+      dockerfile: Dockerfile
+    image: portfolio-cache:local
+    container_name: cache
+    networks:
+      - default
+    ports:
+      - target: 6379
+        published: 6379
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: cache-data
+        target: /data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "password", "ping"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: apps/admin/dist
+      dockerfile: apps/admin/Dockerfile
+    image: portfolio-admin:local
+    container_name: admin
+    networks:
+      - default
+    ports:
+      - target: 80
+        published: 3001
+        protocol: tcp
+    environment:
+      API_URL: ${API_URL:-}
+      NODE_ENV: ${NODE_ENV:-}
+    secrets:
+      - api_url
+      - node_env
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: portfolio-api:local
+    container_name: api
+    networks:
+      - default
+      - db
+    volumes:
+      - .:/app
+    ports:
+      - target: 8787
+        published: 8787
+        protocol: tcp
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-}
+      REDIS_URL: ${REDIS_URL:-}
+      NODE_ENV: ${NODE_ENV:-}
+    secrets:
+      - database_url
+      - redis_url
+      - node_env
+    depends_on:
+      setup-db:
+        condition: service_completed_successfully
+      cache:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    image: portfolio-web:local
+    container_name: web
+    networks:
+      - default
+    volumes:
+      - .:/app
+    ports:
+      - target: 5173
+        published: 5173
+        protocol: tcp
+    environment:
+      API_URL: ${API_URL:-}
+      NODE_ENV: ${NODE_ENV:-}
+    secrets:
+      - api_url
+      - node_env
+    restart: unless-stopped
+
+  wiki:
+    build:
+      context: apps/wiki/dist
+      dockerfile: apps/wiki/Dockerfile
+    image: portfolio-wiki:local
+    container_name: wiki
+    networks:
+      - default
+    ports:
+      - target: 80
+        published: 3002
+        protocol: tcp
+    environment:
+      NODE_ENV: ${NODE_ENV:-}
+    secrets:
+      - node_env
+    restart: unless-stopped
+
+volumes:
+  cache-data:
+    driver: local
+    name: portfolio_cache_data

@@ -1,0 +1,15 @@
+name = "pd"
+data-dir = "/pd/data"
+client-urls = "http://0.0.0.0:2379"
+advertise-client-urls = "http://pd:2379"
+peer-urls = "http://0.0.0.0:2380"
+advertise-peer-urls = "http://pd:2380"
+initial-cluster = "pd=http://pd:2380"
+initial-cluster-state = "new"
+
+[log]
+level = "warn"
+
+[metric]
+interval = "0s"
+address = ""

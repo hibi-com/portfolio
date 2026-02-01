@@ -1,0 +1,12 @@
+[log]
+level = "warn"
+
+[metric]
+interval = "0s"
+address = ""
+
+[raftdb]
+max-open-files = 1024
+
+[rocksdb]
+max-open-files = 1024

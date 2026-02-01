@@ -1,7 +1,0 @@
-*.md
-*.log
-*.sql.bak
-*.sql.backup
-.DS_Store
-.git
-.gitignore

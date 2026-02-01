@@ -29,27 +29,24 @@ if [ "${SKIP_BUILD}" != "true" ]; then
 	echo "📦 Step 1: Installing dependencies and building application..."
 
 	cd "${WORK_DIR}" || exit 1
-	
-	# Verify workspace directories exist
+
 	echo "Verifying workspace directories..."
 	for workspace_pattern in "apps" "packages" "tooling" "testing" "scripts"; do
 		if [ ! -d "${workspace_pattern}" ]; then
 			echo "⚠️  Warning: Workspace directory not found: ${workspace_pattern}" >&2
 		fi
 	done
-	
-	# Always run bun install to ensure workspace dependencies are resolved correctly
-	# Even if node_modules exists, workspace dependencies might not be properly linked
+
 	echo "Installing dependencies at monorepo root..."
 	if ! bun install --frozen-lockfile; then
 		echo "❌ Error: Failed to install dependencies" >&2
 		echo "Debug information:" >&2
 		echo "Current directory: $(pwd)" >&2
 		echo "Workspace directories:" >&2
-		ls -la "${WORK_DIR}" | grep -E "^d" | head -10 >&2
+		find "${WORK_DIR}" -maxdepth 1 -mindepth 1 -type d -exec ls -ld {} \; 2>/dev/null | head -10 >&2
 		if [ -d "${WORK_DIR}/tooling" ]; then
 			echo "tooling directory contents:" >&2
-			ls -la "${WORK_DIR}/tooling" | head -10 >&2
+			find "${WORK_DIR}/tooling" -maxdepth 1 -mindepth 1 -exec ls -ld {} \; 2>/dev/null | head -10 >&2
 		fi
 		exit 1
 	fi

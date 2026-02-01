@@ -1,0 +1,173 @@
+configs:
+  pd_config:
+    file: ./config/pd.toml
+  tikv_config:
+    file: ./config/tikv.toml
+  tidb_config:
+    file: ./config/tidb.toml
+
+networks:
+  db:
+    driver: bridge
+    name: portfolio_db
+
+services:
+  pd:
+    platform: linux/amd64
+    image: pingcap/pd:v7.5.2
+    container_name: pd
+    environment:
+      TZ: "Asia/Tokyo"
+    networks:
+      - db
+    ports:
+      - target: 2379
+        published: 2379
+        protocol: tcp
+      - target: 2380
+        published: 2380
+        protocol: tcp
+    configs:
+      - source: pd_config
+        target: /etc/pd/pd.toml
+    volumes:
+      - pd_data:/pd/data
+      - pd_logs:/pd/logs
+    command:
+      - --name=pd
+      - --config=/etc/pd/pd.toml
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://pd:2379
+      - --advertise-peer-urls=http://pd:2380
+      - --initial-cluster=pd=http://pd:2380
+      - --data-dir=/pd/data
+      - --log-file=/pd/logs/pd.log
+    restart: on-failure
+
+  tikv:
+    platform: linux/amd64
+    image: pingcap/tikv:v7.5.2
+    container_name: tikv
+    environment:
+      TZ: "Asia/Tokyo"
+    networks:
+      - db
+    ports:
+      - target: 20160
+        published: 20160
+        protocol: tcp
+    configs:
+      - source: tikv_config
+        target: /etc/tikv/tikv.toml
+    volumes:
+      - tikv_data:/tikv/data
+      - tikv_logs:/tikv/logs
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv:20160
+      - --config=/etc/tikv/tikv.toml
+      - --data-dir=/tikv/data
+      - --pd=pd:2379
+      - --log-file=/tikv/logs/tikv.log
+    depends_on:
+      - pd
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
+    restart: on-failure
+
+  tidb:
+    platform: linux/amd64
+    image: pingcap/tidb:v7.5.2
+    container_name: tidb
+    environment:
+      TZ: "Asia/Tokyo"
+    networks:
+      - db
+    ports:
+      - target: 4000
+        published: 4000
+        protocol: tcp
+      - target: 10080
+        published: 10080
+        protocol: tcp
+    configs:
+      - source: tidb_config
+        target: /etc/tidb/tidb.toml
+    command:
+      - --store=tikv
+      - --path=pd:2379
+      - --config=/etc/tidb/tidb.toml
+      - --advertise-address=tidb
+    depends_on:
+      - tikv
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget -q -O - http://127.0.0.1:10080/status || exit 1"]
+      interval: 10s
+      retries: 30
+      start_period: 10s
+      timeout: 30s
+    restart: on-failure
+
+  init-tidb:
+    platform: linux/amd64
+    image: mysql:8.0
+    container_name: init-tidb
+    networks:
+      - db
+    depends_on:
+      tidb:
+        condition: service_healthy
+    entrypoint: >
+      sh -c "
+        mysql -h tidb -P 4000 -u root -e 'CREATE DATABASE IF NOT EXISTS portfolio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;' &&
+        mysql -h tidb -P 4000 -u root -e \"CREATE USER IF NOT EXISTS 'user'@'%' IDENTIFIED BY 'password';\" &&
+        mysql -h tidb -P 4000 -u root -e \"GRANT ALL PRIVILEGES ON portfolio.* TO 'user'@'%';\" &&
+        mysql -h tidb -P 4000 -u root -e 'FLUSH PRIVILEGES;' &&
+        mysql -h tidb -P 4000 -u root -e 'SET GLOBAL allow_auto_random_explicit_insert = ON;' &&
+        echo 'TiDB initialization completed.'
+      "
+
+  setup-db:
+    platform: linux/amd64
+    image: mysql:8.0
+    container_name: setup-db
+    networks:
+      - db
+    volumes:
+      - type: bind
+        source: ./sql
+        target: /sql
+        read_only: true
+    depends_on:
+      init-tidb:
+        condition: service_completed_successfully
+    entrypoint: >
+      sh -c "
+        if mysql -h tidb -P 4000 -u user -ppassword portfolio -e 'SELECT 1 FROM \`user\` LIMIT 1' 2>/dev/null; then
+          echo 'DB already has schema; skipping setup-db.';
+          exit 0;
+        fi;
+        for f in $$(ls /sql/*.sql 2>/dev/null | sort); do
+          echo \"Applying $$f...\";
+          mysql -h tidb -P 4000 -u user -ppassword portfolio < \"$$f\" || exit 1;
+        done &&
+        echo 'Schema and seed completed.'
+      "
+
+volumes:
+  pd_data:
+    driver: local
+    name: portfolio_pd_data
+  pd_logs:
+    driver: local
+    name: portfolio_pd_logs
+  tikv_data:
+    driver: local
+    name: portfolio_tikv_data
+  tikv_logs:
+    driver: local
+    name: portfolio_tikv_logs
