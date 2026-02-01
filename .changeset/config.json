@@ -1,20 +1,20 @@
 {
-  "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
-  "changelog": [
-    "@portfolio/changelog-config",
-    {
-      "repo": "ageha734/portfolio"
-    }
-  ],
-  "commit": true,
-  "fixed": [],
-  "linked": [],
-  "access": "restricted",
-  "baseBranch": "master",
-  "updateInternalDependencies": "patch",
-  "privatePackages": {
-    "version": true,
-    "tag": false
-  },
-  "ignore": []
+    "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
+    "changelog": [
+        "@portfolio/changelog-config",
+        {
+            "repo": "ageha734/portfolio"
+        }
+    ],
+    "commit": true,
+    "fixed": [],
+    "linked": [],
+    "access": "restricted",
+    "baseBranch": "master",
+    "updateInternalDependencies": "patch",
+    "privatePackages": {
+        "version": true,
+        "tag": false
+    },
+    "ignore": []
 }
