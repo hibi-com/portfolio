@@ -56,10 +56,12 @@ import {
     SyncPartnersFromFreeeUseCase,
     SyncPartnersToFreeeUseCase,
 } from "~/usecase/freee";
-import { GetPortfolioBySlugUseCase } from "~/usecase/getPortfolioBySlug";
-import { GetPortfoliosUseCase } from "~/usecase/getPortfolios";
-import { GetPostBySlugUseCase } from "~/usecase/getPostBySlug";
-import { GetPostsUseCase } from "~/usecase/getPosts";
+import {
+    GetPortfolioBySlugUseCase,
+    GetPortfoliosUseCase,
+    UploadPortfolioImageUseCase,
+} from "~/usecase/portfolio";
+import { GetPostBySlugUseCase, GetPostsUseCase } from "~/usecase/post";
 import {
     AddInquiryResponseUseCase,
     CloseInquiryUseCase,
@@ -86,7 +88,6 @@ import {
     GetPipelinesUseCase,
     UpdatePipelineUseCase,
 } from "~/usecase/pipeline";
-import { UploadPortfolioImageUseCase } from "~/usecase/uploadPortfolioImage";
 
 export class DIContainer {
     private readonly postRepository: CachedPostRepository;
