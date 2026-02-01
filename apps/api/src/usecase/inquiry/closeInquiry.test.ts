@@ -1,0 +1,60 @@
+import { describe, expect, test, vi } from "vitest";
+import type { Inquiry, InquiryRepository, InquiryResponse } from "~/domain/inquiry";
+import { CloseInquiryUseCase } from "./closeInquiry";
+
+describe("CloseInquiryUseCase", () => {
+    const mockInquiry: Inquiry = {
+        id: "inquiry-1",
+        subject: "Test Inquiry",
+        content: "Test content",
+        status: "OPEN",
+        priority: "MEDIUM",
+        category: "GENERAL",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    };
+
+    const mockResponse: InquiryResponse = {
+        id: "response-1",
+        inquiryId: "inquiry-1",
+        content: "Test response",
+        isInternal: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    };
+
+    const createMockRepository = (overrides: Partial<InquiryRepository> = {}): InquiryRepository => ({
+        findAll: vi.fn().mockResolvedValue([]),
+        findById: vi.fn().mockResolvedValue(null),
+        findByCustomerId: vi.fn().mockResolvedValue([]),
+        findByAssigneeId: vi.fn().mockResolvedValue([]),
+        findByStatus: vi.fn().mockResolvedValue([]),
+        create: vi.fn().mockResolvedValue(mockInquiry),
+        update: vi.fn().mockResolvedValue(mockInquiry),
+        delete: vi.fn().mockResolvedValue(undefined),
+        resolve: vi.fn().mockResolvedValue(mockInquiry),
+        close: vi.fn().mockResolvedValue(mockInquiry),
+        addResponse: vi.fn().mockResolvedValue(mockResponse),
+        getResponses: vi.fn().mockResolvedValue([]),
+        ...overrides,
+    });
+
+    test("should close inquiry", async () => {
+        const closedInquiry: Inquiry = {
+            ...mockInquiry,
+            status: "CLOSED",
+            closedAt: new Date(),
+        };
+
+        const mockRepository = createMockRepository({
+            close: vi.fn().mockResolvedValue(closedInquiry),
+        });
+
+        const useCase = new CloseInquiryUseCase(mockRepository);
+        const result = await useCase.execute("inquiry-1");
+
+        expect(result.status).toBe("CLOSED");
+        expect(result.closedAt).toBeDefined();
+        expect(mockRepository.close).toHaveBeenCalledWith("inquiry-1");
+    });
+});
