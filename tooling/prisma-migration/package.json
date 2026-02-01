@@ -1,7 +1,7 @@
 {
   "private": true,
   "version": "1.0.1",
-  "name": "@portfolio/db",
+  "name": "@portfolio/prisma-migration",
   "type": "module",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -14,35 +14,27 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "bun run build:js && bun run build:types",
-    "build:js": "bun build ./src/index.ts --outdir dist --target node --format esm --external @prisma/client",
+    "build:js": "bun build ./src/index.ts --outdir dist --target node --format esm && mkdir -p dist/cmd && bun build ./cmd/main.ts --outfile dist/cmd/main.js --target node --format esm && chmod +x dist/cmd/main.js",
     "build:types": "git clean -xdf .cache/tsbuildinfo.json && tsc --emitDeclarationOnly --declaration --outDir dist",
     "clean:cache": "git clean -xdf .cache .turbo",
     "clean:pkg": "git clean -xdf node_modules dist",
-    "coverage": "vitest run --coverage",
     "dev": "bun run build:js --watch",
     "fmt": "biome format --write .",
     "fmt:check": "biome format .",
-    "generate": "bun run with-env prisma generate",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
-    "migrate": "prisma-migration",
-    "studio": "bun run with-env prisma studio --browser none",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "with-env": "doppler run --"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@prisma/client": "5.22.0"
+    "@prisma/generator-helper": "7.3.0"
   },
   "devDependencies": {
     "@portfolio/biome-config": "workspace:*",
-    "@portfolio/prisma-migration": "workspace:*",
-    "@portfolio/prisma-markdown": "workspace:*",
     "@portfolio/tsconfig": "workspace:*",
-    "@portfolio/vitest-config": "workspace:*",
-    "prisma": "5.22.0",
-    "typescript": "5.9.3",
-    "vitest": "3.2.4",
-    "vitest-environment-miniflare": "2.14.4"
+    "@types/node": "25.0.3",
+    "typescript": "5.9.3"
+  },
+  "bin": {
+    "prisma-migration": "./dist/cmd/main.js"
   }
 }
