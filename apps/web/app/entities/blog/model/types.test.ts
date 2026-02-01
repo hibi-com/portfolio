@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { BlogData, EnumValue, Post } from "./types.d";
+import type { BlogData, EnumValue, Post } from "./types";
 
 describe("Blog Entity Types", () => {
     describe("Post", () => {

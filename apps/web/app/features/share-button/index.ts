@@ -1,2 +1,2 @@
-export type { ShareButtonProps, ShareOptions } from "./model/types.d";
+export type { ShareButtonProps, ShareOptions } from "./model/types";
 export { ShareButton } from "./ui/ShareButton";

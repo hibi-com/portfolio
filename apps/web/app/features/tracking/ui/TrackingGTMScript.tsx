@@ -1,4 +1,4 @@
-import type { TrackingGTMScriptProps } from "../model/types.d";
+import type { TrackingGTMScriptProps } from "../model/types";
 
 /**
  * @name TrackingGTMScript

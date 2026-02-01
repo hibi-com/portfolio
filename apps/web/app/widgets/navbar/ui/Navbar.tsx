@@ -5,7 +5,7 @@ import type { MouseEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { SITE_AUTHOR } from "~/shared/config/constants";
 import { navLinks, socialLinks } from "../lib/NavData";
-import type { NavLink, SocialLink } from "../model/types.d";
+import type { NavLink, SocialLink } from "../model/types";
 import { ThemeToggle } from "./ThemeToggle";
 
 function useScrollToHash() {

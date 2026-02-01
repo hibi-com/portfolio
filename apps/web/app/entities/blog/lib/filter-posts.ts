@@ -1,4 +1,4 @@
-import type { BlogData, Post } from "../model/types.d";
+import type { BlogData, Post } from "../model/types";
 
 /**
  * @name filterBlogPosts

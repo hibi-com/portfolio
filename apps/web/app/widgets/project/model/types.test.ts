@@ -11,7 +11,7 @@ import type {
     ProjectSectionProps,
     ProjectSectionTextProps,
     ProjectTextRowProps,
-} from "./types.d";
+} from "./types";
 
 describe("Project Widget Types", () => {
     describe("ProjectHeaderProps", () => {

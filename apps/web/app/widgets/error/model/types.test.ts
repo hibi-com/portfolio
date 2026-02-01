@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { ErrorProps } from "./types.d";
+import type { ErrorProps } from "./types";
 
 describe("Error Widget Types", () => {
     describe("ErrorProps", () => {

@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type { BlogUpcomingProps } from "../model/types.d";
+import type { BlogUpcomingProps } from "../model/types";
 
 export const BlogUpcoming = (props: BlogUpcomingProps) => {
     const { className } = props;

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { NavLink, SocialLink } from "./types.d";
+import type { NavLink, SocialLink } from "./types";
 
 describe("Navbar Widget Types", () => {
     describe("NavLink", () => {

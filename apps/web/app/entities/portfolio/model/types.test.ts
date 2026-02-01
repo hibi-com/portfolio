@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { Portfolio } from "./types.d";
+import type { Portfolio } from "./types";
 
 describe("Portfolio Entity Types", () => {
     describe("Portfolio", () => {

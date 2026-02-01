@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { MemoryRouter, Link as RouterLink } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import type { BlogPreviewProps } from "../model/types.d";
+import type { BlogPreviewProps } from "../model/types";
 import { BlogPreview } from "./BlogPreview";
 
 vi.mock("@remix-run/react", async () => {

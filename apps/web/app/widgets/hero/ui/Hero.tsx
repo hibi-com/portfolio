@@ -1,5 +1,5 @@
 import { cn } from "@portfolio/ui";
-import type { HeroProps } from "../model/types.d";
+import type { HeroProps } from "../model/types";
 
 export const Hero = (props: HeroProps) => {
     const { className, copy, highlight, tag: Tag = "h2" } = props;

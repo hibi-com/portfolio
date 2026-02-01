@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { Portfolio } from "~/entities/portfolio";
-import type { PortfolioPreviewProps } from "./types.d";
+import type { PortfolioPreviewProps } from "./types";
 
 describe("PortfolioPreview Feature Types", () => {
     describe("PortfolioPreviewProps", () => {

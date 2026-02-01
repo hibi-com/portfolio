@@ -1,6 +1,6 @@
 import { Link } from "@remix-run/react";
 import classnames from "classnames";
-import type { SandboxSidebarProps } from "../model/types.d";
+import type { SandboxSidebarProps } from "../model/types";
 
 interface SandboxItem {
     title: string;

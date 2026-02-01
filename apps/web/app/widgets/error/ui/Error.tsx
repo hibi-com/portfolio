@@ -1,7 +1,7 @@
 import { Button, cn } from "@portfolio/ui";
 import { Link } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import type { ErrorProps } from "../model/types.d";
+import type { ErrorProps } from "../model/types";
 import flatlineSkull from "./error-flatline.svg";
 
 const notFoundPoster = "/assets/notfound.jpg";

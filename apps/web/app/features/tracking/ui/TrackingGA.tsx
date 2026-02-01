@@ -1,4 +1,4 @@
-import type { TrackingGAProps } from "../model/types.d";
+import type { TrackingGAProps } from "../model/types";
 
 /**
  * @name TrackingGA

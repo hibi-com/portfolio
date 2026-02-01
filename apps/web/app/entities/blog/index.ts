@@ -4,4 +4,4 @@ export type {
     PostSchema,
 } from "./model/schemas";
 export { blogDataSchema, enumValueSchema, postSchema } from "./model/schemas";
-export type { BlogData, EnumValue, Post } from "./model/types.d";
+export type { BlogData, EnumValue, Post } from "./model/types";

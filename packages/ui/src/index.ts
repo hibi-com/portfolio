@@ -12,10 +12,7 @@ export * from "./components/Textarea";
 export type { LogoProps } from "./components/Logo";
 export { Logo } from "./components/Logo";
 export * from "./components/NavigationMenu";
-export type {
-    ShareButtonProps,
-    ShareOptions,
-} from "./components/ShareButton.d";
+export type { ShareButtonProps, ShareOptions } from "./components/ShareButton";
 export { ShareButton } from "./components/ShareButton";
 export * from "./components/Separator";
 export * from "./components/Sheet";

@@ -1,4 +1,4 @@
-import type { TrackingGTMIFrameProps } from "../model/types.d";
+import type { TrackingGTMIFrameProps } from "../model/types";
 
 /**
  * @name TrackingGTMIFrame

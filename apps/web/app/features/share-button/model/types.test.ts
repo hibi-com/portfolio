@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { ShareButtonProps, ShareOptions } from "./types.d";
+import type { ShareButtonProps, ShareOptions } from "./types";
 
 describe("ShareButton Feature Types", () => {
     describe("ShareOptions", () => {

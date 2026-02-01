@@ -1,5 +1,5 @@
 import { SOCIAL_GITHUB } from "~/shared/config/constants";
-import type { NavLink, SocialLink } from "../model/types.d";
+import type { NavLink, SocialLink } from "../model/types";
 
 export const navLinks: NavLink[] = [
     {

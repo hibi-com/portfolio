@@ -1,4 +1,4 @@
-import type { BlogFeaturedProps } from "../model/types.d";
+import type { BlogFeaturedProps } from "../model/types";
 import { BlogPreview } from "./BlogPreview";
 
 export const BlogFeatured = (props: BlogFeaturedProps) => {

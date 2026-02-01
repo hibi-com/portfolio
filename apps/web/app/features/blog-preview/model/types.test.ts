@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { Post } from "~/entities/blog";
-import type { BlogFeaturedProps, BlogPreviewProps, BlogUpcomingProps } from "./types.d";
+import type { BlogFeaturedProps, BlogPreviewProps, BlogUpcomingProps } from "./types";
 
 describe("BlogPreview Feature Types", () => {
     describe("BlogFeaturedProps", () => {

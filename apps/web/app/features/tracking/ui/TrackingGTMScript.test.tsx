@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
-import type { TrackingGTMScriptProps } from "../model/types.d";
+import type { TrackingGTMScriptProps } from "../model/types";
 import { TrackingGTMScript } from "./TrackingGTMScript";
 
 describe("TrackingGTMScript Component", () => {

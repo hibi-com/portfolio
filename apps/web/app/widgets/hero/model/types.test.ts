@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import { describe, expect, test } from "vitest";
-import type { HeroProps } from "./types.d";
+import type { HeroProps } from "./types";
 
 describe("Hero Widget Types", () => {
     describe("HeroProps", () => {

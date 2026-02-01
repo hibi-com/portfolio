@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { SandboxSidebarProps } from "./types.d";
+import type { SandboxSidebarProps } from "./types";
 
 describe("Sandbox Widget Types", () => {
     describe("SandboxSidebarProps", () => {

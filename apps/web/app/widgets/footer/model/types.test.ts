@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { FooterConfig, FooterMobileProps, FooterProps, FooterSocialLink } from "./types.d";
+import type { FooterConfig, FooterMobileProps, FooterProps, FooterSocialLink } from "./types";
 
 describe("Footer Widget Types", () => {
     describe("FooterSocialLink", () => {

@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import { describe, expect, test } from "vitest";
-import type { PostProps } from "./types.d";
+import type { PostProps } from "./types";
 
 describe("Post Widget Types", () => {
     describe("PostProps", () => {

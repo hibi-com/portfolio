@@ -9,7 +9,7 @@ export type {
     ProjectSectionProps,
     ProjectSectionTextProps,
     ProjectTextRowProps,
-} from "./model/types.d";
+} from "./model/types";
 export {
     ProjectBackground,
     ProjectContainer,

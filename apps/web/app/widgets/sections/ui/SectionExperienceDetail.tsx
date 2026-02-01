@@ -1,7 +1,7 @@
-import { getLogger } from "~/lib/logger";
 import { sanitizeHtml } from "@portfolio/ui";
+import { getLogger } from "~/lib/logger";
 import { getTimeWorked } from "../lib/date-time";
-import type { SectionExperienceDetailProps } from "../model/types.d";
+import type { SectionExperienceDetailProps } from "../model/types";
 
 export const SectionExperienceDetail = (props: SectionExperienceDetailProps) => {
     const { experience } = props;

@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
-import type { TrackingGTMIFrameProps } from "../model/types.d";
+import type { TrackingGTMIFrameProps } from "../model/types";
 import { TrackingGTMIFrame } from "./TrackingGTMIFrame";
 
 describe("TrackingGTMIFrame Component", () => {

@@ -2,6 +2,10 @@ import { type RenderOptions, render as rtlRender } from "@testing-library/react"
 import { type ReactElement, type ReactNode } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 
+export interface RenderWithRouterResult extends ReturnType<typeof rtlRender> {
+    router: ReturnType<typeof createMemoryRouter>;
+}
+
 interface WrapperOptions {
     route?: string;
     initialEntries?: string[];

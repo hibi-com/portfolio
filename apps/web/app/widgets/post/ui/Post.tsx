@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import type { MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Footer } from "~/widgets/footer";
-import type { PostProps } from "../model/types.d";
+import type { PostProps } from "../model/types";
 
 function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { Experience } from "~/entities/user";
-import type { SectionExperienceDetailProps } from "./types.d";
+import type { SectionExperienceDetailProps } from "./types";
 
 describe("Sections Widget Types", () => {
     describe("SectionExperienceDetailProps", () => {

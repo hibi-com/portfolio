@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { Experience, Social } from "./types.d";
+import type { Experience, Social } from "./types";
 
 describe("User Entity Types", () => {
     describe("Experience", () => {

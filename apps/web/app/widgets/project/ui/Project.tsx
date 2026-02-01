@@ -11,7 +11,7 @@ import type {
     ProjectSectionProps,
     ProjectSectionTextProps,
     ProjectTextRowProps,
-} from "../model/types.d";
+} from "../model/types";
 
 const initDelay = 300;
 

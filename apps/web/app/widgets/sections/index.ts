@@ -1,4 +1,4 @@
-export type { SectionExperienceDetailProps } from "./model/types.d";
+export type { SectionExperienceDetailProps } from "./model/types";
 export { SectionAmbitions } from "./ui/SectionAmbitions";
 export { SectionCompanies } from "./ui/SectionCompanies";
 export { SectionEducation } from "./ui/SectionEducation";

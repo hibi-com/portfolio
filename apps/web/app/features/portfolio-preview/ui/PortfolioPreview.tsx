@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import type { PortfolioPreviewProps } from "../model/types.d";
+import type { PortfolioPreviewProps } from "../model/types";
 
 /**
  * @name PortfolioPreview

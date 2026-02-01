@@ -3,6 +3,6 @@ export type {
     FooterMobileProps,
     FooterProps,
     FooterSocialLink,
-} from "./model/types.d";
+} from "./model/types";
 export { Footer } from "./ui/Footer";
 export { FooterMobile } from "./ui/FooterMobile";

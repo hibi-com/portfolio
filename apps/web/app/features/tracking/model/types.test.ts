@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { TrackingGAProps, TrackingGTMIFrameProps, TrackingGTMScriptProps } from "./types.d";
+import type { TrackingGAProps, TrackingGTMIFrameProps, TrackingGTMScriptProps } from "./types";
 
 describe("Tracking Feature Types", () => {
     describe("TrackingGAProps", () => {
