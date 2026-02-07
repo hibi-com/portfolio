@@ -48,7 +48,6 @@ interface CoverageMetadata {
     summary: CoverageSummary;
 }
 
-/** Minimal reporter interface; avoids deprecated vitest Reporter type. */
 interface VitestReporterLike {
     onFinished?(): void | Promise<void>;
 }
