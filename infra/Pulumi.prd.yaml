@@ -2,7 +2,4 @@ config:
   portfolio-infra:environment: prd
   portfolio-infra:domain: ageha734.jp
   portfolio-infra:slug: portfolio
-  portfolio-infra:dopplerProject: portfolio
-  portfolio-infra:dopplerConfig: prd
-  portfolio-infra:createDopplerProject: "false"
-  portfolio-infra:syncDopplerSecrets: "true"
+  portfolio-infra:projectName: portfolio

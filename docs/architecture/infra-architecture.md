@@ -8,7 +8,7 @@ title: "インフラアーキテクチャ"
 
 ## 概要
 
-インフラは **Pulumi** で IaC 化され、**Cloudflare**（Workers / Pages / DNS）、**Doppler**（シークレット）、**TiDB Cloud**・**Redis Cloud**（データストア）、**Grafana**・**Sentry**（可観測性）を統合しています。
+インフラは **Pulumi** で IaC 化され、**Cloudflare**（Workers / Pages / DNS および環境変数）、**TiDB Cloud**・**Redis Cloud**（データストア）、**Grafana**・**Sentry**（可観測性）を統合しています。
 
 ## ランタイム構成図
 
@@ -36,7 +36,7 @@ flowchart TB
     end
 
     subgraph Secrets["シークレット管理"]
-        Doppler["Doppler"]
+        CFEnv["Cloudflare Pages/Workers 環境変数"]
     end
 
     subgraph Observability["可観測性"]
@@ -55,10 +55,10 @@ flowchart TB
     WorkerAPI --> TiDB
     WorkerAPI --> Redis
 
-    Doppler -.->|環境変数・シークレット| PagesWeb
-    Doppler -.->|環境変数・シークレット| PagesAdmin
-    Doppler -.->|環境変数・シークレット| PagesWiki
-    Doppler -.->|環境変数・シークレット| WorkerAPI
+    CFEnv -.->|環境変数・シークレット| PagesWeb
+    CFEnv -.->|環境変数・シークレット| PagesAdmin
+    CFEnv -.->|環境変数・シークレット| PagesWiki
+    CFEnv -.->|環境変数・シークレット| WorkerAPI
 
     WorkerAPI -.->|トレース・エラー| Sentry
     WorkerAPI -.->|メトリクス・ログ| Grafana
@@ -71,12 +71,11 @@ Pulumi がどのプロバイダーとリソースを順に作成・参照する�
 ```mermaid
 flowchart LR
     subgraph Pulumi["Pulumi (infra)"]
-        Config["config / Doppler 参照"]
+        Config["config / .env 参照"]
     end
 
     subgraph Providers["プロバイダー"]
         CF["Cloudflare"]
-        Doppler["Doppler"]
         TiDB["TiDB Cloud"]
         RedisCloud["Redis Cloud"]
         Grafana["Grafana"]
@@ -85,8 +84,7 @@ flowchart LR
 
     subgraph Resources["作成リソース"]
         direction TB
-        R1["Doppler Project / Secrets"]
-        R2["TiDB Serverless Cluster<br/>（オプション）"]
+        R1["TiDB Serverless Cluster<br/>（オプション）"]
         R3["Redis Cloud Subscription/DB<br/>（オプション）"]
         R4["Cloudflare Workers (API)"]
         R5["Cloudflare Pages (web, admin, wiki)"]
@@ -96,15 +94,13 @@ flowchart LR
         R9["Sentry Project / DSN"]
     end
 
-    Config --> Doppler
     Config --> CF
     Config --> TiDB
     Config --> RedisCloud
     Config --> Grafana
     Config --> Sentry
 
-    Doppler --> R1
-    TiDB --> R2
+    TiDB --> R1
     RedisCloud --> R3
     CF --> R4
     CF --> R5
@@ -121,24 +117,24 @@ flowchart LR
 ## コンポーネント一覧
 
 | カテゴリ | コンポーネント | 説明 | infra リソース |
-|----------|----------------|------|----------------|
-| シークレット | Doppler | 環境変数・シークレットの一元管理。`.docker/secrets` からの同期またはプロジェクト自動作成 | `resources/secrets.ts` |
+| ---------- | ---------------- | ------ | ---------------- |
+| シークレット | Cloudflare Pages/Workers | 環境変数は `infra/.env` から Pulumi で Cloudflare に反映 | `resources/secrets.ts` |
 | コンピュート | Cloudflare Workers | Hono API（api サブドメイン） | `resources/workers.ts` |
 | コンピュート | Cloudflare Pages | Web (www)、Admin (admin)、Wiki (wiki)。Web/Admin は API Worker に Service Binding | `resources/pages.ts` |
 | ネットワーク | Cloudflare DNS | www, admin, wiki, api の CNAME（Pages/Workers 向け） | `resources/dns.ts` |
 | アクセス制御 | Cloudflare Access | rc/stg 環境でプレビュー用 Zero Trust（admin, api, web, wiki） | `resources/access.ts` |
 | データベース | TiDB Cloud | Serverless（AWS ap-northeast-1）。自動作成または外部 DATABASE_URL | `resources/databases.ts` |
-| キャッシュ | Redis Cloud | AWS ap-northeast-1。自動作成または外部 REDIS_URL | `resources/cache.ts` |
+| キャッシュ | Redis Cloud | AWS ap-northeast-1。自動作成または外部 CACHE_URL | `resources/cache.ts` |
 | 可観測性 | Grafana | フォルダ・ダッシュボード | `resources/observability.ts` |
 | 可観測性 | Sentry | プロジェクト・DSN（エラー追跡） | `resources/observability.ts` |
 
 ## 環境とスタック
 
 - **Pulumi スタック**: `prd`, `stg`, `rc` など（`Pulumi.*.yaml`）
-- **Doppler**: スタックに応じた `dopplerConfig` で環境別シークレットを参照
+- **環境変数**: `infra/.env` を読み、Pulumi で Cloudflare Pages/Workers に反映
 - **Cloudflare Access**: プレビュー用の Access アプリは `rc` / `stg` のみ作成
 
 ## 関連ドキュメント
 
 - [Architecture Overview](./overview.md)
-- [Compose 用シークレット（Doppler）](../development/docker-secrets.md) — ローカルと Doppler の対応
+- [APIキー・トークン発行手順](../development/api-keys-setup.md)

@@ -13,7 +13,6 @@ const SECRET_FILE_PATTERNS = [
 ];
 
 const SECRET_KEY_PATTERNS = [
-    /doppler:dopplerToken/i,
     /secure:/i,
     /api[_-]?key/i,
     /apikey/i,
@@ -38,19 +37,19 @@ const SECRET_KEY_PATTERNS = [
 ];
 
 const SECRET_VALUE_PATTERNS = [
-    /^[A-Za-z0-9+/]{32,}={0,2}$/, // Base64エンコードされた値（32文字以上）
-    /^[A-Za-z0-9_-]{20,}$/, // 長いトークンやキー（20文字以上）
-    /^sk-[A-Za-z0-9_-]+$/, // Stripe APIキー
-    /^pk_[A-Za-z0-9_-]+$/, // Stripe公開キー
-    /^ghp_[A-Za-z0-9_-]+$/, // GitHub Personal Access Token
-    /^gho_[A-Za-z0-9_-]+$/, // GitHub OAuth Token
-    /^ghu_[A-Za-z0-9_-]+$/, // GitHub User-to-Server Token
-    /^ghs_[A-Za-z0-9_-]+$/, // GitHub Server-to-Server Token
-    /^ghr_[A-Za-z0-9_-]+$/, // GitHub Refresh Token
-    /^AKIA[0-9A-Z]{16}$/, // AWS Access Key ID
-    /^AIza[0-9A-Za-z_-]{35}$/, // Google API Key
-    /^ya29\.[0-9A-Za-z_-]+$/, // Google OAuth Token
-    /^xox[baprs]-[0-9a-zA-Z-]{10,48}$/, // Slack Token
+    /^[A-Za-z0-9+/]{32,}={0,2}$/,
+    /^[A-Za-z0-9_-]{20,}$/,
+    /^sk-[A-Za-z0-9_-]+$/,
+    /^pk_[A-Za-z0-9_-]+$/,
+    /^ghp_[A-Za-z0-9_-]+$/,
+    /^gho_[A-Za-z0-9_-]+$/,
+    /^ghu_[A-Za-z0-9_-]+$/,
+    /^ghs_[A-Za-z0-9_-]+$/,
+    /^ghr_[A-Za-z0-9_-]+$/,
+    /^AKIA[0-9A-Z]{16}$/,
+    /^AIza[0-9A-Za-z_-]{35}$/,
+    /^ya29\.[0-9A-Za-z_-]+$/,
+    /^xox[baprs]-[0-9a-zA-Z-]{10,48}$/,
 ];
 
 const EXCLUDE_PATTERNS = [
@@ -89,13 +88,37 @@ function shouldCheckFile(filePath: string): boolean {
 
 function checkPulumiFile(content: string): string[] {
     const issues: string[] = [];
-    if (content.includes("doppler:dopplerToken")) {
-        issues.push("contains 'doppler:dopplerToken' - use DOPPLER_TOKEN environment variable instead");
-    }
     if (/^\s*secure:/m.test(content)) {
         issues.push("contains encrypted secrets (secure:) - use environment variables instead");
     }
     return issues;
+}
+
+function isEmptyOrPlaceholder(value: string): boolean {
+    return value.length === 0 || value === "null" || value === "undefined" || value === "''" || value === '""';
+}
+
+function parseEnvLine(line: string): { key: string; value: string } | null {
+    const parts = line.split("=");
+    if (parts.length < 2) return null;
+    const key = parts[0]?.trim();
+    if (!key) return null;
+    const value = parts
+        .slice(1)
+        .join("=")
+        .trim()
+        .replaceAll(/(?:^["'])|(?:["']$)/g, "");
+    return { key, value };
+}
+
+function detectSecretIssue(key: string, value: string, lineNumber: number): string | null {
+    if (SECRET_VALUE_PATTERNS.some((pattern) => pattern.test(value))) {
+        return `line ${lineNumber}: potential secret in '${key}'`;
+    }
+    if (value.length > 10) {
+        return `line ${lineNumber}: potential secret in '${key}' (long value detected)`;
+    }
+    return null;
 }
 
 function checkEnvFile(content: string): string[] {
@@ -103,33 +126,17 @@ function checkEnvFile(content: string): string[] {
     const lines = content.split("\n");
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i]?.trim();
-        if (!line || line.startsWith("#") || line.length === 0) {
-            continue;
-        }
+        if (!line || line.startsWith("#")) continue;
 
-        const parts = line.split("=");
-        if (parts.length < 2) {
-            continue;
-        }
-        const key = parts[0]?.trim();
-        if (!key) {
-            continue;
-        }
-        const value = parts.slice(1).join("=").trim().replaceAll(/(?:^["'])|(?:["']$)/g, "");
+        const parsed = parseEnvLine(line);
+        if (!parsed) continue;
 
-        if (!SECRET_KEY_PATTERNS.some((pattern) => pattern.test(key))) {
-            continue;
-        }
+        const { key, value } = parsed;
+        if (!SECRET_KEY_PATTERNS.some((pattern) => pattern.test(key))) continue;
+        if (isEmptyOrPlaceholder(value)) continue;
 
-        if (value.length === 0 || value === "null" || value === "undefined" || value === "''" || value === '""') {
-            continue;
-        }
-
-        if (SECRET_VALUE_PATTERNS.some((pattern) => pattern.test(value))) {
-            issues.push(`line ${i + 1}: potential secret in '${key}'`);
-        } else if (value.length > 10) {
-            issues.push(`line ${i + 1}: potential secret in '${key}' (long value detected)`);
-        }
+        const issue = detectSecretIssue(key, value, i + 1);
+        if (issue) issues.push(issue);
     }
     return issues;
 }
@@ -184,14 +191,13 @@ function displayBestPractices(): void {
     console.error(pc.dim("   • Use environment variables instead of hardcoding secrets"));
     console.error(pc.dim("   • Never commit .env files with actual secrets"));
     console.error(pc.dim("   • Use .env.example files for documentation"));
-    console.error(pc.dim("   • Use secret management services (e.g., Doppler, AWS Secrets Manager)"));
+    console.error(pc.dim("   • Use secret management (e.g., Cloudflare env, AWS Secrets Manager)"));
     console.error();
 }
 
 function displayPulumiAdvice(): void {
     console.error(pc.yellow("   For Pulumi config files:"));
-    console.error(pc.dim("   • Remove 'doppler:dopplerToken' from config files"));
-    console.error(pc.dim("   • Use DOPPLER_TOKEN environment variable instead"));
+    console.error(pc.dim("   • Do not commit secure: values; use environment variables"));
     console.error(pc.dim("   • See infra/README.md for details"));
     console.error();
 }

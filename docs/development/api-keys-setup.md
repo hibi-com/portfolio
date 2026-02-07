@@ -4,11 +4,11 @@ title: "APIキー・トークン発行手順"
 
 このプロジェクトで必要な各種APIキー・トークンの発行手順をまとめています。
 
-## 環境変数・Doppler の管理
+## 環境変数・Cloudflare の管理
 
-- **compose で使う値**: `.docker/secrets/` で管理（`database_url`, `redis_url`, `api_url`, `node_env`）。詳細は [Compose 用シークレット（docker-secrets）](./docker-secrets.md) を参照。
-- **Doppler への同期**: `syncDopplerSecrets: true` のとき、`pulumi up` が `.docker/secrets/` の内容を Doppler に反映する（compose がソース）。
-- **その他の infra 用シークレット**（Cloudflare, Sentry, Grafana 等）: Doppler ダッシュボードで設定するか、`check infra` 用に一時的に `.env` に設定してから Doppler に手動で反映してもよい。
+- **compose で使う値**: `compose.yaml` の `environment` を正とし、ローカルは `.env` や compose のデフォルト値を使用。
+- **Cloudflare Pages/Workers**: `pulumi up` 実行時に `infra/.env` の値が Pulumi 経由で Cloudflare の環境変数に反映される。デプロイ後は Cloudflare Dashboard または `wrangler secret` で管理。
+- **infra 用シークレット**（Cloudflare, Sentry, Grafana 等）: `infra/.env` または `infra/environment.yaml` に設定し、`cd infra && pulumi up` で適用。
 
 ## 目次
 
@@ -16,10 +16,9 @@ title: "APIキー・トークン発行手順"
 2. [Sentry認証トークン](#sentry認証トークン)
 3. [Grafana APIキー](#grafana-apiキー)
 4. [Redis Cloud APIキー](#redis-cloud-apiキー)
-5. [Doppler Service Token](#doppler-service-token)
-6. [Google OAuth認証情報](#google-oauth認証情報)
-7. [Better Auth Secret](#better-auth-secret)
-8. [TiDB Cloud接続情報](#tidb-cloud接続情報)
+5. [Google OAuth認証情報](#google-oauth認証情報)
+6. [Better Auth Secret](#better-auth-secret)
+7. [TiDB Cloud接続情報](#tidb-cloud接続情報)
 
 ## Cloudflare APIトークン
 
@@ -122,10 +121,9 @@ SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
 
 **解決方法**:
 
-1. `.env`ファイルの`SENTRY_AUTH_TOKEN`が正しく設定されているか確認
-2. トークンがDopplerに正しく同期されているか確認
-3. トークンが有効で、必要なスコープ（`org:read`, `org:write`, `team:read`, `team:write`, `project:read`, `project:write`）が付与されているか確認
-4. `check infra` を実行して、トークンの有効性を確認
+1. `infra/.env` の `SENTRY_AUTH_TOKEN` が正しく設定されているか確認
+2. トークンが有効で、必要なスコープ（`org:read`, `org:write`, `team:read`, `team:write`, `project:read`, `project:write`）が付与されているか確認
+3. `check infra` を実行して、トークンの有効性を確認
 
 #### エラー: "You do not have permission to perform this action" (403)
 
@@ -245,38 +243,7 @@ REDISCLOUD_SECRET_KEY="your-secret-key"
 
 **原因**: APIキーが無効または期限切れ
 
-**解決方法**: [Redis Cloud](https://app.redislabs.com/) でキーを再発行し、`.env` と Doppler を更新してください。
-
-## Doppler Service Token
-
-### Doppler - 必要な情報
-
-- Doppler Service Token（環境変数として直接設定する必要はありませんが、Pulumiから使用）
-
-### Doppler - 発行手順
-
-1. [Doppler Dashboard](https://dashboard.doppler.com/) にログイン
-2. 対象のプロジェクトを選択
-3. 「Access」→「Service Tokens」にアクセス
-4. 「Generate Service Token」をクリック
-5. 以下の設定を行う：
-   - **Name**: `pulumi-infra` など任意の名前
-   - **Config**: 使用する環境（`rc`, `stg`, `prd`）を選択
-   - **Access**: `Read` または `Read & Write` を選択
-6. 「Generate Token」をクリック
-7. 表示されたトークンをコピー（**再表示できないため注意**）
-
-### Pulumi設定への追加
-
-```bash
-pulumi config set dopplerToken "your-service-token" --secret
-```
-
-### 環境変数として使用する場合
-
-```bash
-export DOPPLER_TOKEN="your-service-token"
-```
+**解決方法**: [Redis Cloud](https://app.redislabs.com/) でキーを再発行し、`infra/.env` を更新してください。
 
 ## Google OAuth認証情報
 
@@ -342,7 +309,7 @@ TIDB_HOST="gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
 
 ## まとめ
 
-すべての認証情報を`.env`ファイルに設定し、`check infra` で検証できます。Doppler に反映したうえで `pulumi up` を実行してください。
+すべての認証情報を `infra/.env` に設定し、`check infra` で検証できます。`cd infra && pulumi up` で Cloudflare Pages/Workers に環境変数が反映されます。
 
 ## check infra コマンド（APIキー・トークン検証）
 
@@ -363,7 +330,6 @@ bunx check infra
 - Sentry認証トークン（トークン・組織・チーム・プロジェクト）
 - Grafana APIキー（Grafana Cloud / セルフホスト）
 - Redis Cloud APIキー
-- Doppler Service Token
 - Google OAuth（形式チェック）
 - Better Auth Secret（形式チェック）
 - TiDB Cloud 接続情報（形式チェック）

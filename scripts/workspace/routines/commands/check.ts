@@ -105,58 +105,6 @@ async function installDocker(): Promise<void> {
     }
 }
 
-async function checkGpgAvailable(): Promise<boolean> {
-    try {
-        await $`which gpg`.quiet();
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-async function installDoppler(): Promise<void> {
-    const gpgAvailable = await checkGpgAvailable();
-    if (!gpgAvailable) {
-        logStep("", "Doppler CLIのインストールにはGnuPGが必要です。gpgが見つかりません", "error");
-        logStep("", "GnuPGをインストールしてください:", "info");
-        if (process.platform === "darwin") {
-            console.log(pc.dim("    brew install gnupg"));
-        } else {
-            console.log(pc.dim("    apt-get install gnupg  # Debian/Ubuntu"));
-            console.log(pc.dim("    yum install gnupg       # RHEL/CentOS"));
-        }
-        throw new Error("Doppler CLIのインストールにはGnuPGが必要です。gpgが見つかりません");
-    }
-
-    const loadingBar = new LoadingBar("Doppler CLIをインストールしています...");
-    loadingBar.start();
-    try {
-        const homeDir = process.env.HOME || process.env.USERPROFILE || "~";
-        const localBinDir = `${homeDir}/.local/bin`;
-        await $`mkdir -p ${localBinDir}`.quiet();
-
-        const installResult =
-            await $`bash -c "curl -Ls --tlsv1.2 --proto '=https' --retry 3 https://cli.doppler.com/install.sh | sh -s -- --install-path ${localBinDir}"`.quiet();
-
-        if (installResult.exitCode !== 0) {
-            const errorOutput = installResult.stderr.toString() || installResult.stdout.toString();
-            loadingBar.stop(false);
-            throw new Error(`インストールに失敗しました: ${errorOutput}`);
-        }
-        loadingBar.stop(true, "Doppler CLIのインストールが完了しました");
-        logStep("", `Doppler CLIは ${localBinDir} にインストールされました`, "info");
-        logStep("", "PATHに追加するには、シェル設定ファイルに以下を追加してください:", "info");
-        console.log(pc.dim(String.raw`    export PATH="$HOME/.local/bin:$PATH"`));
-    } catch (error) {
-        loadingBar.stop(false);
-        logStep("", "Doppler CLIのインストールに失敗しました", "error");
-        if (error instanceof Error) {
-            console.error(pc.dim(`  エラー: ${error.message}`));
-        }
-        throw error;
-    }
-}
-
 async function installCodex(): Promise<void> {
     const loadingBar = new LoadingBar("Codex CLIをインストールしています...");
     loadingBar.start();
@@ -304,13 +252,6 @@ const COMMANDS: CommandInfo[] = [
         checkCommand: "pulumi",
         installScript: "curl -fsSL https://get.pulumi.com | sh",
         description: "Pulumi",
-        required: true,
-    },
-    {
-        name: "doppler",
-        checkCommand: "doppler",
-        installScript: installDoppler,
-        description: "Doppler CLI",
         required: true,
     },
     {

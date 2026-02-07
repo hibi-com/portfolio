@@ -1,7 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
+import type { SecretsFromEnv } from "../config.js";
 import { getProjectName } from "../config.js";
 import { createTiDBCloudServerlessCluster, type TiDBCloudServerlessClusterOutputs } from "../provider/tidbcloud.js";
-import type { SecretsOutputs } from "./secrets.js";
 
 export const TIDB_ALLOWED_REGIONS = ["ap-northeast-1"] as const;
 
@@ -67,7 +67,7 @@ export function createTiDBServerlessConfig(
 }
 
 export function createPortfolioTiDBConfig(
-    secrets?: SecretsOutputs["secrets"],
+    secrets?: SecretsFromEnv,
     apiKeys?: {
         publicKey?: pulumi.Output<string>;
         privateKey?: pulumi.Output<string>;

@@ -7,7 +7,7 @@ import { isValidUuid } from "~/lib/validation";
 
 export async function getEmailLogs(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -44,7 +44,7 @@ export async function getEmailLogs(c: Context) {
 
 export async function getEmailLogById(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -90,7 +90,7 @@ export async function getEmailLogById(c: Context) {
 
 export async function getEmailTemplates(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -127,7 +127,7 @@ export async function getEmailTemplates(c: Context) {
 
 export async function getEmailTemplateById(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -176,7 +176,7 @@ export async function getEmailTemplateById(c: Context) {
 
 export async function createEmailTemplate(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -220,7 +220,7 @@ export async function createEmailTemplate(c: Context) {
 
 export async function updateEmailTemplate(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -263,7 +263,7 @@ export async function updateEmailTemplate(c: Context) {
 
 export async function deleteEmailTemplate(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -305,7 +305,7 @@ export async function deleteEmailTemplate(c: Context) {
 
 export async function sendEmail(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const resendApiKey = c.env.RESEND_API_KEY;
     const defaultFromEmail = c.env.RESEND_FROM_EMAIL || "noreply@example.com";
     const logger = getLogger();
@@ -369,7 +369,7 @@ export async function sendEmail(c: Context) {
 
 export async function sendEmailWithTemplate(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const resendApiKey = c.env.RESEND_API_KEY;
     const defaultFromEmail = c.env.RESEND_FROM_EMAIL || "noreply@example.com";
     const logger = getLogger();

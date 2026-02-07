@@ -7,7 +7,7 @@ import { isValidUuid } from "~/lib/validation";
 
 export async function getCustomers(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -44,7 +44,7 @@ export async function getCustomers(c: Context) {
 
 export async function getCustomerById(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -93,7 +93,7 @@ export async function getCustomerById(c: Context) {
 
 export async function createCustomer(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -133,7 +133,7 @@ export async function createCustomer(c: Context) {
 
 export async function updateCustomer(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -176,7 +176,7 @@ export async function updateCustomer(c: Context) {
 
 export async function deleteCustomer(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -218,7 +218,7 @@ export async function deleteCustomer(c: Context) {
 
 export async function getLeads(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -249,7 +249,7 @@ export async function getLeads(c: Context) {
 
 export async function getLeadById(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -295,7 +295,7 @@ export async function getLeadById(c: Context) {
 
 export async function createLead(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -335,7 +335,7 @@ export async function createLead(c: Context) {
 
 export async function updateLead(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -375,7 +375,7 @@ export async function updateLead(c: Context) {
 
 export async function deleteLead(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -414,7 +414,7 @@ export async function deleteLead(c: Context) {
 
 export async function convertLeadToDeal(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -456,7 +456,7 @@ export async function convertLeadToDeal(c: Context) {
 
 export async function getDeals(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -487,7 +487,7 @@ export async function getDeals(c: Context) {
 
 export async function getDealById(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -533,7 +533,7 @@ export async function getDealById(c: Context) {
 
 export async function createDeal(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -577,7 +577,7 @@ export async function createDeal(c: Context) {
 
 export async function updateDeal(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -617,7 +617,7 @@ export async function updateDeal(c: Context) {
 
 export async function deleteDeal(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -656,7 +656,7 @@ export async function deleteDeal(c: Context) {
 
 export async function moveDealToStage(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -705,10 +705,9 @@ export async function moveDealToStage(c: Context) {
     }
 }
 
-// Pipeline Handlers
 export async function getPipelines(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -739,7 +738,7 @@ export async function getPipelines(c: Context) {
 
 export async function getPipelineById(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -788,7 +787,7 @@ export async function getPipelineById(c: Context) {
 
 export async function createPipeline(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -828,7 +827,7 @@ export async function createPipeline(c: Context) {
 
 export async function updatePipeline(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -871,7 +870,7 @@ export async function updatePipeline(c: Context) {
 
 export async function deletePipeline(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();

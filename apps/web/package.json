@@ -11,7 +11,7 @@
     "clean:cache": "git clean -xdf .cache .turbo",
     "clean:pkg": "git clean -xdf node_modules dist",
     "coverage": "vitest run --coverage",
-    "deploy": "doppler run -- wrangler pages deploy --project-name portfolio-web-9xkcig --branch master",
+    "deploy": "wrangler pages deploy --project-name portfolio-web-9xkcig --branch master",
     "dev": "bun run with-env remix vite:dev",
     "e2e": "docker run --rm -e CI=true -e APP_DIR=apps/web -v $(git rev-parse --show-toplevel):/work -w /work -v $(git rev-parse --show-toplevel)/node_modules:/work/node_modules -v $(git rev-parse --show-toplevel)/docs/playwright/report:/work/docs/playwright/report -v $(git rev-parse --show-toplevel)/docs/security/e2e:/work/docs/security/e2e e2e",
     "fmt": "biome format --write .",
@@ -26,7 +26,7 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "visual": "docker run --rm -e CI=true -e APP_DIR=apps/web -v $(git rev-parse --show-toplevel):/work -w /work/apps/web -v $(git rev-parse --show-toplevel)/node_modules:/work/node_modules -v $(git rev-parse --show-toplevel)/docs/visual/report:/work/docs/playwright/report e2e bun x playwright test --config=playwright.storybook.config.ts e2e/storybook/visual",
-    "with-env": "doppler run --"
+    "with-env": "env"
   },
   "dependencies": {
     "@fireworks-js/react": "2.10.8",

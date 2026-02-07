@@ -105,7 +105,7 @@ title: "Redis Cloud 手動作成手順"
 
 ## 手順5: .envファイルにIDを設定
 
-プロジェクトルートの`.env`に `REDISCLOUD_SUBSCRIPTION_ID`、`REDISCLOUD_DATABASE_ID`、`REDIS_URL` を追加し、`cd infra && pulumi up` で Doppler に同期してください。
+`infra/.env` に `REDISCLOUD_SUBSCRIPTION_ID`、`REDISCLOUD_DATABASE_ID`、`CACHE_URL`（または `REDIS_URL`）を追加し、`cd infra && pulumi up` で Cloudflare 等に反映してください。
 
 ## 手順6: Pulumiで既存リソースをインポート
 

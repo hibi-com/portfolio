@@ -2,9 +2,6 @@ config:
   portfolio-infra:environment: rc
   portfolio-infra:domain: rc.ageha734.jp
   portfolio-infra:slug: portfolio
-  portfolio-infra:dopplerProject: portfolio
-  portfolio-infra:dopplerConfig: rc
-  portfolio-infra:createDopplerProject: "false"
-  portfolio-infra:syncDopplerSecrets: "true"
+  portfolio-infra:projectName: portfolio
   portfolio-infra:skipRedisCloud: "true"
   portfolio-infra:createTiDBCluster: "true"

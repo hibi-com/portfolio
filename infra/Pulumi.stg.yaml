@@ -2,7 +2,4 @@ config:
   portfolio-infra:environment: stg
   portfolio-infra:domain: stg.ageha734.jp
   portfolio-infra:slug: portfolio
-  portfolio-infra:dopplerProject: portfolio
-  portfolio-infra:dopplerConfig: stg
-  portfolio-infra:createDopplerProject: "false"
-  portfolio-infra:syncDopplerSecrets: "true"
+  portfolio-infra:projectName: portfolio

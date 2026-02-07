@@ -6,7 +6,7 @@ import { DIContainer } from "~/di/container";
 
 export async function getPosts(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -51,7 +51,7 @@ export async function getPosts(c: Context) {
 
 export async function getPostBySlug(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const slug = c.req.param("slug");
     const logger = getLogger();
     const metrics = getMetrics();

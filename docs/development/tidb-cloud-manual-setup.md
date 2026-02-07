@@ -86,20 +86,11 @@ title: "TiDB Cloud 手動作成手順"
    mysql://root:your-password@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/portfolio?sslaccept=strict
    ```
 
-## 手順5: 接続情報をDopplerに設定
+## 手順5: 接続情報を infra/.env に設定
 
 TiDB Cloudは`DATABASE_URL`のみを使用します（`TIDB_HOST`は不要）。
 
-### 方法1: Doppler CLIを使用
-
-```bash
-# DATABASE_URLを設定（rc環境の場合）
-doppler secrets set DATABASE_URL="mysql://user:password@host:4000/database?sslaccept=strict" --project portfolio --config rc
-```
-
-### 方法2: .envファイルから同期
-
-`.env`ファイルに追加：
+`infra/.env` に追加：
 
 ```env
 DATABASE_URL="mysql://user:password@host:4000/database?sslaccept=strict"
@@ -107,7 +98,7 @@ DATABASE_URL="mysql://user:password@host:4000/database?sslaccept=strict"
 
 **注意**: `TIDB_HOST`は不要です。`DATABASE_URL`から自動的にホスト名が抽出されます。
 
-その後、PulumiでDopplerに同期：
+その後、Pulumi で Cloudflare 等に反映：
 
 ```bash
 cd infra
@@ -174,14 +165,14 @@ mysql "$DATABASE_URL"
 
 ## 次のステップ
 
-接続情報をDopplerに設定した後、PulumiコードでTiDBクラスターの情報を使用できます：
+接続情報を `infra/.env` に設定した後、Pulumi で TiDB クラスターの情報を使用できます：
 
 ```bash
 cd infra
 pulumi up
 ```
 
-Pulumiコードは、Dopplerから`DATABASE_URL`と`TIDB_HOST`を読み込み、それらを使用してTiDBクラスターの情報を出力します。
+Pulumi は `infra/.env` の `DATABASE_URL` を読み込み、Cloudflare Workers/Pages 等に反映します。
 
 ## 参考リンク
 

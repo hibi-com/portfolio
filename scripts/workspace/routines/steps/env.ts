@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
-import { setupComposeSecrets } from "../lib/env";
+import { logStep } from "../lib/env";
 import type { StepContext } from "../lib/types";
 
-export async function runEnvStep(ctx: StepContext): Promise<void> {
-    await setupComposeSecrets(ctx.rootDir);
+export async function runEnvStep(_ctx: StepContext): Promise<void> {
+    logStep("", "環境変数は compose または Cloudflare で管理します", "info");
 }

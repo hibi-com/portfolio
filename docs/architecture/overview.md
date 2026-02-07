@@ -118,4 +118,4 @@ TypeScriptのパスエイリアスが設定されており、`~`プレフィッ�
 
 ## インフラストラクチャ
 
-Pulumi で管理する Cloudflare / Doppler / TiDB / Redis / Grafana / Sentry の構成と関係は [`infra-architecture.md`](./infra-architecture.md) を参照してください。
+Pulumi で管理する Cloudflare / TiDB / Redis / Grafana / Sentry の構成と関係は [`infra-architecture.md`](./infra-architecture.md) を参照してください。

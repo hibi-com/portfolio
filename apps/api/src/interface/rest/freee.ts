@@ -31,7 +31,7 @@ export async function getFreeeAuthUrl(c: Context) {
 
         const container = new DIContainer(
             c.env.DATABASE_URL,
-            c.env.REDIS_URL,
+            c.env.CACHE_URL,
             undefined,
             undefined,
             c.env.FREEE_AUTH_BASE_URL,
@@ -60,7 +60,7 @@ export async function getFreeeAuthUrl(c: Context) {
 
 export async function handleFreeeCallback(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const freeeClientId = c.env.FREEE_CLIENT_ID;
     const freeeClientSecret = c.env.FREEE_CLIENT_SECRET;
     const logger = getLogger();
@@ -128,7 +128,7 @@ export async function handleFreeeCallback(c: Context) {
 
 export async function getFreeeIntegration(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const userId = c.req.query("userId");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -183,7 +183,7 @@ export async function getFreeeIntegration(c: Context) {
 
 export async function disconnectFreee(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -231,7 +231,7 @@ export async function disconnectFreee(c: Context) {
 
 export async function syncPartnersFromFreee(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const freeeClientId = c.env.FREEE_CLIENT_ID;
     const freeeClientSecret = c.env.FREEE_CLIENT_SECRET;
     const id = c.req.param("id");
@@ -288,7 +288,7 @@ export async function syncPartnersFromFreee(c: Context) {
 
 export async function syncPartnersToFreee(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const freeeClientId = c.env.FREEE_CLIENT_ID;
     const freeeClientSecret = c.env.FREEE_CLIENT_SECRET;
     const id = c.req.param("id");
@@ -345,7 +345,7 @@ export async function syncPartnersToFreee(c: Context) {
 
 export async function getSyncLogs(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();

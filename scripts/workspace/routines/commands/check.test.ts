@@ -73,27 +73,6 @@ if (process.env.E2E_TEST !== "true") {
 
 let testDir: string;
 
-async function checkGpgAvailable($: typeof import("bun").$): Promise<boolean> {
-    try {
-        await $`which gpg`.quiet();
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-async function installDoppler(testBinDir: string, $: typeof import("bun").$): Promise<void> {
-    const gpgAvailable = await checkGpgAvailable($);
-    if (!gpgAvailable) {
-        throw new Error("Doppler CLIのインストールにはGnuPGが必要です。gpgが見つかりません");
-    }
-
-    await $`mkdir -p ${testBinDir}`.quiet();
-    const installResult =
-        await $`bash -c "curl -Ls --tlsv1.2 --proto '=https' --retry 3 https://cli.doppler.com/install.sh | sh -s -- --install-path ${testBinDir}"`.quiet();
-    expect(installResult.exitCode).toBe(0);
-}
-
 async function installCodex(testBinDir: string, $: typeof import("bun").$): Promise<void> {
     const releaseResponse = await fetch("https://api.github.com/repos/openai/codex/releases/latest");
     expect(releaseResponse.ok).toBe(true);
@@ -332,10 +311,7 @@ async function installCommandByName(
     testBinDir: string,
     $: typeof import("bun").$,
 ): Promise<{ isMockEnvironment: boolean }> {
-    if (name === "doppler") {
-        await installDoppler(testBinDir, $);
-        return { isMockEnvironment: false };
-    } else if (name === "codex") {
+    if (name === "codex") {
         await installCodex(testBinDir, $);
         return { isMockEnvironment: false };
     } else if (installScript) {
@@ -351,11 +327,6 @@ function shouldSkipError(error: unknown, name: string): boolean {
     }
 
     if (error.message.includes("macOSではDocker Desktopが必要")) {
-        console.log(`${name}のテストをスキップ: ${error.message}`);
-        return true;
-    }
-
-    if (error.message.includes("GnuPGが必要") || error.message.includes("gpgが見つかりません")) {
         console.log(`${name}のテストをスキップ: ${error.message}`);
         return true;
     }

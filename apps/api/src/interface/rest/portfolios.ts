@@ -16,7 +16,7 @@ import {
 
 export async function getPortfolios(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -65,7 +65,7 @@ export async function getPortfolios(c: Context) {
 
 export async function getPortfolioBySlug(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const slug = c.req.param("slug");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -136,7 +136,7 @@ export async function getPortfolioBySlug(c: Context) {
 
 export async function uploadPortfolioImage(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const portfolioId = c.req.param("portfolioId");
     const r2Bucket = c.env.R2_BUCKET as R2Bucket | undefined;
     const r2PublicUrl = c.env.R2_PUBLIC_URL as string | undefined;

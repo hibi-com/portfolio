@@ -87,9 +87,9 @@ services:
       DATABASE_CONN_MAX_LIFETIME: 5m
       DATABASE_CONN_MAX_IDLE_TIME: 3m
       DATABASE_CA: dummy
-      CHCHE_URL: redis://:password@cache:6379
-      CHCHE_READ_TIMEOUT: 3s
-      CHCHE_WRITE_TIMEOUT: 3s
+      CACHE_URL: redis://:password@cache:6379
+      CACHE_READ_TIMEOUT: 3s
+      CACHE_WRITE_TIMEOUT: 3s
       BETTER_AUTH_SECRET: dummy
       BETTER_AUTH_URL: http://localhost:3000
       GOOGLE_CLIENT_ID: google-client-id

@@ -8,7 +8,7 @@ import { isValidUuid } from "~/lib/validation";
 
 export async function getChatRooms(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -45,7 +45,7 @@ export async function getChatRooms(c: Context) {
 
 export async function getChatRoomById(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -91,7 +91,7 @@ export async function getChatRoomById(c: Context) {
 
 export async function createChatRoom(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -124,7 +124,7 @@ export async function createChatRoom(c: Context) {
 
 export async function closeChatRoom(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -166,7 +166,7 @@ export async function closeChatRoom(c: Context) {
 
 export async function addChatParticipant(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const chatRoomId = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -220,7 +220,7 @@ export async function addChatParticipant(c: Context) {
 
 export async function getChatMessages(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const chatRoomId = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -265,7 +265,7 @@ export async function getChatMessages(c: Context) {
 
 export async function sendChatMessage(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const chatRoomId = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();

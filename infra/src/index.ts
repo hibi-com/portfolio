@@ -1,10 +1,14 @@
+import { resolve } from "node:path";
+import { config as loadEnv } from "dotenv";
+
+loadEnv({ path: resolve(process.cwd(), ".env") });
+
 import * as cloudflare from "@pulumi/cloudflare";
 import * as pulumi from "@pulumi/pulumi";
-import * as doppler from "@pulumiverse/doppler";
 import * as grafana from "@pulumiverse/grafana";
 import * as sentry from "@pulumiverse/sentry";
 import * as rediscloud from "@rediscloud/pulumi-rediscloud";
-import { getConfig, getDopplerSecrets, getProjectName } from "./config.js";
+import { getConfig, getSecretsFromEnv } from "./config.js";
 import { createPreviewDeploymentAccess } from "./resources/access.js";
 import { createPortfolioRedisConfig } from "./resources/cache.js";
 import {
@@ -15,153 +19,18 @@ import {
 import { createPortfolioDnsRecords } from "./resources/dns.js";
 import { createObservability } from "./resources/observability.js";
 import { createPortfolioPagesProjects } from "./resources/pages.js";
-import {
-    createDopplerProject,
-    createDopplerSecretsOnly,
-    type DopplerProjectOutputs,
-    getCloudflareEnvVars,
-    getComposeSecretsDir,
-    getEnvironmentYamlPath,
-    getSecretsFromCreatedResources,
-} from "./resources/secrets.js";
+import { getCloudflareEnvVars } from "./resources/secrets.js";
 import { createPortfolioApiWorker } from "./resources/workers.js";
 
-const pulumiConfig = new pulumi.Config();
+const secrets = getSecretsFromEnv();
+const config = getConfig(secrets);
 
-const shouldCreateDopplerProject = pulumiConfig.getBoolean("createDopplerProject") ?? false;
-const shouldSyncDopplerSecrets = pulumiConfig.getBoolean("syncDopplerSecrets") ?? false;
-
-let dopplerProjectResources: ReturnType<typeof createDopplerProject> | undefined;
-let dopplerSecretsResources: Record<string, doppler.Secret> | undefined;
-
-if (shouldCreateDopplerProject) {
-    const projectName = getProjectName();
-    dopplerProjectResources = createDopplerProject(projectName, `${projectName} infrastructure project`);
-} else if (shouldSyncDopplerSecrets) {
-    dopplerSecretsResources = createDopplerSecretsOnly(getProjectName(), {
-        composeSecretsDir: getComposeSecretsDir(),
-        environmentYamlPath: getEnvironmentYamlPath(),
-    });
-}
-
-export const dopplerProjectId = dopplerProjectResources?.project.id;
-export const dopplerEnvironmentIds = dopplerProjectResources
-    ? pulumi.output(
-          Object.fromEntries(Object.entries(dopplerProjectResources.environments).map(([key, env]) => [key, env.id])),
-      )
-    : undefined;
-
-let dopplerSecrets: ReturnType<typeof getDopplerSecrets>;
-if (shouldCreateDopplerProject && dopplerProjectResources) {
-    const pulumiConfigForEnv = new pulumi.Config();
-    const configName = pulumiConfigForEnv.require("dopplerConfig");
-    const createdSecrets = getSecretsFromCreatedResources(dopplerProjectResources, configName);
-    dopplerSecrets = {
-        DATABASE_URL: createdSecrets.DATABASE_URL ?? pulumi.output(""),
-        REDIS_URL: createdSecrets.REDIS_URL ?? pulumi.output(""),
-        CLOUDFLARE_API_TOKEN: createdSecrets.CLOUDFLARE_API_TOKEN ?? pulumi.output(""),
-        CLOUDFLARE_ACCOUNT_ID: createdSecrets.CLOUDFLARE_ACCOUNT_ID ?? pulumi.output(""),
-        CLOUDFLARE_ZONE_ID: createdSecrets.CLOUDFLARE_ZONE_ID ?? pulumi.output(""),
-        GRAFANA_API_KEY: createdSecrets.GRAFANA_API_KEY ?? pulumi.output(""),
-        GRAFANA_ORG_SLUG: createdSecrets.GRAFANA_ORG_SLUG ?? pulumi.output(""),
-        SENTRY_AUTH_TOKEN: createdSecrets.SENTRY_AUTH_TOKEN ?? pulumi.output(""),
-        SENTRY_ORG: createdSecrets.SENTRY_ORG ?? pulumi.output(""),
-        SENTRY_DSN: createdSecrets.SENTRY_DSN ?? pulumi.output(""),
-        REDISCLOUD_ACCESS_KEY: createdSecrets.REDISCLOUD_ACCESS_KEY ?? pulumi.output(""),
-        REDISCLOUD_SECRET_KEY: createdSecrets.REDISCLOUD_SECRET_KEY ?? pulumi.output(""),
-        REDISCLOUD_SUBSCRIPTION_ID: createdSecrets.REDISCLOUD_SUBSCRIPTION_ID ?? pulumi.output(""),
-        REDISCLOUD_DATABASE_ID: createdSecrets.REDISCLOUD_DATABASE_ID ?? pulumi.output(""),
-        BETTER_AUTH_SECRET: createdSecrets.BETTER_AUTH_SECRET ?? pulumi.output(""),
-        GOOGLE_CLIENT_ID: createdSecrets.GOOGLE_CLIENT_ID ?? pulumi.output(""),
-        GOOGLE_CLIENT_SECRET: createdSecrets.GOOGLE_CLIENT_SECRET ?? pulumi.output(""),
-        TIDBCLOUD_PUBLIC_KEY: createdSecrets.TIDBCLOUD_PUBLIC_KEY ?? pulumi.output(""),
-        TIDBCLOUD_PRIVATE_KEY: createdSecrets.TIDBCLOUD_PRIVATE_KEY ?? pulumi.output(""),
-        API_BASE_URL: createdSecrets.API_BASE_URL ?? pulumi.output(""),
-        APP_VERSION: createdSecrets.APP_VERSION ?? pulumi.output(""),
-        BETTER_AUTH_URL: createdSecrets.BETTER_AUTH_URL ?? pulumi.output(""),
-        VITE_BASE_URL: createdSecrets.VITE_BASE_URL ?? pulumi.output(""),
-        VITE_GOOGLE_ANALYTICS_ENABLED: createdSecrets.VITE_GOOGLE_ANALYTICS_ENABLED ?? pulumi.output(""),
-        VITE_GOOGLE_TAG_MANAGER_ENABLED: createdSecrets.VITE_GOOGLE_TAG_MANAGER_ENABLED ?? pulumi.output(""),
-        VITE_SENTRY_ENVIRONMENT: createdSecrets.VITE_SENTRY_ENVIRONMENT ?? pulumi.output(""),
-        VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE:
-            createdSecrets.VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE ?? pulumi.output(""),
-        VITE_SENTRY_REPLAY_SAMPLE_RATE: createdSecrets.VITE_SENTRY_REPLAY_SAMPLE_RATE ?? pulumi.output(""),
-        VITE_SENTRY_TRACES_SAMPLE_RATE: createdSecrets.VITE_SENTRY_TRACES_SAMPLE_RATE ?? pulumi.output(""),
-        VITE_XSTATE_INSPECTOR_ENABLED: createdSecrets.VITE_XSTATE_INSPECTOR_ENABLED ?? pulumi.output(""),
-    };
-} else if (shouldSyncDopplerSecrets && dopplerSecretsResources) {
-    const pulumiConfigForEnv = new pulumi.Config();
-    const configName = pulumiConfigForEnv.require("dopplerConfig");
-    const createdSecrets = getSecretsFromCreatedResources(
-        { secrets: dopplerSecretsResources } as DopplerProjectOutputs,
-        configName,
-    );
-    dopplerSecrets = {
-        DATABASE_URL: createdSecrets.DATABASE_URL ?? pulumi.output(""),
-        REDIS_URL: createdSecrets.REDIS_URL ?? pulumi.output(""),
-        CLOUDFLARE_API_TOKEN: createdSecrets.CLOUDFLARE_API_TOKEN ?? pulumi.output(""),
-        CLOUDFLARE_ACCOUNT_ID: createdSecrets.CLOUDFLARE_ACCOUNT_ID ?? pulumi.output(""),
-        CLOUDFLARE_ZONE_ID: createdSecrets.CLOUDFLARE_ZONE_ID ?? pulumi.output(""),
-        GRAFANA_API_KEY: createdSecrets.GRAFANA_API_KEY ?? pulumi.output(""),
-        GRAFANA_ORG_SLUG: createdSecrets.GRAFANA_ORG_SLUG ?? pulumi.output(""),
-        SENTRY_AUTH_TOKEN: createdSecrets.SENTRY_AUTH_TOKEN ?? pulumi.output(""),
-        SENTRY_ORG: createdSecrets.SENTRY_ORG ?? pulumi.output(""),
-        SENTRY_DSN: createdSecrets.SENTRY_DSN ?? pulumi.output(""),
-        REDISCLOUD_ACCESS_KEY: createdSecrets.REDISCLOUD_ACCESS_KEY ?? pulumi.output(""),
-        REDISCLOUD_SECRET_KEY: createdSecrets.REDISCLOUD_SECRET_KEY ?? pulumi.output(""),
-        REDISCLOUD_SUBSCRIPTION_ID: createdSecrets.REDISCLOUD_SUBSCRIPTION_ID ?? pulumi.output(""),
-        REDISCLOUD_DATABASE_ID: createdSecrets.REDISCLOUD_DATABASE_ID ?? pulumi.output(""),
-        BETTER_AUTH_SECRET: createdSecrets.BETTER_AUTH_SECRET ?? pulumi.output(""),
-        GOOGLE_CLIENT_ID: createdSecrets.GOOGLE_CLIENT_ID ?? pulumi.output(""),
-        GOOGLE_CLIENT_SECRET: createdSecrets.GOOGLE_CLIENT_SECRET ?? pulumi.output(""),
-        TIDBCLOUD_PUBLIC_KEY: createdSecrets.TIDBCLOUD_PUBLIC_KEY ?? pulumi.output(""),
-        TIDBCLOUD_PRIVATE_KEY: createdSecrets.TIDBCLOUD_PRIVATE_KEY ?? pulumi.output(""),
-        API_BASE_URL: createdSecrets.API_BASE_URL ?? pulumi.output(""),
-        APP_VERSION: createdSecrets.APP_VERSION ?? pulumi.output(""),
-        BETTER_AUTH_URL: createdSecrets.BETTER_AUTH_URL ?? pulumi.output(""),
-        VITE_BASE_URL: createdSecrets.VITE_BASE_URL ?? pulumi.output(""),
-        VITE_GOOGLE_ANALYTICS_ENABLED: createdSecrets.VITE_GOOGLE_ANALYTICS_ENABLED ?? pulumi.output(""),
-        VITE_GOOGLE_TAG_MANAGER_ENABLED: createdSecrets.VITE_GOOGLE_TAG_MANAGER_ENABLED ?? pulumi.output(""),
-        VITE_SENTRY_ENVIRONMENT: createdSecrets.VITE_SENTRY_ENVIRONMENT ?? pulumi.output(""),
-        VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE:
-            createdSecrets.VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE ?? pulumi.output(""),
-        VITE_SENTRY_REPLAY_SAMPLE_RATE: createdSecrets.VITE_SENTRY_REPLAY_SAMPLE_RATE ?? pulumi.output(""),
-        VITE_SENTRY_TRACES_SAMPLE_RATE: createdSecrets.VITE_SENTRY_TRACES_SAMPLE_RATE ?? pulumi.output(""),
-        VITE_XSTATE_INSPECTOR_ENABLED: createdSecrets.VITE_XSTATE_INSPECTOR_ENABLED ?? pulumi.output(""),
-    };
-} else {
-    dopplerSecrets = getDopplerSecrets();
-}
-
-const config = getConfig(dopplerSecrets);
-
-let cloudflareProviderDeps: doppler.Secret[] | undefined;
-if (shouldCreateDopplerProject && dopplerProjectResources?.secrets) {
-    cloudflareProviderDeps = Object.entries(dopplerProjectResources.secrets)
-        .filter(([key]) => key.includes("CLOUDFLARE_API_TOKEN"))
-        .map(([, secret]) => secret);
-}
-
-const cloudflareProvider = new cloudflare.Provider(
-    "cloudflare-provider",
-    {
-        apiToken: config.cloudflare.apiToken,
-    },
-    cloudflareProviderDeps && cloudflareProviderDeps.length > 0 ? { dependsOn: cloudflareProviderDeps } : undefined,
-);
-
-let grafanaProviderDeps: doppler.Secret[] | undefined;
-if (shouldCreateDopplerProject && dopplerProjectResources?.secrets) {
-    grafanaProviderDeps = Object.entries(dopplerProjectResources.secrets)
-        .filter(([key]) => key.includes("GRAFANA_API_KEY"))
-        .map(([, secret]) => secret);
-} else if (shouldSyncDopplerSecrets && dopplerSecretsResources) {
-    grafanaProviderDeps = Object.entries(dopplerSecretsResources)
-        .filter(([key]) => key.includes("GRAFANA_API_KEY"))
-        .map(([, secret]) => secret);
-}
+const cloudflareProvider = new cloudflare.Provider("cloudflare-provider", {
+    apiToken: config.cloudflare.apiToken,
+});
 
 const grafanaOrgSlug = config.grafana.orgSlug;
+const pulumiConfig = new pulumi.Config();
 const grafanaUrlConfig = pulumiConfig.get("grafanaUrl");
 let grafanaUrl: pulumi.Output<string> | string;
 if (grafanaUrlConfig) {
@@ -172,81 +41,13 @@ if (grafanaUrlConfig) {
     grafanaUrl = grafanaOrgSlug.apply((slug) => (slug ? `https://${slug}.grafana.net` : "https://grafana.com"));
 }
 
-const grafanaProvider = new grafana.Provider(
-    "grafana-provider",
-    {
-        auth: config.grafana.apiKey,
-        url: grafanaUrl,
-    },
-    grafanaProviderDeps && grafanaProviderDeps.length > 0 ? { dependsOn: grafanaProviderDeps } : undefined,
-);
+const grafanaProvider = new grafana.Provider("grafana-provider", {
+    auth: config.grafana.apiKey,
+    url: grafanaUrl,
+});
 
-let sentryProviderDeps: doppler.Secret[] | undefined;
-if (shouldCreateDopplerProject && dopplerProjectResources?.secrets) {
-    sentryProviderDeps = Object.entries(dopplerProjectResources.secrets)
-        .filter(([key]) => key.includes("SENTRY_AUTH_TOKEN"))
-        .map(([, secret]) => secret);
-} else if (shouldSyncDopplerSecrets && dopplerSecretsResources) {
-    sentryProviderDeps = Object.entries(dopplerSecretsResources)
-        .filter(([key]) => key.includes("SENTRY_AUTH_TOKEN"))
-        .map(([, secret]) => secret);
-}
-
-const sentryProvider = new sentry.Provider(
-    "sentry-provider",
-    {
-        token: config.sentry.authToken,
-    },
-    sentryProviderDeps && sentryProviderDeps.length > 0 ? { dependsOn: sentryProviderDeps } : undefined,
-);
-
-let redisCloudProviderDeps: doppler.Secret[] | undefined;
-if (shouldCreateDopplerProject && dopplerProjectResources?.secrets) {
-    redisCloudProviderDeps = Object.entries(dopplerProjectResources.secrets)
-        .filter(([key]) => key.includes("REDISCLOUD_ACCESS_KEY") || key.includes("REDISCLOUD_SECRET_KEY"))
-        .map(([, secret]) => secret);
-} else if (shouldSyncDopplerSecrets && dopplerSecretsResources) {
-    redisCloudProviderDeps = Object.entries(dopplerSecretsResources)
-        .filter(([key]) => key.includes("REDISCLOUD_ACCESS_KEY") || key.includes("REDISCLOUD_SECRET_KEY"))
-        .map(([, secret]) => secret);
-}
-
-const secrets = {
-    DATABASE_URL: dopplerSecrets.DATABASE_URL,
-    REDIS_URL: dopplerSecrets.REDIS_URL,
-    CLOUDFLARE_API_TOKEN: dopplerSecrets.CLOUDFLARE_API_TOKEN,
-    CLOUDFLARE_ACCOUNT_ID: dopplerSecrets.CLOUDFLARE_ACCOUNT_ID,
-    CLOUDFLARE_ZONE_ID: dopplerSecrets.CLOUDFLARE_ZONE_ID,
-    REDISCLOUD_SUBSCRIPTION_ID: dopplerSecrets.REDISCLOUD_SUBSCRIPTION_ID,
-    REDISCLOUD_DATABASE_ID: dopplerSecrets.REDISCLOUD_DATABASE_ID,
-    GRAFANA_API_KEY: dopplerSecrets.GRAFANA_API_KEY,
-    GRAFANA_ORG_SLUG: dopplerSecrets.GRAFANA_ORG_SLUG,
-    SENTRY_AUTH_TOKEN: dopplerSecrets.SENTRY_AUTH_TOKEN,
-    SENTRY_ORG: dopplerSecrets.SENTRY_ORG,
-    SENTRY_DSN: dopplerSecrets.SENTRY_DSN,
-    REDISCLOUD_ACCESS_KEY: dopplerSecrets.REDISCLOUD_ACCESS_KEY,
-    REDISCLOUD_SECRET_KEY: dopplerSecrets.REDISCLOUD_SECRET_KEY,
-    BETTER_AUTH_SECRET: dopplerSecrets.BETTER_AUTH_SECRET,
-    GOOGLE_CLIENT_ID: dopplerSecrets.GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET: dopplerSecrets.GOOGLE_CLIENT_SECRET,
-    TIDBCLOUD_PUBLIC_KEY: dopplerSecrets.TIDBCLOUD_PUBLIC_KEY,
-    TIDBCLOUD_PRIVATE_KEY: dopplerSecrets.TIDBCLOUD_PRIVATE_KEY,
-    API_BASE_URL: dopplerSecrets.API_BASE_URL,
-    APP_VERSION: dopplerSecrets.APP_VERSION,
-    BETTER_AUTH_URL: dopplerSecrets.BETTER_AUTH_URL,
-    VITE_BASE_URL: dopplerSecrets.VITE_BASE_URL,
-    VITE_GOOGLE_ANALYTICS_ENABLED: dopplerSecrets.VITE_GOOGLE_ANALYTICS_ENABLED,
-    VITE_GOOGLE_TAG_MANAGER_ENABLED: dopplerSecrets.VITE_GOOGLE_TAG_MANAGER_ENABLED,
-    VITE_SENTRY_ENVIRONMENT: dopplerSecrets.VITE_SENTRY_ENVIRONMENT,
-    VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: dopplerSecrets.VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE,
-    VITE_SENTRY_REPLAY_SAMPLE_RATE: dopplerSecrets.VITE_SENTRY_REPLAY_SAMPLE_RATE,
-    VITE_SENTRY_TRACES_SAMPLE_RATE: dopplerSecrets.VITE_SENTRY_TRACES_SAMPLE_RATE,
-    VITE_XSTATE_INSPECTOR_ENABLED: dopplerSecrets.VITE_XSTATE_INSPECTOR_ENABLED,
-};
-
-const tidb = createPortfolioTiDBConfig(secrets, {
-    publicKey: dopplerSecrets.TIDBCLOUD_PUBLIC_KEY,
-    privateKey: dopplerSecrets.TIDBCLOUD_PRIVATE_KEY,
+const sentryProvider = new sentry.Provider("sentry-provider", {
+    token: config.sentry.authToken,
 });
 
 const pulumiConfigForRedis = new pulumi.Config();
@@ -258,57 +59,17 @@ let redis: ReturnType<typeof createPortfolioRedisConfig>;
 if (skipRedisCloud) {
     redis = createPortfolioRedisConfig(secrets);
 } else {
-    redisCloudProvider = new rediscloud.Provider(
-        "rediscloud-provider",
-        {
-            apiKey: dopplerSecrets.REDISCLOUD_ACCESS_KEY,
-            secretKey: dopplerSecrets.REDISCLOUD_SECRET_KEY,
-        },
-        redisCloudProviderDeps && redisCloudProviderDeps.length > 0 ? { dependsOn: redisCloudProviderDeps } : undefined,
-    );
-
+    redisCloudProvider = new rediscloud.Provider("rediscloud-provider", {
+        apiKey: secrets.REDISCLOUD_ACCESS_KEY,
+        secretKey: secrets.REDISCLOUD_SECRET_KEY,
+    });
     redis = createPortfolioRedisConfig(secrets, redisCloudProvider);
 }
 
-const pulumiConfigForDoppler = new pulumi.Config();
-const dopplerConfigName = pulumiConfigForDoppler.require("dopplerConfig");
-const dopplerProjectName = getProjectName();
-
-new doppler.Secret("doppler-secret-auto-redis-url", {
-    project: dopplerProjectName,
-    config: dopplerConfigName,
-    name: "REDIS_URL",
-    value: pulumi.all([redis.connectionString, secrets.REDIS_URL]).apply(([generatedUrl, existingUrl]) => {
-        if ((!existingUrl || existingUrl.trim() === "") && generatedUrl && generatedUrl.trim() !== "") {
-            return generatedUrl;
-        }
-        return existingUrl || "";
-    }),
+const tidb = createPortfolioTiDBConfig(secrets, {
+    publicKey: secrets.TIDBCLOUD_PUBLIC_KEY,
+    privateKey: secrets.TIDBCLOUD_PRIVATE_KEY,
 });
-
-new doppler.Secret(
-    "doppler-secret-auto-database-url",
-    {
-        project: dopplerProjectName,
-        config: dopplerConfigName,
-        name: "DATABASE_URL",
-        value: pulumi
-            .all([tidb.cluster?.connectionString, tidb.connectionString, secrets.DATABASE_URL])
-            .apply(([clusterConnectionString, generatedUrl, existingUrl]) => {
-                if (clusterConnectionString && clusterConnectionString.trim() !== "") {
-                    return clusterConnectionString;
-                }
-                if (existingUrl && existingUrl.trim() !== "") {
-                    return existingUrl;
-                }
-                if (generatedUrl && generatedUrl.trim() !== "") {
-                    return generatedUrl;
-                }
-                return "";
-            }),
-    },
-    tidb.cluster?.createCommand ? { dependsOn: [tidb.cluster.createCommand] } : undefined,
-);
 
 export const tidbConnectionString = tidb.connectionString;
 export const tidbHost = tidb.host;
@@ -323,9 +84,6 @@ export const tidbClusterInfo = {
     allowedRegions: TIDB_ALLOWED_REGIONS,
     recommendations: TIDB_SERVERLESS_RECOMMENDATIONS,
 };
-
-const domain = config.cloudflare.domain;
-const protocol = config.cloudflare.protocol || "https";
 
 const workers = createPortfolioApiWorker(
     config,
@@ -411,64 +169,6 @@ export const accessApplicationIds = previewAccess
           )
     : undefined;
 
-new doppler.Secret("doppler-secret-auto-api-base-url", {
-    project: dopplerProjectName,
-    config: dopplerConfigName,
-    name: "API_BASE_URL",
-    value: pulumi.all([dnsRecords.records, dopplerSecrets.API_BASE_URL]).apply(([records, existingUrl]) => {
-        const url = existingUrl || "";
-        if (url && url.trim() !== "" && !url.toLowerCase().includes("localhost")) {
-            return url;
-        }
-        const apiRecordKey = Object.keys(records).find((key) => key.includes("api"));
-        if (apiRecordKey && records[apiRecordKey]) {
-            const generatedUrl = `${protocol}://api.${domain}`;
-            return generatedUrl;
-        }
-        return url || "";
-    }),
-});
-
-new doppler.Secret("doppler-secret-auto-better-auth-url", {
-    project: dopplerProjectName,
-    config: dopplerConfigName,
-    name: "BETTER_AUTH_URL",
-    value: pulumi.all([dnsRecords.records, dopplerSecrets.BETTER_AUTH_URL]).apply(([records, existingUrl]) => {
-        const url = existingUrl || "";
-        if (url && url.trim() !== "" && !url.toLowerCase().includes("localhost")) {
-            return url;
-        }
-        const wwwRecordKey = Object.keys(records).find((key) => key.includes("www"));
-        if (wwwRecordKey && records[wwwRecordKey]) {
-            const generatedUrl = `${protocol}://www.${domain}`;
-            return generatedUrl;
-        }
-        if (Object.keys(records).length > 0) {
-            const generatedUrl = `${protocol}://${domain}`;
-            return generatedUrl;
-        }
-        return url || "";
-    }),
-});
-
-new doppler.Secret("doppler-secret-auto-vite-base-url", {
-    project: dopplerProjectName,
-    config: dopplerConfigName,
-    name: "VITE_BASE_URL",
-    value: pulumi.all([dnsRecords.records, dopplerSecrets.VITE_BASE_URL]).apply(([records, existingUrl]) => {
-        const url = existingUrl || "";
-        if (url && url.trim() !== "" && !url.toLowerCase().includes("localhost")) {
-            return url;
-        }
-        const wwwRecordKey = Object.keys(records).find((key) => key.includes("www"));
-        if (wwwRecordKey && records[wwwRecordKey]) {
-            const generatedUrl = `${protocol}://www.${domain}`;
-            return generatedUrl;
-        }
-        return url || "";
-    }),
-});
-
 export const workerScriptNames = pulumi
     .output(workers.scripts)
     .apply((scripts) => Object.fromEntries(Object.entries(scripts).map(([key, script]) => [key, script.scriptName])));
@@ -495,13 +195,9 @@ export const sentryProjectSlugs = Object.fromEntries(
     Object.entries(observability.sentry.projects).map(([key, project]) => [key, project.slug]),
 );
 
-const projectName = getProjectName();
-export const dopplerInfo = {
-    commands: {
-        downloadEnv: "doppler secrets download --no-file --format env > .env",
-        runDev: "doppler run -- bun run dev",
-        runWithProject: `doppler run --project ${projectName} --config dev -- bun run dev`,
-    },
+export const cloudflareInfo = {
+    note: "環境変数は Cloudflare Dashboard の Workers / Pages の設定、または wrangler secret で管理します。",
+    runDev: "bun run dev（ローカルは .env または compose の環境変数を使用）",
 };
 
 export const cloudflareEnvVars = getCloudflareEnvVars(secrets);
@@ -509,7 +205,7 @@ export const cloudflareEnvVars = getCloudflareEnvVars(secrets);
 export const summary = {
     environment: config.environment,
     domain: config.cloudflare.domain,
-    secretsManagement: "Doppler",
+    secretsManagement: "Cloudflare Pages/Workers",
     databases: {
         tidb: {
             type: "Serverless",

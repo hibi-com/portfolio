@@ -7,7 +7,7 @@ import { isValidUuid } from "~/lib/validation";
 
 export async function getInquiries(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -47,7 +47,7 @@ export async function getInquiries(c: Context) {
 
 export async function getInquiryById(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -96,7 +96,7 @@ export async function getInquiryById(c: Context) {
 
 export async function createInquiry(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const logger = getLogger();
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -143,7 +143,7 @@ export async function createInquiry(c: Context) {
 
 export async function updateInquiry(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -186,7 +186,7 @@ export async function updateInquiry(c: Context) {
 
 export async function deleteInquiry(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -228,7 +228,7 @@ export async function deleteInquiry(c: Context) {
 
 export async function resolveInquiry(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -270,7 +270,7 @@ export async function resolveInquiry(c: Context) {
 
 export async function closeInquiry(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const id = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -312,7 +312,7 @@ export async function closeInquiry(c: Context) {
 
 export async function addInquiryResponse(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const inquiryId = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();
@@ -366,7 +366,7 @@ export async function addInquiryResponse(c: Context) {
 
 export async function getInquiryResponses(c: Context) {
     const databaseUrl = c.env.DATABASE_URL;
-    const redisUrl = c.env.REDIS_URL;
+    const redisUrl = c.env.CACHE_URL;
     const inquiryId = c.req.param("id");
     const logger = getLogger();
     const metrics = getMetrics();

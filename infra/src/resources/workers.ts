@@ -307,7 +307,7 @@ export function createPortfolioApiWorker(
 
     if (secrets.redisUrl) {
         secretBindings.push({
-            name: "REDIS_URL",
+            name: "CACHE_URL",
             text: secrets.redisUrl,
             type: "secret_text",
         });

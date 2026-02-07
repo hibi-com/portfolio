@@ -1,7 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as rediscloud from "@rediscloud/pulumi-rediscloud";
+import type { SecretsFromEnv } from "../config.js";
 import { getProjectName } from "../config.js";
-import type { SecretsOutputs } from "./secrets.js";
 
 export interface RedisOutputs {
     subscription?: rediscloud.Subscription;
@@ -9,10 +9,7 @@ export interface RedisOutputs {
     connectionString: pulumi.Output<string>;
 }
 
-export function createPortfolioRedisConfig(
-    secrets?: SecretsOutputs["secrets"],
-    provider?: rediscloud.Provider,
-): RedisOutputs {
+export function createPortfolioRedisConfig(secrets?: SecretsFromEnv, provider?: rediscloud.Provider): RedisOutputs {
     const projectName = getProjectName();
     const region = "ap-northeast-1";
     const pulumiConfig = new pulumi.Config();
@@ -20,12 +17,13 @@ export function createPortfolioRedisConfig(
     const skipRedisCloud = pulumiConfig.getBoolean("skipRedisCloud") ?? false;
 
     if (skipRedisCloud) {
-        const connectionString = secrets?.REDIS_URL?.apply((url) => {
-            if (url && url.trim() !== "") {
-                return url;
-            }
-            return "";
-        }) ?? pulumi.output("");
+        const connectionString =
+            secrets?.CACHE_URL?.apply((url: string) => {
+                if (url && url.trim() !== "") {
+                    return url;
+                }
+                return "";
+            }) ?? pulumi.output("");
 
         return {
             connectionString,
@@ -84,12 +82,13 @@ export function createPortfolioRedisConfig(
         provider ? { provider } : undefined,
     );
 
-    const connectionString = secrets?.REDIS_URL?.apply((url) => {
-        if (url && url.trim() !== "") {
-            return url;
-        }
-        return "";
-    }) ?? pulumi.output("");
+    const connectionString =
+        secrets?.CACHE_URL?.apply((url: string) => {
+            if (url && url.trim() !== "") {
+                return url;
+            }
+            return "";
+        }) ?? pulumi.output("");
 
     const generatedConnectionString = pulumi
         .all([database.publicEndpoint, database.password])

@@ -11,7 +11,7 @@ export { ChatRoomDO };
 
 type Env = {
     DATABASE_URL: string;
-    REDIS_URL?: string;
+    CACHE_URL?: string;
     NODE_ENV: string;
     SENTRY_DSN?: string;
     APP_VERSION?: string;
