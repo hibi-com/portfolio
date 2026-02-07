@@ -6,12 +6,7 @@
                 "organizeImports": {
                     "level": "on",
                     "options": {
-                        "groups": [
-                            [":bun:", ":node:"],
-                            ":npm:",
-                            ":alias:",
-                            ":relative:"
-                        ]
+                        "groups": [[":bun:", ":node:"], ":npm:", ":alias:", ":relative:"]
                     }
                 }
             }
@@ -145,24 +140,12 @@
             "formatter": {
                 "enabled": false
             },
-            "includes": [
-                "**/package.json"
-            ]
+            "includes": ["**/package.json"]
         },
         {
-            "includes": [
-                "**/*.test.*"
-            ],
+            "includes": ["**/*.test.*"],
             "javascript": {
-                "globals": [
-                    "expect",
-                    "test",
-                    "describe",
-                    "beforeEach",
-                    "afterEach",
-                    "vi",
-                    "it"
-                ]
+                "globals": ["expect", "test", "describe", "beforeEach", "afterEach", "vi", "it"]
             },
             "linter": {
                 "rules": {

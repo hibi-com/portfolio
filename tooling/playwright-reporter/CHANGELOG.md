@@ -1,4 +1,4 @@
-# @portfolio/playwright-config
+# @portfolio/playwright-reporter
 
 ## 1.0.1
 

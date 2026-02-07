@@ -1,2 +1,3 @@
-/** @portfolio/prisma-migration: CLI は bin の prisma-migration を利用してください。 */
-export {};
+export type { ParsedArgs } from "./args.js";
+export type { PrismaDiffResult } from "./prisma.js";
+export { main } from "./run.js";

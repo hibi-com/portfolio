@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 
-import { $ } from "bun";
 import { existsSync } from "node:fs";
 import { createInterface } from "node:readline";
+import { $ } from "bun";
 import pc from "picocolors";
-import { LoadingBar, logSection, logStep } from "./env";
+import { LoadingBar, logSection, logStep } from "../lib/env";
 
 interface CommandInfo {
     name: string;
@@ -135,7 +135,8 @@ async function installDoppler(): Promise<void> {
         const localBinDir = `${homeDir}/.local/bin`;
         await $`mkdir -p ${localBinDir}`.quiet();
 
-        const installResult = await $`bash -c "curl -Ls --tlsv1.2 --proto '=https' --retry 3 https://cli.doppler.com/install.sh | sh -s -- --install-path ${localBinDir}"`.quiet();
+        const installResult =
+            await $`bash -c "curl -Ls --tlsv1.2 --proto '=https' --retry 3 https://cli.doppler.com/install.sh | sh -s -- --install-path ${localBinDir}"`.quiet();
 
         if (installResult.exitCode !== 0) {
             const errorOutput = installResult.stderr.toString() || installResult.stdout.toString();
@@ -239,34 +240,38 @@ async function installCodex(): Promise<void> {
     }
 }
 
+async function runShellInstallScript(name: string, script: string): Promise<void> {
+    const loadingBar = new LoadingBar(`${name}をインストールしています...`);
+    loadingBar.start();
+    try {
+        const result = await $`bash -c ${script}`.quiet();
+
+        if (result.exitCode !== 0) {
+            const errorOutput = result.stderr.toString() || result.stdout.toString();
+            loadingBar.stop(false);
+            logStep("", `${name}のインストールに失敗しました`, "error");
+            if (errorOutput) {
+                console.error(pc.dim(`  エラー出力: ${errorOutput.trim()}`));
+            }
+            throw new Error(`インストールスクリプトが終了コード ${result.exitCode} で終了しました`);
+        }
+        loadingBar.stop(true, `${name}のインストールが完了しました`);
+    } catch (error) {
+        loadingBar.stop(false);
+        logStep("", `${name}のインストールに失敗しました`, "error");
+        if (error instanceof Error) {
+            console.error(pc.dim(`  エラー: ${error.message}`));
+        }
+        if (process.env.DEBUG) {
+            console.error(error);
+        }
+        throw error;
+    }
+}
+
 async function installCommand(commandInfo: CommandInfo): Promise<void> {
     if (typeof commandInfo.installScript === "string") {
-        const loadingBar = new LoadingBar(`${commandInfo.name}をインストールしています...`);
-        loadingBar.start();
-        try {
-            const result = await $`bash -c ${commandInfo.installScript}`.quiet();
-
-            if (result.exitCode !== 0) {
-                const errorOutput = result.stderr.toString() || result.stdout.toString();
-                loadingBar.stop(false);
-                logStep("", `${commandInfo.name}のインストールに失敗しました`, "error");
-                if (errorOutput) {
-                    console.error(pc.dim(`  エラー出力: ${errorOutput.trim()}`));
-                }
-                throw new Error(`インストールスクリプトが終了コード ${result.exitCode} で終了しました`);
-            }
-            loadingBar.stop(true, `${commandInfo.name}のインストールが完了しました`);
-        } catch (error) {
-            loadingBar.stop(false);
-            logStep("", `${commandInfo.name}のインストールに失敗しました`, "error");
-            if (error instanceof Error) {
-                console.error(pc.dim(`  エラー: ${error.message}`));
-            }
-            if (process.env.DEBUG) {
-                console.error(error);
-            }
-            throw error;
-        }
+        await runShellInstallScript(commandInfo.name, commandInfo.installScript);
     } else {
         await commandInfo.installScript();
     }
@@ -385,7 +390,11 @@ async function performInstallation(commandInfo: CommandInfo): Promise<void> {
         if (installed) {
             handleInstalledCommand(commandInfo, inPath, false);
         } else {
-            logStep("", `${commandInfo.name}のインストール後、コマンドが見つかりません。シェルを再起動してください`, "warning");
+            logStep(
+                "",
+                `${commandInfo.name}のインストール後、コマンドが見つかりません。シェルを再起動してください`,
+                "warning",
+            );
         }
     } catch (error) {
         logStep("", `${commandInfo.name}のインストールに失敗しました`, "error");

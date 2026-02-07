@@ -331,7 +331,7 @@ test("should return posts list", async ({ request }) => {
 ### モック
 
 ```typescript
-// testing/mocks/src/handlers/rest.ts
+// testing/msw/src/handlers/rest.ts
 export const restHandlers: HttpHandler[] = [
     http.get(`${API_URL}/api/posts`, () => {
         return HttpResponse.json(mockPosts);

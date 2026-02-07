@@ -1,6 +1,8 @@
-# E2E Test Docker Container
+---
+title: "E2E Test Docker Container"
+---
 
-このディレクトリには、Playwright E2Eテスト実行用のDockerコンテナの設定が含まれています。
+このディレクトリ（`.docker/e2e`）には、Playwright E2Eテスト実行用のDockerコンテナの設定が含まれています。
 
 ## ファイル構成
 
@@ -247,4 +249,4 @@ docker run --rm -it \
 
 - [Playwright Documentation](https://playwright.dev/)
 - [Bun Documentation](https://bun.sh/docs)
-- [E2E Testing Guide](../../apps/wiki/docs/development/testing.md)
+- [テストガイドライン](./testing.md)

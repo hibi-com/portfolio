@@ -40,8 +40,11 @@ try {
             },
         });
     }
-} catch {
-    // クリップボードのモック設定に失敗した場合は無視
+} catch (error) {
+    console.warn(
+        "[vitest-config] Failed to setup clipboard mock:",
+        error instanceof Error ? error.message : String(error),
+    );
 }
 
 export class IntersectionObserverMock implements IntersectionObserver {

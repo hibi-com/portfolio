@@ -22,6 +22,7 @@
     "@portfolio/biome-config": "workspace:*",
     "@portfolio/tsconfig": "workspace:*",
     "@types/bun": "1.1.14",
+    "@types/node": "25.0.3",
     "typescript": "5.9.3"
   }
 }

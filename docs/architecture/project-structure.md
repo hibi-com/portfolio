@@ -317,7 +317,7 @@ Pulumiを使用したインフラストラクチャ管理です。
 
 ## テストユーティリティ層 (`testing/`)
 
-### testing/mocks
+### testing/msw
 
 MSW モックハンドラーパッケージです。
 

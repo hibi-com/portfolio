@@ -1,7 +1,6 @@
 import { execSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import type { Reporter } from "vitest";
 
 export interface MonorepoVitestReporterOptions {
     outputDir?: string;
@@ -49,8 +48,13 @@ interface CoverageMetadata {
     summary: CoverageSummary;
 }
 
-class MonorepoVitestReporter implements Reporter {
-    private options: MonorepoVitestReporterOptions;
+/** Minimal reporter interface; avoids deprecated vitest Reporter type. */
+interface VitestReporterLike {
+    onFinished?(): void | Promise<void>;
+}
+
+class MonorepoVitestReporter implements VitestReporterLike {
+    private readonly options: MonorepoVitestReporterOptions;
 
     constructor(options: MonorepoVitestReporterOptions = {}) {
         this.options = options;
@@ -61,7 +65,7 @@ class MonorepoVitestReporter implements Reporter {
         const baseOutputDir = this.options.outputDir || "../wiki/reports/test";
         const coverageDir = this.options.coverageDir || "./coverage";
 
-        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const timestamp = new Date().toISOString().replaceAll(/[:.]/g, "-");
         const commitSha = this.getCommitSha().substring(0, 8);
         const runDir = join(baseOutputDir, projectName, `${timestamp}-${commitSha}`);
 

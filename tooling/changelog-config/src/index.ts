@@ -1,81 +1,76 @@
-import type { ChangelogFunctions } from "@changesets/types";
 import { getInfo, getInfoFromPullRequest } from "@changesets/get-github-info";
+import type { ChangelogFunctions } from "@changesets/types";
+
+const REPO_ERROR_MESSAGE =
+    'Please provide a repo to this changelog generator like this:\n"changelog": ["@portfolio/changelog-config", { "repo": "org/repo" }]';
+
+function parsePrFromFirstLine(firstLine: string): { replacedLine: string; prNumber?: number } {
+    let prNumber: number | undefined;
+    const replacedLine = firstLine.replace(/^\s*(?:pr|pull|pull\s+request):\s*#?(\d+)/i, (_, pr) => {
+        const num = Number.parseInt(pr, 10);
+        if (!Number.isNaN(num)) prNumber = num;
+        return "";
+    });
+    return { replacedLine, prNumber };
+}
+
+function formatError(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
+}
+
+async function fetchCommitInfo(repo: string, commit: string): Promise<{ links: { commit?: string }; user?: string }> {
+    try {
+        const info = await getInfo({ repo, commit });
+        return { links: info.links, user: info.user ?? undefined };
+    } catch (error) {
+        console.warn(`Failed to fetch GitHub info for commit ${commit}:`, formatError(error));
+        return { links: {}, user: undefined };
+    }
+}
+
+async function fetchPrInfo(
+    repo: string,
+    pr: number,
+): Promise<Awaited<ReturnType<typeof getInfoFromPullRequest>> | null> {
+    try {
+        return await getInfoFromPullRequest({ repo, pull: pr });
+    } catch (error) {
+        console.warn(`Failed to fetch GitHub info for PR #${pr}:`, formatError(error));
+        return null;
+    }
+}
+
+function appendLinksToFirstLine(line: string, commitLink?: string, prLink?: string, user?: string): string {
+    let result = line;
+    if (commitLink) result += ` (${commitLink})`;
+    if (prLink) result += ` (${prLink})`;
+    if (user) result += ` (${user})`;
+    return result;
+}
 
 const changelogFunctions: ChangelogFunctions = {
     async getReleaseLine(changeset, _type, options) {
-        if (!options?.repo) {
-            throw new Error(
-                'Please provide a repo to this changelog generator like this:\n"changelog": ["@portfolio/changelog-config", { "repo": "org/repo" }]',
-            );
-        }
+        if (!options?.repo) throw new Error(REPO_ERROR_MESSAGE);
 
         const summaryLines = changeset.summary.split("\n").map((l) => l.trimEnd());
         const firstLine = summaryLines[0] ?? "";
         const futureLines = summaryLines.slice(1);
-
-        let prFromSummary: number | undefined;
-        const replacedFirstLine = firstLine.replace(/^\s*(?:pr|pull|pull\s+request):\s*#?(\d+)/i, (_, pr) => {
-            const num = Number.parseInt(pr, 10);
-            if (!Number.isNaN(num)) prFromSummary = num;
-            return "";
-        });
+        const { replacedLine, prNumber } = parsePrFromFirstLine(firstLine);
 
         const [commit] = changeset.commit?.split(",") ?? [];
         const commitToFetch = commit ?? changeset.id;
+        const { links, user } = await fetchCommitInfo(options.repo, commitToFetch);
 
-        let links: { commit?: string } = {};
-        let user: string | undefined;
-        try {
-            const info = await getInfo({
-                repo: options.repo,
-                commit: commitToFetch,
-            });
-            links = info.links;
-            user = info.user ?? undefined;
-        } catch (error) {
-            console.warn(
-                `Failed to fetch GitHub info for commit ${commitToFetch}:`,
-                error instanceof Error ? error.message : String(error),
-            );
-        }
+        const prInfo = prNumber === undefined ? null : await fetchPrInfo(options.repo, prNumber);
 
-        let prInfo: Awaited<ReturnType<typeof getInfoFromPullRequest>> | null = null;
-        if (prFromSummary !== undefined) {
-            try {
-                prInfo = await getInfoFromPullRequest({
-                    repo: options.repo,
-                    pull: prFromSummary,
-                });
-            } catch (error) {
-                console.warn(
-                    `Failed to fetch GitHub info for PR #${prFromSummary}:`,
-                    error instanceof Error ? error.message : String(error),
-                );
-            }
-        }
-
-        const changelogLines = [`- ${replacedFirstLine || changeset.summary}`, ...futureLines.map((l) => `  ${l}`)];
-
-        if (links.commit) {
-            changelogLines[0] += ` (${links.commit})`;
-        }
-
-        if (prInfo?.links.pull) {
-            changelogLines[0] += ` (${prInfo.links.pull})`;
-        }
-
-        if (user) {
-            changelogLines[0] += ` (${user})`;
-        }
+        const baseLine = `- ${replacedLine || changeset.summary}`;
+        const firstLineWithLinks = appendLinksToFirstLine(baseLine, links.commit, prInfo?.links.pull, user);
+        const changelogLines = [firstLineWithLinks, ...futureLines.map((l) => `  ${l}`)];
 
         return changelogLines.join("\n");
     },
     async getDependencyReleaseLine(changesets, dependenciesUpdated, options) {
-        if (!options?.repo) {
-            throw new Error(
-                'Please provide a repo to this changelog generator like this:\n"changelog": ["@portfolio/changelog-config", { "repo": "org/repo" }]',
-            );
-        }
+        if (!options?.repo) throw new Error(REPO_ERROR_MESSAGE);
 
         if (dependenciesUpdated.length === 0) return "";
 

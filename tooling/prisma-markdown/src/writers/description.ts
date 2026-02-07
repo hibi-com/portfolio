@@ -10,7 +10,7 @@ export namespace description {
             "",
             "Properties as follows:",
             "",
-            ...model.fields.filter((f) => f.kind !== "object").map(writeField),
+            ...model.fields.filter((f) => f.kind !== "object").map((field) => writeField(field)),
         ].join("\n");
     };
 
@@ -35,7 +35,7 @@ export namespace description {
         while (last >= 0 && content[last] !== undefined && empty(content[last]!)) --last;
 
         const summary: string[] = prisma.tagValues("summary")(target);
-        const body: string[] = content.slice(first, last + 1).map(replaceLinks);
+        const body: string[] = content.slice(first, last + 1).map((line) => replaceLinks(line));
 
         if (summary.length > 0) {
             const summaryFirst = summary[0];

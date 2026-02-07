@@ -1,7 +1,7 @@
 {
   "private": true,
   "version": "1.0.1",
-  "name": "@portfolio/testing-mocks",
+  "name": "@portfolio/testing-msw",
   "type": "module",
   "types": "./dist/index.d.ts",
   "exports": {

@@ -1,4 +1,4 @@
-import { server } from "@portfolio/testing-mocks";
+import { server } from "@portfolio/testing-msw";
 import { cleanup } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, vi } from "vitest";
 

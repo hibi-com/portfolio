@@ -115,3 +115,7 @@ TypeScriptのパスエイリアスが設定されており、`~`プレフィッ�
 ## プロジェクト構造
 
 詳細なプロジェクト構造については [`project-structure.md`](./project-structure.md) を参照してください。
+
+## インフラストラクチャ
+
+Pulumi で管理する Cloudflare / Doppler / TiDB / Redis / Grafana / Sentry の構成と関係は [`infra-architecture.md`](./infra-architecture.md) を参照してください。

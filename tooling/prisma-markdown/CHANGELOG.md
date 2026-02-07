@@ -1,4 +1,4 @@
-# @portfolio/vitest-config
+# @portfolio/prisma-markdown
 
 ## 1.0.1
 

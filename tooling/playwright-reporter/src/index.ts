@@ -52,10 +52,6 @@ class MonorepoReporter implements Reporter {
         this.targetReportDir = resolve(runDir);
     }
 
-    onTestBegin(_test: TestCase) {
-        // No-op: HTML reporter handles this
-    }
-
     onTestEnd(test: TestCase, result: TestResult) {
         this.testResults.push({ test, result });
     }

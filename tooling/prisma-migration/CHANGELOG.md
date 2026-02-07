@@ -1,4 +1,4 @@
-# @portfolio/vitest-config
+# @portfolio/prisma-migration
 
 ## 1.0.1
 

@@ -7,7 +7,7 @@ export namespace mermaid {
         [
             "```mermaid",
             "erDiagram",
-            ...chapter.map(writeTable),
+            ...chapter.map((model) => writeTable(model)),
             ...chapter
                 .flatMap((model) =>
                     model.fields.filter((f) => f.kind === "object").map(writeRelationship({ group: chapter, model })),

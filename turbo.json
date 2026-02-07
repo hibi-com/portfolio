@@ -44,10 +44,6 @@
         "deploy": {
             "dependsOn": ["^build"]
         },
-        "dev": {
-            "cache": false,
-            "persistent": true
-        },
         "e2e": {
             "dependsOn": ["^build", "^e2e"],
             "env": ["NODE_ENV", "CI"],

@@ -1,44 +1,13 @@
 include:
   - .docker/db/compose.yml
 
-secrets:
-  database_url:
-    file: ./.docker/secrets/database_url
-  redis_url:
-    file: ./.docker/secrets/redis_url
-  node_env:
-    file: ./.docker/secrets/node_env
-  api_base_url:
-    file: ./.docker/secrets/api_base_url
-  better_auth_secret:
-    file: ./.docker/secrets/better_auth_secret
-  better_auth_url:
-    file: ./.docker/secrets/better_auth_url
-  google_client_id:
-    file: ./.docker/secrets/google_client_id
-  google_client_secret:
-    file: ./.docker/secrets/google_client_secret
-  vite_base_url:
-    file: ./.docker/secrets/vite_base_url
-  sentry_dsn:
-    file: ./.docker/secrets/sentry_dsn
-  sentry_org:
-    file: ./.docker/secrets/sentry_org
-  sentry_project:
-    file: ./.docker/secrets/sentry_project
-  app_version:
-    file: ./.docker/secrets/app_version
-
 networks:
   default:
     name: portfolio_default
 
 services:
   cache:
-    build:
-      context: .docker/cache
-      dockerfile: Dockerfile
-    image: portfolio-cache:local
+    image: redis:latest
     container_name: cache
     networks:
       - default
@@ -46,12 +15,8 @@ services:
       - target: 6379
         published: 6379
         protocol: tcp
-    volumes:
-      - type: volume
-        source: cache-data
-        target: /data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "password", "ping"]
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 30s
       timeout: 10s
       start_period: 10s
@@ -71,18 +36,16 @@ services:
         published: 3001
         protocol: tcp
     environment:
-      API_URL: ${API_URL:-http://localhost:8787}
-      NODE_ENV: ${NODE_ENV:-development}
-      VITE_GOOGLE_ANALYTICS_ENABLED: "false"
-      VITE_GOOGLE_TAG_MANAGER_ENABLED: "false"
-      VITE_XSTATE_INSPECTOR_ENABLED: "true"
-      VITE_SENTRY_ENVIRONMENT: "development"
-      VITE_SENTRY_TRACES_SAMPLE_RATE: "1"
-      VITE_SENTRY_REPLAY_SAMPLE_RATE: "0"
-      VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: "0"
-    secrets:
-      - api_base_url
-      - node_env
+      NODE_ENV: development
+      VITE_API_URL: http://api:8787
+      VITE_GOOGLE_ANALYTICS_ENABLED: false
+      VITE_GOOGLE_TAG_MANAGER_ENABLED: false
+      VITE_XSTATE_INSPECTOR_ENABLED: true
+      VITE_SENTRY_DSN: dummy
+      VITE_SENTRY_ENVIRONMENT: development
+      VITE_SENTRY_TRACES_SAMPLE_RATE: 1
+      VITE_SENTRY_REPLAY_SAMPLE_RATE: 0
+      VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: 0
     restart: unless-stopped
 
   mock-apis:
@@ -98,7 +61,7 @@ services:
         published: 3920
         protocol: tcp
     environment:
-      PORT: "3920"
+      PORT: 3920
     restart: unless-stopped
 
   api:
@@ -117,29 +80,27 @@ services:
         published: 8787
         protocol: tcp
     environment:
-      DATABASE_URL: ${DATABASE_URL:-}
-      REDIS_URL: ${REDIS_URL:-}
-      NODE_ENV: ${NODE_ENV:-}
-      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-}
-      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
-      SENTRY_DSN: ${SENTRY_DSN:-}
-      APP_VERSION: ${APP_VERSION:-}
-      FREEE_CLIENT_ID: ${FREEE_CLIENT_ID:-mock-client-id}
-      FREEE_CLIENT_SECRET: ${FREEE_CLIENT_SECRET:-mock-client-secret}
-      FREEE_AUTH_BASE_URL: ${FREEE_AUTH_BASE_URL:-http://mock-apis:3920}
-      FREEE_API_BASE_URL: ${FREEE_API_BASE_URL:-http://mock-apis:3920}
-    secrets:
-      - database_url
-      - redis_url
-      - node_env
-      - better_auth_secret
-      - better_auth_url
-      - google_client_id
-      - google_client_secret
-      - sentry_dsn
-      - app_version
+      NODE_ENV: development
+      DATABASE_URL: mysql://user:password@tidb:4000/portfolio
+      DATABASE_MAX_OPEN_CONNS: 1
+      DATABASE_MAX_IDLE_CONNS: 10
+      DATABASE_CONN_MAX_LIFETIME: 5m
+      DATABASE_CONN_MAX_IDLE_TIME: 3m
+      DATABASE_CA: dummy
+      CHCHE_URL: redis://:password@cache:6379
+      CHCHE_READ_TIMEOUT: 3s
+      CHCHE_WRITE_TIMEOUT: 3s
+      BETTER_AUTH_SECRET: dummy
+      BETTER_AUTH_URL: http://localhost:3000
+      GOOGLE_CLIENT_ID: google-client-id
+      GOOGLE_CLIENT_SECRET: google-client-secret
+      FREEE_CLIENT_ID: mock-client-id
+      FREEE_CLIENT_SECRET: mock-client-secret
+      FREEE_AUTH_URL: http://mock-apis:3920
+      FREEE_API_URL: http://mock-apis:3920
+      FREEE_TIMEOUT: 150ms
+      FREEE_MAX_RETRIES: 3
+      FREEE_RETRY_TIMEOUT: 300ms
     depends_on:
       setup-db:
         condition: service_completed_successfully
@@ -164,22 +125,16 @@ services:
         published: 5173
         protocol: tcp
     environment:
-      API_URL: ${API_BASE_URL:-http://localhost:8787}
-      NODE_ENV: ${NODE_ENV:-development}
-      VITE_BASE_URL: ${VITE_BASE_URL:-http://localhost:5173}
-      SENTRY_DSN: ${SENTRY_DSN:-}
-      VITE_GOOGLE_ANALYTICS_ENABLED: "false"
-      VITE_GOOGLE_TAG_MANAGER_ENABLED: "false"
-      VITE_XSTATE_INSPECTOR_ENABLED: "true"
-      VITE_SENTRY_ENVIRONMENT: "development"
-      VITE_SENTRY_TRACES_SAMPLE_RATE: "1"
-      VITE_SENTRY_REPLAY_SAMPLE_RATE: "0"
-      VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: "0"
-    secrets:
-      - api_base_url
-      - node_env
-      - vite_base_url
-      - sentry_dsn
+      NODE_ENV: development
+      VITE_API_URL: http://api:8787
+      VITE_GOOGLE_ANALYTICS_ENABLED: false
+      VITE_GOOGLE_TAG_MANAGER_ENABLED: false
+      VITE_XSTATE_INSPECTOR_ENABLED: true
+      VITE_SENTRY_DSN: dummy
+      VITE_SENTRY_ENVIRONMENT: development
+      VITE_SENTRY_TRACES_SAMPLE_RATE: 1
+      VITE_SENTRY_REPLAY_SAMPLE_RATE: 0
+      VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: 0
     restart: unless-stopped
 
   wiki:
@@ -195,12 +150,5 @@ services:
         published: 3002
         protocol: tcp
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
-    secrets:
-      - node_env
+      NODE_ENV: development
     restart: unless-stopped
-
-volumes:
-  cache-data:
-    driver: local
-    name: portfolio_cache_data

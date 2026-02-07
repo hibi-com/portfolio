@@ -39,7 +39,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "bun run build:js && bun run build:types",
-    "build:js": "bun build ./src/index.ts ./src/env.ts ./src/mocks.ts ./src/msw.ts ./src/render.tsx ./src/setup.ts --outdir dist --target node --format esm --splitting --external react --external react-dom --external vite --external vitest --external lightningcss --external @vitejs/* --external @portfolio/testing-mocks --external @testing-library/* --external msw --external jsdom --external vite-tsconfig-paths --external react-router --external dotenv --external regenerator-runtime",
+    "build:js": "bun build ./src/index.ts ./src/env.ts ./src/mocks.ts ./src/msw.ts ./src/render.tsx ./src/setup.ts --outdir dist --target node --format esm --splitting --external react --external react-dom --external vite --external vitest --external lightningcss --external @vitejs/* --external @portfolio/testing-msw --external @testing-library/* --external msw --external jsdom --external vite-tsconfig-paths --external react-router --external dotenv --external regenerator-runtime",
     "build:types": "git clean -xdf .cache/tsbuildinfo.json && tsc --emitDeclarationOnly --declaration --outDir dist",
     "clean:cache": "git clean -xdf .cache .turbo",
     "clean:pkg": "git clean -xdf node_modules dist",
@@ -51,7 +51,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@portfolio/testing-mocks": "workspace:*",
+    "@portfolio/testing-msw": "workspace:*",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.1",
     "@testing-library/user-event": "14.6.1",

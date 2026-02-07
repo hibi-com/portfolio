@@ -25,7 +25,9 @@ export namespace PrismaMarkdown {
             ...chapters.map(({ name }) => `- [${name}](#${name.toLowerCase()})`),
         ].join("\n");
         if (chapters.length === 0) return [frontMatter, "", preface].join("\n");
-        return [frontMatter, "", preface, "", chapters.map(writeChapter).join("\n\n"), ""].join("\n");
+        return [frontMatter, "", preface, "", chapters.map((chapter) => writeChapter(chapter)).join("\n\n"), ""].join(
+            "\n",
+        );
     };
 
     export const writeChapter = (chapterParam: Chapter): string =>
@@ -164,9 +166,7 @@ export namespace PrismaMarkdown {
         const opposite = modelList.find((m) => m.name === field.type);
         if (opposite === undefined) return null;
 
-        const oppositeField = opposite.fields.find(
-            (f) => f.kind === "object" && f.isList && f.type === model.name,
-        );
+        const oppositeField = opposite.fields.find((f) => f.kind === "object" && f.isList && f.type === model.name);
         if (oppositeField === undefined || model === opposite) return null;
 
         const relations: DMMF.Model[] = [model, opposite].sort((x, y) => x.name.localeCompare(y.name));

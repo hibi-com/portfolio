@@ -1,4 +1,4 @@
-# @portfolio/testing-mocks
+# @portfolio/testing-msw
 
 ## 1.0.1
 

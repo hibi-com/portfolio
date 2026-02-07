@@ -1,1 +1,1 @@
-import "@portfolio/testing-mocks/setup";
+import "@portfolio/testing-msw/setup";

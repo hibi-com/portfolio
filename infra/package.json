@@ -21,7 +21,6 @@
     "fmt": "biome format --write .",
     "fmt:check": "biome format .",
     "generate": "bun run dist/generators/index.js",
-    "graph": "pulumi stack graph graph.dot && bun run -e 'import { readFileSync, writeFileSync } from \"fs\"; const dot = readFileSync(\"graph.dot\", \"utf-8\"); const mermaid = `\\`\\`\\`mermaid\\n${dot}\\n\\`\\`\\``; writeFileSync(\"architecture.md\", `# Architecture Graph\\n\\n${mermaid}\\n`);'",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "login": "pulumi login && doppler login",
@@ -29,8 +28,7 @@
     "refresh": "pulumi refresh",
     "select": "pulumi stack select",
     "typecheck": "tsc --noEmit",
-    "up": "pulumi up",
-    "verify": "bun run scripts/verify.ts"
+    "up": "pulumi up"
   },
   "dependencies": {
     "@pulumi/cloudflare": "6.13.0",

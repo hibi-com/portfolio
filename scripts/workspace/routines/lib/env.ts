@@ -6,7 +6,6 @@ import pc from "picocolors";
 
 const COMPOSE_SECRETS_DIR = ".docker/secrets";
 
-/** example.env のうち .docker/secrets で管理する項目（Doppler 同期対象）。Secret Manager に載せないものは含めない。 */
 const COMPOSE_SECRET_DEFAULTS: Record<string, string> = {
     database_url: "mysql://user:password@tidb:4000/portfolio",
     redis_url: "redis://:password@cache:6379",
@@ -26,7 +25,6 @@ const COMPOSE_SECRET_DEFAULTS: Record<string, string> = {
     app_version: "1.0.0",
 };
 
-/** compose の environment に直書きする項目（Secret Manager に載せない）。example.env 33–39 の VITE_* など。 */
 export const COMPOSE_ENV_ONLY_DEFAULTS: Record<string, string> = {
     VITE_GOOGLE_ANALYTICS_ENABLED: "false",
     VITE_GOOGLE_TAG_MANAGER_ENABLED: "false",
@@ -121,10 +119,6 @@ export class LoadingBar {
     }
 }
 
-/**
- * compose 用シークレット（.docker/secrets/）をセットアップする。
- * 環境変数は .env ではなく compose の secrets で管理する。
- */
 export async function setupComposeSecrets(rootDir: string): Promise<void> {
     logSection("📝 環境設定（compose secrets）");
     const secretsDir = join(rootDir, COMPOSE_SECRETS_DIR);

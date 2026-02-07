@@ -1,69 +1,23 @@
 #!/usr/bin/env bun
 
-import { existsSync } from "node:fs";
-import { join, resolve } from "node:path";
 import { $ } from "bun";
 import pc from "picocolors";
-import { checkAndInstallCommands } from "./check";
-import { buildDockerImages } from "./docker";
-import { logStep, setupComposeSecrets } from "./env";
-import { installDependencies } from "./install";
-import { runDatabaseMigrations } from "./migrate";
-import { generatePrismaSchema } from "./schema";
+import { checkAndInstallCommands } from "./commands/check";
+import { logStep } from "./lib/env";
+import { findRootDir } from "./lib/root";
+import type { ResolvedOptions, SetupOptions, SetupStep, StepId } from "./lib/types";
+import { runDockerStep } from "./steps/docker";
+import { runEnvStep } from "./steps/env";
+import { runInstallStep } from "./steps/install";
 
-export function findRootDir(startDir: string = process.cwd()): string {
-    let currentDir = resolve(startDir);
-    const root = resolve("/");
-
-    while (currentDir !== root) {
-        const packageJsonPath = join(currentDir, "package.json");
-        const turboJsonPath = join(currentDir, "turbo.json");
-
-        if (existsSync(packageJsonPath) && existsSync(turboJsonPath)) {
-            return currentDir;
-        }
-
-        currentDir = resolve(currentDir, "..");
-    }
-
-    return process.cwd();
-}
-
-async function checkBunInstalled(): Promise<boolean> {
-    if (process.versions?.bun !== undefined) {
-        return true;
-    }
-    try {
-        if ($ !== undefined) {
-            await $`bun --version`.quiet();
-            return true;
-        }
-    } catch {
-        return false;
-    }
-    return false;
-}
-
-export interface SetupOptions {
-    env?: boolean;
-    install?: boolean;
-    schema?: boolean;
-    docker?: boolean;
-    migrate?: boolean;
-    parallel?: boolean;
-}
-
-interface ResolvedOptions {
-    runEnv: boolean;
-    runInstall: boolean;
-    runSchema: boolean;
-    runDocker: boolean;
-    runMigrate: boolean;
-    parallel: boolean;
-}
+export const SETUP_STEPS: Record<StepId, SetupStep> = {
+    env: runEnvStep,
+    install: runInstallStep,
+    docker: runDockerStep,
+};
 
 function shouldRunAll(options: SetupOptions): boolean {
-    return !options.env && !options.install && !options.schema && !options.docker && !options.migrate;
+    return !options.env && !options.install && !options.docker;
 }
 
 function resolveOptions(options: SetupOptions): ResolvedOptions {
@@ -71,9 +25,7 @@ function resolveOptions(options: SetupOptions): ResolvedOptions {
     return {
         runEnv: runAll || options.env !== false,
         runInstall: runAll || options.install !== false,
-        runSchema: runAll || options.schema !== false,
         runDocker: runAll || options.docker !== false,
-        runMigrate: runAll || options.migrate !== false,
         parallel: options.parallel ?? true,
     };
 }
@@ -107,6 +59,21 @@ function printErrorMessage(error: unknown): void {
     console.error();
 }
 
+async function checkBunInstalled(): Promise<boolean> {
+    if (process.versions?.bun !== undefined) {
+        return true;
+    }
+    try {
+        if ($ !== undefined) {
+            await $`bun --version`.quiet();
+            return true;
+        }
+    } catch {
+        return false;
+    }
+    return false;
+}
+
 async function handleInstallStep(rootDir: string, runInstall: boolean): Promise<void> {
     if (!runInstall) {
         return;
@@ -114,40 +81,20 @@ async function handleInstallStep(rootDir: string, runInstall: boolean): Promise<
 
     const shouldSkipInstall = process.env.BUN_LIFECYCLE_EVENT === "prepare";
     if (shouldSkipInstall) {
-        const { logSection } = await import("./env");
+        const { logSection } = await import("./lib/env");
         logSection("📦 依存関係のインストール");
         logStep("", "依存関係のインストールをスキップしました（prepareスクリプトから実行中）", "info");
         return;
     }
 
-    await installDependencies(rootDir);
+    await SETUP_STEPS.install({ rootDir, useLoadingBar: true });
 }
 
-async function runBuildTasks(
-    rootDir: string,
-    runSchema: boolean,
-    runDocker: boolean,
-    parallel: boolean,
-): Promise<void> {
+async function runBuildTasks(rootDir: string, runDocker: boolean, parallel: boolean): Promise<void> {
     const useLoadingBar = !parallel;
 
-    if (parallel && (runSchema || runDocker)) {
-        const tasks: Promise<void>[] = [];
-        if (runSchema) {
-            tasks.push(generatePrismaSchema(rootDir, useLoadingBar));
-        }
-        if (runDocker) {
-            tasks.push(buildDockerImages(rootDir, useLoadingBar));
-        }
-        await Promise.all(tasks);
-        return;
-    }
-
-    if (runSchema) {
-        await generatePrismaSchema(rootDir, useLoadingBar);
-    }
     if (runDocker) {
-        await buildDockerImages(rootDir, useLoadingBar);
+        await SETUP_STEPS.docker({ rootDir, useLoadingBar });
     }
 }
 
@@ -171,15 +118,11 @@ export async function runWorkspace(options: SetupOptions = {}): Promise<void> {
         await checkAndInstallCommands();
 
         if (resolved.runEnv) {
-            await setupComposeSecrets(rootDir);
+            await SETUP_STEPS.env({ rootDir, useLoadingBar: true });
         }
 
         await handleInstallStep(rootDir, resolved.runInstall);
-        await runBuildTasks(rootDir, resolved.runSchema, resolved.runDocker, resolved.parallel);
-
-        if (resolved.runMigrate) {
-            await runDatabaseMigrations(rootDir);
-        }
+        await runBuildTasks(rootDir, resolved.runDocker, resolved.parallel);
 
         printSuccessMessage();
     } catch (error) {
@@ -187,3 +130,6 @@ export async function runWorkspace(options: SetupOptions = {}): Promise<void> {
         process.exit(1);
     }
 }
+
+export { findRootDir } from "./lib/root";
+export type { SetupOptions } from "./lib/types";

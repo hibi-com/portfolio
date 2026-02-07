@@ -44,6 +44,16 @@ node_modules
 .env.local
 .env.*.local
 
+# compose 用シークレット（値はコミットしない）
+.docker/secrets/*
+!.docker/secrets/README.md
+
+# infra 専用環境変数（environment.example.yaml をコピーして値を設定）
+infra/environment.yaml
+
+# Pulumi stack graph 出力（bun run graph で再生成）
+infra/graph.dot
+
 .cache
 .turbo
 .wrangler

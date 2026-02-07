@@ -26,8 +26,12 @@ generatorHandler({
         const file: string = options.generator.output?.value ?? "./ERD.md";
         try {
             await fs.promises.mkdir(path.dirname(file), { recursive: true });
-        } catch {
-            // do nothing
+        } catch (error) {
+            console.error(
+                `[prisma-markdown] Failed to create output directory for ${file}:`,
+                error instanceof Error ? error.message : String(error),
+            );
+            throw error;
         }
         await fs.promises.writeFile(file, content, "utf8");
     },

@@ -1,12 +1,10 @@
 {
     "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
     "extends": ["@portfolio/biome-config/base"],
-    "linter": {
-        "languageOptions": {
-            "globals": ["Bun"]
-        }
-    },
     "files": {
         "includes": ["!!.cache", "!!.turbo", "!!dist"]
+    },
+    "javascript": {
+        "globals": ["$", "Bun"]
     }
 }
