@@ -36,7 +36,6 @@
     "@portfolio/biome-config": "workspace:*",
     "@portfolio/playwright-config": "workspace:*",
     "@portfolio/tsconfig": "workspace:*",
-    "@portfolio/ui": "workspace:*",
     "@portfolio/vite-config": "workspace:*",
     "@portfolio/vitest-config": "workspace:*",
     "@tailwindcss/vite": "4.1.18",

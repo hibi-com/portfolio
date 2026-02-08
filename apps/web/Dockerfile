@@ -1,22 +1,22 @@
-# Web: イメージ内でビルドしない・turbo は使わない。
-#
-# 開発（compose）: ビルドコンテキスト = リポジトリルート。compose で volume マウント (.:/app) し、
-#                 ホストで bun install / パッケージビルド済みのソースで remix vite:dev を実行する。
-# 本番（K8s）:    CI がビルドした静的成果物（build/ の中身）をコンテキストに渡し、
-#                 docker build -f apps/web/Dockerfile -t web ./out/web のようにビルドする。
-#                 Dockerfile が COPY . で nginx に配信する想定のときは、コンテキスト = build/ の中身。
-
-FROM oven/bun:1.1.43-alpine
+FROM oven/bun:1.1.43 AS builder
 
 WORKDIR /app
 
-COPY apps/web/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+COPY package.json ./
+RUN bun install --frozen-lockfile --ignore-scripts
 
-# 開発時は compose の volume で . が /app にマウントされ、ホストのソースで動く
-WORKDIR /app/apps/web
+COPY . .
+RUN bun run build
 
-EXPOSE 5173
+FROM nginx:alpine-slim
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["bunx", "remix", "vite:dev"]
+COPY --from=builder /app/build /usr/share/nginx/html
+
+RUN printf "%s" \
+  "server{listen 80;root /usr/share/nginx/html;index index.html;" \
+  "location /{try_files \$uri \$uri/ /index.html;}}" \
+  > /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

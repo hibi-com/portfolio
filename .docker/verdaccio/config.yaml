@@ -1,0 +1,41 @@
+storage: /verdaccio/storage
+plugins: /verdaccio/plugins
+
+web:
+  title: Portfolio Private Registry
+  enable: true
+  primary_color: "#4b32c3"
+
+auth:
+  htpasswd:
+    file: /verdaccio/storage/htpasswd
+    max_users: 100
+    algorithm: bcrypt
+
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
+    timeout: 30s
+    maxage: 2m
+    cache: true
+
+packages:
+  "@portfolio/*":
+    access: $all
+    publish: $authenticated
+    unpublish: $authenticated
+
+  "**":
+    access: $all
+    publish: $authenticated
+    proxy: npmjs
+
+server:
+  keepAliveTimeout: 60
+
+logs:
+  - { type: stdout, format: pretty, level: http }
+
+security:
+  api:
+    legacy: true

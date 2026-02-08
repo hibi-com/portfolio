@@ -1,11 +1,13 @@
 {
     "$schema": "https://turbo.build/schema.json",
     "globalDependencies": [".env"],
+    "globalEnv": ["NODE_OPTIONS"],
     "tasks": {
         "build": {
             "dependsOn": ["^build"],
             "outputs": ["dist/**"],
-            "inputs": ["src/**", "cmd/**", "generated/**", "generators/**", "tsconfig.json", "package.json"]
+            "inputs": ["src/**", "cmd/**", "generated/**", "generators/**", "tsconfig.json", "package.json"],
+            "env": ["NODE_OPTIONS"]
         },
         "build:js": {
             "dependsOn": ["^build:js"],

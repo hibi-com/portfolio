@@ -1,5 +1,6 @@
 include:
   - .docker/db/compose.yml
+  - .docker/verdaccio/compose.yml
 
 networks:
   default:
@@ -21,31 +22,6 @@ services:
       timeout: 10s
       start_period: 10s
       retries: 3
-    restart: unless-stopped
-
-  admin:
-    build:
-      context: apps/admin/dist
-      dockerfile: apps/admin/Dockerfile
-    image: portfolio-admin:local
-    container_name: admin
-    networks:
-      - default
-    ports:
-      - target: 80
-        published: 3001
-        protocol: tcp
-    environment:
-      NODE_ENV: development
-      VITE_API_URL: http://api:8787
-      VITE_GOOGLE_ANALYTICS_ENABLED: false
-      VITE_GOOGLE_TAG_MANAGER_ENABLED: false
-      VITE_XSTATE_INSPECTOR_ENABLED: true
-      VITE_SENTRY_DSN: dummy
-      VITE_SENTRY_ENVIRONMENT: development
-      VITE_SENTRY_TRACES_SAMPLE_RATE: 1
-      VITE_SENTRY_REPLAY_SAMPLE_RATE: 0
-      VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: 0
     restart: unless-stopped
 
   mock-apis:
@@ -73,11 +49,9 @@ services:
     networks:
       - default
       - db
-    volumes:
-      - .:/app
     ports:
-      - target: 8787
-        published: 8787
+      - target: 8080
+        published: 3000
         protocol: tcp
     environment:
       NODE_ENV: development
@@ -118,11 +92,9 @@ services:
     container_name: web
     networks:
       - default
-    volumes:
-      - .:/app
     ports:
-      - target: 5173
-        published: 5173
+      - target: 80
+        published: 3000
         protocol: tcp
     environment:
       NODE_ENV: development
@@ -137,9 +109,23 @@ services:
       VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: 0
     restart: unless-stopped
 
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    image: portfolio-admin:local
+    container_name: admin
+    networks:
+      - default
+    ports:
+      - target: 80
+        published: 3001
+        protocol: tcp
+    restart: unless-stopped
+
   wiki:
     build:
-      context: apps/wiki/dist
+      context: .
       dockerfile: apps/wiki/Dockerfile
     image: portfolio-wiki:local
     container_name: wiki
@@ -149,6 +135,4 @@ services:
       - target: 80
         published: 3002
         protocol: tcp
-    environment:
-      NODE_ENV: development
     restart: unless-stopped

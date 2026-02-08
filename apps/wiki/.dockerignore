@@ -1,0 +1,11 @@
+*.tsbuildinfo
+.DS_Store
+.astro
+.cache
+.results
+.turbo
+.wrangler
+build
+coverage
+dist
+node_modules
