@@ -1,16 +1,25 @@
-/**
- * @sequence docs/sequence/admin/crm/customers-list.md
- * @description GET /crm/customers - 顧客一覧ページの統合テスト
- *
- * シーケンス図に基づき、以下のフローを検証:
- * Browser → TanStack Router → Route → Component → Hook → APIClient → API
- */
-
 import { render, screen } from "@testing-library/react";
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import "@testing-library/jest-dom/vitest";
+
+type Customer = {
+    id: string;
+    name: string;
+    company?: string;
+    email?: string;
+    status: string;
+};
+
+type PaginatedResponse = {
+    data: Customer[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+    };
+};
 
 const server = setupServer();
 
@@ -18,10 +27,11 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-// モックコンポーネント
 const MockCustomersList = ({
     customers,
-}: { customers: Array<{ id: string; name: string; company: string; status: string }> }) => (
+}: {
+    customers: Array<{ id: string; name: string; company: string; status: string }>;
+}) => (
     <div data-testid="customers-list">
         {customers.map((customer) => (
             <div key={customer.id} data-testid="customer-item">
@@ -38,7 +48,6 @@ describe("Customers List Integration - docs/sequence/admin/crm/customers-list.md
 
     describe("シーケンス: Component → Hook → APIClient → API", () => {
         test("正常系: 顧客一覧を取得する", async () => {
-            // Given: APIが顧客一覧を返す
             const mockCustomers = [
                 { id: "1", name: "John Doe", company: "Tech Corp", email: "john@example.com", status: "active" },
                 { id: "2", name: "Jane Smith", company: "Design Inc", email: "jane@example.com", status: "inactive" },
@@ -50,15 +59,13 @@ describe("Customers List Integration - docs/sequence/admin/crm/customers-list.md
                 }),
             );
 
-            // When: APIを呼び出す
             const response = await fetch(`${API_URL}/api/crm/customers`);
-            const data = await response.json();
+            const data = (await response.json()) as Customer[];
 
-            // Then: 顧客一覧が取得される
             expect(response.ok).toBe(true);
             expect(data).toHaveLength(2);
-            expect(data[0].name).toBe("John Doe");
-            expect(data[0].status).toBe("active");
+            expect(data[0]!.name).toBe("John Doe");
+            expect(data[0]!.status).toBe("active");
         });
 
         test("正常系: コンポーネントレンダリング検証", () => {
@@ -77,9 +84,7 @@ describe("Customers List Integration - docs/sequence/admin/crm/customers-list.md
 
     describe("シーケンス分岐: フィルタリング", () => {
         test("ステータスでフィルタリング", async () => {
-            const mockCustomers = [
-                { id: "1", name: "Active Customer", status: "active" },
-            ];
+            const mockCustomers = [{ id: "1", name: "Active Customer", status: "active" }];
 
             server.use(
                 http.get(`${API_URL}/api/crm/customers`, ({ request }) => {
@@ -93,10 +98,10 @@ describe("Customers List Integration - docs/sequence/admin/crm/customers-list.md
             );
 
             const response = await fetch(`${API_URL}/api/crm/customers?status=active`);
-            const data = await response.json();
+            const data = (await response.json()) as Customer[];
 
             expect(data).toHaveLength(1);
-            expect(data[0].status).toBe("active");
+            expect(data[0]!.status).toBe("active");
         });
     });
 
@@ -120,7 +125,7 @@ describe("Customers List Integration - docs/sequence/admin/crm/customers-list.md
             );
 
             const response = await fetch(`${API_URL}/api/crm/customers?page=2&limit=20`);
-            const data = await response.json();
+            const data = (await response.json()) as PaginatedResponse;
 
             expect(data.pagination.page).toBe(2);
             expect(data.pagination.limit).toBe(20);

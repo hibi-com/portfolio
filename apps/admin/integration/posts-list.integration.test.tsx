@@ -1,16 +1,9 @@
-/**
- * @sequence docs/sequence/admin/posts/posts-list.md
- * @description GET /posts - 投稿一覧ページの統合テスト
- *
- * シーケンス図に基づき、以下のフローを検証:
- * Browser → TanStack Router → Route → Component → Hook → APIClient → API
- */
-
 import { render, screen } from "@testing-library/react";
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import "@testing-library/jest-dom/vitest";
+import React from "react";
 
 const server = setupServer();
 
@@ -18,7 +11,6 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-// モックコンポーネント（実際のPostsListをモック）
 const MockPostsList = ({ posts }: { posts: Array<{ id: string; title: string; slug: string }> }) => (
     <div data-testid="posts-list">
         {posts.map((post) => (
@@ -35,7 +27,6 @@ describe("Posts List Integration - docs/sequence/admin/posts/posts-list.md", () 
 
     describe("シーケンス: Component → Hook → APIClient → API", () => {
         test("正常系: 投稿一覧を取得して表示する", async () => {
-            // Given: APIが投稿一覧を返す
             const mockPosts = [
                 { id: "1", title: "Test Post 1", slug: "test-post-1", status: "published" },
                 { id: "2", title: "Test Post 2", slug: "test-post-2", status: "draft" },
@@ -47,27 +38,22 @@ describe("Posts List Integration - docs/sequence/admin/posts/posts-list.md", () 
                 }),
             );
 
-            // When: APIを呼び出す
             const response = await fetch(`${API_URL}/api/posts`);
             const data = await response.json();
 
-            // Then: 投稿一覧が取得される
             expect(response.ok).toBe(true);
             expect(data).toHaveLength(2);
             expect(data[0].title).toBe("Test Post 1");
         });
 
         test("正常系: コンポーネントレンダリング検証", () => {
-            // Given: 投稿データ
             const posts = [
                 { id: "1", title: "Post A", slug: "post-a" },
                 { id: "2", title: "Post B", slug: "post-b" },
             ];
 
-            // When: コンポーネントをレンダリング
             render(<MockPostsList posts={posts} />);
 
-            // Then: 投稿が表示される
             expect(screen.getByTestId("posts-list")).toBeInTheDocument();
             expect(screen.getAllByTestId("post-item")).toHaveLength(2);
         });
