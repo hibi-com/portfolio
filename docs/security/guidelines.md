@@ -390,8 +390,8 @@ graph TD
 
 | 役割 | 連絡先 |
 | ---- | ------ |
-| セキュリティ担当 | security@example.com |
-| インシデント対応 | incident@example.com |
+| セキュリティ担当 | <security@example.com> |
+| インシデント対応 | <incident@example.com> |
 
 ## 関連ドキュメント
 

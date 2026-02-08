@@ -19,7 +19,7 @@ Email APIは以下の機能を提供します:
 ## エンドポイント一覧
 
 | Method | Path | 説明 |
-|--------|------|------|
+| ------ | ---- | ---- |
 | GET | `/api/email/logs` | 送信ログ一覧取得 |
 | GET | `/api/email/logs/:id` | 送信ログ詳細取得 |
 | GET | `/api/email/templates` | テンプレート一覧取得 |

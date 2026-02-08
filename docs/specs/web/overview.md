@@ -43,11 +43,9 @@ apps/web/
 
 ### トップページ (`/`)
 
-#### 概要
-
 サイトのメインエントリーポイント。ポートフォリオのハイライトと最新ブログ記事を表示。
 
-#### コンポーネント構成
+**コンポーネント構成:**
 
 ```text
 <Header />
@@ -70,11 +68,9 @@ export const loader = async ({ context }: LoaderFunctionArgs) => {
 
 ### ブログ一覧 (`/blog`)
 
-#### 概要
-
 公開済みのブログ記事を一覧表示。タグでフィルタリング可能。
 
-#### コンポーネント構成
+**コンポーネント構成:**
 
 ```text
 <Header />
@@ -95,11 +91,9 @@ export const loader = async ({ context }: LoaderFunctionArgs) => {
 
 ### ブログ詳細 (`/blog/:slug`)
 
-#### 概要
-
 ブログ記事の本文を表示。
 
-#### コンポーネント構成
+**コンポーネント構成:**
 
 ```text
 <Header />
@@ -123,11 +117,9 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => [
 
 ### ポートフォリオ一覧 (`/portfolio`)
 
-#### 概要
-
 ポートフォリオプロジェクトを一覧表示。
 
-#### コンポーネント構成
+**コンポーネント構成:**
 
 ```text
 <Header />
@@ -139,11 +131,9 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => [
 
 ### ポートフォリオ詳細 (`/portfolio/:slug`)
 
-#### 概要
-
 ポートフォリオプロジェクトの詳細を表示。
 
-#### コンポーネント構成
+**コンポーネント構成:**
 
 ```text
 <Header />
@@ -158,11 +148,9 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => [
 
 ### お問い合わせ (`/contact`)
 
-#### 概要
-
 お問い合わせフォームを表示。
 
-#### コンポーネント構成
+**コンポーネント構成:**
 
 ```text
 <Header />

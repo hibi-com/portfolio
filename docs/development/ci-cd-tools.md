@@ -123,7 +123,7 @@ CDフロー:
 CircleCIのContextsで管理:
 
 | Context | 変数 | 説明 |
-|---------|------|------|
+| ------- | ---- | ---- |
 | backblaze-b2 | `B2_APPLICATION_KEY_ID` | B2認証ID |
 | backblaze-b2 | `B2_APPLICATION_KEY` | B2認証キー |
 | backblaze-b2 | `B2_BUCKET_NAME` | バケット名 |
@@ -133,7 +133,7 @@ CircleCIのContextsで管理:
 Project Settingsで管理:
 
 | 変数 | 説明 |
-|------|------|
+| ---- | ---- |
 | `GITHUB_TOKEN` | GitHub Issue作成用 |
 
 ### テスト失敗時のIssue自動作成
@@ -151,11 +151,11 @@ Project Settingsで管理:
 
 Renovateは依存関係の自動更新を管理するツールです。
 
-### 設定
+### Renovate設定
 
 設定ファイルは `renovate.json` にあります。
 
-### 主な機能
+### Renovateの主な機能
 
 - **自動依存関係検出**: `package.json` の依存関係を自動的に検出
 - **スケジュール実行**: 毎週月曜日の午前10時（JST）にPRを作成
@@ -167,11 +167,11 @@ Renovateは依存関係の自動更新を管理するツールです。
 
 SonarCloudはコード品質・セキュリティ分析をするクラウドサービスです。
 
-### 設定
+### SonarCloud設定
 
 設定ファイルは `sonar-project.properties` にあります。
 
-### 主な機能
+### SonarCloudの主な機能
 
 - **コード品質分析**: TypeScript/JavaScriptコードの品質を分析
 - **セキュリティ脆弱性検出**: 既知の脆弱性パターンを検出

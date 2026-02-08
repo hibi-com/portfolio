@@ -19,7 +19,7 @@ Integration APIは以下の機能を提供します:
 ## エンドポイント一覧
 
 | Method | Path | 説明 |
-|--------|------|------|
+| ------ | ---- | ---- |
 | GET | `/api/freee/auth` | 認証URL取得 |
 | POST | `/api/freee/callback` | OAuthコールバック |
 | GET | `/api/freee/integration` | 連携状態取得 |

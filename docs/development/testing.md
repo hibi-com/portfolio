@@ -11,7 +11,7 @@ title: "テストガイドライン"
 本プロジェクトでは、[Google Testing Blog](https://testing.googleblog.com/2010/12/test-sizes.html) で提唱されているテストサイズの概念を採用しています。
 
 | サイズ | 特徴 | 実行時間目標 | 実行タイミング |
-|-------|------|------------|---------------|
+| ------ | ---- | ---------- | ------------- |
 | **Small** | 単一プロセス、完全モック、ネットワークなし | < 100ms | コミット毎 |
 | **Medium** | 複数プロセス可、外部サービスモック、DB接続可 | < 1秒 | PR毎 |
 | **Large** | 実システム全体、ブラウザ含む | < 10秒 | マージ前、定期実行 |
@@ -53,7 +53,7 @@ title: "テストガイドライン"
 ### テストファイル命名規則
 
 | サイズ | 命名規則 | 配置場所 | 例 |
-|-------|---------|---------|-----|
+| ----- | ------- | ------- | --- |
 | Small | `*.test.ts` | ソースファイルと同階層 | `getPosts.test.ts` |
 | Medium | `*.medium.test.ts` | `tests/medium/` | `posts-list.medium.test.ts` |
 | Large | `*.large.spec.ts` | `e2e/large/` | `browse-blog.large.spec.ts` |
@@ -64,7 +64,7 @@ title: "テストガイドライン"
 
 Medium Tests は `docs/sequence/api/` 内のシーケンス図と1:1で対応します。
 
-```
+```text
 docs/sequence/api/post/posts-list.md
   ↓ 対応
 apps/api/tests/medium/post/posts-list.medium.test.ts
@@ -83,7 +83,7 @@ apps/api/tests/medium/post/posts-list.medium.test.ts
 
 Large Tests は `docs/user-stories/` 内のユーザーストーリーと1:1で対応します。
 
-```
+```text
 docs/user-stories/visitor/browse-blog.md
   ↓ 対応
 apps/web/e2e/large/visitor/browse-blog.large.spec.ts
@@ -113,7 +113,7 @@ app/
             └── types.test.ts
 ```
 
-### テストの書き方
+### Small Testsの書き方
 
 #### 関数のテスト
 
@@ -259,7 +259,7 @@ apps/api/tests/
 └── vitest.medium.config.ts       # Medium Test専用設定
 ```
 
-### テストの書き方
+### Medium Testsの書き方
 
 Medium Tests はシーケンス図の各ステップを検証します。
 
@@ -319,7 +319,7 @@ describe("Posts List Integration", () => {
 });
 ```
 
-### テスト実行
+### Medium Tests実行コマンド
 
 ```bash
 # API Medium Testsのみ実行
@@ -335,7 +335,7 @@ bun vitest run -c apps/api/tests/vitest.medium.config.ts --filter=post
 
 フロントエンドアプリケーション（web/admin）のIntegration Testsは、Remixローダー/TanStack Routerとコンポーネントの統合を検証します。
 
-### ディレクトリ構造
+### Integrationディレクトリ構造
 
 ```text
 apps/web/
@@ -357,12 +357,12 @@ apps/admin/
 ### シーケンス図との対応
 
 | シーケンス図 | Integration Test |
-|-------------|------------------|
+| ----------- | ---------------- |
 | `docs/sequence/web/blog-list.md` | `apps/web/integration/blog-list.integration.test.ts` |
 | `docs/sequence/web/blog-detail.md` | `apps/web/integration/blog-detail.integration.test.ts` |
 | `docs/sequence/admin/posts/posts-list.md` | `apps/admin/integration/posts-list.integration.test.tsx` |
 
-### テストの書き方
+### Integration Testsの書き方
 
 Integration Tests はMSWを使用してAPIをモックし、フロントエンドの統合フローを検証します。
 
@@ -393,7 +393,7 @@ describe("Blog List Integration", () => {
 });
 ```
 
-### テスト実行
+### Integration Tests実行コマンド
 
 ```bash
 # Web Integration Tests
@@ -407,7 +407,7 @@ bun vitest run -c apps/admin/vitest.integration.config.ts
 
 ## Large Tests（E2Eテスト）
 
-### ディレクトリ構造
+### Largeディレクトリ構造
 
 ```text
 apps/web/e2e/
@@ -715,7 +715,7 @@ describe("formatDate", () => {
 本プロジェクトでは、MC/DC（Modified Condition/Decision Coverage）に準拠したカバレッジ基準を採用しています。
 
 | メトリクス | 閾値 | 説明 |
-|-----------|------|------|
+| --------- | ---- | ---- |
 | **Lines** | 90% | 実行された行の割合 |
 | **Functions** | 90% | 呼び出された関数の割合 |
 | **Branches** | 100% | 通過した分岐の割合（MC/DC準拠） |
@@ -760,7 +760,7 @@ describe("複合条件のMC/DCテスト", () => {
 #### MC/DC真理値表
 
 | A | B | C | A && B | A && B \|\| C | Aの影響 | Bの影響 | Cの影響 |
-|---|---|---|--------|---------------|---------|---------|---------|
+| - | - | - | ------ | ------------- | ------- | ------- | ------- |
 | T | T | F | T | T | ✓ | ✓ | |
 | F | T | F | F | F | ✓ | | |
 | T | F | F | F | F | | ✓ | |

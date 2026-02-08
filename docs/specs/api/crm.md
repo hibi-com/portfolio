@@ -17,7 +17,7 @@ CRM APIは以下のドメインを管理します:
 
 すべてのCRM APIエンドポイントは認証が必要です。
 
-```
+```text
 Authorization: Bearer <token>
 ```
 
@@ -26,7 +26,7 @@ Authorization: Bearer <token>
 ### Customer（顧客）
 
 | Method | Path | 説明 |
-|--------|------|------|
+| ------ | ---- | ---- |
 | GET | `/api/crm/customers` | 顧客一覧取得 |
 | GET | `/api/crm/customers/:id` | 顧客詳細取得 |
 | POST | `/api/crm/customers` | 顧客作成 |
@@ -36,7 +36,7 @@ Authorization: Bearer <token>
 ### Lead（リード）
 
 | Method | Path | 説明 |
-|--------|------|------|
+| ------ | ---- | ---- |
 | GET | `/api/crm/leads` | リード一覧取得 |
 | GET | `/api/crm/leads/:id` | リード詳細取得 |
 | POST | `/api/crm/leads` | リード作成 |
@@ -47,7 +47,7 @@ Authorization: Bearer <token>
 ### Deal（商談）
 
 | Method | Path | 説明 |
-|--------|------|------|
+| ------ | ---- | ---- |
 | GET | `/api/crm/deals` | 商談一覧取得 |
 | GET | `/api/crm/deals/:id` | 商談詳細取得 |
 | POST | `/api/crm/deals` | 商談作成 |
@@ -58,7 +58,7 @@ Authorization: Bearer <token>
 ### Pipeline（パイプライン）
 
 | Method | Path | 説明 |
-|--------|------|------|
+| ------ | ---- | ---- |
 | GET | `/api/crm/pipelines` | パイプライン一覧取得 |
 | GET | `/api/crm/pipelines/:id` | パイプライン詳細取得 |
 | POST | `/api/crm/pipelines` | パイプライン作成 |
@@ -168,6 +168,7 @@ interface PipelineStage {
 ### POST /api/crm/customers - 顧客作成
 
 **リクエスト:**
+
 ```json
 {
     "name": "山田太郎",
@@ -179,6 +180,7 @@ interface PipelineStage {
 ```
 
 **レスポンス (201 Created):**
+
 ```json
 {
     "id": "cust_123",
@@ -195,6 +197,7 @@ interface PipelineStage {
 ### POST /api/crm/leads/:id/convert - リード変換
 
 **リクエスト:**
+
 ```json
 {
     "stageId": "stage_123",
@@ -205,6 +208,7 @@ interface PipelineStage {
 ```
 
 **レスポンス (200 OK):**
+
 ```json
 {
     "lead": {
@@ -226,6 +230,7 @@ interface PipelineStage {
 ### PUT /api/crm/deals/:id/stage - 商談ステージ移動
 
 **リクエスト:**
+
 ```json
 {
     "stageId": "stage_456"
@@ -233,6 +238,7 @@ interface PipelineStage {
 ```
 
 **レスポンス (200 OK):**
+
 ```json
 {
     "id": "deal_123",
@@ -262,7 +268,7 @@ interface ErrorResponse {
 ### 共通エラーコード
 
 | ステータス | 説明 |
-|-----------|------|
+| --------- | ---- |
 | 400 | バリデーションエラー |
 | 401 | 未認証 |
 | 403 | 権限不足 |

@@ -20,7 +20,7 @@ Chat APIは以下の機能を提供します:
 ## エンドポイント一覧
 
 | Method | Path | 説明 |
-|--------|------|------|
+| ------ | ---- | ---- |
 | GET | `/api/chat/rooms` | ルーム一覧取得 |
 | POST | `/api/chat/rooms` | ルーム作成 |
 | GET | `/api/chat/rooms/:id` | ルーム詳細取得 |

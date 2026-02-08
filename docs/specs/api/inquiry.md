@@ -19,7 +19,7 @@ Inquiry APIは以下の機能を提供します:
 ## エンドポイント一覧
 
 | Method | Path | 説明 | 認証 |
-|--------|------|------|------|
+| ------ | ---- | ---- | ---- |
 | GET | `/api/support/inquiries` | 問い合わせ一覧取得 | 必要 |
 | POST | `/api/support/inquiries` | 問い合わせ作成 | 不要 |
 | GET | `/api/support/inquiries/:id` | 問い合わせ詳細取得 | 必要 |
@@ -73,7 +73,7 @@ interface InquiryResponse {
 
 ## 状態遷移
 
-```
+```text
 OPEN → IN_PROGRESS → WAITING_CUSTOMER → RESOLVED → CLOSED
                    ↳ RESOLVED → CLOSED
 ```
