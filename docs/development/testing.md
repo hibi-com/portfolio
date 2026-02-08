@@ -6,9 +6,56 @@ title: "テストガイドライン"
 
 ## テスト戦略
 
+### テストハニカム戦略
+
+本プロジェクトでは、[Spotify Testing Honeycomb](https://engineering.atspotify.com/2018/01/testing-of-microservices) に基づくテスト戦略を採用しています。
+
+> **"最も複雑なのはサービス内部ではなく、他とのインタラクション"**
+>
+> — Spotify Engineering
+
+従来のテストピラミッドとは異なり、**Integration Tests（Medium Tests）を最も重視**します。
+
+```text
+        ┌───────────┐
+        │  Large    │  ← 最小限
+        │ (E2E)     │
+        ├───────────┤
+    ┌───┴───────────┴───┐
+    │     Medium        │  ← 最重視 ⭐⭐⭐
+    │  (Integration)    │
+    ├───────────────────┤
+        │   Small   │  ← 限定的
+        │  (Unit)   │
+        └───────────┘
+```
+
+#### テスト優先順位
+
+| 優先度 | テストタイプ | 説明 |
+| ------ | ----------- | ---- |
+| ⭐⭐⭐ | **Medium Tests** | サービス間インタラクションの検証。シーケンス図と1:1対応 |
+| ⭐ | Small Tests | 複雑なビジネスロジックに限定。単純なCRUD/委譲は不要 |
+| ⚠️ | Large Tests | クリティカルパスのみ。外部依存は壊れやすいため最小限に |
+
+#### なぜMedium Testsを重視するのか
+
+1. **複雑性の所在**: マイクロサービスの複雑性はサービス内部ではなく、相互作用にある
+2. **Small Testsの問題**: 実装詳細に依存し、コード変更時にテストも変更が必要になりがち
+3. **Large Testsの問題**: 外部サービスに依存し、脆弱で壊れやすい
+
+#### Small Testを書くべきケース
+
+| ✅ 書くべき | ❌ 書かない |
+| ---------- | ----------- |
+| 複雑なビジネスロジック（計算、変換、解析） | 単純なCRUD操作 |
+| 多くの分岐を持つ関数 | 他への委譲だけの薄いラッパー |
+| 自然に隔離されたユーティリティ関数 | フレームワーク機能を呼ぶだけのコード |
+| エッジケースが多い処理 | 実装の詳細に依存するテスト |
+
 ### Google テストサイズ
 
-本プロジェクトでは、[Google Testing Blog](https://testing.googleblog.com/2010/12/test-sizes.html) で提唱されているテストサイズの概念を採用しています。
+テストサイズの分類は [Google Testing Blog](https://testing.googleblog.com/2010/12/test-sizes.html) の概念を採用しています。
 
 | サイズ | 特徴 | 実行時間目標 | 実行タイミング |
 | ------ | ---- | ---------- | ------------- |
@@ -89,9 +136,7 @@ docs/user-stories/visitor/browse-blog.md
 apps/web/e2e/large/visitor/browse-blog.large.spec.ts
 ```
 
----
-
-## Small Tests（単体テスト）
+## 単体テスト
 
 ### テストファイルの配置
 
@@ -233,9 +278,7 @@ bun run coverage
 turbo run coverage --filter=@portfolio/web
 ```
 
----
-
-## Medium Tests（統合テスト）
+## 統合テスト
 
 ### ディレクトリ構造
 
@@ -329,8 +372,6 @@ bun vitest run -c apps/api/tests/vitest.medium.config.ts
 bun vitest run -c apps/api/tests/vitest.medium.config.ts --filter=post
 ```
 
----
-
 ## Integration Tests（Web/Admin）
 
 フロントエンドアプリケーション（web/admin）のIntegration Testsは、Remixローダー/TanStack Routerとコンポーネントの統合を検証します。
@@ -403,9 +444,7 @@ bun vitest run -c apps/web/vitest.integration.config.ts
 bun vitest run -c apps/admin/vitest.integration.config.ts
 ```
 
----
-
-## Large Tests（E2Eテスト）
+## E2Eテスト
 
 ### Largeディレクトリ構造
 
@@ -559,8 +598,6 @@ test("BlogPreview visual regression", async ({ page }) => {
 });
 ```
 
----
-
 ## テスト実行
 
 ### ローカル環境
@@ -605,8 +642,6 @@ docker run --rm -e CI=true \
   -v $(pwd)/node_modules:/work/node_modules \
   e2e bunx playwright test
 ```
-
----
 
 ## テストのベストプラクティス
 
@@ -705,8 +740,6 @@ describe("formatDate", () => {
     });
 });
 ```
-
----
 
 ## テストカバレッジ
 
@@ -856,8 +889,6 @@ if (process.env.NODE_ENV === "development") {
     // 開発環境専用コード
 }
 ```
-
----
 
 ## 参考資料
 
