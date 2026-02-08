@@ -4,7 +4,7 @@
   "name": "@portfolio/mock-apis",
   "type": "module",
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir dist --target node --minify",
+    "build": "bun build ./src/index.ts --outdir dist --target bun --minify --external bun",
     "clean:cache": "git clean -xdf .cache .turbo",
     "clean:pkg": "git clean -xdf node_modules dist",
     "dev": "bun run src/index.ts",
