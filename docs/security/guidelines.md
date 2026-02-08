@@ -386,13 +386,6 @@ graph TD
 4. **復旧**: サービスの復旧
 5. **振り返り**: 再発防止策の策定
 
-### 連絡先
-
-| 役割 | 連絡先 |
-| ---- | ------ |
-| セキュリティ担当 | <security@example.com> |
-| インシデント対応 | <incident@example.com> |
-
 ## 関連ドキュメント
 
 - [OWASP チェックリスト](./owasp-checklist.md)
