@@ -55,6 +55,7 @@ services:
         protocol: tcp
     environment:
       NODE_ENV: development
+      PORT: 8080
       DATABASE_URL: mysql://user:password@tidb:4000/portfolio
       DATABASE_MAX_OPEN_CONNS: 1
       DATABASE_MAX_IDLE_CONNS: 10
@@ -121,6 +122,17 @@ services:
       - target: 80
         published: 3001
         protocol: tcp
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://api:8787
+      VITE_GOOGLE_ANALYTICS_ENABLED: false
+      VITE_GOOGLE_TAG_MANAGER_ENABLED: false
+      VITE_XSTATE_INSPECTOR_ENABLED: true
+      VITE_SENTRY_DSN: dummy
+      VITE_SENTRY_ENVIRONMENT: development
+      VITE_SENTRY_TRACES_SAMPLE_RATE: 1
+      VITE_SENTRY_REPLAY_SAMPLE_RATE: 0
+      VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: 0
     restart: unless-stopped
 
   wiki:
