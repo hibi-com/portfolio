@@ -1,0 +1,8 @@
+*.tsbuildinfo
+.DS_Store
+.cache
+.turbo
+build
+coverage
+dist
+node_modules
