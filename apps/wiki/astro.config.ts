@@ -71,12 +71,105 @@ export default defineConfig({
                     label: "Sequence Diagrams",
                     items: [
                         {
-                            label: "Web",
-                            autogenerate: { directory: "sequence/web" },
+                            label: "Web Pages",
+                            items: [
+                                {
+                                    label: "Blog",
+                                    autogenerate: { directory: "sequence/web/blog" },
+                                },
+                                {
+                                    label: "Portfolio",
+                                    autogenerate: { directory: "sequence/web/portfolio" },
+                                },
+                                {
+                                    label: "API Routes",
+                                    autogenerate: { directory: "sequence/web/api" },
+                                },
+                            ],
                         },
                         {
+                            label: "Admin",
+                            items: [
+                                {
+                                    label: "Dashboard",
+                                    autogenerate: { directory: "sequence/admin/dashboard" },
+                                },
+                                {
+                                    label: "Posts",
+                                    autogenerate: { directory: "sequence/admin/posts" },
+                                },
+                                {
+                                    label: "Portfolios",
+                                    autogenerate: { directory: "sequence/admin/portfolios" },
+                                },
+                                {
+                                    label: "CRM",
+                                    autogenerate: { directory: "sequence/admin/crm" },
+                                },
+                                {
+                                    label: "Inquiries",
+                                    autogenerate: { directory: "sequence/admin/inquiries" },
+                                },
+                            ],
+                        },
+                        {
+                            label: "Backend API",
+                            items: [
+                                {
+                                    label: "Post",
+                                    autogenerate: { directory: "sequence/api/post" },
+                                },
+                                {
+                                    label: "Portfolio",
+                                    autogenerate: { directory: "sequence/api/portfolio" },
+                                },
+                                {
+                                    label: "CRM",
+                                    autogenerate: { directory: "sequence/api/crm" },
+                                },
+                                {
+                                    label: "Chat",
+                                    autogenerate: { directory: "sequence/api/chat" },
+                                },
+                                {
+                                    label: "Email",
+                                    autogenerate: { directory: "sequence/api/email" },
+                                },
+                                {
+                                    label: "Inquiry",
+                                    autogenerate: { directory: "sequence/api/inquiry" },
+                                },
+                                {
+                                    label: "Integration",
+                                    autogenerate: { directory: "sequence/api/integration" },
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    label: "Specifications",
+                    items: [
+                        {
                             label: "API",
-                            autogenerate: { directory: "sequence/api" },
+                            autogenerate: { directory: "specs/api" },
+                        },
+                        {
+                            label: "Database",
+                            autogenerate: { directory: "specs/db" },
+                        },
+                    ],
+                },
+                {
+                    label: "User Stories",
+                    items: [
+                        {
+                            label: "Overview",
+                            link: "/user-stories/",
+                        },
+                        {
+                            label: "Visitor",
+                            autogenerate: { directory: "user-stories/visitor" },
                         },
                     ],
                 },
