@@ -9,10 +9,14 @@
 | テストタイプ | 実装済 | 未実装 | 進捗 |
 | ------------ | ------ | ------ | ---- |
 | Small Tests | 9パッケージ | 0 | ✅ 100% |
-| Medium Tests | 9ドメイン | 2 | 🔄 82% |
-| Large Tests | 3シナリオ | 6 | 🔄 33% |
+| Integration Tests (API) | 9ドメイン | 2 | 🔄 82% |
+| Integration Tests (Admin) | 5ファイル | 2 | 🔄 71% |
+| Integration Tests (Web) | 4ファイル | 0 | ✅ 100% |
+| E2E Tests (Web) | 3シナリオ | 0 | ✅ 100% |
+| E2E Tests (Admin) | 4ファイル | 0 | ✅ 100% |
+| E2E Tests (独立) | 4カテゴリ | 0 | ✅ 100% |
 
-> **注**: テストハニカム戦略により、Large Testsは最小限を目指しています。
+> **注**: テストハニカム戦略により、E2E Testsは最小限を目指しています。
 
 ## テスト戦略：テストハニカム
 
@@ -33,9 +37,9 @@
 
 | 優先度 | テストタイプ | 目的 | 作成基準 |
 | ------ | ----------- | ---- | -------- |
-| ⭐⭐⭐ | Medium Tests | サービス間インタラクション検証 | シーケンス図と1:1対応（必須） |
+| ⭐⭐⭐ | Integration Tests | サービス間インタラクション検証 | シーケンス図と1:1対応（必須） |
 | ⭐ | Small Tests | 複雑なロジック検証 | 複雑な計算・変換・解析のみ |
-| ⚠️ | Large Tests | クリティカルパス検証 | ユーザーストーリーの主要パスのみ |
+| ⚠️ | E2E Tests | クリティカルパス検証 | ユーザーストーリーの主要パスのみ |
 
 ### Small Test作成基準
 
@@ -73,39 +77,96 @@
 | apps/web | `*.test.ts` | コンポーネント、フック | ✅ 実装済 |
 | apps/admin | `*.test.ts` | コンポーネント、フック | ✅ 実装済 |
 
-### Medium Tests（統合テスト）- 最重視 ⭐⭐⭐
+### Integration Tests（API）- 最重視 ⭐⭐⭐
 
-> **重要**: すべての機能に対してMedium Testを作成。シーケンス図と1:1で対応。
+> **重要**: すべての機能に対してIntegration Testを作成。シーケンス図と1:1で対応。
+> **配置**: `apps/api/integration/{domain}/*.integration.test.ts`
 
 | ドメイン | テストファイル | 対応シーケンス図 | 状態 |
 | -------- | -------------- | ---------------- | ---- |
-| Post | `posts-list.medium.test.ts` | `docs/sequence/api/post/posts-list.md` | ✅ 実装済 |
-| Post | `post-by-slug.medium.test.ts` | `docs/sequence/api/post/post-by-slug.md` | ✅ 実装済 |
-| Portfolio | `portfolios-list.medium.test.ts` | `docs/sequence/api/portfolio/portfolios-list.md` | ✅ 実装済 |
-| Portfolio | `portfolio-by-slug.medium.test.ts` | `docs/sequence/api/portfolio/portfolio-by-slug.md` | ✅ 実装済 |
-| CRM | `customer-crud.medium.test.ts` | `docs/sequence/api/crm/customer-*.md` | ✅ 実装済 |
-| CRM | `lead-conversion.medium.test.ts` | `docs/sequence/api/crm/lead-convert.md` | ✅ 実装済 |
-| CRM | `deal-pipeline.medium.test.ts` | `docs/sequence/api/crm/deal-*.md` | ✅ 実装済 |
-| Chat | `chat-flow.medium.test.ts` | `docs/sequence/api/chat/*.md` | ✅ 実装済 |
-| Inquiry | `inquiry-flow.medium.test.ts` | `docs/sequence/api/inquiry/*.md` | ✅ 実装済 |
-| Email | `email-send.medium.test.ts` | `docs/sequence/api/email/*.md` | ⏳ 未実装 |
-| Integration | `freee-sync.medium.test.ts` | `docs/sequence/api/integration/*.md` | ⏳ 未実装 |
+| Post | `posts-list.integration.test.ts` | `docs/sequence/api/post/posts-list.md` | ✅ 実装済 |
+| Post | `post-by-slug.integration.test.ts` | `docs/sequence/api/post/post-by-slug.md` | ✅ 実装済 |
+| Portfolio | `portfolios-list.integration.test.ts` | `docs/sequence/api/portfolio/portfolios-list.md` | ✅ 実装済 |
+| Portfolio | `portfolio-by-slug.integration.test.ts` | `docs/sequence/api/portfolio/portfolio-by-slug.md` | ✅ 実装済 |
+| CRM | `customer-crud.integration.test.ts` | `docs/sequence/api/crm/customer-*.md` | ✅ 実装済 |
+| CRM | `lead-conversion.integration.test.ts` | `docs/sequence/api/crm/lead-convert.md` | ✅ 実装済 |
+| CRM | `deal-pipeline.integration.test.ts` | `docs/sequence/api/crm/deal-*.md` | ✅ 実装済 |
+| Chat | `chat-flow.integration.test.ts` | `docs/sequence/api/chat/*.md` | ✅ 実装済 |
+| Inquiry | `inquiry-flow.integration.test.ts` | `docs/sequence/api/inquiry/*.md` | ✅ 実装済 |
+| Email | `email-send.integration.test.ts` | `docs/sequence/api/email/*.md` | ⏳ 未実装 |
+| Integration | `freee-sync.integration.test.ts` | `docs/sequence/api/integration/*.md` | ⏳ 未実装 |
 
-### Large Tests（E2Eテスト）- 最小限 ⚠️
+### Integration Tests（Admin）- 最重視 ⭐⭐⭐
 
-> **注意**: 外部依存は壊れやすいため、クリティカルパスのみに限定。
+> **配置**: `apps/admin/integration/*.integration.test.tsx`
+
+| 機能 | テストファイル | 対応シーケンス図 | 状態 |
+| ---- | -------------- | ---------------- | ---- |
+| 顧客一覧 | `customers-list.integration.test.tsx` | `docs/sequence/admin/crm/customers-list.md` | ✅ 実装済 |
+| ポートフォリオ一覧 | `portfolios-list.integration.test.tsx` | `docs/sequence/admin/portfolios/portfolios-list.md` | ✅ 実装済 |
+| 投稿一覧 | `posts-list.integration.test.tsx` | `docs/sequence/admin/posts/posts-list.md` | ✅ 実装済 |
+| ダッシュボード | `dashboard-load.integration.test.tsx` | `docs/sequence/admin/dashboard/dashboard-load.md` | ✅ 実装済 |
+| 問い合わせ一覧 | `inquiries-list.integration.test.tsx` | `docs/sequence/admin/inquiries/inquiries-list.md` | ✅ 実装済 |
+| 投稿作成 | `post-create.integration.test.tsx` | `docs/sequence/admin/posts/post-create.md` | ⏳ 未実装 |
+| 投稿編集 | `post-edit.integration.test.tsx` | `docs/sequence/admin/posts/post-edit.md` | ⏳ 未実装 |
+
+### Integration Tests（Web）- 最重視 ⭐⭐⭐
+
+> **配置**: `apps/web/integration/*.integration.test.ts`
+
+| 機能 | テストファイル | 対応シーケンス図 | 状態 |
+| ---- | -------------- | ---------------- | ---- |
+| ブログ一覧 | `blog-list.integration.test.ts` | `docs/sequence/web/blog/blog-list.md` | ✅ 実装済 |
+| ブログ詳細 | `blog-detail.integration.test.ts` | `docs/sequence/web/blog/blog-detail.md` | ✅ 実装済 |
+| ポートフォリオ一覧 | `portfolio-list.integration.test.ts` | `docs/sequence/web/portfolio/portfolio-list.md` | ✅ 実装済 |
+| ポートフォリオ詳細 | `portfolio-detail.integration.test.ts` | `docs/sequence/web/portfolio/portfolio-detail.md` | ✅ 実装済 |
+
+### E2E Tests（Web）- 最小限 ⚠️
+
+> **配置**: `apps/web/e2e/pages/*.spec.ts`
 
 | ペルソナ | テストファイル | 対応ユーザーストーリー | 状態 |
 | -------- | -------------- | ---------------------- | ---- |
-| Visitor | `browse-blog.large.spec.ts` | `docs/user-stories/visitor/browse-blog.md` | ✅ 実装済 |
-| Visitor | `browse-portfolio.large.spec.ts` | `docs/user-stories/visitor/browse-portfolio.md` | ✅ 実装済 |
-| Visitor | `submit-inquiry.large.spec.ts` | `docs/user-stories/visitor/submit-inquiry.md` | ✅ 実装済 |
-| Admin | `manage-posts.large.spec.ts` | `docs/user-stories/admin/manage-posts.md` | ⏳ 未実装 |
-| Admin | `manage-portfolios.large.spec.ts` | `docs/user-stories/admin/manage-portfolios.md` | ⏳ 未実装 |
-| Admin | `manage-inquiries.large.spec.ts` | `docs/user-stories/admin/manage-inquiries.md` | ⏳ 未実装 |
-| CRM User | `manage-customers.large.spec.ts` | `docs/user-stories/crm-user/manage-customers.md` | ⏳ 未実装 |
-| CRM User | `manage-leads.large.spec.ts` | `docs/user-stories/crm-user/manage-leads.md` | ⏳ 未実装 |
-| CRM User | `manage-deals.large.spec.ts` | `docs/user-stories/crm-user/manage-deals.md` | ⏳ 未実装 |
+| Visitor | `browse-blog.spec.ts` | `docs/user-stories/visitor/browse-blog.md` | ✅ 実装済 |
+| Visitor | `browse-portfolio.spec.ts` | `docs/user-stories/visitor/browse-portfolio.md` | ✅ 実装済 |
+| Visitor | `submit-inquiry.spec.ts` | `docs/user-stories/visitor/submit-inquiry.md` | ✅ 実装済 |
+
+### E2E Tests（Admin）- 最小限 ⚠️
+
+> **配置**: `apps/admin/e2e/*.spec.ts`
+
+| 機能 | テストファイル | 対応ユーザーストーリー | 状態 |
+| ---- | -------------- | ---------------------- | ---- |
+| 投稿管理 | `posts.spec.ts` | `docs/user-stories/admin/manage-posts.md` | ✅ 実装済 |
+| ポートフォリオ管理 | `portfolios.spec.ts` | `docs/user-stories/admin/manage-portfolios.md` | ✅ 実装済 |
+| 問い合わせ管理 | `manage-inquiries.spec.ts` | `docs/user-stories/admin/manage-inquiries.md` | ✅ 実装済 |
+| ナビゲーション | `navigation.spec.ts` | - | ✅ 実装済 |
+
+### E2E Tests（API）- 最小限 ⚠️
+
+> **配置**: `apps/api/e2e/*.spec.ts`
+
+| 機能 | テストファイル | 対応ユーザーストーリー | 状態 |
+| ---- | -------------- | ---------------------- | ---- |
+| 顧客管理 | `customers.spec.ts` | `docs/user-stories/crm-user/manage-customers.md` | ✅ 実装済 |
+| リード管理 | `leads.spec.ts` | `docs/user-stories/crm-user/manage-leads.md` | ✅ 実装済 |
+| 案件管理 | `deals.spec.ts` | `docs/user-stories/crm-user/manage-deals.md` | ✅ 実装済 |
+| パイプライン | `pipelines.spec.ts` | - | ✅ 実装済 |
+| 問い合わせ | `inquiries.spec.ts` | - | ✅ 実装済 |
+
+### E2E Tests（独立プロジェクト）- apps/e2e
+
+> **配置**: `apps/e2e/e2e/**/*.spec.ts`
+> **用途**: 本番環境に対する独立したE2Eテスト
+
+| カテゴリ | テストファイル | 目的 | 状態 |
+| -------- | -------------- | ---- | ---- |
+| アクセシビリティ | `accessibility/*.spec.ts` | WCAG 2.1 AA準拠チェック | ✅ 実装済 |
+| モンキーテスト | `monkey/*.spec.ts` | ランダム操作による安定性テスト | ✅ 実装済 |
+| Web API | `web-api/*.spec.ts` | Web BFF APIテスト | ✅ 実装済 |
+| Admin API | `admin-api/*.spec.ts` | Admin APIテスト | ✅ 実装済 |
+| ビジュアル | `storybook/visual/*.spec.ts` | スクリーンショット比較 | ✅ 実装済 |
+| インタラクション | `storybook/interactions/*.spec.ts` | Storybookインタラクションテスト | ✅ 実装済 |
 
 ## 機能別テストマトリクス
 
@@ -205,16 +266,20 @@
 
 ## アクセシビリティテスト
 
+> **配置**: `apps/e2e/e2e/accessibility/*.spec.ts`
+
 ### WCAG 2.1 AA準拠チェック
 
-| カテゴリ | テスト項目 | 自動化 | 状態 |
-| -------- | ---------- | ------ | ---- |
-| 知覚可能 | 画像の代替テキスト | axe-core | - |
-| 知覚可能 | カラーコントラスト | axe-core | - |
-| 操作可能 | キーボードナビゲーション | Playwright | - |
-| 操作可能 | フォーカス管理 | Playwright | - |
-| 理解可能 | フォームラベル | axe-core | - |
-| 堅牢 | HTML構造 | axe-core | - |
+| カテゴリ | テスト項目 | テストファイル | 状態 |
+| -------- | ---------- | -------------- | ---- |
+| 知覚可能 | 画像の代替テキスト | `images.spec.ts` | ✅ 実装済 |
+| 知覚可能 | カラーコントラスト | `contrast.spec.ts` | ✅ 実装済 |
+| 操作可能 | キーボードナビゲーション | `keyboard.spec.ts` | ✅ 実装済 |
+| 操作可能 | フォーカス管理 | `keyboard.spec.ts` | ✅ 実装済 |
+| 理解可能 | フォームラベル | `forms.spec.ts` | ✅ 実装済 |
+| 理解可能 | ボタン/リンクラベル | `labels.spec.ts` | ✅ 実装済 |
+| 堅牢 | HTML構造/見出し階層 | `semantic.spec.ts` | ✅ 実装済 |
+| 堅牢 | ナビゲーション | `navigation.spec.ts` | ✅ 実装済 |
 
 ## パフォーマンステスト
 
@@ -241,20 +306,31 @@
 ## テスト実行コマンド
 
 ```bash
-# Small Tests
+# Small Tests（ユニットテスト）
 bun run test
 
-# Medium Tests
-bun vitest run -c apps/api/tests/vitest.medium.config.ts
+# Integration Tests（API）
+cd apps/api && bun run test:integration
 
-# Large Tests
-bun run e2e
+# Integration Tests（Admin）
+cd apps/admin && bun vitest run -c vitest.integration.config.ts
+
+# Integration Tests（Web）
+cd apps/web && bun vitest run -c vitest.integration.config.ts
+
+# E2E Tests（Web）
+cd apps/web && bun run e2e
+
+# E2E Tests（Admin）
+cd apps/admin && bun run e2e
+
+# E2E Tests（独立）
+cd apps/e2e && BASE_URL=https://example.com bun run accessibility
+cd apps/e2e && BASE_URL=https://example.com bun run monkey
+cd apps/e2e && BASE_URL=https://example.com bun run e2e:web
 
 # カバレッジレポート
 bun run coverage
-
-# アクセシビリティテスト
-bun run test:a11y
 ```
 
 ## CI/CDパイプライン
