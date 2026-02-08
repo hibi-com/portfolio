@@ -73,33 +73,6 @@ if (process.env.E2E_TEST !== "true") {
 
 let testDir: string;
 
-async function installCodex(testBinDir: string, $: typeof import("bun").$): Promise<void> {
-    const releaseResponse = await fetch("https://api.github.com/repos/openai/codex/releases/latest");
-    expect(releaseResponse.ok).toBe(true);
-    const releaseData = (await releaseResponse.json()) as {
-        tag_name: string;
-        assets: Array<{ name: string; browser_download_url: string }>;
-    };
-    const archResult = await $`uname -m`.quiet();
-    const archRaw = archResult.stdout.toString().trim();
-    const arch = archRaw === "arm64" ? "aarch64" : "x86_64";
-    const assetName = `codex-${arch}-apple-darwin.tar.gz`;
-    const asset = releaseData.assets.find((a) => a.name === assetName);
-    expect(asset).toBeDefined();
-    const downloadPath = `${testDir}/${assetName}`;
-    const downloadResult = await $`curl -fsSL -o ${downloadPath} ${asset!.browser_download_url}`.quiet();
-    expect(downloadResult.exitCode).toBe(0);
-    const extractResult = await $`tar -xzf ${downloadPath} -C ${testDir}`.quiet();
-    expect(extractResult.exitCode).toBe(0);
-    const extractedFileName = `codex-${arch}-apple-darwin`;
-    const extractedPath = `${testDir}/${extractedFileName}`;
-    await $`mkdir -p ${testBinDir}`.quiet();
-    const moveResult = await $`mv ${extractedPath} ${testBinDir}/codex`.quiet();
-    expect(moveResult.exitCode).toBe(0);
-    await $`chmod +x ${testBinDir}/codex`.quiet();
-    await $`rm ${downloadPath}`.quiet();
-}
-
 function createInstallEnv(name: string, testBinDir: string): Record<string, string | undefined> {
     const env: Record<string, string | undefined> = { ...process.env, PATH: `${testBinDir}:${process.env.PATH}` };
     if (name === "pulumi") {
@@ -311,14 +284,10 @@ async function installCommandByName(
     testBinDir: string,
     $: typeof import("bun").$,
 ): Promise<{ isMockEnvironment: boolean }> {
-    if (name === "codex") {
-        await installCodex(testBinDir, $);
-        return { isMockEnvironment: false };
-    } else if (installScript) {
+    if (installScript) {
         return await installStandardCommand(name, installScript, testBinDir, $);
-    } else {
-        throw new Error(`${name}のインストールスクリプトが定義されていません`);
     }
+    throw new Error(`${name}のインストールスクリプトが定義されていません`);
 }
 
 function shouldSkipError(error: unknown, name: string): boolean {
@@ -381,10 +350,7 @@ describe("command installation (E2E)", () => {
         { name: "bun", installScript: "curl -fsSL https://bun.sh/install | bash" },
         { name: "docker", installScript: "curl -fsSL https://get.docker.com/ | sh" },
         { name: "pulumi", installScript: "curl -fsSL https://get.pulumi.com | sh" },
-        { name: "doppler", installScript: null },
-        { name: "coderabbit", installScript: "curl -fsSL https://cli.coderabbit.ai/install.sh | sh" },
         { name: "claude", installScript: "curl -fsSL https://claude.ai/install.sh | bash" },
-        { name: "codex", installScript: null },
     ];
 
     beforeAll(() => {

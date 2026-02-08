@@ -7,23 +7,20 @@ import { logStep } from "./lib/env";
 import { findRootDir } from "./lib/root";
 import type { ResolvedOptions, SetupOptions, SetupStep, StepId } from "./lib/types";
 import { runDockerStep } from "./steps/docker";
-import { runEnvStep } from "./steps/env";
 import { runInstallStep } from "./steps/install";
 
 export const SETUP_STEPS: Record<StepId, SetupStep> = {
-    env: runEnvStep,
     install: runInstallStep,
     docker: runDockerStep,
 };
 
 function shouldRunAll(options: SetupOptions): boolean {
-    return !options.env && !options.install && !options.docker;
+    return !options.install && !options.docker;
 }
 
 function resolveOptions(options: SetupOptions): ResolvedOptions {
     const runAll = shouldRunAll(options);
     return {
-        runEnv: runAll || options.env !== false,
         runInstall: runAll || options.install !== false,
         runDocker: runAll || options.docker !== false,
         parallel: options.parallel ?? true,
@@ -44,7 +41,6 @@ function printSuccessMessage(): void {
     console.log(pc.bold(pc.green("  ╰─────────────────────────────────────────────╯")));
     console.log();
     console.log(pc.bold("  次のステップ:"));
-    console.log(pc.dim("    • 必要に応じて .docker/secrets/ の値を編集してください"));
     console.log(pc.dim("    • bun run dev で開発サーバー（docker compose up）を起動できます"));
     console.log();
 }
@@ -116,10 +112,6 @@ export async function runWorkspace(options: SetupOptions = {}): Promise<void> {
 
     try {
         await checkAndInstallCommands();
-
-        if (resolved.runEnv) {
-            await SETUP_STEPS.env({ rootDir, useLoadingBar: true });
-        }
 
         await handleInstallStep(rootDir, resolved.runInstall);
         await runBuildTasks(rootDir, resolved.runDocker, resolved.parallel);

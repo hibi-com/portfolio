@@ -105,89 +105,6 @@ async function installDocker(): Promise<void> {
     }
 }
 
-async function installCodex(): Promise<void> {
-    const loadingBar = new LoadingBar("Codex CLIをインストールしています...");
-    loadingBar.start();
-    try {
-        const releaseResponse = await fetch("https://api.github.com/repos/openai/codex/releases/latest");
-
-        if (!releaseResponse.ok) {
-            loadingBar.stop(false);
-            throw new Error(`GitHub APIエラー: ${releaseResponse.status}`);
-        }
-
-        const releaseData = (await releaseResponse.json()) as {
-            tag_name: string;
-            assets: Array<{ name: string; browser_download_url: string }>;
-        };
-
-        const archResult = await $`uname -m`.quiet();
-        const archRaw = archResult.stdout.toString().trim();
-        const arch = archRaw === "arm64" ? "aarch64" : "x86_64";
-
-        const assetName = `codex-${arch}-apple-darwin.tar.gz`;
-
-        const asset = releaseData.assets.find((a) => a.name === assetName);
-
-        if (!asset) {
-            loadingBar.stop(false);
-            throw new Error(`アセットが見つかりません: ${assetName}`);
-        }
-
-        const downloadPath = `/tmp/${assetName}`;
-
-        const downloadResult = await $`curl -fsSL -o ${downloadPath} ${asset.browser_download_url}`.quiet();
-
-        if (downloadResult.exitCode !== 0) {
-            loadingBar.stop(false);
-            throw new Error("ダウンロードに失敗しました");
-        }
-
-        const extractResult = await $`tar -xzf ${downloadPath} -C /tmp`.quiet();
-
-        if (extractResult.exitCode !== 0) {
-            loadingBar.stop(false);
-            throw new Error(`解凍に失敗しました: ${extractResult.stderr.toString()}`);
-        }
-
-        const extractedFileName = `codex-${arch}-apple-darwin`;
-        const extractedPath = `/tmp/${extractedFileName}`;
-
-        const checkResult = await $`test -f ${extractedPath}`.quiet();
-
-        if (checkResult.exitCode !== 0) {
-            loadingBar.stop(false);
-            throw new Error(`解凍後のcodexバイナリが見つかりません: ${extractedPath}`);
-        }
-
-        const homeDir = process.env.HOME || process.env.USERPROFILE || "~";
-        const localBinDir = `${homeDir}/.local/bin`;
-        await $`mkdir -p ${localBinDir}`.quiet();
-
-        const moveResult = await $`mv ${extractedPath} ${localBinDir}/codex`.quiet();
-
-        if (moveResult.exitCode !== 0) {
-            loadingBar.stop(false);
-            throw new Error("インストールに失敗しました");
-        }
-
-        await $`chmod +x ${localBinDir}/codex`.quiet();
-        await $`rm ${downloadPath}`.quiet();
-
-        loadingBar.stop(true, `Codex CLI ${releaseData.tag_name} のインストールが完了しました`);
-        logStep("", `Codex CLIは ${localBinDir} にインストールされました`, "info");
-        logStep("", "PATHに追加するには、シェル設定ファイルに以下を追加してください:", "info");
-        console.log(pc.dim(String.raw`    export PATH="$HOME/.local/bin:$PATH"`));
-    } catch (error) {
-        loadingBar.stop(false);
-        logStep("", "Codex CLIのインストールに失敗しました", "error");
-        if (error instanceof Error) {
-            console.error(pc.dim(`  エラー: ${error.message}`));
-        }
-        throw error;
-    }
-}
-
 async function runShellInstallScript(name: string, script: string): Promise<void> {
     const loadingBar = new LoadingBar(`${name}をインストールしています...`);
     loadingBar.start();
@@ -255,24 +172,10 @@ const COMMANDS: CommandInfo[] = [
         required: true,
     },
     {
-        name: "coderabbit",
-        checkCommand: "coderabbit",
-        installScript: "curl -fsSL https://cli.coderabbit.ai/install.sh | sh",
-        description: "CodeRabbit CLI",
-        required: false,
-    },
-    {
         name: "claude",
         checkCommand: "claude",
         installScript: "curl -fsSL https://claude.ai/install.sh | bash",
         description: "Claude Code",
-        required: false,
-    },
-    {
-        name: "codex",
-        checkCommand: "codex",
-        installScript: installCodex,
-        description: "Codex CLI",
         required: false,
     },
 ];
