@@ -72,7 +72,7 @@ export function createVitestConfig(options: VitestConfigOptions = {}) {
                 thresholds: {
                     lines: 90,
                     functions: 90,
-                    branches: 100, // MC/DC準拠: すべての条件分岐を網羅
+                    branches: 100,
                     statements: 90,
                 },
                 poolOptions: {
