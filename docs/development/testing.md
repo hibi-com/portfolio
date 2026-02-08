@@ -6,27 +6,92 @@ title: "テストガイドライン"
 
 ## テスト戦略
 
-### テストの種類
+### Google テストサイズ
 
-1. **ユニットテスト** (Vitest)
-   - 個別の関数、コンポーネント、ユーティリティのテスト
-   - カバレッジ目標: 95%以上
+本プロジェクトでは、[Google Testing Blog](https://testing.googleblog.com/2010/12/test-sizes.html) で提唱されているテストサイズの概念を採用しています。
 
-2. **E2Eテスト** (Playwright)
-   - ユーザーシナリオに基づく統合テスト
-   - ページオブジェクトモデル（POM）パターンを採用
+| サイズ | 特徴 | 実行時間目標 | 実行タイミング |
+|-------|------|------------|---------------|
+| **Small** | 単一プロセス、完全モック、ネットワークなし | < 100ms | コミット毎 |
+| **Medium** | 複数プロセス可、外部サービスモック、DB接続可 | < 1秒 | PR毎 |
+| **Large** | 実システム全体、ブラウザ含む | < 10秒 | マージ前、定期実行 |
 
-3. **アクセシビリティテスト** (Playwright + axe-core)
-   - WCAG準拠の検証
-   - Storybook上でのコンポーネントテスト
+### テストサイズの定義
 
-4. **ビジュアルリグレッションテスト** (Playwright)
-   - Storybook上でのスクリーンショット比較
+#### Small Tests（単体テスト）
 
-5. **インタラクションテスト** (Playwright)
-   - Storybook上でのコンポーネントインタラクション検証
+- **目的**: 個別の関数、クラス、コンポーネントの動作検証
+- **特徴**:
+  - 単一プロセスで実行
+  - 外部依存関係は完全にモック化
+  - ネットワークアクセスなし
+  - ファイルシステムアクセスなし
+- **対象**: UseCase、Repository（モック）、ユーティリティ関数、Reactコンポーネント
+- **フレームワーク**: Vitest
 
-## ユニットテスト (Vitest)
+#### Medium Tests（統合テスト）
+
+- **目的**: 複数コンポーネント間の連携と仕様書（シーケンス図）の検証
+- **特徴**:
+  - 複数プロセス可
+  - 外部サービス（API等）はモック化
+  - テスト用データベース接続可
+  - **シーケンス図と1:1で対応**
+- **対象**: REST API統合、UseCase→Repository→DB連携、ミドルウェア統合
+- **フレームワーク**: Vitest + テストDB
+
+#### Large Tests（E2Eテスト）
+
+- **目的**: ユーザーストーリーに基づくシステム全体の動作検証
+- **特徴**:
+  - 実システム全体を使用
+  - ブラウザシミュレーション含む
+  - **ユーザーストーリーと1:1で対応**
+- **対象**: ユーザーシナリオ、クリティカルパス、リグレッション
+- **フレームワーク**: Playwright
+
+### テストファイル命名規則
+
+| サイズ | 命名規則 | 配置場所 | 例 |
+|-------|---------|---------|-----|
+| Small | `*.test.ts` | ソースファイルと同階層 | `getPosts.test.ts` |
+| Medium | `*.medium.test.ts` | `tests/medium/` | `posts-list.medium.test.ts` |
+| Large | `*.large.spec.ts` | `e2e/large/` | `browse-blog.large.spec.ts` |
+
+### テストと仕様書の対応
+
+#### Medium Tests とシーケンス図
+
+Medium Tests は `docs/sequence/api/` 内のシーケンス図と1:1で対応します。
+
+```
+docs/sequence/api/post/posts-list.md
+  ↓ 対応
+apps/api/tests/medium/post/posts-list.medium.test.ts
+```
+
+テストファイルの冒頭には、対応するシーケンス図へのリンクを記載します：
+
+```typescript
+/**
+ * @sequence docs/sequence/api/post/posts-list.md
+ * @description GET /api/posts - 投稿一覧取得の統合テスト
+ */
+```
+
+#### Large Tests とユーザーストーリー
+
+Large Tests は `docs/user-stories/` 内のユーザーストーリーと1:1で対応します。
+
+```
+docs/user-stories/visitor/browse-blog.md
+  ↓ 対応
+apps/web/e2e/large/visitor/browse-blog.large.spec.ts
+```
+
+---
+
+## Small Tests（単体テスト）
 
 ### テストファイルの配置
 
@@ -168,7 +233,126 @@ bun run coverage
 turbo run coverage --filter=@portfolio/web
 ```
 
-## E2Eテスト (Playwright)
+---
+
+## Medium Tests（統合テスト）
+
+### ディレクトリ構造
+
+```text
+apps/api/tests/
+├── medium/
+│   ├── setup/
+│   │   ├── db.setup.ts           # テストDB初期化
+│   │   └── container.setup.ts    # DIコンテナ初期化
+│   ├── post/
+│   │   ├── posts-list.medium.test.ts
+│   │   └── post-by-slug.medium.test.ts
+│   ├── portfolio/
+│   │   ├── portfolios-list.medium.test.ts
+│   │   └── portfolio-by-slug.medium.test.ts
+│   ├── crm/
+│   │   ├── customer-crud.medium.test.ts
+│   │   ├── lead-conversion.medium.test.ts
+│   │   └── deal-pipeline.medium.test.ts
+│   └── ...
+└── vitest.medium.config.ts       # Medium Test専用設定
+```
+
+### テストの書き方
+
+Medium Tests はシーケンス図の各ステップを検証します。
+
+```typescript
+/**
+ * @sequence docs/sequence/api/post/posts-list.md
+ * @description GET /api/posts - 投稿一覧取得の統合テスト
+ */
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { setupTestDb, teardownTestDb, seedTestData } from "../setup/db.setup";
+import { createTestContainer } from "../setup/container.setup";
+import type { DIContainer } from "@/di/container";
+
+describe("Posts List Integration", () => {
+    let container: DIContainer;
+
+    beforeAll(async () => {
+        await setupTestDb();
+        container = createTestContainer();
+    });
+
+    afterAll(async () => {
+        await teardownTestDb();
+    });
+
+    describe("シーケンス: Client → API → UseCase → Repository → DB", () => {
+        test("正常系: 投稿一覧を取得する", async () => {
+            // Given: DBに投稿が存在する
+            await seedTestData({
+                posts: [
+                    { id: "1", title: "Test Post 1", slug: "test-1" },
+                    { id: "2", title: "Test Post 2", slug: "test-2" },
+                ],
+            });
+
+            // When: GET /api/posts を実行
+            const useCase = container.getGetPostsUseCase();
+            const result = await useCase.execute();
+
+            // Then: 投稿一覧がレスポンスされる
+            expect(result).toHaveLength(2);
+            expect(result[0].title).toBe("Test Post 1");
+        });
+
+        test("異常系: 投稿が0件の場合は空配列を返す", async () => {
+            // Given: DBに投稿が存在しない
+            // (setupTestDbで初期化済み)
+
+            // When: GET /api/posts を実行
+            const useCase = container.getGetPostsUseCase();
+            const result = await useCase.execute();
+
+            // Then: 空配列がレスポンスされる
+            expect(result).toHaveLength(0);
+        });
+    });
+});
+```
+
+### テスト実行
+
+```bash
+# Medium Testsのみ実行
+bun vitest run -c apps/api/tests/vitest.medium.config.ts
+
+# 特定ドメインのMedium Tests
+bun vitest run -c apps/api/tests/vitest.medium.config.ts --filter=post
+```
+
+---
+
+## Large Tests（E2Eテスト）
+
+### ディレクトリ構造
+
+```text
+apps/web/e2e/
+├── large/                        # ユーザーストーリーベース
+│   ├── visitor/
+│   │   ├── browse-blog.large.spec.ts
+│   │   └── browse-portfolio.large.spec.ts
+│   ├── admin/
+│   │   ├── manage-posts.large.spec.ts
+│   │   └── manage-inquiries.large.spec.ts
+│   └── crm-user/
+│       └── manage-customers.large.spec.ts
+├── api/                          # APIレスポンス検証（従来のE2E）
+│   ├── posts.spec.ts
+│   └── portfolios.spec.ts
+├── accessibility/                # アクセシビリティテスト
+├── visual/                       # ビジュアルリグレッションテスト
+└── interactions/                 # インタラクションテスト
+```
 
 ### ページオブジェクトモデル（POM）
 
@@ -200,25 +384,47 @@ export class HomePage extends BasePage {
 }
 ```
 
-#### テストの書き方
+### ユーザーストーリーベースのテスト
+
+Large Tests はユーザーストーリーのシナリオを検証します。
 
 ```typescript
-// e2e/home.spec.ts
+/**
+ * @story docs/user-stories/visitor/browse-blog.md
+ * @description 訪問者がブログを閲覧するシナリオ
+ */
 import { expect, test } from "@playwright/test";
-import { HomePage } from "./pages/home.page";
+import { HomePage } from "../pages/home.page";
+import { BlogPage } from "../pages/blog.page";
 
-test("should display home page", async ({ page }) => {
-    const homePage = new HomePage(page);
-    await homePage.gotoHome();
-    await homePage.expectHeroVisible();
-});
+test.describe("訪問者がブログを閲覧する", () => {
+    test("シナリオ1: ブログ一覧からブログ詳細へ遷移する", async ({ page }) => {
+        // Given: トップページにアクセスしている
+        const homePage = new HomePage(page);
+        await homePage.gotoHome();
 
-test("should navigate to blog page", async ({ page }) => {
-    const homePage = new HomePage(page);
-    await homePage.gotoHome();
-    await homePage.clickBlogLink();
+        // When: ブログ一覧リンクをクリック
+        await homePage.clickBlogLink();
 
-    await expect(page).toHaveURL(/\/blog/);
+        // Then: ブログ一覧ページが表示される
+        await expect(page).toHaveURL(/\/blog/);
+        const blogPage = new BlogPage(page);
+        await blogPage.expectBlogListVisible();
+
+        // When: 最初のブログ記事をクリック
+        await blogPage.clickFirstPost();
+
+        // Then: ブログ詳細ページが表示される
+        await blogPage.expectPostDetailVisible();
+    });
+
+    test("シナリオ2: 存在しないブログにアクセスすると404が表示される", async ({ page }) => {
+        // Given: 存在しないスラッグでアクセス
+        await page.goto("/blog/non-existent-post");
+
+        // Then: 404ページが表示される
+        await expect(page.locator("text=404")).toBeVisible();
+    });
 });
 ```
 
@@ -279,15 +485,17 @@ test("BlogPreview visual regression", async ({ page }) => {
 });
 ```
 
+---
+
 ## テスト実行
 
 ### ローカル環境
 
 ```bash
-# すべてのユニットテストを実行
+# Small Tests（すべてのユニットテスト）
 bun run test
 
-# 特定のパッケージのテスト
+# 特定のパッケージのSmall Tests
 turbo run test --filter=@portfolio/web
 
 # ウォッチモード
@@ -296,7 +504,10 @@ bun vitest
 # カバレッジレポート生成
 bun run coverage
 
-# E2Eテスト実行
+# Medium Tests（統合テスト）
+bun vitest run -c apps/api/tests/vitest.medium.config.ts
+
+# Large Tests（E2Eテスト）
 bun run e2e
 
 # アクセシビリティテスト
@@ -320,6 +531,8 @@ docker run --rm -e CI=true \
   -v $(pwd)/node_modules:/work/node_modules \
   e2e bunx playwright test
 ```
+
+---
 
 ## テストのベストプラクティス
 
@@ -419,6 +632,8 @@ describe("formatDate", () => {
 });
 ```
 
+---
+
 ## テストカバレッジ
 
 ### カバレッジ目標
@@ -436,8 +651,11 @@ open docs/vitest/coverage/index.html
 cat docs/vitest/coverage/lcov.info
 ```
 
+---
+
 ## 参考資料
 
+- [Google Testing Blog - Test Sizes](https://testing.googleblog.com/2010/12/test-sizes.html)
 - [Vitest公式ドキュメント](https://vitest.dev/)
 - [Playwright公式ドキュメント](https://playwright.dev/)
 - [Testing Library公式ドキュメント](https://testing-library.com/)

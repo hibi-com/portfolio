@@ -1,0 +1,107 @@
+---
+title: "PUT /api/crm/deals/:id/stage - 商談ステージ移動"
+---
+
+## Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant Client as クライアント
+    participant API as API Server<br/>(Hono)
+    participant Auth as 認証ミドルウェア
+    participant Validation as バリデーション
+    participant Container as DIContainer
+    participant UseCase as MoveDealToStageUseCase
+    participant DealRepo as DealRepository
+    participant StageRepo as PipelineStageRepository
+    participant DB as D1 Database
+
+    Client->>API: PUT /api/crm/deals/:id/stage
+    API->>Auth: authenticate()
+    alt 未認証の場合
+        Auth-->>API: null
+        API-->>Client: 401 { error: "Unauthorized" }
+    else 認証済みの場合
+        Auth-->>API: { userId: string }
+        API->>Validation: validateMoveStageInput(body)
+        alt バリデーションエラーの場合
+            Validation-->>API: errors[]
+            API-->>Client: 400 { error: "Validation failed", details: errors }
+        else バリデーション成功の場合
+            Validation-->>API: validatedInput
+            API->>Container: DIContainer作成(DB)
+            Container->>UseCase: getMoveDealToStageUseCase()
+            API->>UseCase: execute(dealId, stageId)
+            UseCase->>DealRepo: findById(dealId)
+            DealRepo->>DB: SELECT * FROM deals WHERE id = ?
+            DB-->>DealRepo: deal | null
+            alt 商談が見つからない場合
+                DealRepo-->>UseCase: null
+                UseCase-->>API: NotFoundError
+                API-->>Client: 404 { error: "Deal not found" }
+            else 商談がクローズ済みの場合
+                DealRepo-->>UseCase: Deal (status: WON | LOST)
+                UseCase-->>API: ConflictError
+                API-->>Client: 409 { error: "Cannot move closed deal" }
+            else 正常な場合
+                DealRepo-->>UseCase: Deal
+                UseCase->>StageRepo: findById(stageId)
+                StageRepo->>DB: SELECT * FROM pipeline_stages WHERE id = ?
+                DB-->>StageRepo: stage | null
+                alt ステージが見つからない場合
+                    StageRepo-->>UseCase: null
+                    UseCase-->>API: NotFoundError
+                    API-->>Client: 404 { error: "Stage not found" }
+                else 正常な場合
+                    StageRepo-->>UseCase: Stage
+                    UseCase->>DealRepo: updateStage(dealId, stageId)
+                    DealRepo->>DB: UPDATE deals SET stage_id = ?
+                    DB-->>DealRepo: deal
+                    DealRepo-->>UseCase: Deal
+                    UseCase-->>API: Deal
+                    API-->>Client: 200 Deal
+                end
+            end
+        end
+    end
+```
+
+## エンドポイント仕様
+
+### リクエスト
+
+- **Method**: PUT
+- **Path**: `/api/crm/deals/:id/stage`
+- **認証**: 必要
+- **Content-Type**: `application/json`
+
+### パスパラメータ
+
+| パラメータ | 型 | 説明 |
+|-----------|-----|------|
+| id | string | 商談ID |
+
+### リクエストボディ
+
+```typescript
+interface MoveStageInput {
+    stageId: string;  // 必須: 移動先ステージID
+}
+```
+
+### レスポンス
+
+| ステータス | 説明 | ボディ |
+|-----------|------|--------|
+| 200 | 移動成功 | `Deal` |
+| 400 | バリデーションエラー | `{ error: "Validation failed", details: [] }` |
+| 401 | 未認証 | `{ error: "Unauthorized" }` |
+| 404 | 商談/ステージが見つからない | `{ error: "Deal not found" }` or `{ error: "Stage not found" }` |
+| 409 | クローズ済み商談 | `{ error: "Cannot move closed deal" }` |
+| 500 | サーバーエラー | `{ error: "Failed to move deal" }` |
+
+## ビジネスルール
+
+1. ステータスが `WON` または `LOST` の商談はステージ移動できない
+2. 移動先ステージは同じパイプライン内に存在する必要がある
+3. ステージ移動時に `updatedAt` タイムスタンプを更新
