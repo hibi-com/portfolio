@@ -113,6 +113,46 @@ apps/web/e2e/
     └── visitor/
 ```
 
+## 追加作業（2026-02-07 続き）
+
+### MC/DC（Modified Condition/Decision Coverage）対応
+
+**カバレッジ閾値の更新:**
+- `tooling/vitest-config/src/index.ts` - カバレッジ閾値を更新
+  - lines: 80% → 90%
+  - functions: 80% → 90%
+  - branches: 80% → 100%（MC/DC準拠）
+  - statements: 80% → 90%
+
+**ドキュメント追加:**
+- `docs/development/testing.md` - MC/DCセクション追加
+  - MC/DCの3つの要件の説明
+  - MC/DCテストパターン（真理値表含む）
+  - 実践的なガイドライン
+
+### Web/Admin Integration Tests追加
+
+**シーケンス図（新規作成）:**
+- `docs/sequence/admin/posts/posts-list.md`
+- `docs/sequence/admin/portfolios/portfolios-list.md`
+- `docs/sequence/admin/crm/customers-list.md`
+
+**Integration Tests:**
+- `apps/web/integration/blog-list.integration.test.ts`
+- `apps/web/integration/blog-detail.integration.test.ts`
+- `apps/web/integration/portfolio-list.integration.test.ts`
+- `apps/web/integration/portfolio-detail.integration.test.ts`
+- `apps/admin/integration/posts-list.integration.test.tsx`
+- `apps/admin/integration/portfolios-list.integration.test.tsx`
+- `apps/admin/integration/customers-list.integration.test.tsx`
+
+**設定ファイル:**
+- `apps/web/vitest.integration.config.ts`
+- `apps/admin/vitest.integration.config.ts`
+
+**Large Test追加:**
+- `apps/web/e2e/large/visitor/submit-inquiry.large.spec.ts`
+
 ## 残っている課題
 
 1. **Medium Testの型エラー修正**: 一部のテストで暗黙的anyの警告あり

@@ -70,10 +70,10 @@ export function createVitestConfig(options: VitestConfigOptions = {}) {
                 reporter: ["lcov", "json-summary"],
                 reportsDirectory: coverageDir,
                 thresholds: {
-                    lines: 80,
-                    functions: 80,
-                    branches: 80,
-                    statements: 80,
+                    lines: 90,
+                    functions: 90,
+                    branches: 100, // MC/DC準拠: すべての条件分岐を網羅
+                    statements: 90,
                 },
                 poolOptions: {
                     threads: {

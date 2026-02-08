@@ -322,11 +322,85 @@ describe("Posts List Integration", () => {
 ### テスト実行
 
 ```bash
-# Medium Testsのみ実行
+# API Medium Testsのみ実行
 bun vitest run -c apps/api/tests/vitest.medium.config.ts
 
 # 特定ドメインのMedium Tests
 bun vitest run -c apps/api/tests/vitest.medium.config.ts --filter=post
+```
+
+---
+
+## Integration Tests（Web/Admin）
+
+フロントエンドアプリケーション（web/admin）のIntegration Testsは、Remixローダー/TanStack Routerとコンポーネントの統合を検証します。
+
+### ディレクトリ構造
+
+```text
+apps/web/
+├── integration/                    # Web Integration Tests
+│   ├── blog-list.integration.test.ts
+│   ├── blog-detail.integration.test.ts
+│   ├── portfolio-list.integration.test.ts
+│   └── portfolio-detail.integration.test.ts
+└── vitest.integration.config.ts
+
+apps/admin/
+├── integration/                    # Admin Integration Tests
+│   ├── posts-list.integration.test.tsx
+│   ├── portfolios-list.integration.test.tsx
+│   └── customers-list.integration.test.tsx
+└── vitest.integration.config.ts
+```
+
+### シーケンス図との対応
+
+| シーケンス図 | Integration Test |
+|-------------|------------------|
+| `docs/sequence/web/blog-list.md` | `apps/web/integration/blog-list.integration.test.ts` |
+| `docs/sequence/web/blog-detail.md` | `apps/web/integration/blog-detail.integration.test.ts` |
+| `docs/sequence/admin/posts/posts-list.md` | `apps/admin/integration/posts-list.integration.test.tsx` |
+
+### テストの書き方
+
+Integration Tests はMSWを使用してAPIをモックし、フロントエンドの統合フローを検証します。
+
+```typescript
+/**
+ * @sequence docs/sequence/web/blog-list.md
+ * @description GET /blog - ブログ一覧ページの統合テスト
+ */
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/node";
+import { describe, expect, test } from "vitest";
+
+const server = setupServer();
+
+describe("Blog List Integration", () => {
+    test("正常系: 投稿一覧を取得する", async () => {
+        server.use(
+            http.get(`${API_URL}/api/posts`, () => {
+                return HttpResponse.json([{ id: "1", title: "Test" }]);
+            }),
+        );
+
+        const response = await fetch(`${API_URL}/api/posts`);
+        const data = await response.json();
+
+        expect(data).toHaveLength(1);
+    });
+});
+```
+
+### テスト実行
+
+```bash
+# Web Integration Tests
+bun vitest run -c apps/web/vitest.integration.config.ts
+
+# Admin Integration Tests
+bun vitest run -c apps/admin/vitest.integration.config.ts
 ```
 
 ---
@@ -638,8 +712,121 @@ describe("formatDate", () => {
 
 ### カバレッジ目標
 
-- **全体**: 80%以上
-- **新規コード**: 90%以上
+本プロジェクトでは、MC/DC（Modified Condition/Decision Coverage）に準拠したカバレッジ基準を採用しています。
+
+| メトリクス | 閾値 | 説明 |
+|-----------|------|------|
+| **Lines** | 90% | 実行された行の割合 |
+| **Functions** | 90% | 呼び出された関数の割合 |
+| **Branches** | 100% | 通過した分岐の割合（MC/DC準拠） |
+| **Statements** | 90% | 実行されたステートメントの割合 |
+
+### MC/DC（Modified Condition/Decision Coverage）
+
+MC/DCは航空・医療・自動車など安全性が重要なシステムで採用されるカバレッジ基準です。
+
+#### MC/DCの3つの要件
+
+1. **エントリ/エグジット網羅**: すべてのエントリポイントとエグジットポイントが呼び出される
+2. **条件網羅**: 判定内のすべての条件がtrue/falseの両方を取る
+3. **独立影響**: 各条件が独立して判定の結果に影響を与える
+
+#### MC/DCテストパターン
+
+複合条件 `if (A && B || C)` に対するMC/DCテストケース:
+
+```typescript
+describe("複合条件のMC/DCテスト", () => {
+    // 条件Aの独立影響テスト
+    it("Aがtrueからfalseに変化すると結果が変わる（B=true, C=false）", () => {
+        expect(evaluate(true, true, false)).toBe(true);   // A=true
+        expect(evaluate(false, true, false)).toBe(false); // A=false
+    });
+
+    // 条件Bの独立影響テスト
+    it("Bがtrueからfalseに変化すると結果が変わる（A=true, C=false）", () => {
+        expect(evaluate(true, true, false)).toBe(true);   // B=true
+        expect(evaluate(true, false, false)).toBe(false); // B=false
+    });
+
+    // 条件Cの独立影響テスト
+    it("Cがtrueからfalseに変化すると結果が変わる（A=false, B=false）", () => {
+        expect(evaluate(false, false, true)).toBe(true);  // C=true
+        expect(evaluate(false, false, false)).toBe(false); // C=false
+    });
+});
+```
+
+#### MC/DC真理値表
+
+| A | B | C | A && B | A && B \|\| C | Aの影響 | Bの影響 | Cの影響 |
+|---|---|---|--------|---------------|---------|---------|---------|
+| T | T | F | T | T | ✓ | ✓ | |
+| F | T | F | F | F | ✓ | | |
+| T | F | F | F | F | | ✓ | |
+| F | F | T | F | T | | | ✓ |
+| F | F | F | F | F | | | ✓ |
+
+### 実践的なMC/DCガイドライン
+
+#### 1. 複合条件の分解
+
+```typescript
+// ❌ Bad: 複雑な複合条件
+if (user.isAdmin && (user.hasPermission || config.allowAll) && !user.isBanned) {
+    // ...
+}
+
+// ✅ Good: 条件を分解して各条件を独立してテスト可能に
+const isAdminUser = user.isAdmin;
+const hasAccess = user.hasPermission || config.allowAll;
+const isNotBanned = !user.isBanned;
+
+if (isAdminUser && hasAccess && isNotBanned) {
+    // ...
+}
+```
+
+#### 2. 早期リターンの活用
+
+```typescript
+// ✅ Good: 各条件を個別にテスト可能
+function canAccess(user: User, config: Config): boolean {
+    if (!user.isAdmin) return false;
+    if (user.isBanned) return false;
+    if (!user.hasPermission && !config.allowAll) return false;
+    return true;
+}
+```
+
+#### 3. ガード句のテスト
+
+```typescript
+describe("canAccess MC/DC", () => {
+    const baseUser = { isAdmin: true, isBanned: false, hasPermission: true };
+    const baseConfig = { allowAll: false };
+
+    it("isAdmin=falseで拒否", () => {
+        expect(canAccess({ ...baseUser, isAdmin: false }, baseConfig)).toBe(false);
+    });
+
+    it("isBanned=trueで拒否", () => {
+        expect(canAccess({ ...baseUser, isBanned: true }, baseConfig)).toBe(false);
+    });
+
+    it("hasPermission=false, allowAll=falseで拒否", () => {
+        expect(canAccess({ ...baseUser, hasPermission: false }, baseConfig)).toBe(false);
+    });
+
+    it("hasPermission=false, allowAll=trueで許可", () => {
+        expect(canAccess({ ...baseUser, hasPermission: false }, { allowAll: true })).toBe(true);
+    });
+
+    it("すべての条件を満たす場合は許可", () => {
+        expect(canAccess(baseUser, baseConfig)).toBe(true);
+    });
+});
+```
 
 ### カバレッジレポートの確認
 
@@ -649,6 +836,25 @@ open docs/vitest/coverage/index.html
 
 # LCOVレポート（CI用）
 cat docs/vitest/coverage/lcov.info
+
+# 特定ファイルのブランチカバレッジ詳細
+bun vitest run --coverage --reporter=verbose
+```
+
+### カバレッジ除外
+
+特定のコードをカバレッジから除外する場合は、コメントを使用します：
+
+```typescript
+/* istanbul ignore next */
+function debugOnly() {
+    // デバッグ専用コード
+}
+
+/* istanbul ignore if */
+if (process.env.NODE_ENV === "development") {
+    // 開発環境専用コード
+}
 ```
 
 ---
