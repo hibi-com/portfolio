@@ -95,11 +95,11 @@ sequenceDiagram
     Note over A,V: バリデーション
     A->>V: validate(request)
     alt リクエストパラメータに{field}が存在しない場合
-        V-->>A: `VALIDATION_MISSING_FIELD`
+        V-->>A: `PF200001` (VALIDATION_MISSING_FIELD)
         A-->>C: 400 Bad Request
     end
     alt {field}が文字列ではない場合
-        V-->>A: `VALIDATION_INVALID_TYPE`
+        V-->>A: `PF200004` (VALIDATION_INVALID_TYPE)
         A-->>C: 400 Bad Request
     end
     V-->>A: validated data
@@ -114,7 +114,7 @@ sequenceDiagram
 
     alt リソースが存在しない場合
         R-->>U: null
-        U-->>A: `NOT_FOUND_{RESOURCE}`
+        U-->>A: `PF3xxxxx` (NOT_FOUND_{RESOURCE})
         A-->>C: 404 Not Found
     end
 
@@ -159,16 +159,26 @@ interface RequestBody {
 
 ## エラーコード一覧
 
-| ステータス | エラーコード | 説明 | 発生条件 |
-| ---------- | ------------ | ---- | -------- |
-| 400 | `VALIDATION_MISSING_FIELD` | 必須フィールド不足 | {field}が未指定 |
-| 400 | `VALIDATION_INVALID_TYPE` | 型が不正 | {field}が文字列ではない |
-| 400 | `VALIDATION_INVALID_FORMAT` | 形式が不正 | {field}の形式が不正 |
-| 401 | `AUTH_UNAUTHORIZED` | 認証エラー | 認証トークンが無効 |
-| 403 | `AUTH_FORBIDDEN` | 認可エラー | アクセス権限がない |
-| 404 | `NOT_FOUND_{RESOURCE}` | リソース未発見 | 指定IDが存在しない |
-| 429 | `RATE_LIMIT_EXCEEDED` | レート制限超過 | リクエスト数超過 |
-| 500 | `INTERNAL_SERVER_ERROR` | サーバーエラー | 予期せぬエラー |
+| ステータス | PFコード | 定数名 | 説明 | 発生条件 |
+| ---------- | -------- | ------ | ---- | -------- |
+| 400 | `PF200001` | VALIDATION_MISSING_FIELD | 必須フィールド不足 | {field}が未指定 |
+| 400 | `PF200004` | VALIDATION_INVALID_TYPE | 型が不正 | {field}が文字列ではない |
+| 400 | `PF200002` | VALIDATION_INVALID_FORMAT | 形式が不正 | {field}の形式が不正 |
+| 401 | `PF100003` | AUTH_UNAUTHORIZED | 認証エラー | 認証トークンが無効 |
+| 403 | `PF100004` | AUTH_FORBIDDEN | 認可エラー | アクセス権限がない |
+| 404 | `PF3xxxxx` | NOT_FOUND_{RESOURCE} | リソース未発見 | 指定IDが存在しない |
+| 429 | `PF600001` | RATE_LIMIT_EXCEEDED | レート制限超過 | リクエスト数超過 |
+| 500 | `PF400001` | INTERNAL_SERVER_ERROR | サーバーエラー | 予期せぬエラー |
+
+> **PFコード体系**: `PF` + カテゴリ桁 + 5桁の番号
+> - PF1xxxxx: 認証 (401/403)
+> - PF2xxxxx: バリデーション (400)
+> - PF3xxxxx: リソース未発見 (404)
+> - PF4xxxxx: 内部エラー (500)
+> - PF5xxxxx: 外部サービス (500)
+> - PF6xxxxx: レート制限 (429)
+> - PF7xxxxx: データベース (500)
+> - PF8xxxxx: キャッシュ (500)
 
 ## 外部システム呼び出しまとめ
 
@@ -236,7 +246,8 @@ loop は外部システム（DB, API, Redis）への呼び出しにのみ使用�
 ### エラーコードの記法
 
 ```text
-エラーコードはバッククォートで囲む: `VALIDATION_MISSING_FIELD`
+エラーコードはPF形式でバッククォートで囲み、括弧内に定数名を記載:
+`PF200001` (VALIDATION_MISSING_FIELD)
 ```
 
 ## セルフレビューチェックリスト

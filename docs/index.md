@@ -14,8 +14,6 @@ hero:
       variant: minimal
 ---
 
-# Portfolio Documentation
-
 > 仕様駆動開発 (SDD) + テスト駆動開発 (TDD) を採用したMonorepoプロジェクト
 
 ## Quick Start

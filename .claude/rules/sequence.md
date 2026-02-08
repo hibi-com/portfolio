@@ -84,7 +84,8 @@ docs/sequence/api/{domain}/{operation}.md
 ### エラーコード
 
 ```text
-エラーコードはバッククォートで囲む: `VALIDATION_MISSING_FIELD`
+エラーコードはPF形式でバッククォートで囲み、括弧内に定数名を記載:
+`PF200001` (VALIDATION_MISSING_FIELD)
 ```
 
 ## セルフレビューチェックリスト
