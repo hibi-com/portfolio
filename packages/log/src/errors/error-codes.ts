@@ -1,3 +1,17 @@
+/**
+ * エラーコード体系
+ *
+ * PFxxxxxx形式:
+ * - PF1xxxxx: 認証エラー (Authentication)
+ * - PF2xxxxx: バリデーションエラー (Validation)
+ * - PF3xxxxx: リソース未発見 (Not Found)
+ * - PF4xxxxx: 内部エラー (Internal)
+ * - PF5xxxxx: 外部サービスエラー (External)
+ * - PF6xxxxx: レート制限 (Rate Limit)
+ * - PF7xxxxx: データベースエラー (Database)
+ * - PF8xxxxx: キャッシュエラー (Cache)
+ */
+
 export enum ErrorCategory {
     AUTHENTICATION = "AUTH",
     VALIDATION = "VALIDATION",
@@ -10,46 +24,81 @@ export enum ErrorCategory {
 }
 
 export const ErrorCodes = {
-    AUTH_INVALID_TOKEN: "AUTH_INVALID_TOKEN",
-    AUTH_TOKEN_EXPIRED: "AUTH_TOKEN_EXPIRED",
-    AUTH_UNAUTHORIZED: "AUTH_UNAUTHORIZED",
-    AUTH_FORBIDDEN: "AUTH_FORBIDDEN",
-    AUTH_MISSING_CREDENTIALS: "AUTH_MISSING_CREDENTIALS",
-    VALIDATION_MISSING_FIELD: "VALIDATION_MISSING_FIELD",
-    VALIDATION_INVALID_FORMAT: "VALIDATION_INVALID_FORMAT",
-    VALIDATION_OUT_OF_RANGE: "VALIDATION_OUT_OF_RANGE",
-    VALIDATION_INVALID_TYPE: "VALIDATION_INVALID_TYPE",
-    NOT_FOUND_RESOURCE: "NOT_FOUND_RESOURCE",
-    NOT_FOUND_USER: "NOT_FOUND_USER",
-    NOT_FOUND_PORTFOLIO: "NOT_FOUND_PORTFOLIO",
-    NOT_FOUND_POST: "NOT_FOUND_POST",
-    INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
-    INTERNAL_PROCESSING_ERROR: "INTERNAL_PROCESSING_ERROR",
-    EXTERNAL_API_ERROR: "EXTERNAL_API_ERROR",
-    EXTERNAL_TIMEOUT: "EXTERNAL_TIMEOUT",
-    EXTERNAL_RATE_LIMIT: "EXTERNAL_RATE_LIMIT",
-    RATE_LIMIT_EXCEEDED: "RATE_LIMIT_EXCEEDED",
-    DATABASE_CONNECTION_ERROR: "DATABASE_CONNECTION_ERROR",
-    DATABASE_QUERY_ERROR: "DATABASE_QUERY_ERROR",
-    DATABASE_TRANSACTION_ERROR: "DATABASE_TRANSACTION_ERROR",
-    CACHE_CONNECTION_ERROR: "CACHE_CONNECTION_ERROR",
-    CACHE_OPERATION_ERROR: "CACHE_OPERATION_ERROR",
+    // 認証エラー (PF1xxxxx)
+    AUTH_INVALID_TOKEN: "PF100001",
+    AUTH_TOKEN_EXPIRED: "PF100002",
+    AUTH_UNAUTHORIZED: "PF100003",
+    AUTH_FORBIDDEN: "PF100004",
+    AUTH_MISSING_CREDENTIALS: "PF100005",
+
+    // バリデーションエラー (PF2xxxxx)
+    VALIDATION_MISSING_FIELD: "PF200001",
+    VALIDATION_INVALID_FORMAT: "PF200002",
+    VALIDATION_OUT_OF_RANGE: "PF200003",
+    VALIDATION_INVALID_TYPE: "PF200004",
+
+    // リソース未発見 (PF3xxxxx)
+    NOT_FOUND_RESOURCE: "PF300001",
+    NOT_FOUND_USER: "PF300002",
+    NOT_FOUND_PORTFOLIO: "PF300003",
+    NOT_FOUND_POST: "PF300004",
+
+    // 内部エラー (PF4xxxxx)
+    INTERNAL_SERVER_ERROR: "PF400001",
+    INTERNAL_PROCESSING_ERROR: "PF400002",
+
+    // 外部サービスエラー (PF5xxxxx)
+    EXTERNAL_API_ERROR: "PF500001",
+    EXTERNAL_TIMEOUT: "PF500002",
+    EXTERNAL_RATE_LIMIT: "PF500003",
+
+    // レート制限 (PF6xxxxx)
+    RATE_LIMIT_EXCEEDED: "PF600001",
+
+    // データベースエラー (PF7xxxxx)
+    DATABASE_CONNECTION_ERROR: "PF700001",
+    DATABASE_QUERY_ERROR: "PF700002",
+    DATABASE_TRANSACTION_ERROR: "PF700003",
+
+    // キャッシュエラー (PF8xxxxx)
+    CACHE_CONNECTION_ERROR: "PF800001",
+    CACHE_OPERATION_ERROR: "PF800002",
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
 
+/**
+ * エラーコードからカテゴリを取得
+ * PFの後の最初の数字でカテゴリを判定
+ */
 export function getErrorCategory(code: ErrorCode): ErrorCategory {
-    if (code.startsWith("AUTH_")) return ErrorCategory.AUTHENTICATION;
-    if (code.startsWith("VALIDATION_")) return ErrorCategory.VALIDATION;
-    if (code.startsWith("NOT_FOUND_")) return ErrorCategory.NOT_FOUND;
-    if (code.startsWith("INTERNAL_")) return ErrorCategory.INTERNAL;
-    if (code.startsWith("EXTERNAL_")) return ErrorCategory.EXTERNAL;
-    if (code.startsWith("RATE_LIMIT_")) return ErrorCategory.RATE_LIMIT;
-    if (code.startsWith("DATABASE_")) return ErrorCategory.DATABASE;
-    if (code.startsWith("CACHE_")) return ErrorCategory.CACHE;
-    return ErrorCategory.INTERNAL;
+    const categoryDigit = code.charAt(2);
+
+    switch (categoryDigit) {
+        case "1":
+            return ErrorCategory.AUTHENTICATION;
+        case "2":
+            return ErrorCategory.VALIDATION;
+        case "3":
+            return ErrorCategory.NOT_FOUND;
+        case "4":
+            return ErrorCategory.INTERNAL;
+        case "5":
+            return ErrorCategory.EXTERNAL;
+        case "6":
+            return ErrorCategory.RATE_LIMIT;
+        case "7":
+            return ErrorCategory.DATABASE;
+        case "8":
+            return ErrorCategory.CACHE;
+        default:
+            return ErrorCategory.INTERNAL;
+    }
 }
 
+/**
+ * エラーコードからHTTPステータスコードを取得
+ */
 export function getHttpStatusFromErrorCode(code: ErrorCode): number {
     const category = getErrorCategory(code);
 
@@ -75,4 +124,13 @@ export function getHttpStatusFromErrorCode(code: ErrorCode): number {
         default:
             return 500;
     }
+}
+
+/**
+ * エラーコードの人間が読める名前を取得
+ */
+export function getErrorCodeName(code: ErrorCode): string {
+    const entries = Object.entries(ErrorCodes) as [string, ErrorCode][];
+    const entry = entries.find(([, value]) => value === code);
+    return entry ? entry[0] : "UNKNOWN";
 }
