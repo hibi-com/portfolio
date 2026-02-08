@@ -44,37 +44,3 @@ sequenceDiagram
         end
     end
 ```
-
-## エンドポイント仕様
-
-### リクエスト
-
-- **Method**: POST
-- **Path**: `/api/crm/customers`
-- **認証**: 必要
-- **Content-Type**: `application/json`
-
-### リクエストボディ
-
-```typescript
-interface CreateCustomerInput {
-    name: string;           // 必須
-    email?: string;         // オプション
-    phone?: string;         // オプション
-    company?: string;       // オプション
-    website?: string;       // オプション
-    address?: string;       // オプション
-    notes?: string;         // オプション
-    status?: CustomerStatus; // デフォルト: "PROSPECT"
-    tags?: string[];        // オプション
-}
-```
-
-### レスポンス
-
-| ステータス | 説明 | ボディ |
-|-----------|------|--------|
-| 201 | 作成成功 | `Customer` |
-| 400 | バリデーションエラー | `{ error: "Validation failed", details: [] }` |
-| 401 | 未認証 | `{ error: "Unauthorized" }` |
-| 500 | サーバーエラー | `{ error: "Failed to create customer" }` |

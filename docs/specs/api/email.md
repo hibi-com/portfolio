@@ -68,3 +68,4 @@ interface EmailTemplate {
 ## 関連シーケンス図
 
 - [メール送信](../sequence/api/email/email-send.md)
+- [メールテンプレート作成](../sequence/api/email/email-template-create.md)

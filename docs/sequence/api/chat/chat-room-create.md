@@ -35,29 +35,3 @@ sequenceDiagram
         API-->>Client: 201 ChatRoom
     end
 ```
-
-## エンドポイント仕様
-
-### リクエスト
-
-- **Method**: POST
-- **Path**: `/api/chat/rooms`
-- **認証**: 必要
-
-### リクエストボディ
-
-```typescript
-interface CreateChatRoomInput {
-    customerId?: string;    // 顧客ID（オプション）
-    inquiryId?: string;     // 問い合わせID（オプション）
-    title?: string;         // ルームタイトル
-}
-```
-
-### レスポンス
-
-| ステータス | 説明 | ボディ |
-|-----------|------|--------|
-| 201 | 作成成功 | `ChatRoom` |
-| 401 | 未認証 | `{ error: "Unauthorized" }` |
-| 500 | サーバーエラー | `{ error: "Failed to create chat room" }` |

@@ -276,5 +276,9 @@ interface ErrorResponse {
 
 - [顧客一覧取得](../sequence/api/crm/customers-list.md)
 - [顧客作成](../sequence/api/crm/customer-create.md)
+- [顧客更新](../sequence/api/crm/customer-update.md)
+- [リード一覧取得](../sequence/api/crm/leads-list.md)
 - [リード変換](../sequence/api/crm/lead-convert.md)
+- [商談一覧取得](../sequence/api/crm/deals-list.md)
 - [商談ステージ移動](../sequence/api/crm/deal-move-stage.md)
+- [パイプライン一覧取得](../sequence/api/crm/pipelines-list.md)

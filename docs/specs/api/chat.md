@@ -77,3 +77,5 @@ interface ChatMessage {
 ## 関連シーケンス図
 
 - [チャットルーム作成](../sequence/api/chat/chat-room-create.md)
+- [メッセージ送信](../sequence/api/chat/chat-message-send.md)
+- [参加者追加](../sequence/api/chat/chat-participant-add.md)

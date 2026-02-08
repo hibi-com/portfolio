@@ -1,4 +1,19 @@
 {
+    "$schema": "https://json.schemastore.org/claude-code-settings.json",
+    "language": "日本語（明るく元気、絵文字あり）",
+    "spinnerVerbs": {
+        "mode": "replace",
+        "verbs": [
+            "モゾモゾ",
+            "ざわ…ざわ",
+            "もじもじ",
+            "うねうね",
+            "ピロピロピロ",
+            "うにょにょーん",
+            "ぱやぱや",
+            "はわわわ"
+        ]
+    },
     "permissions": {
         "allow": [
             "Read(*)",
@@ -44,7 +59,8 @@
             "Bash(docker start:*)",
             "Bash(docker restart:*)",
             "Bash(bun:*)",
-            "WebFetch(domain:*)"
+            "WebSearch",
+            "WebFetch"
         ],
         "deny": [
             "Bash(git tag:*)",
@@ -70,9 +86,46 @@
     "includeCoAuthoredBy": false,
     "statusLine": {
         "type": "command",
-        "command": "~/.claude/scripts/statusline.sh"
+        "command": "~/.claude/statusline.sh"
     },
     "hooks": {
+        "SessionStart": [
+            {
+                "matcher": "startup",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/load-project-context.sh",
+                        "statusMessage": "プロジェクトコンテキストを読み込み中..."
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-dangerous-commands.sh",
+                        "statusMessage": "コマンドを検証中..."
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Write|Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-on-save.sh",
+                        "timeout": 30,
+                        "async": true
+                    }
+                ]
+            }
+        ],
         "PermissionRequest": [
             {
                 "matcher": "*",
@@ -86,22 +139,30 @@
         ],
         "Stop": [
             {
-                "matcher": "",
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "/usr/bin/afplay /System/Library/Sounds/Ping.aiff"
+                        "command": "afplay /System/Library/Sounds/Ping.aiff"
                     }
                 ]
             }
         ],
         "Notification": [
             {
-                "matcher": "",
+                "matcher": "permission_prompt",
                 "hooks": [
                     {
                         "type": "command",
                         "command": "osascript -e 'display notification \"許可待ち\" with title \"Claude Code\"'"
+                    }
+                ]
+            },
+            {
+                "matcher": "idle_prompt",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "osascript -e 'display notification \"アイドル状態\" with title \"Claude Code\"'"
                     }
                 ]
             }

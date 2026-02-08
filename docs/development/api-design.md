@@ -65,8 +65,6 @@ model Post {
 
 ## Orval設定
 
-### 設定ファイル
-
 `packages/api/orval.config.ts` でOrvalの設定を定義しています。
 
 ```typescript
@@ -340,8 +338,6 @@ export const restHandlers: HttpHandler[] = [
 ```
 
 ## TypeSpec設定
-
-### 設定ファイル
 
 `packages/api/tspconfig.yaml` にTypeSpecの設定が定義されています。
 

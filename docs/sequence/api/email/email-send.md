@@ -46,32 +46,3 @@ sequenceDiagram
         end
     end
 ```
-
-## エンドポイント仕様
-
-### リクエスト
-
-- **Method**: POST
-- **Path**: `/api/email/send`
-- **認証**: 必要
-
-### リクエストボディ
-
-```typescript
-interface SendEmailInput {
-    to: string;             // 宛先メールアドレス
-    subject: string;        // 件名
-    body: string;           // 本文（HTML可）
-    customerId?: string;    // 顧客ID（ログ用）
-    from?: string;          // 送信元（オプション）
-}
-```
-
-### レスポンス
-
-| ステータス | 説明 | ボディ |
-|-----------|------|--------|
-| 200 | 送信成功 | `EmailLog` |
-| 400 | バリデーションエラー | `{ error: "Validation failed" }` |
-| 401 | 未認証 | `{ error: "Unauthorized" }` |
-| 500 | 送信失敗 | `{ error: "Failed to send email" }` |

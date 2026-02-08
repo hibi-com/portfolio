@@ -161,6 +161,71 @@ apps/web/e2e/
 4. **既存E2Eのマイグレーション**: 既存のE2Eテストをlarge/ディレクトリに移動する作業は未実施
 5. **CI/CDスクリプトの更新**: package.jsonへのtest:medium, test:largeスクリプト追加は未実施
 
+## 追加作業（2026-02-07 続き2）
+
+### docsディレクトリ構造の整理
+
+**シーケンス図の再編成:**
+
+| 移動元 | 移動先 |
+|-------|-------|
+| `docs/sequence/api/posts-list.md` | `docs/sequence/api/post/posts-list.md` |
+| `docs/sequence/api/post-by-slug.md` | `docs/sequence/api/post/post-by-slug.md` |
+| `docs/sequence/api/portfolios-list.md` | `docs/sequence/api/portfolio/portfolios-list.md` |
+| `docs/sequence/api/portfolio-by-slug.md` | `docs/sequence/api/portfolio/portfolio-by-slug.md` |
+| `docs/sequence/api/blog-list.md` | `docs/sequence/web/api/blog-list.md` |
+| `docs/sequence/api/blog-detail.md` | `docs/sequence/web/api/blog-detail.md` |
+| `docs/sequence/api/portfolio-list.md` | `docs/sequence/web/api/portfolio-list.md` |
+| `docs/sequence/api/portfolio-detail.md` | `docs/sequence/web/api/portfolio-detail.md` |
+| `docs/sequence/web/blog-list.md` | `docs/sequence/web/blog/blog-list.md` |
+| `docs/sequence/web/blog-detail.md` | `docs/sequence/web/blog/blog-detail.md` |
+| `docs/sequence/web/portfolio-list.md` | `docs/sequence/web/portfolio/portfolio-list.md` |
+| `docs/sequence/web/portfolio-detail.md` | `docs/sequence/web/portfolio/portfolio-detail.md` |
+
+**wiki設定の更新:**
+- `apps/wiki/astro.config.ts` - サイドバー構造を更新
+  - Sequence Diagrams: Web Pages / Admin / Backend API のカテゴリに分離
+  - Specifications: API / Database のセクション追加
+  - User Stories: Overview / Visitor のセクション追加
+
+**最終ディレクトリ構造:**
+```
+docs/
+├── architecture/           # アーキテクチャドキュメント
+├── database/               # ERD（prisma-markdown自動生成）
+├── development/            # 開発ガイドライン
+├── reports/                # 自動生成レポート
+├── sequence/               # シーケンス図
+│   ├── api/                # バックエンドAPI (Hono)
+│   │   ├── post/
+│   │   ├── portfolio/
+│   │   ├── crm/
+│   │   ├── chat/
+│   │   ├── email/
+│   │   ├── inquiry/
+│   │   └── integration/
+│   ├── web/                # Webフロントエンド (Remix)
+│   │   ├── blog/
+│   │   ├── portfolio/
+│   │   └── api/            # Remix API Routes
+│   └── admin/              # 管理画面 (TanStack Router)
+│       ├── posts/
+│       ├── portfolios/
+│       └── crm/
+├── specs/                  # 仕様書
+│   ├── api/
+│   └── db/
+└── user-stories/           # ユーザーストーリー
+    ├── visitor/
+    ├── admin/
+    └── crm-user/
+```
+
+**自動生成設定の確認:**
+- prisma-markdown: `docs/database/erd.md` に出力（正常）
+- vitest-reporter: `apps/wiki/reports/test/{project}/` に出力（正常）
+- playwright-reporter: `apps/wiki/reports/e2e/{project}/` に出力（正常）
+
 ## 次のステップ
 
 1. `bun run lint` でフォーマットと静的解析を実行

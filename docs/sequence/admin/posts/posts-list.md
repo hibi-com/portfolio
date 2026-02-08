@@ -35,10 +35,3 @@ sequenceDiagram
     Hook-->>Component: { data: Post[], isLoading: false }
     Component-->>Browser: HTML (投稿一覧テーブル)
 ```
-
-## 検証ポイント
-
-1. **ローディング状態**: APIレスポンス待機中のローディング表示
-2. **データ表示**: 取得した投稿の一覧表示
-3. **エラーハンドリング**: API失敗時のエラー表示
-4. **空データ**: 投稿が0件の場合のメッセージ表示

@@ -81,3 +81,5 @@ OPEN → IN_PROGRESS → WAITING_CUSTOMER → RESOLVED → CLOSED
 ## 関連シーケンス図
 
 - [問い合わせ作成](../sequence/api/inquiry/inquiry-create.md)
+- [問い合わせ返信](../sequence/api/inquiry/inquiry-response-add.md)
+- [問い合わせクローズ](../sequence/api/inquiry/inquiry-close.md)

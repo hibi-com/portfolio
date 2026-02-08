@@ -75,3 +75,4 @@ interface FreeeSyncLog {
 ## 関連シーケンス図
 
 - [Freee OAuth認証](../sequence/api/integration/freee-auth.md)
+- [Freeeデータ同期](../sequence/api/integration/freee-sync.md)

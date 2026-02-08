@@ -72,8 +72,6 @@ Resources:
 ## 追加されたパッケージ
 - `@pulumi/command@1.1.3`
 
----
-
 # TiDB Cloud クラスター自動作成
 
 ## 問題の概要

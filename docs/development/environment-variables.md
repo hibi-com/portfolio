@@ -2,6 +2,12 @@
 title: "環境変数管理"
 ---
 
+# 環境変数管理
+
+このドキュメントでは、環境変数の管理方法、命名規則、セキュリティベストプラクティスを説明します。
+
+## 概要
+
 このプロジェクトでは、環境変数を適切に管理し、セキュリティと設定の一貫性を保つための仕組みを提供しています。
 
 ## 環境変数の種類
@@ -235,6 +241,10 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 - `DATABASE_URL`: データベース接続URL（開発環境: `file:./dev.db`）
 
+### キャッシュ
+
+- `CACHE_URL`: Redis/Upstash キャッシュ接続URL（旧: `REDIS_URL`）
+
 ### 認証
 
 - `BETTER_AUTH_SECRET`: Better Authのシークレットキー
@@ -325,8 +335,30 @@ docker compose で開発するとき、freee の代わりに `@portfolio/mock-ap
 1. `env.d.ts` ファイルに環境変数の型定義を追加
 2. TypeScriptの型チェックを実行: `bun run typecheck`
 
+## 環境変数チェックリスト
+
+### 新規プロジェクトセットアップ
+
+- [ ] `.env.example` をコピーして `.env` を作成
+- [ ] `BETTER_AUTH_SECRET` を生成して設定
+- [ ] `DATABASE_URL` を設定
+- [ ] 必要なOAuthクライアントIDを設定
+
+### デプロイ前
+
+- [ ] 本番用の環境変数がCloudflareに設定されている
+- [ ] シークレットが `wrangler secret` で設定されている
+- [ ] `.env` ファイルがコミットされていない
+
+### セキュリティ監査
+
+- [ ] ハードコードされた認証情報がない
+- [ ] ログに機密情報が出力されていない
+- [ ] 不要な環境変数が削除されている
+
 ## 参考資料
 
 - [Vite環境変数とモード](https://vitejs.dev/guide/env-and-mode.html)
 - [Cloudflare Pages環境変数](https://developers.cloudflare.com/pages/platform/build-configuration/#environment-variables)
 - [Cloudflare Workers環境変数](https://developers.cloudflare.com/workers/configuration/environment-variables/)
+- [セキュリティガイドライン](../security/guidelines.md)

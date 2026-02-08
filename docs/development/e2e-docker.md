@@ -2,7 +2,14 @@
 title: "E2E Test Docker Container"
 ---
 
-このディレクトリ（`.docker/e2e`）には、Playwright E2Eテスト実行用のDockerコンテナの設定が含まれています。
+# E2E Test Docker Container
+
+Playwright E2Eテスト実行用のDockerコンテナの設定ガイド。
+
+## 概要
+
+`.docker/e2e` ディレクトリには、E2Eテスト実行に必要なDocker設定が含まれています。
+このコンテナはマルチステージビルドを使用し、ビルド→セキュリティスキャン→E2Eテストを自動実行します。
 
 ## ファイル構成
 
@@ -245,8 +252,102 @@ docker run --rm -it \
 - レイヤーキャッシュを最適化するため、依存関係のインストールを先に行っています
 - 不要なファイルは`.dockerignore`で除外されています
 
+## CI/CD統合
+
+### GitHub Actions での使用
+
+```yaml
+# .github/workflows/e2e.yml
+name: E2E Tests
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build E2E Docker image
+        run: docker build -t e2e -f .docker/e2e/Dockerfile .
+
+      - name: Run E2E tests
+        run: |
+          docker run --rm \
+            -e CI=true \
+            -v $(pwd):/work \
+            -w /work \
+            e2e
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: docs/playwright/report/
+```
+
+### テスト結果の確認
+
+```bash
+# HTMLレポートを開く
+open docs/playwright/report/index.html
+
+# セキュリティレポートを確認
+cat docs/security/e2e/trivy-report.json
+```
+
+## ベストプラクティス
+
+### 1. テストの並列実行
+
+```bash
+# ワーカー数を指定
+docker run --rm \
+  -e CI=true \
+  -e PLAYWRIGHT_WORKERS=4 \
+  -v $(pwd):/work \
+  -w /work \
+  e2e \
+  bunx playwright test --workers=4
+```
+
+### 2. 特定のブラウザでテスト
+
+```bash
+# Chromiumのみ
+docker run --rm \
+  -e CI=true \
+  -v $(pwd):/work \
+  -w /work \
+  e2e \
+  bunx playwright test --project=chromium
+
+# 全ブラウザ
+docker run --rm \
+  -e CI=true \
+  -v $(pwd):/work \
+  -w /work \
+  e2e \
+  bunx playwright test --project=chromium --project=firefox --project=webkit
+```
+
+### 3. 失敗したテストのリトライ
+
+```bash
+docker run --rm \
+  -e CI=true \
+  -v $(pwd):/work \
+  -w /work \
+  e2e \
+  bunx playwright test --retries=2
+```
+
 ## 関連ドキュメント
 
 - [Playwright Documentation](https://playwright.dev/)
 - [Bun Documentation](https://bun.sh/docs)
 - [テストガイドライン](./testing.md)
+- [QAシート](../testing/qa-sheet.md)
+- [セキュリティガイドライン](../security/guidelines.md)
