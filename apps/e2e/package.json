@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "name": "@portfolio/e2e",
+  "type": "module",
+  "scripts": {
+    "accessibility": "bun run with-env playwright test e2e/accessibility",
+    "monkey": "bun run with-env playwright test e2e/monkey",
+    "visual": "playwright test --config=playwright.storybook.config.ts e2e/storybook/visual",
+    "interactions": "playwright test --config=playwright.storybook.config.ts e2e/storybook/interactions",
+    "e2e:web": "bun run with-env playwright test e2e/web-api",
+    "e2e:admin": "bun run with-env playwright test e2e/admin-api",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "fmt": "biome format --write .",
+    "fmt:check": "biome format .",
+    "typecheck": "tsc --noEmit",
+    "with-env": "env --"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.57.0",
+    "@portfolio/biome-config": "workspace:*",
+    "@portfolio/playwright-config": "workspace:*",
+    "@portfolio/tsconfig": "workspace:*",
+    "playwright": "1.57.0",
+    "typescript": "5.9.3"
+  }
+}

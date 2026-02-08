@@ -1,5 +1,5 @@
 /**
- * Medium Test専用Vitest設定
+ * Integration Test専用Vitest設定
  *
  * シーケンス図に基づく統合テスト用の設定
  * テストDB接続を有効にし、外部サービスはモック化
@@ -12,19 +12,19 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
     plugins: [
         tsconfigPaths({
-            root: resolve(__dirname, ".."),
-            projects: ["../tsconfig.json"],
+            root: resolve(__dirname),
+            projects: ["./tsconfig.json"],
         }) as any,
     ],
     resolve: {
         alias: {
-            "~": resolve(__dirname, "../src"),
+            "~": resolve(__dirname, "./src"),
         },
     },
     test: {
-        name: "medium",
-        root: resolve(__dirname, ".."),
-        include: ["tests/medium/**/*.medium.test.ts"],
+        name: "integration",
+        root: resolve(__dirname),
+        include: ["integration/**/*.integration.test.ts"],
         exclude: ["**/node_modules/**", "**/dist/**"],
         globals: true,
         environment: "node",
@@ -45,9 +45,9 @@ export default defineConfig({
             [
                 "@portfolio/vitest-reporter",
                 {
-                    outputDir: "../../apps/wiki/reports/test",
-                    projectName: "api-medium",
-                    coverageDir: "../../apps/wiki/reports/test/api-medium",
+                    outputDir: "../wiki/reports/test",
+                    projectName: "api-integration",
+                    coverageDir: "../wiki/reports/test/api-integration",
                 },
             ],
         ],

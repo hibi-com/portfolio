@@ -23,6 +23,7 @@
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "test": "vitest run",
+    "test:integration": "vitest run -c vitest.integration.config.ts",
     "typecheck": "tsc --noEmit",
     "with-env": "env"
   },

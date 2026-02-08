@@ -890,9 +890,74 @@ if (process.env.NODE_ENV === "development") {
 }
 ```
 
+## 独立したE2Eテスト（apps/e2e）
+
+本番環境に対して実行する独立したE2Eテストは `apps/e2e` パッケージで管理します。
+
+### アクセシビリティテスト
+
+WCAG準拠とキーボードナビゲーションを検証します。
+
+| ファイル | 検証内容 |
+| -------- | -------- |
+| `navigation.spec.ts` | ナビゲーションのアクセシビリティ |
+| `keyboard.spec.ts` | キーボードナビゲーション、フォーカス管理 |
+| `images.spec.ts` | 画像のalt属性 |
+| `forms.spec.ts` | フォームラベル |
+| `semantic.spec.ts` | 見出し階層、ARIAランドマーク、スキップリンク |
+| `labels.spec.ts` | ボタン/リンクのラベル |
+| `contrast.spec.ts` | 色のコントラスト |
+
+```bash
+# アクセシビリティテスト実行
+cd apps/e2e && bun run accessibility:web:prd
+```
+
+### モンキーテスト
+
+ランダム操作による安定性テストです。
+
+| ファイル | 検証内容 |
+| -------- | -------- |
+| `interactions.spec.ts` | ランダムなクリック、入力、スクロール |
+| `navigation.spec.ts` | 高速なページ遷移 |
+| `mouse.spec.ts` | ランダムなマウス操作 |
+
+```bash
+# モンキーテスト実行
+cd apps/e2e && bun run monkey:web:prd
+```
+
+### Page Object Model（POM）
+
+E2Eテストでは、ページオブジェクトモデルを採用しています。
+
+```typescript
+// 使用例
+import { HomePage, BlogPage } from "./pages";
+
+test("ブログへの遷移", async ({ page }) => {
+    const homePage = new HomePage(page);
+    await homePage.gotoHome();
+    await homePage.clickBlogLink();
+
+    const blogPage = new BlogPage(page);
+    await blogPage.expectHeroVisible();
+});
+```
+
+| ページオブジェクト | 対象ページ |
+| ----------------- | ---------- |
+| `HomePage` | トップページ |
+| `BlogPage` | ブログページ |
+| `PortfolioPage` | ポートフォリオページ |
+| `ResumePage` | 履歴書ページ |
+| `UsesPage` | Usesページ |
+
 ## 参考資料
 
 - [Google Testing Blog - Test Sizes](https://testing.googleblog.com/2010/12/test-sizes.html)
+- [Spotify Testing Honeycomb](https://engineering.atspotify.com/2018/01/testing-of-microservices)
 - [Vitest公式ドキュメント](https://vitest.dev/)
 - [Playwright公式ドキュメント](https://playwright.dev/)
 - [Testing Library公式ドキュメント](https://testing-library.com/)
