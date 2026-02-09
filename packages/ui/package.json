@@ -15,7 +15,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "bun run build:js && bun run build:types",
-    "build:js": "bun build ./src/index.ts --outdir dist --target node --format esm --external react --external react-dom --external @portfolio/ui",
+    "build:js": "bun build ./src/index.ts --outdir dist --target browser --format esm --external react --external react-dom --external @portfolio/ui --external isomorphic-dompurify",
     "build:types": "git clean -xdf .cache/tsbuildinfo.json && tsc --emitDeclarationOnly --declaration --outDir dist",
     "build:ui": "storybook build -o ../../apps/wiki/design/ui",
     "clean:cache": "git clean -xdf .cache .turbo",

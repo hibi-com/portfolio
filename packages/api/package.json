@@ -34,7 +34,7 @@
   "main": "./dist/src/index.js",
   "scripts": {
     "build": "bun run build:js && bun run build:types",
-    "build:js": "bun build ./src/index.ts ./generated/api.schemas.ts ./generated/mutator.ts ./generated/portfolios/portfolios.ts ./generated/posts/posts.ts --outdir dist --target node --format esm",
+    "build:js": "bun build ./src/index.ts ./generated/api.schemas.ts ./generated/mutator.ts ./generated/portfolios/portfolios.ts ./generated/posts/posts.ts --outdir dist --target browser --format esm --external axios",
     "build:types": "git clean -xdf .cache/tsbuildinfo.json && tsc --emitDeclarationOnly --declaration --outDir dist",
     "build:ui": "redoc-cli bundle openapi.yaml --output ../../apps/wiki/reference/index.html",
     "clean:cache": "git clean -xdf .cache .turbo",
