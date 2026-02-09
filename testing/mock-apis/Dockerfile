@@ -3,7 +3,10 @@ FROM oven/bun:1.1.43-alpine AS builder
 WORKDIR /app
 
 COPY package.json ./
-RUN bun install --frozen-lockfile --ignore-scripts
+RUN apk add --no-cache jq=1.7.1-r0 && \
+    jq 'del(.devDependencies)' package.json > package.tmp.json && \
+    mv package.tmp.json package.json && \
+    bun install --ignore-scripts
 
 COPY . .
 RUN bun build --compile --minify --sourcemap ./src/index.ts --outfile server

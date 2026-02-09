@@ -22,8 +22,8 @@ uplinks:
 packages:
   "@portfolio/*":
     access: $all
-    publish: $authenticated
-    unpublish: $authenticated
+    publish: $all
+    unpublish: $all
 
   "**":
     access: $all

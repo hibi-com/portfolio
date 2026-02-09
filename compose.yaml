@@ -44,6 +44,8 @@ services:
     build:
       context: apps/api
       dockerfile: Dockerfile
+      args:
+        REGISTRY_URL: http://host.docker.internal:4873
     image: portfolio-api:local
     container_name: api
     networks:
@@ -89,6 +91,8 @@ services:
     build:
       context: apps/web
       dockerfile: Dockerfile
+      args:
+        REGISTRY_URL: http://host.docker.internal:4873
     image: portfolio-web:local
     container_name: web
     networks:
@@ -114,6 +118,8 @@ services:
     build:
       context: apps/admin
       dockerfile: Dockerfile
+      args:
+        REGISTRY_URL: http://host.docker.internal:4873
     image: portfolio-admin:local
     container_name: admin
     networks:
@@ -139,6 +145,8 @@ services:
     build:
       context: apps/wiki
       dockerfile: Dockerfile
+      args:
+        REGISTRY_URL: http://host.docker.internal:4873
     image: portfolio-wiki:local
     container_name: wiki
     networks:

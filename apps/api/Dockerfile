@@ -1,9 +1,20 @@
-FROM oven/bun:1.1.43-alpine AS builder
+FROM oven/bun:1.1.43 AS builder
+
+ARG REGISTRY_URL=http://verdaccio:4873
 
 WORKDIR /app
 
 COPY package.json ./
-RUN bun install --frozen-lockfile --ignore-scripts
+
+RUN apt-get update && apt-get install -y --no-install-recommends jq=1.6-2.1 && \
+    jq 'del(.devDependencies) | .dependencies = (.dependencies | to_entries | \
+    map(select(.value | test("^workspace:") | not) | {(.key): .value}) | add // {})' \
+    package.json > package.tmp.json && \
+    mv package.tmp.json package.json && \
+    echo "registry=${REGISTRY_URL}" > ~/.npmrc && \
+    bun install --ignore-scripts
+
+RUN bun add @portfolio/api @portfolio/auth @portfolio/cache @portfolio/db @portfolio/log --registry "${REGISTRY_URL}"
 
 COPY . .
 RUN bun build --compile --minify --sourcemap ./src/index.ts --outfile server
