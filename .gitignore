@@ -1,3 +1,4 @@
+
 $RECYCLE.BIN/
 *.cab
 *.icloud
@@ -23,6 +24,7 @@ $RECYCLE.BIN/
 .VolumeIcon.icns
 ._*
 .apdisk
+.astro
 .cache
 .claude/cache/
 .claude/settings.local.json
