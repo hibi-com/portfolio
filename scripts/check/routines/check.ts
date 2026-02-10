@@ -3,7 +3,10 @@ import { join, relative, resolve } from "node:path";
 import { $ } from "bun";
 
 declare const Bun: {
-    spawn: (args: string[], options?: { stdout?: "inherit" | "pipe"; stderr?: "inherit" | "pipe"; cwd?: string }) => {
+    spawn: (
+        args: string[],
+        options?: { stdout?: "inherit" | "pipe"; stderr?: "inherit" | "pipe"; cwd?: string },
+    ) => {
         exited: Promise<number>;
         exitCode: number | null;
         stdout: ReadableStream | null;
@@ -261,14 +264,13 @@ async function runRootFilesCommand(
 
     if (isFormat) {
         if (isFix) {
-            // biome check --write はフォーマット、リント、import整理をすべて実行
-            // --only=formatter でフォーマットのみ、--organize-imports-enabled=true でimport整理も有効化
-            await $`${biomePath} check --write --only=formatter --organize-imports-enabled=true ${rootFiles}`.cwd(rootDir);
+            await $`${biomePath} check --write --only=formatter --organize-imports-enabled=true ${rootFiles}`.cwd(
+                rootDir,
+            );
         } else {
             await $`${biomePath} check --only=formatter --organize-imports-enabled=true ${rootFiles}`.cwd(rootDir);
         }
     } else if (isFix) {
-        // biome check --write はフォーマット、リント、import整理をすべて実行
         await $`${biomePath} check --write --only=linter --organize-imports-enabled=true ${rootFiles}`.cwd(rootDir);
     } else {
         await $`${biomePath} check --only=linter --organize-imports-enabled=true ${rootFiles}`.cwd(rootDir);

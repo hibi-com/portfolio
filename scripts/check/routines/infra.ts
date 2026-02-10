@@ -14,11 +14,6 @@ declare const Bun: {
     };
 };
 
-/**
- * infra/scripts/verify.ts を実行し、APIキー・トークンの有効性を検証する。
- * check infra コマンドから利用される。
- * @returns 検証が成功した場合 true
- */
 export async function runInfraVerify(): Promise<boolean> {
     const repoRoot = findRepoRoot(process.cwd());
     const verifyPath = join(repoRoot, "infra", "scripts", "verify.ts");
@@ -30,7 +25,8 @@ export async function runInfraVerify(): Promise<boolean> {
 
     const proc = Bun.spawn(["bun", "run", verifyPath], {
         cwd: repoRoot,
-        stdio: "inherit",
+        stdout: "inherit",
+        stderr: "inherit",
     });
 
     const exitCode = await proc.exited;

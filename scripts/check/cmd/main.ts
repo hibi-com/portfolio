@@ -52,7 +52,6 @@ cli.command("dispatch <command>", "パッケージごとにコマンドを実行
         process.exit(success ? 0 : 1);
     });
 
-// 既存のcheckコマンド（後方互換性のため）
 cli.command("*", "既存のcheckコマンドを実行します").action(async () => {
     await runCheck();
 });
