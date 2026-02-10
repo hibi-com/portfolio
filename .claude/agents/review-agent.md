@@ -86,3 +86,13 @@ color: purple
 - {positive-1}
 - {positive-2}
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/implement`, `/refactor` |
+| スキル | `/review`, `/lint`, `/format` |
+| テンプレート | `workflow/code-review.md` |
+| ルール | `api.md`, `web.md`, `admin.md` |
+| ドキュメント | `docs/development/coding-standards.md` |

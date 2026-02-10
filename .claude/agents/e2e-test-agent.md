@@ -95,3 +95,13 @@ test.describe("{Persona}: {Story Title}", () => {
 ### 確認事項
 - [ ] ローカルでテストが通過することを確認
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/tdd`, `/test`, `/implement` |
+| スキル | `/e2e-test` |
+| テンプレート | `tdd/e2e-test.md` |
+| ルール | `testing.md` |
+| ドキュメント | `docs/development/testing.md`, `docs/development/e2e-docker.md` |

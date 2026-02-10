@@ -47,3 +47,13 @@ bun vitest run -c apps/admin/vitest.integration.config.ts
 ### 失敗したテスト（該当する場合）
 - {test-name}: {error-message}
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/tdd`, `/test` |
+| スキル | `/integration-test` |
+| テンプレート | - |
+| ルール | `testing.md` |
+| ドキュメント | `docs/development/testing.md` |

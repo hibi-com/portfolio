@@ -77,3 +77,13 @@ describe("機能名", () => {
 ### 確認事項
 - [ ] テストが失敗することを確認（Red）
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/tdd`, `/test`, `/implement`, `/fix-bug` |
+| スキル | `/unit-test` |
+| テンプレート | `tdd/unit-test.md` |
+| ルール | `testing.md` |
+| ドキュメント | `docs/development/testing.md` |

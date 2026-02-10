@@ -128,3 +128,13 @@ docs/specs/db/{domain}.md
 - [ ] テスト通過
 - [ ] DB仕様書更新
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/spec`, `/implement` |
+| スキル | `/db-migrate` |
+| テンプレート | `sdd/db-spec.md` |
+| ルール | - |
+| ドキュメント | `docs/development/database.md`, `docs/specs/db/` |

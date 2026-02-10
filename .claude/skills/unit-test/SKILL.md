@@ -20,52 +20,25 @@ allowed-tools: Bash, Read, Glob, Grep
 
 ## 実行コマンド
 
-### 全テスト
-
 ```bash
+# 全テスト
 bun run test
-```
 
-### 特定パッケージ
-
-```bash
+# 特定パッケージ
 turbo run test --filter=@portfolio/{package-name}
-```
 
-### 特定ファイル
-
-```bash
+# 特定ファイル
 bun vitest run {file-pattern}
-```
 
-### ウォッチモード
-
-```bash
+# ウォッチモード
 bun vitest
-```
 
-## カバレッジ
-
-```bash
+# カバレッジ
 bun run coverage
 ```
 
-### カバレッジ閾値（MC/DC準拠）
+## 参考ドキュメント
 
-| メトリクス | 閾値 |
-| ----------- | ------ |
-| Lines | 90% |
-| Functions | 90% |
-| Branches | 100% |
-| Statements | 90% |
+詳細なテスト戦略、TDD、カバレッジ目標については以下を参照：
 
-## テスト命名規則
-
-- ファイル名: `*.test.ts` または `*.test.tsx`
-- 配置: ソースファイルと同じディレクトリ
-
-## TDD ワークフロー
-
-1. **Red**: テストを先に書く（失敗確認）
-2. **Green**: テストを通過させる最小限のコード
-3. **Refactor**: コード品質を改善
+- [テスト戦略](docs/development/testing.md) - テストハニカム、Small Tests作成基準、MC/DCカバレッジ

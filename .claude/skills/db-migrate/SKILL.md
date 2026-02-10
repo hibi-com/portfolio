@@ -20,34 +20,24 @@ Prismaマイグレーションを実行します。
 
 ## 実行コマンド
 
-### ステータス確認
-
 ```bash
+# ステータス確認
 cd packages/db && bun prisma migrate status
-```
 
-### 開発用マイグレーション
-
-```bash
+# 開発用マイグレーション
 cd packages/db && bun prisma migrate dev --name {migration-name}
-```
 
-### 本番適用
-
-```bash
+# 本番適用
 cd packages/db && bun prisma migrate deploy
-```
 
-### DBリセット（開発用）
-
-```bash
+# DBリセット（開発用）
 cd packages/db && bun prisma migrate reset
-```
 
-### 型生成のみ
-
-```bash
+# 型生成のみ
 bun run db:generate
+
+# バリデーション
+cd packages/db && bun prisma validate
 ```
 
 ## Prismaスキーマ構成
@@ -64,61 +54,8 @@ packages/db/prisma/schema/
 └── integration.prisma # 外部連携
 ```
 
-## マイグレーションワークフロー
+## 参考ドキュメント
 
-### 新規テーブル追加
+Prismaスキーマ設計、マイグレーション戦略の詳細については以下を参照：
 
-1. スキーマファイル作成・編集
-2. `/db-migrate dev --name create-table-name`
-3. `bun run db:generate`
-4. DB仕様書更新（`docs/specs/db/`）
-
-### カラム追加
-
-1. スキーマファイル編集
-2. `/db-migrate dev --name add-column-name`
-3. `bun run db:generate`
-
-### カラム削除（危険）
-
-1. 既存データのバックアップ確認
-2. スキーマファイル編集
-3. `/db-migrate dev --name remove-column-name`
-4. `bun run db:generate`
-
-## 危険な操作
-
-以下は事前確認必須：
-
-| 操作 | リスク | 確認コマンド |
-| ---- | ------ | ------------ |
-| カラム削除 | データ消失 | `SELECT COUNT(*) FROM table WHERE column IS NOT NULL` |
-| 型変更 | 変換エラー | 既存データの互換性確認 |
-| テーブル削除 | データ消失 | 依存関係確認 |
-| reset | 全データ消失 | 開発環境のみ |
-
-## Cloudflare D1対応
-
-D1マイグレーション用コマンド：
-
-```bash
-# マイグレーションリスト
-wrangler d1 migrations list {database-name}
-
-# マイグレーション適用
-wrangler d1 migrations apply {database-name}
-```
-
-## トラブルシューティング
-
-| エラー | 原因 | 対処 |
-| ------ | ---- | ---- |
-| Migration failed | スキーマエラー | prisma validate 実行 |
-| Drift detected | 手動変更あり | migrate reset または手動修正 |
-| P3009 | マイグレーション競合 | 履歴を確認・解決 |
-
-## バリデーション
-
-```bash
-cd packages/db && bun prisma validate
-```
+- [データベース](docs/development/database.md) - Prisma設定、マイグレーションワークフロー、D1/TiDB対応

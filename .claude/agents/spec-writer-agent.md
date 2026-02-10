@@ -150,3 +150,13 @@ sequenceDiagram
 - [ ] レビュー依頼
 - [ ] 実装開始可能
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/spec`, `/implement` |
+| スキル | `/sequence-diagram`, `/db-migrate` |
+| テンプレート | `sdd/sequence-diagram.md`, `sdd/api-spec.md`, `sdd/db-spec.md`, `sdd/user-story.md` |
+| ルール | `spec-driven.md`, `sequence.md`, `api.md` |
+| ドキュメント | `docs/development/api-design.md` |

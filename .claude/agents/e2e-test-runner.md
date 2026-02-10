@@ -83,3 +83,13 @@ bun --cwd apps/web playwright test --ui
 | Timeout | ページ読み込み遅延 | `waitForLoadState` 追加 |
 | Element not found | セレクタ不一致 | `data-testid` 使用 |
 | Network error | サーバー未起動 | `bun run dev` 確認 |
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/tdd`, `/test` |
+| スキル | `/e2e-test` |
+| テンプレート | - |
+| ルール | `testing.md` |
+| ドキュメント | `docs/development/testing.md`, `docs/development/e2e-docker.md` |

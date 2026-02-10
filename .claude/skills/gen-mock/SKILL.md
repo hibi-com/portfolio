@@ -21,3 +21,9 @@ MSW（Mock Service Worker）を使用したAPIモックを生成します。
 ```text
 testing/msw/src/handlers/
 ```
+
+## 参考ドキュメント
+
+MSWの使い方、テストダブル戦略については以下を参照：
+
+- [テスト戦略](docs/development/testing.md) - Integration Tests、MSWを使ったモック

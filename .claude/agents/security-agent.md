@@ -157,3 +157,13 @@ npm audit --audit-level=moderate
 - [ ] Mediumを計画的に修正
 - [ ] Lowを検討
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/analyze`, `/review` |
+| スキル | `/review` |
+| テンプレート | `workflow/code-review.md` |
+| ルール | - |
+| ドキュメント | `docs/security/` |

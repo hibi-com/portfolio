@@ -18,21 +18,18 @@ allowed-tools: Bash, Read, Glob
 
 ## 実行コマンド
 
-### チェックのみ
-
 ```bash
+# チェックのみ
 bun run lint
-```
 
-### 自動修正
-
-```bash
+# 自動修正
 bun run lint:fix
+
+# 特定パッケージ
+turbo run lint --filter=@portfolio/{package-name}
 ```
 
 ## リントツール
-
-このプロジェクトでは以下のツールを使用:
 
 - **Biome**: TypeScript/JavaScript のリント・フォーマット
 - **Sherif**: Monorepo の依存関係チェック
@@ -40,17 +37,8 @@ bun run lint:fix
 - **ShellCheck**: シェルスクリプトのリント
 - **actionlint**: GitHub Actions のリント
 
-## エラー対応
+## 参考ドキュメント
 
-### よくあるエラー
+Biome設定、リントルールの詳細については以下を参照：
 
-1. **未使用インポート**: 使用していないインポートを削除
-2. **型エラー**: 適切な型を追加
-3. **フォーマット**: `bun run fmt` で自動修正
-4. **依存関係不整合**: `bun install` で解決
-
-### 特定パッケージのリント
-
-```bash
-turbo run lint --filter=@portfolio/{package-name}
-```
+- [コーディング規約](docs/development/coding-standards.md) - フォーマット設定、命名規則、インポート順序

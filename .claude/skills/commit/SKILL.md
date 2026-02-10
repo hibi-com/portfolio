@@ -16,25 +16,6 @@ Git コミットを実行します。
 /commit "fix: bug修正"     # 指定メッセージでコミット
 ```
 
-## Conventional Commits 形式
-
-```text
-<type>(<scope>): <subject>
-```
-
-### Type 一覧
-
-- `feat`: 新機能
-- `fix`: バグ修正
-- `docs`: ドキュメント
-- `refactor`: リファクタリング
-- `test`: テスト追加・修正
-- `chore`: ビルド・ツール変更
-
-### Scope 例
-
-- `api`, `web`, `admin`, `db`, `ui`
-
 ## 実行手順
 
 1. `git status` で変更ファイルを確認
@@ -48,3 +29,9 @@ Git コミットを実行します。
 - `.env`, `credentials` などの機密ファイルはコミットしない
 - デバッグログは削除してからコミット
 - `--no-verify` は使用しない
+
+## 参考ドキュメント
+
+Conventional Commitsの詳細、タイプ選択ガイドについては以下を参照：
+
+- [Git Commitガイド](docs/development/git-commit.md) - コミットタイプ一覧、メッセージの書き方

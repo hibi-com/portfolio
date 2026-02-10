@@ -50,3 +50,13 @@ bun run coverage
 - Lines: {percentage}%
 - Branches: {percentage}%
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/tdd`, `/test` |
+| スキル | `/unit-test` |
+| テンプレート | - |
+| ルール | `testing.md` |
+| ドキュメント | `docs/development/testing.md` |

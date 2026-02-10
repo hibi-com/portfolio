@@ -20,34 +20,22 @@ Biomeでコードをフォーマットします。
 
 ## 実行コマンド
 
-### チェックのみ
-
 ```bash
+# チェックのみ
 bun run biome format .
-```
 
-### 修正
-
-```bash
+# 修正
 bun run biome format --write .
-```
 
-### 特定パス
-
-```bash
+# 特定パス
 bun run biome format --write apps/api/src/
 bun run biome format --write packages/validation/
-```
 
-### 特定ファイル
-
-```bash
-bun run biome format --write apps/api/src/index.ts
+# Lint と同時実行
+bun run biome check --write .
 ```
 
 ## 対象ファイル
-
-Biomeが処理するファイル：
 
 | 拡張子 | 対象 |
 | ------ | ---- |
@@ -56,47 +44,8 @@ Biomeが処理するファイル：
 | `.json` | JSON |
 | `.md` | Markdown |
 
-## 除外パス
+## 参考ドキュメント
 
-`biome.json`で設定された除外パス：
+フォーマット設定、エディタ統合の詳細については以下を参照：
 
-```text
-node_modules/
-dist/
-build/
-.cache/
-coverage/
-```
-
-## Lint との組み合わせ
-
-フォーマットとLintを同時実行：
-
-```bash
-bun run biome check --write .
-```
-
-## エディタ統合
-
-### VS Code
-
-保存時に自動フォーマット（`settings.json`）：
-
-```json
-{
-  "editor.defaultFormatter": "biomejs.biome",
-  "editor.formatOnSave": true
-}
-```
-
-## Claude Code Hook
-
-Write/Edit後に自動でフォーマットが実行されます（`.claude/hooks/format-on-save.sh`）。
-
-## トラブルシューティング
-
-| 問題 | 原因 | 対処 |
-| ---- | ---- | ---- |
-| フォーマットされない | 除外パスに含まれる | biome.json確認 |
-| 構文エラー | ファイル破損 | エラー箇所を修正 |
-| 設定が反映されない | キャッシュ | `bun run biome --no-cache` |
+- [コーディング規約](docs/development/coding-standards.md) - Biome設定、インデント、クォートスタイル

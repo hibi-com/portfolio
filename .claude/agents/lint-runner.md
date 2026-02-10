@@ -47,3 +47,13 @@ turbo run lint --filter=@portfolio/{package}
 - {action-1}
 - {action-2}
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/implement`, `/refactor` |
+| スキル | `/lint`, `/format`, `/typecheck` |
+| テンプレート | - |
+| ルール | - |
+| ドキュメント | `docs/development/coding-standards.md` |

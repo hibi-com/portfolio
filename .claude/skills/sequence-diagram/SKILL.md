@@ -6,9 +6,7 @@ allowed-tools: ["Read", "Write", "Glob", "Grep", "Bash", "Task"]
 
 # Sequence Diagram Skill
 
-## 概要
-
-このスキルは、実装コードを分析してシーケンス図を作成します。
+実装コードを分析してシーケンス図を作成します。
 
 ## 使用方法
 
@@ -22,10 +20,7 @@ allowed-tools: ["Read", "Write", "Glob", "Grep", "Bash", "Task"]
 1. **対象ファイルの特定**
 
    ```bash
-   # APIハンドラを検索
    grep -r "{operation}" apps/api/src/interface/rest/
-
-   # UseCaseを検索
    ls apps/api/src/application/usecases/{domain}/
    ```
 
@@ -44,13 +39,7 @@ allowed-tools: ["Read", "Write", "Glob", "Grep", "Bash", "Task"]
 
 4. **シーケンス図の作成**
 
-   テンプレートに従って以下を記述:
-   - 概要とエンドポイント情報
-   - 対象ファイル一覧
-   - Mermaidシーケンス図
-   - リクエスト/レスポンス仕様
-   - エラーコード一覧
-   - 実装参照
+   テンプレートに従って記述
 
 5. **セルフレビュー**
 
@@ -71,27 +60,8 @@ docs/sequence/api/{domain}/{operation}.md
 3. **捏造禁止**: 存在しないコードを追加しない
 4. **明示的検証**: すべての矢印に対応コードが必要
 
-## 出力フォーマット
+## 参考ドキュメント
 
-```markdown
-## シーケンス図作成完了
+RESTful設計、エンドポイント命名規則については以下を参照：
 
-### 作成ファイル
-
-- パス: `docs/sequence/api/{domain}/{operation}.md`
-- 対応API: `{method} {path}`
-
-### コードリーディング結果
-
-| レイヤー | ファイル | 確認済み |
-| -------- | -------- | -------- |
-| Handler | {path} | ✅ |
-| UseCase | {path} | ✅ |
-| Repository | {path} | ✅ |
-
-### セルフレビュー
-
-- [x] コードと図が一致
-- [x] エラーパス網羅
-- [x] 用語規則遵守
-```
+- [API設計](docs/development/api-design.md) - RESTful設計、エラーハンドリング、レスポンス形式

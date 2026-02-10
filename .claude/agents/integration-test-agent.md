@@ -75,3 +75,13 @@ describe("{Domain} {Operation} Integration", () => {
 ### テストケース
 1. {test-name} - {description}
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/tdd`, `/test`, `/implement` |
+| スキル | `/integration-test` |
+| テンプレート | `tdd/integration-test.md` |
+| ルール | `testing.md` |
+| ドキュメント | `docs/development/testing.md` |

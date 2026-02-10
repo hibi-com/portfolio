@@ -19,18 +19,16 @@ allowed-tools: Bash, Read, Glob, Grep
 
 ## 実行コマンド
 
-### API Medium Tests
-
 ```bash
+# API Medium Tests
 bun vitest run -c apps/api/tests/vitest.medium.config.ts
-```
 
-### 特定ドメイン
-
-```bash
+# 特定ドメイン
 bun vitest run -c apps/api/tests/vitest.medium.config.ts --filter={domain}
 ```
 
-## シーケンス図との対応
+## 参考ドキュメント
 
-Medium Tests は `docs/sequence/api/` のシーケンス図と1:1で対応します。
+詳細なテスト戦略、シーケンス図との対応については以下を参照：
+
+- [テスト戦略](docs/development/testing.md) - テストハニカム、Medium Testsの書き方、シーケンス図連携

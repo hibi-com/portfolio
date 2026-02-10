@@ -141,3 +141,13 @@ Cloudflareへのデプロイ前チェック：
 ### 次のステップ
 - {suggestion}
 ```
+
+## 関連リソース
+
+| 種類 | リソース |
+| ---- | -------- |
+| コマンド | `/implement` |
+| スキル | `/build`, `/typecheck`, `/lint` |
+| テンプレート | - |
+| ルール | - |
+| ドキュメント | `docs/development/deployment.md`, `docs/development/monorepo-management.md` |
