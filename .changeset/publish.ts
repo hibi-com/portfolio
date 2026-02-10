@@ -6,7 +6,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT_DIR = resolve(__dirname, "../../..");
+const ROOT_DIR = resolve(__dirname, "..");
 
 interface PublishConfig {
     verdaccioUrl: string;
@@ -43,6 +43,24 @@ const defaultConfig: PublishConfig = {
         "packages/ui",
     ],
 };
+
+function isDockerAvailable(): boolean {
+    try {
+        execSync("docker --version", { stdio: "pipe" });
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function isDockerRunning(): boolean {
+    try {
+        execSync("docker info", { stdio: "pipe" });
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 async function isVerdaccioRunning(url: string): Promise<boolean> {
     try {
@@ -189,7 +207,24 @@ async function publishPackage(pkgPath: string, config: PublishConfig): Promise<b
 async function main(): Promise<void> {
     const config = defaultConfig;
 
-    console.log(`📦 Publishing workspace packages to Verdaccio (${config.verdaccioUrl})`);
+    console.log("🚀 Portfolio Verdaccio Publisher");
+    console.log("================================\n");
+
+    // Check Docker availability
+    if (!isDockerAvailable()) {
+        console.error("❌ Docker is not installed.");
+        console.error("   Please install Docker Desktop from https://www.docker.com/products/docker-desktop/");
+        process.exit(1);
+    }
+
+    if (!isDockerRunning()) {
+        console.error("❌ Docker is not running.");
+        console.error("   Please start Docker Desktop and try again.");
+        process.exit(1);
+    }
+
+    console.log("✅ Docker is available and running");
+    console.log(`📦 Publishing workspace packages to Verdaccio (${config.verdaccioUrl})\n`);
 
     const startedByScript = await ensureVerdaccioRunning(config);
 
