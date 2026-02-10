@@ -63,6 +63,7 @@
         "@portfolio/cache": "packages/cache",
         "@portfolio/db": "packages/db",
         "@portfolio/log": "packages/log",
+        "@portfolio/validation": "packages/validation",
         "hono": "4.6.11",
       },
       "devDependencies": {
@@ -1629,7 +1630,7 @@
 
     "@portfolio/changelog-config": ["@portfolio/changelog-config@workspace:tooling/changelog-config", { "dependencies": { "@changesets/get-github-info": "0.5.0", "@changesets/types": "6.1.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "typescript": "5.9.3" } }],
 
-    "@portfolio/cms": ["@portfolio/cms@workspace:apps/api", { "dependencies": { "@portfolio/api": "packages/api", "@portfolio/auth": "packages/auth", "@portfolio/cache": "packages/cache", "@portfolio/db": "packages/db", "@portfolio/log": "packages/log", "hono": "4.6.11" }, "devDependencies": { "@cloudflare/vite-plugin": "1.12.3", "@cloudflare/workers-types": "4.20260101.0", "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@portfolio/vitest-config": "tooling/vitest-config", "dotenv": "17.2.3", "typescript": "5.9.3", "vite": "6.1.0", "vitest": "3.2.4", "vitest-environment-miniflare": "2.14.4", "wrangler": "4.54.0" }, "peerDependencies": { "wrangler": "4.54.0" } }],
+    "@portfolio/cms": ["@portfolio/cms@workspace:apps/api", { "dependencies": { "@portfolio/api": "packages/api", "@portfolio/auth": "packages/auth", "@portfolio/cache": "packages/cache", "@portfolio/db": "packages/db", "@portfolio/log": "packages/log", "@portfolio/validation": "packages/validation", "hono": "4.6.11" }, "devDependencies": { "@cloudflare/vite-plugin": "1.12.3", "@cloudflare/workers-types": "4.20260101.0", "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@portfolio/vitest-config": "tooling/vitest-config", "dotenv": "17.2.3", "typescript": "5.9.3", "vite": "6.1.0", "vitest": "3.2.4", "vitest-environment-miniflare": "2.14.4", "wrangler": "4.54.0" }, "peerDependencies": { "wrangler": "4.54.0" } }],
 
     "@portfolio/db": ["@portfolio/db@workspace:packages/db", { "dependencies": { "@prisma/client": "5.22.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/prisma-markdown": "tooling/prisma-markdown", "@portfolio/prisma-migration": "tooling/prisma-migration", "@portfolio/tsconfig": "tooling/tsconfig", "@portfolio/vitest-config": "tooling/vitest-config", "prisma": "5.22.0", "typescript": "5.9.3", "vitest": "3.2.4", "vitest-environment-miniflare": "2.14.4" } }],
 
