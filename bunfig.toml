@@ -19,6 +19,3 @@ scanner = "@acme/bun-security-scanner"
 
 [runtime]
 node = true
-
-[install.scopes]
-"@portfolio" = { url = "http://localhost:4873", token = "$VERDACCIO_TOKEN" }
