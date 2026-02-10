@@ -1,23 +1,33 @@
 FROM oven/bun:1.1.43 AS builder
 
-ARG REGISTRY_URL=http://verdaccio:4873
+ARG REGISTRY_URL=http://host.docker.internal:4873
 
 WORKDIR /app
 
+RUN printf '[install.scopes]\n"@portfolio" = "%s"\n' "${REGISTRY_URL}" >> ~/.bunfig.toml
+
+RUN apt-get update && apt-get install -y --no-install-recommends jq=1.7.1 && rm -rf /var/lib/apt/lists/*
+
 COPY package.json ./
-
-RUN apt-get update && apt-get install -y --no-install-recommends jq=1.6-2.1 && \
-    jq 'del(.devDependencies) | .dependencies = (.dependencies | to_entries | \
-    map(select(.value | test("^workspace:") | not) | {(.key): .value}) | add // {})' \
-    package.json > package.tmp.json && \
-    mv package.tmp.json package.json && \
-    echo "registry=${REGISTRY_URL}" > ~/.npmrc && \
-    bun install --ignore-scripts
-
-RUN bun add @portfolio/api @portfolio/cms @portfolio/log @portfolio/ui --registry "${REGISTRY_URL}"
+RUN jq 'del(.devDependencies) | del(.dependencies["@portfolio/cms"]) | '\
+'if .dependencies then .dependencies |= '\
+'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end | '\
+'if .peerDependencies then .peerDependencies |= '\
+'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end' \
+  package.json > package.tmp.json \
+  && mv package.tmp.json package.json \
+  && bun install --ignore-scripts
 
 COPY . .
-RUN bun run build
+RUN jq 'del(.devDependencies) | del(.dependencies["@portfolio/cms"]) | '\
+'if .dependencies then .dependencies |= '\
+'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end | '\
+'if .peerDependencies then .peerDependencies |= '\
+'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end' \
+  package.json > package.tmp.json \
+  && mv package.tmp.json package.json \
+  && bun install --ignore-scripts \
+  && bun run build
 
 FROM nginx:alpine-slim
 
