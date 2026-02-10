@@ -1,8 +1,3 @@
-/**
- * Admin Portfolios API E2E Tests
- *
- * BASE_URL 環境変数で対象環境を切り替え可能
- */
 import { expect, test } from "@playwright/test";
 
 test.describe("Admin Portfolios API", () => {

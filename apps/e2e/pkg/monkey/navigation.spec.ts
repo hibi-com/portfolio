@@ -47,50 +47,64 @@ async function navigateToRoute(page: Page, route: string): Promise<boolean> {
     }
 }
 
+async function runOneNavigationAttempt(
+    page: Page,
+    route: string,
+    navigationErrors: Array<{ route: string; error: string }>,
+): Promise<{ success: boolean; recoveryFailed: boolean }> {
+    const success = await navigateToRoute(page, route);
+    if (success) {
+        return { success: true, recoveryFailed: false };
+    }
+
+    navigationErrors.push({ route, error: `Navigation failed for ${route}` });
+    console.warn(`Navigation to ${route} failed`);
+    const recovered = await recoverToHomePage(page, route);
+    return { success: false, recoveryFailed: !recovered };
+}
+
+function logNavigationSummary(
+    successCount: number,
+    errorCount: number,
+    recoveryFailureCount: number,
+    navigationErrors: Array<{ route: string; error: string }>,
+): void {
+    console.log(`Navigation summary: ${successCount} successful, ${errorCount} errors out of 10 attempts`);
+    if (recoveryFailureCount > 0) {
+        console.log(`Recovery failures: ${recoveryFailureCount}`);
+    }
+    if (navigationErrors.length > 0) {
+        console.log("Failed routes:", navigationErrors.map((e) => `${e.route}: ${e.error}`).join(", "));
+    }
+    if (errorCount / 10 > 0.5) {
+        console.warn("High navigation error rate detected. Some routes may be unstable.");
+    }
+    if (recoveryFailureCount > 0 && errorCount > 0 && recoveryFailureCount / errorCount > 0.5) {
+        console.warn("High recovery failure rate detected. Application may be in an unstable state.");
+    }
+}
+
 test.describe("Rapid Navigation", () => {
     test("should handle rapid navigation without errors", async ({ page }) => {
         const routes = ["/", "/blog", "/portfolio", "/resume", "/uses"];
         let successCount = 0;
-        let errorCount = 0;
         let recoveryFailureCount = 0;
         const navigationErrors: Array<{ route: string; error: string }> = [];
 
         for (let i = 0; i < 10; i++) {
-            const randomRoute = routes[Math.floor(Math.random() * routes.length)];
-            const success = await navigateToRoute(page, randomRoute);
-
-            if (success) {
+            const randomRoute = routes[Math.floor(Math.random() * routes.length)] ?? routes[0] ?? "/";
+            const result = await runOneNavigationAttempt(page, randomRoute, navigationErrors);
+            if (result.success) {
                 successCount++;
-            } else {
-                errorCount++;
-                const errorMessage = `Navigation failed for ${randomRoute}`;
-                navigationErrors.push({ route: randomRoute, error: errorMessage });
-                console.warn(`Navigation to ${randomRoute} failed`);
-
-                const recovered = await recoverToHomePage(page, randomRoute);
-                if (!recovered) {
-                    recoveryFailureCount++;
-                }
+            } else if (result.recoveryFailed) {
+                recoveryFailureCount++;
             }
         }
 
-        console.log(`Navigation summary: ${successCount} successful, ${errorCount} errors out of 10 attempts`);
-        if (recoveryFailureCount > 0) {
-            console.log(`Recovery failures: ${recoveryFailureCount}`);
-        }
-        if (navigationErrors.length > 0) {
-            console.log("Failed routes:", navigationErrors.map((e) => `${e.route}: ${e.error}`).join(", "));
-        }
-
-        if (errorCount / 10 > 0.5) {
-            console.warn("High navigation error rate detected. Some routes may be unstable.");
-        }
-        if (recoveryFailureCount > 0 && recoveryFailureCount / errorCount > 0.5) {
-            console.warn("High recovery failure rate detected. Application may be in an unstable state.");
-        }
+        const errorCount = 10 - successCount;
+        logNavigationSummary(successCount, errorCount, recoveryFailureCount, navigationErrors);
 
         expect(successCount).toBeGreaterThan(0);
-
         await expect(page).toHaveURL(/.*/);
     });
 });
