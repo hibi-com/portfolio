@@ -1,9 +1,3 @@
-/**
- * Pulumi のデフォルトコマンド `pulumi stack graph` でスタックの依存グラフを DOT 形式で出力し、
- * Graphviz で SVG に変換して docs/architecture に保存する。
- * 前提: スタックが選択済みかつデプロイ済みであること。Graphviz (dot) は任意。
- */
-
 import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -65,7 +59,7 @@ function writeMarkdown(svgGenerated: boolean): void {
 title: "インフラスタックグラフ（自動生成）"
 ---
 
-この図は Pulumi のデフォルトコマンド ${t}pulumi stack graph${t} により、**デプロイ済みスタックのリソース依存関係**から自動生成されています。
+この図は Pulumi のデフォルトコマンド ${t}pulumi stack graph${t} により、自動生成されています。
 
 ## リソース依存グラフ
 
@@ -90,11 +84,6 @@ ${t}${t}${t}
     console.log("[generate-architecture-doc] Wrote", MARKDOWN_FILE);
 }
 
-/**
- * Pulumi stack graph を実行し、DOT と（Graphviz があれば）SVG、および docs/architecture 用 Markdown を生成する。
- * generate コマンドから利用される。
- * @returns 成功した場合 true
- */
 export function generateArchitectureDoc(): boolean {
     const ok = runPulumiStackGraph();
     if (!ok) {

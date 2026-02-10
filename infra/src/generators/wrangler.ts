@@ -13,11 +13,11 @@ interface WranglerConfig {
 }
 
 function generatePagesWrangler(config: WranglerConfig): string {
-    const lines: string[] = [];
-
-    lines.push(`name = "${config.name}"`);
-    lines.push(`compatibility_date = "${config.compatibilityDate}"`);
-    lines.push('compatibility_flags = ["nodejs_compat"]');
+    const lines: string[] = [
+        `name = "${config.name}"`,
+        `compatibility_date = "${config.compatibilityDate}"`,
+        'compatibility_flags = ["nodejs_compat"]',
+    ];
 
     if (config.outputDir) {
         lines.push(`pages_build_output_dir = "${config.outputDir}"`);

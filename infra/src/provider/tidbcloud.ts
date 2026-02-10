@@ -9,9 +9,6 @@ export interface TiDBCloudServerlessClusterOutputs {
     status: pulumi.Output<string>;
 }
 
-/**
- * TiDB Cloud Serverless クラスターを curl + Digest認証で作成
- */
 export function createTiDBCloudServerlessCluster(
     name: string,
     args: {
@@ -23,37 +20,31 @@ export function createTiDBCloudServerlessCluster(
     },
     opts?: pulumi.CustomResourceOptions,
 ): TiDBCloudServerlessClusterOutputs {
-    // TiDB Serverless API v1beta1 endpoint
     const baseUrl = "https://serverless.tidbapi.com";
 
-    // クラスター作成コマンド
     const createClusterCommand = new command.local.Command(
         `${name}-create`,
         {
-            create: pulumi
-                .all([args.publicKey, args.privateKey])
-                .apply(([publicKey, privateKey]) => {
-                    // TiDB Serverless API v1beta1 format
-                    const payload = JSON.stringify({
-                        displayName: args.displayName,
-                        region: {
-                            name: `regions/aws-${args.region}`,
-                        },
-                        spendingLimit: {
-                            monthly: args.spendingLimitMonthly ?? 0,
-                        },
-                    });
+            create: pulumi.all([args.publicKey, args.privateKey]).apply(([publicKey, privateKey]) => {
+                const payload = JSON.stringify({
+                    displayName: args.displayName,
+                    region: {
+                        name: `regions/aws-${args.region}`,
+                    },
+                    spendingLimit: {
+                        monthly: args.spendingLimitMonthly ?? 0,
+                    },
+                });
 
-                    return `curl -s --digest -u "${publicKey}:${privateKey}" \\
-                        -X POST "${baseUrl}/v1beta1/clusters" \\
-                        -H "Content-Type: application/json" \\
+                return String.raw`curl -s --digest -u "${publicKey}:${privateKey}" \
+                        -X POST "${baseUrl}/v1beta1/clusters" \
+                        -H "Content-Type: application/json" \
                         -d '${payload}'`;
-                }),
+            }),
         },
         opts,
     );
 
-    // レスポンスからクラスター情報を抽出 (TiDB Serverless API v1beta1 format)
     const clusterId: pulumi.Output<string> = createClusterCommand.stdout.apply((stdout): string => {
         try {
             const response = JSON.parse(stdout);
