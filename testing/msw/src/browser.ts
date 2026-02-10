@@ -1,15 +1,23 @@
 import { setupWorker } from "msw/browser";
-import { restHandlers } from "./handlers/rest";
+import { getAllHandlers } from "./handlers/index.js";
+import { SERVICE_WORKER_PATH, UNHANDLED_REQUEST_STRATEGY } from "./lib/constants.js";
 
-const handlers = [...restHandlers];
+function createWorker() {
+    const handlers = getAllHandlers();
+    return setupWorker(...handlers);
+}
 
-const worker = setupWorker(...handlers);
+function isBrowserEnvironment(): boolean {
+    return "window" in globalThis;
+}
 
-if ("window" in globalThis) {
+const worker = createWorker();
+
+if (isBrowserEnvironment()) {
     worker.start({
-        onUnhandledRequest: "bypass",
+        onUnhandledRequest: UNHANDLED_REQUEST_STRATEGY,
         serviceWorker: {
-            url: "/mockServiceWorker.js",
+            url: SERVICE_WORKER_PATH,
         },
     });
 }

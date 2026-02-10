@@ -1,40 +1,12 @@
 import type { HttpHandler } from "msw";
 import { HttpResponse, http } from "msw";
-import type { Portfolio, Post } from "~/types";
+import { API_URL } from "../lib/constants.js";
+import { mockPortfolios, mockPosts } from "../lib/mocks.js";
+import type { ApiError } from "../lib/types.js";
 
-const API_URL = process.env.API_URL || "http://localhost:8787";
-
-const mockPosts: Post[] = [
-    {
-        id: "1",
-        title: "Test Post 1",
-        slug: "test-post-1",
-        date: new Date("2024-01-01").toISOString(),
-        description: "Test description",
-        content: "<p>Test content</p>",
-        imageTemp: "test-image.jpg",
-        sticky: false,
-        intro: "Test intro",
-        tags: ["test", "blog"],
-        createdAt: new Date("2024-01-01").toISOString(),
-        updatedAt: new Date("2024-01-01").toISOString(),
-    },
-];
-
-const mockPortfolios: Portfolio[] = [
-    {
-        id: "1",
-        title: "Test Portfolio 1",
-        slug: "test-portfolio-1",
-        company: "Test Company",
-        date: new Date("2024-01-01").toISOString(),
-        current: true,
-        overview: "Test overview",
-        thumbnailTemp: "test-thumbnail.jpg",
-        createdAt: new Date("2024-01-01").toISOString(),
-        updatedAt: new Date("2024-01-01").toISOString(),
-    },
-];
+function createNotFoundResponse(message: string) {
+    return HttpResponse.json<ApiError>({ error: message }, { status: 404 });
+}
 
 export const restHandlers: HttpHandler[] = [
     http.get(`${API_URL}/api/posts`, () => {
@@ -44,9 +16,11 @@ export const restHandlers: HttpHandler[] = [
     http.get(`${API_URL}/api/post/:slug`, ({ params }) => {
         const slug = params.slug as string;
         const post = mockPosts.find((p) => p.slug === slug);
+
         if (!post) {
-            return HttpResponse.json({ error: "Post not found" }, { status: 404 });
+            return createNotFoundResponse("Post not found");
         }
+
         return HttpResponse.json(post);
     }),
 
@@ -57,9 +31,11 @@ export const restHandlers: HttpHandler[] = [
     http.get(`${API_URL}/api/portfolio/:slug`, ({ params }) => {
         const slug = params.slug as string;
         const portfolio = mockPortfolios.find((p) => p.slug === slug);
+
         if (!portfolio) {
-            return HttpResponse.json({ error: "Portfolio not found" }, { status: 404 });
+            return createNotFoundResponse("Portfolio not found");
         }
+
         return HttpResponse.json(portfolio);
     }),
 ];

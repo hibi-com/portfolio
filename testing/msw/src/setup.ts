@@ -1,7 +1,9 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, vi } from "vitest";
 
-afterEach(() => {
+function cleanupAfterEachTest(): void {
     vi.resetModules();
     vi.restoreAllMocks();
-});
+}
+
+afterEach(cleanupAfterEachTest);

@@ -28,7 +28,13 @@ export interface Portfolio {
     intro?: string;
     createdAt: Date | string;
     updatedAt: Date | string;
-    images?: Array<{
-        url: string;
-    }>;
+    images?: PortfolioImage[];
+}
+
+export interface PortfolioImage {
+    url: string;
+}
+
+export interface ApiError {
+    error: string;
 }
