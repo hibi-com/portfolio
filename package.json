@@ -39,6 +39,7 @@
     "lint:ts:fix": "turbo run lint:fix",
     "lint:ws:check": "sherif",
     "nuke": "bun run clean && git clean -xdf bun.lock yarn.lock && bun install && bun run setup",
+    "publish": "bun run t.changeset/publish.ts",
     "prepare": "workspace setup && bun run generate --filter='!@portfolio/infra' && bun run build",
     "setup": "turbo run up && bun run generate --filter='!@portfolio/infra' && bun run deploy",
     "start": "docker compose up -d",
