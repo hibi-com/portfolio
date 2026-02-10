@@ -1,26 +1,19 @@
 import { serve } from "bun";
 import { Hono } from "hono";
-import { getAuthorize, getCompanies, getPartnerById, getPartners, postPartner, postToken, putPartner } from "./freee";
+import { DEFAULT_HOSTNAME, DEFAULT_PORT } from "./lib/constants.js";
+import { registerAllRoutes } from "./routes/index.js";
 
 const app = new Hono();
 
-app.get("/health", (c) => c.json({ status: "ok", service: "mock-apis" }));
+registerAllRoutes(app);
 
-app.get("/public_api/authorize", getAuthorize);
-app.post("/public_api/token", postToken);
-
-app.get("/api/1/companies", getCompanies);
-app.get("/api/1/partners", getPartners);
-app.get("/api/1/partners/:id", getPartnerById);
-app.post("/api/1/partners", postPartner);
-app.put("/api/1/partners/:id", putPartner);
-
-const port = Number(process.env.PORT) || 3920;
+const port = Number(process.env.PORT) || DEFAULT_PORT;
+const hostname = process.env.HOSTNAME || DEFAULT_HOSTNAME;
 
 serve({
     port,
-    hostname: "0.0.0.0",
+    hostname,
     fetch: app.fetch,
 });
 
-console.log(`[mock-apis] listening on http://0.0.0.0:${port}`);
+console.log(`[mock-apis] listening on http://${hostname}:${port}`);
