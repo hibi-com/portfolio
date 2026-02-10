@@ -29,12 +29,47 @@
       "types": "./dist/generated/posts/posts.d.ts",
       "import": "./dist/generated/posts/posts.js",
       "require": "./dist/generated/posts/posts.js"
+    },
+    "./generated/customers/customers": {
+      "types": "./dist/generated/customers/customers.d.ts",
+      "import": "./dist/generated/customers/customers.js",
+      "require": "./dist/generated/customers/customers.js"
+    },
+    "./generated/leads/leads": {
+      "types": "./dist/generated/leads/leads.d.ts",
+      "import": "./dist/generated/leads/leads.js",
+      "require": "./dist/generated/leads/leads.js"
+    },
+    "./generated/deals/deals": {
+      "types": "./dist/generated/deals/deals.d.ts",
+      "import": "./dist/generated/deals/deals.js",
+      "require": "./dist/generated/deals/deals.js"
+    },
+    "./generated/pipelines/pipelines": {
+      "types": "./dist/generated/pipelines/pipelines.d.ts",
+      "import": "./dist/generated/pipelines/pipelines.js",
+      "require": "./dist/generated/pipelines/pipelines.js"
+    },
+    "./generated/inquiries/inquiries": {
+      "types": "./dist/generated/inquiries/inquiries.d.ts",
+      "import": "./dist/generated/inquiries/inquiries.js",
+      "require": "./dist/generated/inquiries/inquiries.js"
+    },
+    "./generated/chats/chats": {
+      "types": "./dist/generated/chats/chats.d.ts",
+      "import": "./dist/generated/chats/chats.js",
+      "require": "./dist/generated/chats/chats.js"
+    },
+    "./generated/emails/emails": {
+      "types": "./dist/generated/emails/emails.d.ts",
+      "import": "./dist/generated/emails/emails.js",
+      "require": "./dist/generated/emails/emails.js"
     }
   },
   "main": "./dist/src/index.js",
   "scripts": {
     "build": "bun run build:js && bun run build:types",
-    "build:js": "bun build ./src/index.ts ./generated/api.schemas.ts ./generated/mutator.ts ./generated/portfolios/portfolios.ts ./generated/posts/posts.ts --outdir dist --target browser --format esm --external axios",
+    "build:js": "bun build ./src/index.ts ./generated/api.schemas.ts ./generated/mutator.ts ./generated/portfolios/portfolios.ts ./generated/posts/posts.ts ./generated/customers/customers.ts ./generated/leads/leads.ts ./generated/deals/deals.ts ./generated/pipelines/pipelines.ts ./generated/inquiries/inquiries.ts ./generated/chats/chats.ts ./generated/emails/emails.ts --outdir dist --target browser --format esm --external axios",
     "build:types": "git clean -xdf .cache/tsbuildinfo.json && tsc --emitDeclarationOnly --declaration --outDir dist",
     "build:ui": "redoc-cli bundle openapi.yaml --output ../../apps/wiki/reference/index.html",
     "clean:cache": "git clean -xdf .cache .turbo",

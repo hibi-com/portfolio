@@ -5,7 +5,1438 @@ info:
 tags:
   - name: Posts
   - name: Portfolios
+  - name: Customers
+  - name: Leads
+  - name: Deals
+  - name: Pipelines
+  - name: Inquiries
+  - name: Chats
+  - name: Emails
 paths:
+  /api/chat/rooms:
+    get:
+      operationId: Chats_listChatRooms
+      summary: Get all chat rooms
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ChatRoomStatus'
+          explode: false
+        - name: customerId
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/ChatRoom'
+                  - type: object
+                    required:
+                      - data
+                      - meta
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ChatRoom'
+                      meta:
+                        $ref: '#/components/schemas/PaginationMeta'
+      tags:
+        - Chats
+    post:
+      operationId: Chats_createChatRoom
+      summary: Create a new chat room
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoom'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Chats
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChatRoomInput'
+  /api/chat/rooms/{id}:
+    get:
+      operationId: Chats_getChatRoomById
+      summary: Get a chat room by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoomWithParticipants'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Chats
+  /api/chat/rooms/{id}/close:
+    post:
+      operationId: Chats_closeChatRoom
+      summary: Close a chat room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoom'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Chats
+  /api/chat/rooms/{id}/messages:
+    get:
+      operationId: Chats_getChatRoomMessages
+      summary: Get messages in a chat room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: before
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatMessage'
+      tags:
+        - Chats
+    post:
+      operationId: Chats_sendChatMessage
+      summary: Send a message in a chat room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Chats
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageInput'
+  /api/chat/rooms/{id}/participants:
+    get:
+      operationId: Chats_getChatRoomParticipants
+      summary: Get participants in a chat room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatParticipant'
+      tags:
+        - Chats
+    post:
+      operationId: Chats_addChatParticipant
+      summary: Add a participant to a chat room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatParticipant'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Chats
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddParticipantInput'
+  /api/chat/rooms/{roomId}/messages/read:
+    post:
+      operationId: Chats_markMessagesAsRead
+      summary: Mark messages as read
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: participantId
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Chats
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messageIds:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - messageIds
+  /api/chat/rooms/{roomId}/participants/{participantId}:
+    delete:
+      operationId: Chats_removeChatParticipant
+      summary: Remove a participant from a chat room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Chats
+  /api/crm/customers:
+    get:
+      operationId: Customers_listCustomers
+      summary: Get all customers
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/CustomerStatus'
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Customer'
+                  - type: object
+                    required:
+                      - data
+                      - meta
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Customer'
+                      meta:
+                        $ref: '#/components/schemas/PaginationMeta'
+      tags:
+        - Customers
+    post:
+      operationId: Customers_createCustomer
+      summary: Create a new customer
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Customers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerInput'
+  /api/crm/customers/{id}:
+    get:
+      operationId: Customers_getCustomerById
+      summary: Get a customer by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Customers
+    put:
+      operationId: Customers_updateCustomer
+      summary: Update a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Customers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerInput'
+    delete:
+      operationId: Customers_deleteCustomer
+      summary: Delete a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Customers
+  /api/crm/deals:
+    get:
+      operationId: Deals_listDeals
+      summary: Get all deals
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/DealStatus'
+          explode: false
+        - name: customerId
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+        - name: stageId
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Deal'
+                  - type: object
+                    required:
+                      - data
+                      - meta
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Deal'
+                      meta:
+                        $ref: '#/components/schemas/PaginationMeta'
+      tags:
+        - Deals
+    post:
+      operationId: Deals_createDeal
+      summary: Create a new deal
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Deals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDealInput'
+  /api/crm/deals/{id}:
+    get:
+      operationId: Deals_getDealById
+      summary: Get a deal by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Deals
+    put:
+      operationId: Deals_updateDeal
+      summary: Update a deal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Deals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDealInput'
+    delete:
+      operationId: Deals_deleteDeal
+      summary: Delete a deal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Deals
+  /api/crm/deals/{id}/lost:
+    post:
+      operationId: Deals_markDealAsLost
+      summary: Mark a deal as lost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: reason
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Deals
+  /api/crm/deals/{id}/stage:
+    put:
+      operationId: Deals_moveDealToStage
+      summary: Move a deal to a different stage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Deals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stageId:
+                  type: string
+              required:
+                - stageId
+  /api/crm/deals/{id}/won:
+    post:
+      operationId: Deals_markDealAsWon
+      summary: Mark a deal as won
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Deals
+  /api/crm/leads:
+    get:
+      operationId: Leads_listLeads
+      summary: Get all leads
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/LeadStatus'
+          explode: false
+        - name: customerId
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Lead'
+                  - type: object
+                    required:
+                      - data
+                      - meta
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Lead'
+                      meta:
+                        $ref: '#/components/schemas/PaginationMeta'
+      tags:
+        - Leads
+    post:
+      operationId: Leads_createLead
+      summary: Create a new lead
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Leads
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeadInput'
+  /api/crm/leads/{id}:
+    get:
+      operationId: Leads_getLeadById
+      summary: Get a lead by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Leads
+    put:
+      operationId: Leads_updateLead
+      summary: Update a lead
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Leads
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLeadInput'
+    delete:
+      operationId: Leads_deleteLead
+      summary: Delete a lead
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Leads
+  /api/crm/leads/{id}/convert:
+    post:
+      operationId: Leads_convertLead
+      summary: Convert a lead to a deal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Leads
+  /api/crm/pipelines:
+    get:
+      operationId: Pipelines_listPipelines
+      summary: Get all pipelines
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pipeline'
+      tags:
+        - Pipelines
+    post:
+      operationId: Pipelines_createPipeline
+      summary: Create a new pipeline
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Pipelines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePipelineInput'
+  /api/crm/pipelines/default:
+    get:
+      operationId: Pipelines_getDefaultPipeline
+      summary: Get the default pipeline
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Pipelines
+  /api/crm/pipelines/{id}:
+    get:
+      operationId: Pipelines_getPipelineById
+      summary: Get a pipeline by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Pipelines
+    put:
+      operationId: Pipelines_updatePipeline
+      summary: Update a pipeline
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Pipelines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePipelineInput'
+    delete:
+      operationId: Pipelines_deletePipeline
+      summary: Delete a pipeline
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Pipelines
+  /api/crm/pipelines/{pipelineId}/stages:
+    post:
+      operationId: Pipelines_createPipelineStage
+      summary: Create a new pipeline stage
+      parameters:
+        - name: pipelineId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineStage'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Pipelines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePipelineStageInput'
+  /api/crm/pipelines/{pipelineId}/stages/{stageId}:
+    put:
+      operationId: Pipelines_updatePipelineStage
+      summary: Update a pipeline stage
+      parameters:
+        - name: pipelineId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineStage'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Pipelines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePipelineStageInput'
+    delete:
+      operationId: Pipelines_deletePipelineStage
+      summary: Delete a pipeline stage
+      parameters:
+        - name: pipelineId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Pipelines
+  /api/email/logs:
+    get:
+      operationId: Emails_listEmailLogs
+      summary: Get all email logs
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/EmailStatus'
+          explode: false
+        - name: customerId
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/EmailLog'
+                  - type: object
+                    required:
+                      - data
+                      - meta
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/EmailLog'
+                      meta:
+                        $ref: '#/components/schemas/PaginationMeta'
+      tags:
+        - Emails
+  /api/email/logs/{id}:
+    get:
+      operationId: Emails_getEmailLogById
+      summary: Get an email log by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailLog'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Emails
+  /api/email/send:
+    post:
+      operationId: Emails_sendEmail
+      summary: Send an email
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailLog'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Emails
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailInput'
+  /api/email/send-with-template:
+    post:
+      operationId: Emails_sendEmailWithTemplate
+      summary: Send an email using a template
+      parameters:
+        - name: templateSlug
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: toEmail
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: customerId
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailLog'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Emails
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                variables:
+                  type: object
+                  additionalProperties:
+                    type: string
+  /api/email/templates:
+    get:
+      operationId: Emails_listEmailTemplates
+      summary: Get all email templates
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/EmailTemplateCategory'
+          explode: false
+        - name: isActive
+          in: query
+          required: false
+          schema:
+            type: boolean
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmailTemplate'
+      tags:
+        - Emails
+    post:
+      operationId: Emails_createEmailTemplate
+      summary: Create a new email template
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplate'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Emails
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmailTemplateInput'
+  /api/email/templates/slug/{slug}:
+    get:
+      operationId: Emails_getEmailTemplateBySlug
+      summary: Get an email template by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplate'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Emails
+  /api/email/templates/{id}:
+    get:
+      operationId: Emails_getEmailTemplateById
+      summary: Get an email template by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplate'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Emails
+    put:
+      operationId: Emails_updateEmailTemplate
+      summary: Update an email template
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplate'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Emails
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmailTemplateInput'
+    delete:
+      operationId: Emails_deleteEmailTemplate
+      summary: Delete an email template
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Emails
   /api/portfolio/{slug}:
     get:
       operationId: Portfolios_getPortfolioBySlug
@@ -184,8 +1615,283 @@ paths:
                         $ref: '#/components/schemas/PaginationMeta'
       tags:
         - Posts
+  /api/support/inquiries:
+    get:
+      operationId: Inquiries_listInquiries
+      summary: Get all inquiries
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/InquiryStatus'
+          explode: false
+        - name: customerId
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+        - name: assigneeId
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Inquiry'
+                  - type: object
+                    required:
+                      - data
+                      - meta
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Inquiry'
+                      meta:
+                        $ref: '#/components/schemas/PaginationMeta'
+      tags:
+        - Inquiries
+    post:
+      operationId: Inquiries_createInquiry
+      summary: Create a new inquiry
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inquiry'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Inquiries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInquiryInput'
+  /api/support/inquiries/{id}:
+    get:
+      operationId: Inquiries_getInquiryById
+      summary: Get an inquiry by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inquiry'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Inquiries
+    put:
+      operationId: Inquiries_updateInquiry
+      summary: Update an inquiry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inquiry'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Inquiries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInquiryInput'
+    delete:
+      operationId: Inquiries_deleteInquiry
+      summary: Delete an inquiry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Inquiries
+  /api/support/inquiries/{id}/close:
+    post:
+      operationId: Inquiries_closeInquiry
+      summary: Close an inquiry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inquiry'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Inquiries
+  /api/support/inquiries/{id}/resolve:
+    post:
+      operationId: Inquiries_resolveInquiry
+      summary: Resolve an inquiry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inquiry'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Inquiries
+  /api/support/inquiries/{id}/responses:
+    get:
+      operationId: Inquiries_getInquiryResponses
+      summary: Get responses for an inquiry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InquiryResponse'
+      tags:
+        - Inquiries
+    post:
+      operationId: Inquiries_addInquiryResponse
+      summary: Add a response to an inquiry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InquiryResponse'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Inquiries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInquiryResponseInput'
 components:
   schemas:
+    AddParticipantInput:
+      type: object
+      required:
+        - chatRoomId
+        - name
+      properties:
+        chatRoomId:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/ChatParticipantRole'
     Asset:
       type: object
       required:
@@ -193,6 +1899,544 @@ components:
       properties:
         url:
           type: string
+    ChatMessage:
+      type: object
+      required:
+        - id
+        - chatRoomId
+        - participantId
+        - type
+        - content
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        chatRoomId:
+          type: string
+        participantId:
+          type: string
+        type:
+          $ref: '#/components/schemas/ChatMessageType'
+        content:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: {}
+        readBy:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    ChatMessageType:
+      type: string
+      enum:
+        - TEXT
+        - IMAGE
+        - FILE
+        - SYSTEM
+    ChatParticipant:
+      type: object
+      required:
+        - id
+        - chatRoomId
+        - name
+        - role
+        - isOnline
+        - joinedAt
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        chatRoomId:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/ChatParticipantRole'
+        isOnline:
+          type: boolean
+        lastSeenAt:
+          type: string
+        joinedAt:
+          type: string
+        leftAt:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    ChatParticipantRole:
+      type: string
+      enum:
+        - CUSTOMER
+        - AGENT
+        - OBSERVER
+    ChatRoom:
+      type: object
+      required:
+        - id
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        customerId:
+          type: string
+        inquiryId:
+          type: string
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/ChatRoomStatus'
+        metadata:
+          type: object
+          additionalProperties: {}
+        closedAt:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    ChatRoomStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - ARCHIVED
+        - CLOSED
+    ChatRoomWithParticipants:
+      type: object
+      required:
+        - id
+        - status
+        - createdAt
+        - updatedAt
+        - participants
+      properties:
+        id:
+          type: string
+        customerId:
+          type: string
+        inquiryId:
+          type: string
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/ChatRoomStatus'
+        metadata:
+          type: object
+          additionalProperties: {}
+        closedAt:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatParticipant'
+    CreateChatRoomInput:
+      type: object
+      properties:
+        customerId:
+          type: string
+        inquiryId:
+          type: string
+        name:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: {}
+    CreateCustomerInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        company:
+          type: string
+        website:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: '#/components/schemas/CustomerStatus'
+        tags:
+          type: array
+          items:
+            type: string
+        customFields:
+          type: object
+          additionalProperties: {}
+    CreateDealInput:
+      type: object
+      required:
+        - stageId
+        - name
+      properties:
+        customerId:
+          type: string
+        leadId:
+          type: string
+        stageId:
+          type: string
+        name:
+          type: string
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        expectedCloseDate:
+          type: string
+        status:
+          $ref: '#/components/schemas/DealStatus'
+        notes:
+          type: string
+    CreateEmailTemplateInput:
+      type: object
+      required:
+        - name
+        - slug
+        - subject
+        - htmlContent
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/EmailTemplateCategory'
+        subject:
+          type: string
+        htmlContent:
+          type: string
+        textContent:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+    CreateInquiryInput:
+      type: object
+      required:
+        - subject
+        - content
+      properties:
+        customerId:
+          type: string
+        assigneeId:
+          type: string
+        subject:
+          type: string
+        content:
+          type: string
+        status:
+          $ref: '#/components/schemas/InquiryStatus'
+        priority:
+          $ref: '#/components/schemas/InquiryPriority'
+        category:
+          $ref: '#/components/schemas/InquiryCategory'
+        tags:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: {}
+    CreateInquiryResponseInput:
+      type: object
+      required:
+        - inquiryId
+        - content
+      properties:
+        inquiryId:
+          type: string
+        userId:
+          type: string
+        content:
+          type: string
+        isInternal:
+          type: boolean
+        attachments:
+          type: array
+          items:
+            type: string
+    CreateLeadInput:
+      type: object
+      required:
+        - name
+      properties:
+        customerId:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        company:
+          type: string
+        source:
+          type: string
+        status:
+          $ref: '#/components/schemas/LeadStatus'
+        score:
+          type: integer
+          format: int32
+        notes:
+          type: string
+    CreatePipelineInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        isDefault:
+          type: boolean
+    CreatePipelineStageInput:
+      type: object
+      required:
+        - pipelineId
+        - name
+        - order
+      properties:
+        pipelineId:
+          type: string
+        name:
+          type: string
+        order:
+          type: integer
+          format: int32
+        probability:
+          type: number
+          format: double
+        color:
+          type: string
+    Customer:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        company:
+          type: string
+        website:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: '#/components/schemas/CustomerStatus'
+        tags:
+          type: array
+          items:
+            type: string
+        customFields:
+          type: object
+          additionalProperties: {}
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    CustomerStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - PROSPECT
+        - CHURNED
+    Deal:
+      type: object
+      required:
+        - id
+        - stageId
+        - name
+        - currency
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        customerId:
+          type: string
+        leadId:
+          type: string
+        stageId:
+          type: string
+        name:
+          type: string
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        expectedCloseDate:
+          type: string
+        actualCloseDate:
+          type: string
+        status:
+          $ref: '#/components/schemas/DealStatus'
+        notes:
+          type: string
+        lostReason:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    DealStatus:
+      type: string
+      enum:
+        - OPEN
+        - WON
+        - LOST
+        - STALLED
+    EmailLog:
+      type: object
+      required:
+        - id
+        - fromEmail
+        - toEmail
+        - subject
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        customerId:
+          type: string
+        templateId:
+          type: string
+        resendId:
+          type: string
+        fromEmail:
+          type: string
+        toEmail:
+          type: string
+        ccEmail:
+          type: string
+        bccEmail:
+          type: string
+        subject:
+          type: string
+        htmlContent:
+          type: string
+        textContent:
+          type: string
+        status:
+          $ref: '#/components/schemas/EmailStatus'
+        errorMessage:
+          type: string
+        sentAt:
+          type: string
+        deliveredAt:
+          type: string
+        openedAt:
+          type: string
+        clickedAt:
+          type: string
+        bouncedAt:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: {}
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    EmailStatus:
+      type: string
+      enum:
+        - PENDING
+        - SENT
+        - DELIVERED
+        - BOUNCED
+        - FAILED
+    EmailTemplate:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - category
+        - subject
+        - htmlContent
+        - isActive
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/EmailTemplateCategory'
+        subject:
+          type: string
+        htmlContent:
+          type: string
+        textContent:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    EmailTemplateCategory:
+      type: string
+      enum:
+        - MARKETING
+        - TRANSACTIONAL
+        - SUPPORT
+        - NOTIFICATION
     ErrorResponse:
       type: object
       required:
@@ -201,6 +2445,148 @@ components:
         error:
           type: string
         details: {}
+    Inquiry:
+      type: object
+      required:
+        - id
+        - subject
+        - content
+        - status
+        - priority
+        - category
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        customerId:
+          type: string
+        assigneeId:
+          type: string
+        subject:
+          type: string
+        content:
+          type: string
+        status:
+          $ref: '#/components/schemas/InquiryStatus'
+        priority:
+          $ref: '#/components/schemas/InquiryPriority'
+        category:
+          $ref: '#/components/schemas/InquiryCategory'
+        tags:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: {}
+        resolvedAt:
+          type: string
+        closedAt:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    InquiryCategory:
+      type: string
+      enum:
+        - GENERAL
+        - TECHNICAL
+        - BILLING
+        - SALES
+        - COMPLAINT
+        - FEATURE_REQUEST
+        - OTHER
+    InquiryPriority:
+      type: string
+      enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - URGENT
+    InquiryResponse:
+      type: object
+      required:
+        - id
+        - inquiryId
+        - content
+        - isInternal
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        inquiryId:
+          type: string
+        userId:
+          type: string
+        content:
+          type: string
+        isInternal:
+          type: boolean
+        attachments:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    InquiryStatus:
+      type: string
+      enum:
+        - OPEN
+        - IN_PROGRESS
+        - WAITING_CUSTOMER
+        - RESOLVED
+        - CLOSED
+    Lead:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        customerId:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        company:
+          type: string
+        source:
+          type: string
+        status:
+          $ref: '#/components/schemas/LeadStatus'
+        score:
+          type: integer
+          format: int32
+        notes:
+          type: string
+        convertedAt:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    LeadStatus:
+      type: string
+      enum:
+        - NEW
+        - CONTACTED
+        - QUALIFIED
+        - UNQUALIFIED
+        - CONVERTED
     PaginationMeta:
       type: object
       required:
@@ -221,6 +2607,60 @@ components:
         totalPages:
           type: integer
           format: int32
+    Pipeline:
+      type: object
+      required:
+        - id
+        - name
+        - isDefault
+        - stages
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        isDefault:
+          type: boolean
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PipelineStage'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    PipelineStage:
+      type: object
+      required:
+        - id
+        - pipelineId
+        - name
+        - order
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        pipelineId:
+          type: string
+        name:
+          type: string
+        order:
+          type: integer
+          format: int32
+        probability:
+          type: number
+          format: double
+        color:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
     Portfolio:
       type: object
       required:
@@ -313,6 +2753,198 @@ components:
         html:
           type: string
         raw: {}
+    SendEmailInput:
+      type: object
+      required:
+        - toEmail
+        - subject
+      properties:
+        customerId:
+          type: string
+        templateId:
+          type: string
+        fromEmail:
+          type: string
+        toEmail:
+          type: string
+        ccEmail:
+          type: string
+        bccEmail:
+          type: string
+        subject:
+          type: string
+        htmlContent:
+          type: string
+        textContent:
+          type: string
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+        metadata:
+          type: object
+          additionalProperties: {}
+    SendMessageInput:
+      type: object
+      required:
+        - chatRoomId
+        - participantId
+        - content
+      properties:
+        chatRoomId:
+          type: string
+        participantId:
+          type: string
+        type:
+          $ref: '#/components/schemas/ChatMessageType'
+        content:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: {}
+    UpdateCustomerInput:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        company:
+          type: string
+        website:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: '#/components/schemas/CustomerStatus'
+        tags:
+          type: array
+          items:
+            type: string
+        customFields:
+          type: object
+          additionalProperties: {}
+    UpdateDealInput:
+      type: object
+      properties:
+        customerId:
+          type: string
+        stageId:
+          type: string
+        name:
+          type: string
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        expectedCloseDate:
+          type: string
+        actualCloseDate:
+          type: string
+        status:
+          $ref: '#/components/schemas/DealStatus'
+        notes:
+          type: string
+        lostReason:
+          type: string
+    UpdateEmailTemplateInput:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/EmailTemplateCategory'
+        subject:
+          type: string
+        htmlContent:
+          type: string
+        textContent:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+    UpdateInquiryInput:
+      type: object
+      properties:
+        customerId:
+          type: string
+        assigneeId:
+          type: string
+        subject:
+          type: string
+        content:
+          type: string
+        status:
+          $ref: '#/components/schemas/InquiryStatus'
+        priority:
+          $ref: '#/components/schemas/InquiryPriority'
+        category:
+          $ref: '#/components/schemas/InquiryCategory'
+        tags:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: {}
+    UpdateLeadInput:
+      type: object
+      properties:
+        customerId:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        company:
+          type: string
+        source:
+          type: string
+        status:
+          $ref: '#/components/schemas/LeadStatus'
+        score:
+          type: integer
+          format: int32
+        notes:
+          type: string
+    UpdatePipelineInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        isDefault:
+          type: boolean
+    UpdatePipelineStageInput:
+      type: object
+      properties:
+        name:
+          type: string
+        order:
+          type: integer
+          format: int32
+        probability:
+          type: number
+          format: double
+        color:
+          type: string
 servers:
   - url: https://api.example.com
     variables: {}

@@ -4,20 +4,450 @@
  * Portfolio API
  * OpenAPI spec version: 0.0.0
  */
+export interface AddParticipantInput {
+  chatRoomId: string;
+  userId?: string;
+  name: string;
+  role?: ChatParticipantRole;
+}
+
 export interface Asset {
   url: string;
 }
+
+export type ChatMessageMetadata = {[key: string]: unknown};
+
+export interface ChatMessage {
+  id: string;
+  chatRoomId: string;
+  participantId: string;
+  type: ChatMessageType;
+  content: string;
+  metadata?: ChatMessageMetadata;
+  readBy?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ChatMessageType = typeof ChatMessageType[keyof typeof ChatMessageType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ChatMessageType = {
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  FILE: 'FILE',
+  SYSTEM: 'SYSTEM',
+} as const;
+
+export interface ChatParticipant {
+  id: string;
+  chatRoomId: string;
+  userId?: string;
+  name: string;
+  role: ChatParticipantRole;
+  isOnline: boolean;
+  lastSeenAt?: string;
+  joinedAt: string;
+  leftAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ChatParticipantRole = typeof ChatParticipantRole[keyof typeof ChatParticipantRole];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ChatParticipantRole = {
+  CUSTOMER: 'CUSTOMER',
+  AGENT: 'AGENT',
+  OBSERVER: 'OBSERVER',
+} as const;
+
+export type ChatRoomMetadata = {[key: string]: unknown};
+
+export interface ChatRoom {
+  id: string;
+  customerId?: string;
+  inquiryId?: string;
+  name?: string;
+  status: ChatRoomStatus;
+  metadata?: ChatRoomMetadata;
+  closedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ChatRoomStatus = typeof ChatRoomStatus[keyof typeof ChatRoomStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ChatRoomStatus = {
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED',
+  CLOSED: 'CLOSED',
+} as const;
+
+export type ChatRoomWithParticipantsMetadata = {[key: string]: unknown};
+
+export interface ChatRoomWithParticipants {
+  id: string;
+  customerId?: string;
+  inquiryId?: string;
+  name?: string;
+  status: ChatRoomStatus;
+  metadata?: ChatRoomWithParticipantsMetadata;
+  closedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  participants: ChatParticipant[];
+}
+
+export type CreateChatRoomInputMetadata = {[key: string]: unknown};
+
+export interface CreateChatRoomInput {
+  customerId?: string;
+  inquiryId?: string;
+  name?: string;
+  metadata?: CreateChatRoomInputMetadata;
+}
+
+export type CreateCustomerInputCustomFields = {[key: string]: unknown};
+
+export interface CreateCustomerInput {
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  website?: string;
+  address?: string;
+  notes?: string;
+  status?: CustomerStatus;
+  tags?: string[];
+  customFields?: CreateCustomerInputCustomFields;
+}
+
+export interface CreateDealInput {
+  customerId?: string;
+  leadId?: string;
+  stageId: string;
+  name: string;
+  value?: number;
+  currency?: string;
+  expectedCloseDate?: string;
+  status?: DealStatus;
+  notes?: string;
+}
+
+export interface CreateEmailTemplateInput {
+  name: string;
+  slug: string;
+  description?: string;
+  category?: EmailTemplateCategory;
+  subject: string;
+  htmlContent: string;
+  textContent?: string;
+  variables?: string[];
+  isActive?: boolean;
+}
+
+export type CreateInquiryInputMetadata = {[key: string]: unknown};
+
+export interface CreateInquiryInput {
+  customerId?: string;
+  assigneeId?: string;
+  subject: string;
+  content: string;
+  status?: InquiryStatus;
+  priority?: InquiryPriority;
+  category?: InquiryCategory;
+  tags?: string[];
+  source?: string;
+  metadata?: CreateInquiryInputMetadata;
+}
+
+export interface CreateInquiryResponseInput {
+  inquiryId: string;
+  userId?: string;
+  content: string;
+  isInternal?: boolean;
+  attachments?: string[];
+}
+
+export interface CreateLeadInput {
+  customerId?: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  source?: string;
+  status?: LeadStatus;
+  score?: number;
+  notes?: string;
+}
+
+export interface CreatePipelineInput {
+  name: string;
+  description?: string;
+  isDefault?: boolean;
+}
+
+export interface CreatePipelineStageInput {
+  pipelineId: string;
+  name: string;
+  order: number;
+  probability?: number;
+  color?: string;
+}
+
+export type CustomerCustomFields = {[key: string]: unknown};
+
+export interface Customer {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  website?: string;
+  address?: string;
+  notes?: string;
+  status: CustomerStatus;
+  tags?: string[];
+  customFields?: CustomerCustomFields;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CustomerStatus = typeof CustomerStatus[keyof typeof CustomerStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CustomerStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  PROSPECT: 'PROSPECT',
+  CHURNED: 'CHURNED',
+} as const;
+
+export interface Deal {
+  id: string;
+  customerId?: string;
+  leadId?: string;
+  stageId: string;
+  name: string;
+  value?: number;
+  currency: string;
+  expectedCloseDate?: string;
+  actualCloseDate?: string;
+  status: DealStatus;
+  notes?: string;
+  lostReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DealStatus = typeof DealStatus[keyof typeof DealStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DealStatus = {
+  OPEN: 'OPEN',
+  WON: 'WON',
+  LOST: 'LOST',
+  STALLED: 'STALLED',
+} as const;
+
+export type EmailLogMetadata = {[key: string]: unknown};
+
+export interface EmailLog {
+  id: string;
+  customerId?: string;
+  templateId?: string;
+  resendId?: string;
+  fromEmail: string;
+  toEmail: string;
+  ccEmail?: string;
+  bccEmail?: string;
+  subject: string;
+  htmlContent?: string;
+  textContent?: string;
+  status: EmailStatus;
+  errorMessage?: string;
+  sentAt?: string;
+  deliveredAt?: string;
+  openedAt?: string;
+  clickedAt?: string;
+  bouncedAt?: string;
+  metadata?: EmailLogMetadata;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EmailStatus = typeof EmailStatus[keyof typeof EmailStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const EmailStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  BOUNCED: 'BOUNCED',
+  FAILED: 'FAILED',
+} as const;
+
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  category: EmailTemplateCategory;
+  subject: string;
+  htmlContent: string;
+  textContent?: string;
+  variables?: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EmailTemplateCategory = typeof EmailTemplateCategory[keyof typeof EmailTemplateCategory];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const EmailTemplateCategory = {
+  MARKETING: 'MARKETING',
+  TRANSACTIONAL: 'TRANSACTIONAL',
+  SUPPORT: 'SUPPORT',
+  NOTIFICATION: 'NOTIFICATION',
+} as const;
 
 export interface ErrorResponse {
   error: string;
   details?: unknown;
 }
 
+export type InquiryMetadata = {[key: string]: unknown};
+
+export interface Inquiry {
+  id: string;
+  customerId?: string;
+  assigneeId?: string;
+  subject: string;
+  content: string;
+  status: InquiryStatus;
+  priority: InquiryPriority;
+  category: InquiryCategory;
+  tags?: string[];
+  source?: string;
+  metadata?: InquiryMetadata;
+  resolvedAt?: string;
+  closedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type InquiryCategory = typeof InquiryCategory[keyof typeof InquiryCategory];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const InquiryCategory = {
+  GENERAL: 'GENERAL',
+  TECHNICAL: 'TECHNICAL',
+  BILLING: 'BILLING',
+  SALES: 'SALES',
+  COMPLAINT: 'COMPLAINT',
+  FEATURE_REQUEST: 'FEATURE_REQUEST',
+  OTHER: 'OTHER',
+} as const;
+
+export type InquiryPriority = typeof InquiryPriority[keyof typeof InquiryPriority];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const InquiryPriority = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  URGENT: 'URGENT',
+} as const;
+
+export interface InquiryResponse {
+  id: string;
+  inquiryId: string;
+  userId?: string;
+  content: string;
+  isInternal: boolean;
+  attachments?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type InquiryStatus = typeof InquiryStatus[keyof typeof InquiryStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const InquiryStatus = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  WAITING_CUSTOMER: 'WAITING_CUSTOMER',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED',
+} as const;
+
+export interface Lead {
+  id: string;
+  customerId?: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  source?: string;
+  status: LeadStatus;
+  score?: number;
+  notes?: string;
+  convertedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type LeadStatus = typeof LeadStatus[keyof typeof LeadStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const LeadStatus = {
+  NEW: 'NEW',
+  CONTACTED: 'CONTACTED',
+  QUALIFIED: 'QUALIFIED',
+  UNQUALIFIED: 'UNQUALIFIED',
+  CONVERTED: 'CONVERTED',
+} as const;
+
 export interface PaginationMeta {
   page: number;
   perPage: number;
   total: number;
   totalPages: number;
+}
+
+export interface Pipeline {
+  id: string;
+  name: string;
+  description?: string;
+  isDefault: boolean;
+  stages: PipelineStage[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PipelineStage {
+  id: string;
+  pipelineId: string;
+  name: string;
+  order: number;
+  probability?: number;
+  color?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Portfolio {
@@ -60,6 +490,222 @@ export interface PostContent {
   raw?: unknown;
 }
 
+export type SendEmailInputVariables = {[key: string]: string};
+
+export type SendEmailInputMetadata = {[key: string]: unknown};
+
+export interface SendEmailInput {
+  customerId?: string;
+  templateId?: string;
+  fromEmail?: string;
+  toEmail: string;
+  ccEmail?: string;
+  bccEmail?: string;
+  subject: string;
+  htmlContent?: string;
+  textContent?: string;
+  variables?: SendEmailInputVariables;
+  metadata?: SendEmailInputMetadata;
+}
+
+export type SendMessageInputMetadata = {[key: string]: unknown};
+
+export interface SendMessageInput {
+  chatRoomId: string;
+  participantId: string;
+  type?: ChatMessageType;
+  content: string;
+  metadata?: SendMessageInputMetadata;
+}
+
+export type UpdateCustomerInputCustomFields = {[key: string]: unknown};
+
+export interface UpdateCustomerInput {
+  name?: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  website?: string;
+  address?: string;
+  notes?: string;
+  status?: CustomerStatus;
+  tags?: string[];
+  customFields?: UpdateCustomerInputCustomFields;
+}
+
+export interface UpdateDealInput {
+  customerId?: string;
+  stageId?: string;
+  name?: string;
+  value?: number;
+  currency?: string;
+  expectedCloseDate?: string;
+  actualCloseDate?: string;
+  status?: DealStatus;
+  notes?: string;
+  lostReason?: string;
+}
+
+export interface UpdateEmailTemplateInput {
+  name?: string;
+  slug?: string;
+  description?: string;
+  category?: EmailTemplateCategory;
+  subject?: string;
+  htmlContent?: string;
+  textContent?: string;
+  variables?: string[];
+  isActive?: boolean;
+}
+
+export type UpdateInquiryInputMetadata = {[key: string]: unknown};
+
+export interface UpdateInquiryInput {
+  customerId?: string;
+  assigneeId?: string;
+  subject?: string;
+  content?: string;
+  status?: InquiryStatus;
+  priority?: InquiryPriority;
+  category?: InquiryCategory;
+  tags?: string[];
+  source?: string;
+  metadata?: UpdateInquiryInputMetadata;
+}
+
+export interface UpdateLeadInput {
+  customerId?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  source?: string;
+  status?: LeadStatus;
+  score?: number;
+  notes?: string;
+}
+
+export interface UpdatePipelineInput {
+  name?: string;
+  description?: string;
+  isDefault?: boolean;
+}
+
+export interface UpdatePipelineStageInput {
+  name?: string;
+  order?: number;
+  probability?: number;
+  color?: string;
+}
+
+export type ChatsListChatRoomsParams = {
+page?: number;
+perPage?: number;
+status?: ChatRoomStatus;
+customerId?: string;
+};
+
+export type ChatsListChatRooms200AnyOf = {
+  data: ChatRoom[];
+  meta: PaginationMeta;
+};
+
+export type ChatsListChatRooms200 = ChatRoom[] | ChatsListChatRooms200AnyOf;
+
+export type ChatsGetChatRoomMessagesParams = {
+limit?: number;
+before?: string;
+};
+
+export type ChatsMarkMessagesAsReadParams = {
+participantId: string;
+};
+
+export type ChatsMarkMessagesAsReadBody = {
+  messageIds: string[];
+};
+
+export type CustomersListCustomersParams = {
+page?: number;
+perPage?: number;
+status?: CustomerStatus;
+};
+
+export type CustomersListCustomers200AnyOf = {
+  data: Customer[];
+  meta: PaginationMeta;
+};
+
+export type CustomersListCustomers200 = Customer[] | CustomersListCustomers200AnyOf;
+
+export type DealsListDealsParams = {
+page?: number;
+perPage?: number;
+status?: DealStatus;
+customerId?: string;
+stageId?: string;
+};
+
+export type DealsListDeals200AnyOf = {
+  data: Deal[];
+  meta: PaginationMeta;
+};
+
+export type DealsListDeals200 = Deal[] | DealsListDeals200AnyOf;
+
+export type DealsMarkDealAsLostParams = {
+reason?: string;
+};
+
+export type DealsMoveDealToStageBody = {
+  stageId: string;
+};
+
+export type LeadsListLeadsParams = {
+page?: number;
+perPage?: number;
+status?: LeadStatus;
+customerId?: string;
+};
+
+export type LeadsListLeads200AnyOf = {
+  data: Lead[];
+  meta: PaginationMeta;
+};
+
+export type LeadsListLeads200 = Lead[] | LeadsListLeads200AnyOf;
+
+export type EmailsListEmailLogsParams = {
+page?: number;
+perPage?: number;
+status?: EmailStatus;
+customerId?: string;
+};
+
+export type EmailsListEmailLogs200AnyOf = {
+  data: EmailLog[];
+  meta: PaginationMeta;
+};
+
+export type EmailsListEmailLogs200 = EmailLog[] | EmailsListEmailLogs200AnyOf;
+
+export type EmailsSendEmailWithTemplateParams = {
+templateSlug: string;
+toEmail: string;
+customerId?: string;
+};
+
+export type EmailsSendEmailWithTemplateBodyVariables = {[key: string]: string};
+
+export type EmailsSendEmailWithTemplateBody = {
+  variables?: EmailsSendEmailWithTemplateBodyVariables;
+};
+
+export type EmailsListEmailTemplatesParams = {
+category?: EmailTemplateCategory;
+isActive?: boolean;
+};
+
 export type PortfoliosListPortfoliosParams = {
 page?: number;
 perPage?: number;
@@ -84,4 +730,19 @@ export type PostsListPosts200AnyOf = {
 };
 
 export type PostsListPosts200 = Post[] | PostsListPosts200AnyOf;
+
+export type InquiriesListInquiriesParams = {
+page?: number;
+perPage?: number;
+status?: InquiryStatus;
+customerId?: string;
+assigneeId?: string;
+};
+
+export type InquiriesListInquiries200AnyOf = {
+  data: Inquiry[];
+  meta: PaginationMeta;
+};
+
+export type InquiriesListInquiries200 = Inquiry[] | InquiriesListInquiries200AnyOf;
 

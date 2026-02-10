@@ -112,7 +112,7 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                         <Badge className={priorityColors[inquiry.priority]} variant="secondary">
                             {inquiry.priority}
                         </Badge>
-                        <span className="text-muted-foreground text-sm">{inquiry.type.replace("_", " ")}</span>
+                        <span className="text-muted-foreground text-sm">{inquiry.type?.replace("_", " ") ?? inquiry.category ?? "-"}</span>
                     </div>
                 </div>
             </div>

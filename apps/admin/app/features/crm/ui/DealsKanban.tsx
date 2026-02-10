@@ -175,8 +175,8 @@ export function DealsKanban() {
                 <div className="overflow-x-auto">
                     <div className="flex gap-4 pb-4">
                         {activePipeline.stages
-                            .sort((a, b) => a.order - b.order)
-                            .map((stage) => (
+                            .sort((a: PipelineStage, b: PipelineStage) => a.order - b.order)
+                            .map((stage: PipelineStage) => (
                                 <StageColumn
                                     key={stage.id}
                                     stage={stage}

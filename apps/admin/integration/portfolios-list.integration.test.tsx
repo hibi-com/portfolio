@@ -3,7 +3,15 @@ import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import "@testing-library/jest-dom/vitest";
-import React from "react";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as React from "react";
+
+interface MockPortfolio {
+    id: string;
+    title: string;
+    company: string;
+    slug?: string;
+}
 
 const server = setupServer();
 
@@ -39,7 +47,7 @@ describe("Portfolios List Integration - docs/sequence/admin/portfolios/portfolio
             );
 
             const response = await fetch(`${API_URL}/api/portfolios`);
-            const data = await response.json();
+            const data = (await response.json()) as MockPortfolio[];
 
             expect(response.ok).toBe(true);
             expect(data).toHaveLength(2);

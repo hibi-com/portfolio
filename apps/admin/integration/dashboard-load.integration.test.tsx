@@ -2,6 +2,7 @@
  * @sequence docs/sequence/admin/dashboard/dashboard-load.md
  * @description ダッシュボード読み込みの統合テスト
  */
+// @ts-expect-error - imports will be used when tests are implemented
 import { render, screen } from "@testing-library/react";
 import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
