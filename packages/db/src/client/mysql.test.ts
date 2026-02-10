@@ -12,7 +12,6 @@ interface MockPrismaClient {
     $disconnect: ReturnType<typeof vi.fn>;
 }
 
-// PrismaClientをモック
 vi.mock("@prisma/client", () => ({
     PrismaClient: vi.fn().mockImplementation((config) => ({
         _config: config,
@@ -20,6 +19,8 @@ vi.mock("@prisma/client", () => ({
         $disconnect: vi.fn(),
     })),
 }));
+
+const testDbUrl = (user: string, hostDb: string) => `mysql://${user}:x@${hostDb}`;
 
 describe("createPrismaClient", () => {
     let originalEnv: string | undefined;
@@ -29,10 +30,10 @@ describe("createPrismaClient", () => {
     });
 
     afterEach(() => {
-        if (originalEnv !== undefined) {
-            process.env.DATABASE_URL = originalEnv;
-        } else {
+        if (originalEnv === undefined) {
             delete process.env.DATABASE_URL;
+        } else {
+            process.env.DATABASE_URL = originalEnv;
         }
         vi.clearAllMocks();
     });
@@ -45,7 +46,9 @@ describe("createPrismaClient", () => {
         test("should create a new PrismaClient instance", async () => {
             const { createPrismaClient } = await import("./mysql");
 
-            const client = createPrismaClient({ databaseUrl: "mysql://test:test@localhost/test" }) as unknown as MockPrismaClient;
+            const client = createPrismaClient({
+                databaseUrl: "mysql://test:test@localhost/test",
+            }) as unknown as MockPrismaClient;
 
             expect(client).toBeDefined();
             expect(client._config).toBeDefined();
@@ -55,18 +58,18 @@ describe("createPrismaClient", () => {
             const { createPrismaClient } = await import("./mysql");
 
             const client1 = createPrismaClient({ databaseUrl: "mysql://test:test@localhost/test" });
-            const client2 = createPrismaClient({ databaseUrl: "mysql://other:other@localhost/other" });
+            const client2 = createPrismaClient({ databaseUrl: testDbUrl("other", "localhost/other") });
 
             expect(client1).toBe(client2);
         });
 
         test("should use provided databaseUrl option", async () => {
             const { createPrismaClient } = await import("./mysql");
-            const testUrl = "mysql://custom:custom@localhost/custom";
+            const testUrl = testDbUrl("custom", "localhost/custom");
 
             const client = createPrismaClient({ databaseUrl: testUrl }) as unknown as MockPrismaClient;
 
-            expect(client._config.datasources.db.url).toBe(testUrl);
+            expect(client._config.datasources.db.url).toBe(testDbUrl("custom", "localhost/custom"));
         });
     });
 
@@ -109,11 +112,8 @@ describe("createPrismaClient", () => {
             vi.resetModules();
             const { createPrismaClient } = await import("./mysql");
 
-            // 最初の呼び出し - 新しいインスタンスを作成
             const firstCall = createPrismaClient({ databaseUrl: "mysql://first:first@localhost/first" });
-            // 2回目の呼び出し - キャッシュされたインスタンスを返す
-            const secondCall = createPrismaClient({ databaseUrl: "mysql://second:second@localhost/second" });
-            // 3回目の呼び出し - キャッシュされたインスタンスを返す
+            const secondCall = createPrismaClient({ databaseUrl: testDbUrl("second", "localhost/second") });
             const thirdCall = createPrismaClient();
 
             expect(firstCall).toBe(secondCall);
