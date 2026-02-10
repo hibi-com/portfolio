@@ -11,6 +11,11 @@ import type {
     UpdateInquiryInput,
 } from "~/domain/inquiry";
 
+function toDateString(d: Date | null | undefined): string | undefined {
+    if (d == null) return undefined;
+    return d instanceof Date ? d.toISOString() : String(d);
+}
+
 export class InquiryRepositoryImpl implements InquiryRepository {
     constructor(private readonly databaseUrl?: string) {}
 
@@ -43,10 +48,10 @@ export class InquiryRepositoryImpl implements InquiryRepository {
             tags: data.tags ? JSON.parse(data.tags) : undefined,
             source: data.source ?? undefined,
             metadata: data.metadata ? JSON.parse(data.metadata) : undefined,
-            resolvedAt: data.resolvedAt ?? undefined,
-            closedAt: data.closedAt ?? undefined,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
+            resolvedAt: toDateString(data.resolvedAt),
+            closedAt: toDateString(data.closedAt),
+            createdAt: toDateString(data.createdAt) ?? "",
+            updatedAt: toDateString(data.updatedAt) ?? "",
         };
     }
 
@@ -67,8 +72,8 @@ export class InquiryRepositoryImpl implements InquiryRepository {
             content: data.content,
             isInternal: data.isInternal,
             attachments: data.attachments ? JSON.parse(data.attachments) : undefined,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
+            createdAt: toDateString(data.createdAt) ?? "",
+            updatedAt: toDateString(data.updatedAt) ?? "",
         };
     }
 

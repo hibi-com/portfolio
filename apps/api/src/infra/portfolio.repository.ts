@@ -1,6 +1,31 @@
 import { createPrismaClient } from "@portfolio/db";
 import type { Portfolio, PortfolioRepository } from "~/domain/portfolio";
 
+type PortfolioRow = Awaited<
+    ReturnType<
+        ReturnType<typeof createPrismaClient>["portfolio"]["findMany"]
+    >
+>[number];
+
+function toPortfolio(row: PortfolioRow): Portfolio {
+    return {
+        id: row.id,
+        title: row.title,
+        slug: row.slug,
+        company: row.company,
+        date: row.date instanceof Date ? row.date.toISOString() : String(row.date),
+        current: row.current,
+        overview: row.overview ?? undefined,
+        description: row.description ?? undefined,
+        content:
+            row.content != null && row.content !== ""
+                ? { html: row.content }
+                : undefined,
+        thumbnailTemp: row.thumbnailTemp ?? undefined,
+        intro: row.intro ?? undefined,
+    };
+}
+
 export class PortfolioRepositoryImpl implements PortfolioRepository {
     constructor(private readonly databaseUrl?: string) {}
 
@@ -13,21 +38,7 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
             },
         });
 
-        return portfolios.map((portfolio) => ({
-            id: portfolio.id,
-            title: portfolio.title,
-            slug: portfolio.slug,
-            company: portfolio.company,
-            date: portfolio.date,
-            current: portfolio.current,
-            overview: portfolio.overview ?? undefined,
-            description: portfolio.description ?? undefined,
-            content: portfolio.content ?? undefined,
-            thumbnailTemp: portfolio.thumbnailTemp ?? undefined,
-            intro: portfolio.intro ?? undefined,
-            createdAt: portfolio.createdAt,
-            updatedAt: portfolio.updatedAt,
-        }));
+        return portfolios.map((row) => toPortfolio(row as PortfolioRow));
     }
 
     async findBySlug(slug: string): Promise<Portfolio | null> {
@@ -41,21 +52,7 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
 
         if (!portfolio) return null;
 
-        return {
-            id: portfolio.id,
-            title: portfolio.title,
-            slug: portfolio.slug,
-            company: portfolio.company,
-            date: portfolio.date,
-            current: portfolio.current,
-            overview: portfolio.overview ?? undefined,
-            description: portfolio.description ?? undefined,
-            content: portfolio.content ?? undefined,
-            thumbnailTemp: portfolio.thumbnailTemp ?? undefined,
-            intro: portfolio.intro ?? undefined,
-            createdAt: portfolio.createdAt,
-            updatedAt: portfolio.updatedAt,
-        };
+        return toPortfolio(portfolio as PortfolioRow);
     }
 
     async findById(id: string): Promise<Portfolio | null> {
@@ -69,21 +66,7 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
 
         if (!portfolio) return null;
 
-        return {
-            id: portfolio.id,
-            title: portfolio.title,
-            slug: portfolio.slug,
-            company: portfolio.company,
-            date: portfolio.date,
-            current: portfolio.current,
-            overview: portfolio.overview ?? undefined,
-            description: portfolio.description ?? undefined,
-            content: portfolio.content ?? undefined,
-            thumbnailTemp: portfolio.thumbnailTemp ?? undefined,
-            intro: portfolio.intro ?? undefined,
-            createdAt: portfolio.createdAt,
-            updatedAt: portfolio.updatedAt,
-        };
+        return toPortfolio(portfolio as PortfolioRow);
     }
 
     async addImage(portfolioId: string, imageUrl: string): Promise<void> {

@@ -6,16 +6,16 @@ describe("SyncPartnersToFreeeUseCase", () => {
     const mockSyncLog: FreeeSyncLog = {
         id: "log-1",
         integrationId: "integration-1",
-        direction: "TO_FREEE",
-        status: "SUCCESS",
-        recordsProcessed: 10,
-        recordsSucceeded: 10,
-        recordsFailed: 0,
-        errorMessage: null,
-        startedAt: new Date(),
-        completedAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        direction: "EXPORT",
+        status: "COMPLETED",
+        entityType: "partner",
+        totalRecords: 10,
+        successCount: 10,
+        errorCount: 0,
+        startedAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
     };
 
     const createMockSyncService = (overrides: Partial<FreeeSyncService> = {}): FreeeSyncService => ({
@@ -45,15 +45,15 @@ describe("SyncPartnersToFreeeUseCase", () => {
                 expect(mockService.syncPartnersToFreee).toHaveBeenCalledTimes(1);
             });
 
-            test("同期に成功した場合、SUCCESS状態のログが返される", async () => {
+            test("同期に成功した場合、COMPLETED状態のログが返される", async () => {
                 // Given: 同期が成功する
                 const integrationId = "integration-1";
                 const successLog: FreeeSyncLog = {
                     ...mockSyncLog,
-                    status: "SUCCESS",
-                    recordsProcessed: 5,
-                    recordsSucceeded: 5,
-                    recordsFailed: 0,
+                    status: "COMPLETED",
+                    totalRecords: 5,
+                    successCount: 5,
+                    errorCount: 0,
                 };
                 const mockService = createMockSyncService({
                     syncPartnersToFreee: vi.fn().mockResolvedValue(successLog),
@@ -63,11 +63,11 @@ describe("SyncPartnersToFreeeUseCase", () => {
                 const useCase = new SyncPartnersToFreeeUseCase(mockService);
                 const result = await useCase.execute(integrationId);
 
-                // Then: SUCCESS状態のログが返される
-                expect(result.status).toBe("SUCCESS");
-                expect(result.recordsProcessed).toBe(5);
-                expect(result.recordsSucceeded).toBe(5);
-                expect(result.recordsFailed).toBe(0);
+                // Then: COMPLETED状態のログが返される
+                expect(result.status).toBe("COMPLETED");
+                expect(result.totalRecords).toBe(5);
+                expect(result.successCount).toBe(5);
+                expect(result.errorCount).toBe(0);
             });
         });
 
@@ -78,10 +78,10 @@ describe("SyncPartnersToFreeeUseCase", () => {
                 const failedLog: FreeeSyncLog = {
                     ...mockSyncLog,
                     status: "FAILED",
-                    recordsProcessed: 10,
-                    recordsSucceeded: 5,
-                    recordsFailed: 5,
-                    errorMessage: "Some partners failed to sync",
+                    totalRecords: 10,
+                    successCount: 5,
+                    errorCount: 5,
+                    errorDetails: [{ record: "partner:1", error: "Some partners failed to sync" }],
                 };
                 const mockService = createMockSyncService({
                     syncPartnersToFreee: vi.fn().mockResolvedValue(failedLog),
@@ -93,8 +93,8 @@ describe("SyncPartnersToFreeeUseCase", () => {
 
                 // Then: FAILED状態のログが返される
                 expect(result.status).toBe("FAILED");
-                expect(result.recordsFailed).toBe(5);
-                expect(result.errorMessage).toBe("Some partners failed to sync");
+                expect(result.errorCount).toBe(5);
+                expect(result.errorDetails).toBeDefined();
             });
 
             test("サービスでエラーが発生した場合、エラーがスローされる", async () => {
@@ -116,9 +116,9 @@ describe("SyncPartnersToFreeeUseCase", () => {
                 const integrationId = "integration-1";
                 const emptyLog: FreeeSyncLog = {
                     ...mockSyncLog,
-                    recordsProcessed: 0,
-                    recordsSucceeded: 0,
-                    recordsFailed: 0,
+                    totalRecords: 0,
+                    successCount: 0,
+                    errorCount: 0,
                 };
                 const mockService = createMockSyncService({
                     syncPartnersToFreee: vi.fn().mockResolvedValue(emptyLog),
@@ -129,8 +129,8 @@ describe("SyncPartnersToFreeeUseCase", () => {
                 const result = await useCase.execute(integrationId);
 
                 // Then: 0件のログが返される
-                expect(result.recordsProcessed).toBe(0);
-                expect(result.recordsSucceeded).toBe(0);
+                expect(result.totalRecords).toBe(0);
+                expect(result.successCount).toBe(0);
             });
         });
     });

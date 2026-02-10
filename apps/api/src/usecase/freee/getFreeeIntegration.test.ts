@@ -10,12 +10,12 @@ describe("GetFreeeIntegrationUseCase", () => {
         companyName: "Test Company",
         accessToken: "access-token",
         refreshToken: "refresh-token",
-        tokenExpiresAt: new Date(),
+        tokenExpiresAt: new Date().toISOString(),
         scopes: ["read", "write"],
         isActive: true,
-        lastSyncAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        lastSyncAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
     };
 
     const createMockRepository = (overrides: Partial<FreeeRepository> = {}): FreeeRepository => ({

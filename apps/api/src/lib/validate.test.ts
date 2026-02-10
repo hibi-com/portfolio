@@ -1,8 +1,7 @@
-import { describe, expect, test } from "vitest";
 import { AppError, ErrorCodes } from "@portfolio/log";
+import { describe, expect, test } from "vitest";
 import { validateBody } from "./validate";
 
-// モックスキーマの型定義
 type ZodIssue = {
     message: string;
     path: PropertyKey[];
@@ -16,7 +15,6 @@ type ZodLikeSchema<T = unknown> = {
 describe("validateBody", () => {
     describe("正常系", () => {
         test("バリデーション成功時: 正しいデータを返す", () => {
-            // Given: 前提条件 - バリデーション成功するスキーマとデータ
             const schema: ZodLikeSchema<{ name: string }> = {
                 safeParse: (data: unknown) => ({
                     success: true,
@@ -25,15 +23,12 @@ describe("validateBody", () => {
             };
             const body = { name: "test" };
 
-            // When: 操作 - バリデーション実行
             const result = validateBody(schema, body);
 
-            // Then: 検証 - 元のデータがそのまま返される
             expect(result).toEqual({ name: "test" });
         });
 
         test("バリデーション成功時: 複雑なオブジェクトを返す", () => {
-            // Given
             const schema: ZodLikeSchema<{ user: { id: number; email: string } }> = {
                 safeParse: (data: unknown) => ({
                     success: true,
@@ -42,17 +37,14 @@ describe("validateBody", () => {
             };
             const body = { user: { id: 1, email: "test@example.com" } };
 
-            // When
             const result = validateBody(schema, body);
 
-            // Then
             expect(result).toEqual({ user: { id: 1, email: "test@example.com" } });
         });
     });
 
     describe("異常系", () => {
         test("バリデーション失敗時: AppErrorをスロー", () => {
-            // Given: 前提条件 - バリデーション失敗するスキーマ
             const schema: ZodLikeSchema<never> = {
                 safeParse: () => ({
                     success: false,
@@ -69,12 +61,10 @@ describe("validateBody", () => {
             };
             const body = { email: "invalid" };
 
-            // When & Then: エラーがスローされることを確認
             expect(() => validateBody(schema, body)).toThrow(AppError);
         });
 
         test("バリデーション失敗時: エラーコードがVALIDATION_INVALID_FORMAT", () => {
-            // Given
             const schema: ZodLikeSchema<never> = {
                 safeParse: () => ({
                     success: false,
@@ -91,7 +81,6 @@ describe("validateBody", () => {
             };
             const body = { email: "invalid" };
 
-            // When & Then
             try {
                 validateBody(schema, body);
             } catch (error) {
@@ -101,7 +90,6 @@ describe("validateBody", () => {
         });
 
         test("バリデーション失敗時: 最初のissueのメッセージを使用", () => {
-            // Given: 前提条件 - 複数のissuesがある
             const schema: ZodLikeSchema<never> = {
                 safeParse: () => ({
                     success: false,
@@ -123,7 +111,6 @@ describe("validateBody", () => {
             };
             const body = {};
 
-            // When & Then
             try {
                 validateBody(schema, body);
             } catch (error) {
@@ -133,7 +120,6 @@ describe("validateBody", () => {
         });
 
         test("複数のissuesがある場合: すべてのissuesがメタデータに含まれる", () => {
-            // Given
             const schema: ZodLikeSchema<never> = {
                 safeParse: () => ({
                     success: false,
@@ -155,7 +141,6 @@ describe("validateBody", () => {
             };
             const body = {};
 
-            // When & Then
             try {
                 validateBody(schema, body);
             } catch (error) {
@@ -178,7 +163,6 @@ describe("validateBody", () => {
         });
 
         test("ネストしたパス: パスが正しくドット区切りで連結される", () => {
-            // Given: 前提条件 - ネストしたフィールドパス
             const schema: ZodLikeSchema<never> = {
                 safeParse: () => ({
                     success: false,
@@ -195,7 +179,6 @@ describe("validateBody", () => {
             };
             const body = {};
 
-            // When & Then
             try {
                 validateBody(schema, body);
             } catch (error) {
@@ -215,7 +198,6 @@ describe("validateBody", () => {
 
     describe("エッジケース", () => {
         test("issuesが空の場合: デフォルトメッセージを使用", () => {
-            // Given: 前提条件 - issuesが空配列
             const schema: ZodLikeSchema<never> = {
                 safeParse: () => ({
                     success: false,
@@ -226,7 +208,6 @@ describe("validateBody", () => {
             };
             const body = {};
 
-            // When & Then
             try {
                 validateBody(schema, body);
             } catch (error) {
@@ -239,7 +220,6 @@ describe("validateBody", () => {
         });
 
         test("パスが空配列の場合: 空文字列を返す", () => {
-            // Given
             const schema: ZodLikeSchema<never> = {
                 safeParse: () => ({
                     success: false,
@@ -256,7 +236,6 @@ describe("validateBody", () => {
             };
             const body = {};
 
-            // When & Then
             try {
                 validateBody(schema, body);
             } catch (error) {
@@ -274,7 +253,6 @@ describe("validateBody", () => {
         });
 
         test("パスに数値インデックスが含まれる場合: 正しく文字列に変換される", () => {
-            // Given: 前提条件 - 配列インデックスを含むパス
             const schema: ZodLikeSchema<never> = {
                 safeParse: () => ({
                     success: false,
@@ -291,7 +269,6 @@ describe("validateBody", () => {
             };
             const body = {};
 
-            // When & Then
             try {
                 validateBody(schema, body);
             } catch (error) {
@@ -309,7 +286,6 @@ describe("validateBody", () => {
         });
 
         test("パスにSymbolが含まれる場合: 正しく文字列に変換される", () => {
-            // Given: 前提条件 - Symbolを含むパス
             const testSymbol = Symbol("testField");
             const schema: ZodLikeSchema<never> = {
                 safeParse: () => ({
@@ -327,13 +303,11 @@ describe("validateBody", () => {
             };
             const body = {};
 
-            // When & Then
             try {
                 validateBody(schema, body);
             } catch (error) {
                 expect(error).toBeInstanceOf(AppError);
                 const appError = error as AppError;
-                // Symbol.toString() の結果とnestedが連結される
                 expect(appError.metadata?.field).toContain("Symbol");
                 expect(appError.metadata?.field).toContain("nested");
             }

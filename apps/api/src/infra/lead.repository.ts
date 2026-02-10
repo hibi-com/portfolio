@@ -1,6 +1,11 @@
 import { createPrismaClient } from "@portfolio/db";
 import type { CreateLeadInput, Lead, LeadRepository, LeadStatus, UpdateLeadInput } from "~/domain/lead";
 
+function toDateString(d: Date | null | undefined): string | undefined {
+    if (d == null) return undefined;
+    return d instanceof Date ? d.toISOString() : String(d);
+}
+
 export class LeadRepositoryImpl implements LeadRepository {
     constructor(private readonly databaseUrl?: string) {}
 
@@ -30,9 +35,9 @@ export class LeadRepositoryImpl implements LeadRepository {
             status: data.status as LeadStatus,
             score: data.score ?? undefined,
             notes: data.notes ?? undefined,
-            convertedAt: data.convertedAt ?? undefined,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
+            convertedAt: toDateString(data.convertedAt),
+            createdAt: toDateString(data.createdAt) ?? "",
+            updatedAt: toDateString(data.updatedAt) ?? "",
         };
     }
 

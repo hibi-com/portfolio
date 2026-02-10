@@ -1,6 +1,6 @@
-export type { Lead, LeadStatus, CreateLeadInput, UpdateLeadInput } from "@portfolio/api/generated/zod";
+export type { CreateLeadInput, Lead, LeadStatus, UpdateLeadInput } from "@portfolio/api/generated/zod";
 
-import type { Lead, CreateLeadInput, UpdateLeadInput } from "@portfolio/api/generated/zod";
+import type { CreateLeadInput, Lead, UpdateLeadInput } from "@portfolio/api/generated/zod";
 
 export interface LeadRepository {
     findAll(): Promise<Lead[]>;

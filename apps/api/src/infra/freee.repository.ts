@@ -36,6 +36,11 @@ export class FreeeRepositoryImpl implements FreeeRepository {
         return JSON.stringify(value);
     }
 
+    private toDateString(d: Date | null | undefined): string | undefined {
+        if (d == null) return undefined;
+        return d instanceof Date ? d.toISOString() : String(d);
+    }
+
     private mapToIntegration(record: {
         id: string;
         userId: string;
@@ -57,12 +62,12 @@ export class FreeeRepositoryImpl implements FreeeRepository {
             companyName: record.companyName ?? undefined,
             accessToken: record.accessToken,
             refreshToken: record.refreshToken,
-            tokenExpiresAt: record.tokenExpiresAt,
+            tokenExpiresAt: this.toDateString(record.tokenExpiresAt) ?? "",
             scopes: this.parseJsonField<string[]>(record.scopes),
             isActive: record.isActive,
-            lastSyncAt: record.lastSyncAt ?? undefined,
-            createdAt: record.createdAt,
-            updatedAt: record.updatedAt,
+            lastSyncAt: this.toDateString(record.lastSyncAt),
+            createdAt: this.toDateString(record.createdAt) ?? "",
+            updatedAt: this.toDateString(record.updatedAt) ?? "",
         };
     }
 
@@ -91,10 +96,10 @@ export class FreeeRepositoryImpl implements FreeeRepository {
             successCount: record.successCount ?? undefined,
             errorCount: record.errorCount ?? undefined,
             errorDetails: this.parseJsonField<Array<{ record: string; error: string }>>(record.errorDetails),
-            startedAt: record.startedAt ?? undefined,
-            completedAt: record.completedAt ?? undefined,
-            createdAt: record.createdAt,
-            updatedAt: record.updatedAt,
+            startedAt: this.toDateString(record.startedAt),
+            completedAt: this.toDateString(record.completedAt),
+            createdAt: this.toDateString(record.createdAt) ?? "",
+            updatedAt: this.toDateString(record.updatedAt) ?? "",
         };
     }
 
@@ -113,10 +118,10 @@ export class FreeeRepositoryImpl implements FreeeRepository {
             customerId: record.customerId,
             freeePartnerId: record.freeePartnerId,
             freeeCompanyId: record.freeeCompanyId,
-            lastSyncAt: record.lastSyncAt,
+            lastSyncAt: this.toDateString(record.lastSyncAt) ?? "",
             syncHash: record.syncHash ?? undefined,
-            createdAt: record.createdAt,
-            updatedAt: record.updatedAt,
+            createdAt: this.toDateString(record.createdAt) ?? "",
+            updatedAt: this.toDateString(record.updatedAt) ?? "",
         };
     }
 
@@ -135,10 +140,10 @@ export class FreeeRepositoryImpl implements FreeeRepository {
             dealId: record.dealId,
             freeeDealId: record.freeeDealId,
             freeeCompanyId: record.freeeCompanyId,
-            lastSyncAt: record.lastSyncAt,
+            lastSyncAt: this.toDateString(record.lastSyncAt) ?? "",
             syncHash: record.syncHash ?? undefined,
-            createdAt: record.createdAt,
-            updatedAt: record.updatedAt,
+            createdAt: this.toDateString(record.createdAt) ?? "",
+            updatedAt: this.toDateString(record.updatedAt) ?? "",
         };
     }
 
@@ -180,7 +185,7 @@ export class FreeeRepositoryImpl implements FreeeRepository {
                 companyName: input.companyName,
                 accessToken: input.accessToken,
                 refreshToken: input.refreshToken,
-                tokenExpiresAt: input.tokenExpiresAt,
+                tokenExpiresAt: new Date(input.tokenExpiresAt),
                 scopes: this.stringifyJsonField(input.scopes),
             },
         });
@@ -193,7 +198,7 @@ export class FreeeRepositoryImpl implements FreeeRepository {
             data: {
                 accessToken: input.accessToken,
                 refreshToken: input.refreshToken,
-                tokenExpiresAt: input.tokenExpiresAt,
+                tokenExpiresAt: new Date(input.tokenExpiresAt),
             },
         });
         return this.mapToIntegration(integration);
@@ -257,8 +262,8 @@ export class FreeeRepositoryImpl implements FreeeRepository {
                 successCount: input.successCount,
                 errorCount: input.errorCount,
                 errorDetails: this.stringifyJsonField(input.errorDetails),
-                startedAt: input.startedAt,
-                completedAt: input.completedAt,
+                startedAt: input.startedAt == null ? undefined : new Date(input.startedAt),
+                completedAt: input.completedAt == null ? undefined : new Date(input.completedAt),
             },
         });
         return this.mapToSyncLog(log);

@@ -44,7 +44,6 @@ const SlugParamSchema = z.object({
     slug: z.string().openapi({ description: "Post slug", example: "my-first-post" }),
 });
 
-// Routes
 const listPostsRoute = createRoute({
     method: "get",
     path: "/posts",
@@ -82,7 +81,6 @@ const getPostBySlugRoute = createRoute({
     },
 });
 
-// Handlers
 const listPostsHandler: Handler<{ Bindings: Env }> = async (c) => {
     const metrics = getMetrics();
     const startTime = Date.now();
@@ -149,9 +147,7 @@ const getPostBySlugHandler: Handler<{ Bindings: Env }> = async (c) => {
     }
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: PoC - type safety will be improved
 app.openapi(listPostsRoute, listPostsHandler as any);
-// biome-ignore lint/suspicious/noExplicitAny: PoC - type safety will be improved
 app.openapi(getPostBySlugRoute, getPostBySlugHandler as any);
 
 export { app as postsRouter };

@@ -7,6 +7,11 @@ import type {
     UpdateCustomerInput,
 } from "~/domain/customer";
 
+function toDateString(d: Date | null | undefined): string | undefined {
+    if (d == null) return undefined;
+    return d instanceof Date ? d.toISOString() : String(d);
+}
+
 export class CustomerRepositoryImpl implements CustomerRepository {
     constructor(private readonly databaseUrl?: string) {}
 
@@ -37,8 +42,8 @@ export class CustomerRepositoryImpl implements CustomerRepository {
             status: data.status as CustomerStatus,
             tags: data.tags ? JSON.parse(data.tags) : undefined,
             customFields: data.customFields ? JSON.parse(data.customFields) : undefined,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
+            createdAt: toDateString(data.createdAt) ?? "",
+            updatedAt: toDateString(data.updatedAt) ?? "",
         };
     }
 

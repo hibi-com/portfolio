@@ -21,7 +21,7 @@ export class HandleFreeeCallbackUseCase {
             return this.freeeRepository.updateTokens(existingIntegration.id, {
                 accessToken: tokens.accessToken,
                 refreshToken: tokens.refreshToken,
-                tokenExpiresAt: new Date(Date.now() + tokens.expiresIn * 1000),
+                tokenExpiresAt: new Date(Date.now() + tokens.expiresIn * 1000).toISOString(),
             });
         }
 
@@ -31,7 +31,7 @@ export class HandleFreeeCallbackUseCase {
             companyName: primaryCompany.displayName,
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
-            tokenExpiresAt: new Date(Date.now() + tokens.expiresIn * 1000),
+            tokenExpiresAt: new Date(Date.now() + tokens.expiresIn * 1000).toISOString(),
             scopes: tokens.scope.split(" "),
         });
     }

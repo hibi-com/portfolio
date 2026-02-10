@@ -1,4 +1,4 @@
-import type { WebSocket as CFWebSocket, DurableObjectState } from "@cloudflare/workers-types";
+import { type WebSocket as CFWebSocket, type DurableObjectState, WebSocketPair } from "@cloudflare/workers-types";
 
 interface ChatSession {
     webSocket: CFWebSocket;
@@ -83,7 +83,7 @@ export class ChatRoomDO {
 
             return new Response(null, {
                 status: 101,
-                webSocket: client,
+                webSocket: client as unknown as WebSocket,
             });
         }
 

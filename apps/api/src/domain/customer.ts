@@ -1,11 +1,11 @@
 export type {
+    CreateCustomerInput,
     Customer,
     CustomerStatus,
-    CreateCustomerInput,
     UpdateCustomerInput,
 } from "@portfolio/api/generated/zod";
 
-import type { Customer, CreateCustomerInput, UpdateCustomerInput } from "@portfolio/api/generated/zod";
+import type { CreateCustomerInput, Customer, UpdateCustomerInput } from "@portfolio/api/generated/zod";
 
 export interface CustomerRepository {
     findAll(): Promise<Customer[]>;

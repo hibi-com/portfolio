@@ -1,6 +1,6 @@
-export type { Deal, DealStatus, CreateDealInput, UpdateDealInput } from "@portfolio/api/generated/zod";
+export type { CreateDealInput, Deal, DealStatus, UpdateDealInput } from "@portfolio/api/generated/zod";
 
-import type { Deal, CreateDealInput, UpdateDealInput } from "@portfolio/api/generated/zod";
+import type { CreateDealInput, Deal, UpdateDealInput } from "@portfolio/api/generated/zod";
 
 export interface DealRepository {
     findAll(): Promise<Deal[]>;

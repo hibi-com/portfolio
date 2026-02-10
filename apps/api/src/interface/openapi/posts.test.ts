@@ -1,141 +1,133 @@
-import { describe, expect, test, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { postsRouter } from "./posts";
 
-// DIContainerをモック
 vi.mock("~/di/container", () => ({
-	DIContainer: vi.fn().mockImplementation(() => ({
-		getGetPostsUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue([
-				{
-					id: "123e4567-e89b-12d3-a456-426614174000",
-					slug: "test-post",
-					title: "Test Post",
-					excerpt: "Test excerpt",
-					createdAt: "2024-01-01T00:00:00.000Z",
-					updatedAt: "2024-01-01T00:00:00.000Z",
-				},
-			]),
-		})),
-		getGetPostBySlugUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue({
-				id: "123e4567-e89b-12d3-a456-426614174000",
-				slug: "test-post",
-				title: "Test Post",
-				excerpt: "Test excerpt",
-				content: { html: "<p>Test content</p>" },
-				createdAt: "2024-01-01T00:00:00.000Z",
-				updatedAt: "2024-01-01T00:00:00.000Z",
-			}),
-		})),
-	})),
+    DIContainer: vi.fn().mockImplementation(() => ({
+        getGetPostsUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue([
+                {
+                    id: "123e4567-e89b-12d3-a456-426614174000",
+                    slug: "test-post",
+                    title: "Test Post",
+                    excerpt: "Test excerpt",
+                    createdAt: "2024-01-01T00:00:00.000Z",
+                    updatedAt: "2024-01-01T00:00:00.000Z",
+                },
+            ]),
+        })),
+        getGetPostBySlugUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue({
+                id: "123e4567-e89b-12d3-a456-426614174000",
+                slug: "test-post",
+                title: "Test Post",
+                excerpt: "Test excerpt",
+                content: { html: "<p>Test content</p>" },
+                createdAt: "2024-01-01T00:00:00.000Z",
+                updatedAt: "2024-01-01T00:00:00.000Z",
+            }),
+        })),
+    })),
 }));
 
-// Logger & Metricsをモック
 vi.mock("~/lib/logger", () => ({
-	getLogger: vi.fn(() => ({
-		logError: vi.fn(),
-	})),
-	getMetrics: vi.fn(() => ({
-		httpRequestDuration: {
-			observe: vi.fn(),
-		},
-		httpRequestTotal: {
-			inc: vi.fn(),
-		},
-	})),
+    getLogger: vi.fn(() => ({
+        logError: vi.fn(),
+    })),
+    getMetrics: vi.fn(() => ({
+        httpRequestDuration: {
+            observe: vi.fn(),
+        },
+        httpRequestTotal: {
+            inc: vi.fn(),
+        },
+    })),
 }));
 
 describe("postsRouter", () => {
-	const mockEnv = {
-		DATABASE_URL: "test-db-url",
-		CACHE_URL: "test-cache-url",
-	};
+    const mockEnv = {
+        DATABASE_URL: "test-db-url",
+        CACHE_URL: "test-cache-url",
+    };
 
-	beforeEach(() => {
-		vi.clearAllMocks();
-	});
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
-	describe("GET /posts", () => {
-		describe("正常系", () => {
-			test("投稿一覧を200で返す", async () => {
-				// Given: モック環境
-				const req = new Request("http://localhost/posts", {
-					method: "GET",
-				});
+    describe("GET /posts", () => {
+        describe("正常系", () => {
+            test("投稿一覧を200で返す", async () => {
+                const req = new Request("http://localhost/posts", {
+                    method: "GET",
+                });
 
-				// When: リクエスト実行
-				const res = await postsRouter.request(req, mockEnv);
+                const res = await postsRouter.request(req, undefined, mockEnv);
 
-				// Then: レスポンス検証
-				expect(res.status).toBe(200);
-				const json = await res.json();
-				expect(Array.isArray(json)).toBe(true);
-				expect(json).toHaveLength(1);
-			});
-		});
+                expect(res.status).toBe(200);
+                const json = await res.json();
+                expect(Array.isArray(json)).toBe(true);
+                expect(json).toHaveLength(1);
+            });
+        });
 
-		describe("異常系", () => {
-			test("投稿が存在しない場合は404を返す", async () => {
-				// Given: 空配列を返すモック
-				const { DIContainer } = await import("~/di/container");
-				vi.mocked(DIContainer).mockImplementationOnce(() => ({
-					getGetPostsUseCase: vi.fn(() => ({
-						execute: vi.fn().mockResolvedValue([]),
-					})),
-				}) as never);
+        describe("異常系", () => {
+            test("投稿が存在しない場合は404を返す", async () => {
+                const { DIContainer } = await import("~/di/container");
+                vi.mocked(DIContainer).mockImplementationOnce(
+                    () =>
+                        ({
+                            getGetPostsUseCase: vi.fn(() => ({
+                                execute: vi.fn().mockResolvedValue([]),
+                            })),
+                        }) as never,
+                );
 
-				const req = new Request("http://localhost/posts", {
-					method: "GET",
-				});
+                const req = new Request("http://localhost/posts", {
+                    method: "GET",
+                });
 
-				// When: リクエスト実行
-				const res = await postsRouter.request(req, mockEnv);
+                const res = await postsRouter.request(req, undefined, mockEnv);
 
-				// Then: 404エラー
-				expect(res.status).toBe(404);
-			});
-		});
-	});
+                expect(res.status).toBe(404);
+            });
+        });
+    });
 
-	describe("GET /post/:slug", () => {
-		describe("正常系", () => {
-			test("指定されたslugの投稿を200で返す", async () => {
-				// Given: 有効なslug
-				const req = new Request("http://localhost/post/test-post", {
-					method: "GET",
-				});
+    describe("GET /post/:slug", () => {
+        describe("正常系", () => {
+            test("指定されたslugの投稿を200で返す", async () => {
+                const req = new Request("http://localhost/post/test-post", {
+                    method: "GET",
+                });
 
-				// When: リクエスト実行
-				const res = await postsRouter.request(req, mockEnv);
+                const res = await postsRouter.request(req, undefined, mockEnv);
 
-				// Then: レスポンス検証
-				expect(res.status).toBe(200);
-				const json = await res.json();
-				expect(json).toHaveProperty("slug", "test-post");
-				expect(json).toHaveProperty("title", "Test Post");
-			});
-		});
+                expect(res.status).toBe(200);
+                const json = await res.json();
+                expect(json).toHaveProperty("slug", "test-post");
+                expect(json).toHaveProperty("title", "Test Post");
+            });
+        });
 
-		describe("異常系", () => {
-			test("投稿が見つからない場合は404を返す", async () => {
-				// Given: nullを返すモック
-				const { DIContainer } = await import("~/di/container");
-				vi.mocked(DIContainer).mockImplementationOnce(() => ({
-					getGetPostBySlugUseCase: vi.fn(() => ({
-						execute: vi.fn().mockResolvedValue(null),
-					})),
-				}) as never);
+        describe("異常系", () => {
+            test("投稿が見つからない場合は404を返す", async () => {
+                const { DIContainer } = await import("~/di/container");
+                vi.mocked(DIContainer).mockImplementationOnce(
+                    () =>
+                        ({
+                            getGetPostBySlugUseCase: vi.fn(() => ({
+                                execute: vi.fn().mockResolvedValue(null),
+                            })),
+                        }) as never,
+                );
 
-				const req = new Request("http://localhost/post/nonexistent", {
-					method: "GET",
-				});
+                const req = new Request("http://localhost/post/nonexistent", {
+                    method: "GET",
+                });
 
-				// When: リクエスト実行
-				const res = await postsRouter.request(req, mockEnv);
+                const res = await postsRouter.request(req, undefined, mockEnv);
 
-				// Then: 404エラー
-				expect(res.status).toBe(404);
-			});
-		});
-	});
+                expect(res.status).toBe(404);
+            });
+        });
+    });
 });

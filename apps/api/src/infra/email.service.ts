@@ -45,11 +45,11 @@ export class ResendEmailService implements EmailService {
             });
 
             if (!response.ok) {
-                const errorData = (await response.json()) as ResendErrorResponse;
+                const errorData: ResendErrorResponse = await response.json();
                 return { success: false, error: errorData.message || "Failed to send email" };
             }
 
-            const data = (await response.json()) as ResendEmailResponse;
+            const data: ResendEmailResponse = await response.json();
             return { success: true, id: data.id };
         } catch (error) {
             return {
@@ -62,7 +62,7 @@ export class ResendEmailService implements EmailService {
     private replaceVariables(content: string, variables: Record<string, string>): string {
         let result = content;
         for (const [key, value] of Object.entries(variables)) {
-            result = result.replace(new RegExp(`{{${key}}}`, "g"), value);
+            result = result.replaceAll(`{{${key}}}`, value);
         }
         return result;
     }

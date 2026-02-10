@@ -1,9 +1,8 @@
-import { describe, expect, test, vi } from "vitest";
-import { PostRepositoryImpl } from "./post.repository";
-import type { Post } from "~/domain/post";
 import { createPrismaClient } from "@portfolio/db";
+import { describe, expect, test, vi } from "vitest";
+import type { Post } from "~/domain/post";
+import { PostRepositoryImpl } from "./post.repository";
 
-// Mock Prisma client
 vi.mock("@portfolio/db", () => ({
     createPrismaClient: vi.fn(),
 }));

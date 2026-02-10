@@ -6,16 +6,15 @@ describe("GetSyncLogsUseCase", () => {
     const mockSyncLog: FreeeSyncLog = {
         id: "log-1",
         integrationId: "integration-1",
-        direction: "FROM_FREEE",
-        status: "SUCCESS",
-        recordsProcessed: 10,
-        recordsSucceeded: 10,
-        recordsFailed: 0,
-        errorMessage: null,
-        startedAt: new Date(),
-        completedAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        direction: "IMPORT",
+        status: "COMPLETED",
+        totalRecords: 10,
+        successCount: 10,
+        errorCount: 0,
+        startedAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
     };
 
     const createMockRepository = (overrides: Partial<FreeeRepository> = {}): FreeeRepository => ({

@@ -9,6 +9,11 @@ import type {
     UpdatePipelineStageInput,
 } from "~/domain/pipeline";
 
+function toDateString(d: Date | null | undefined): string | undefined {
+    if (d == null) return undefined;
+    return d instanceof Date ? d.toISOString() : String(d);
+}
+
 export class PipelineRepositoryImpl implements PipelineRepository {
     constructor(private readonly databaseUrl?: string) {}
 
@@ -29,8 +34,8 @@ export class PipelineRepositoryImpl implements PipelineRepository {
             order: data.order,
             probability: data.probability ?? undefined,
             color: data.color ?? undefined,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
+            createdAt: toDateString(data.createdAt) ?? "",
+            updatedAt: toDateString(data.updatedAt) ?? "",
         };
     }
 
@@ -51,8 +56,8 @@ export class PipelineRepositoryImpl implements PipelineRepository {
             description: data.description ?? undefined,
             isDefault: data.isDefault,
             stages,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
+            createdAt: toDateString(data.createdAt) ?? "",
+            updatedAt: toDateString(data.updatedAt) ?? "",
         };
     }
 
@@ -64,7 +69,10 @@ export class PipelineRepositoryImpl implements PipelineRepository {
         });
 
         return pipelines.map((pipeline) =>
-            this.mapToPipeline(pipeline, pipeline.stages.map((stage) => this.mapToStage(stage))),
+            this.mapToPipeline(
+                pipeline,
+                pipeline.stages.map((stage) => this.mapToStage(stage)),
+            ),
         );
     }
 
@@ -77,7 +85,10 @@ export class PipelineRepositoryImpl implements PipelineRepository {
 
         if (!pipeline) return null;
 
-        return this.mapToPipeline(pipeline, pipeline.stages.map((stage) => this.mapToStage(stage)));
+        return this.mapToPipeline(
+            pipeline,
+            pipeline.stages.map((stage) => this.mapToStage(stage)),
+        );
     }
 
     async findDefault(): Promise<Pipeline | null> {
@@ -89,7 +100,10 @@ export class PipelineRepositoryImpl implements PipelineRepository {
 
         if (!pipeline) return null;
 
-        return this.mapToPipeline(pipeline, pipeline.stages.map((stage) => this.mapToStage(stage)));
+        return this.mapToPipeline(
+            pipeline,
+            pipeline.stages.map((stage) => this.mapToStage(stage)),
+        );
     }
 
     async create(input: CreatePipelineInput): Promise<Pipeline> {
@@ -134,7 +148,10 @@ export class PipelineRepositoryImpl implements PipelineRepository {
             include: { stages: { orderBy: { order: "asc" } } },
         });
 
-        return this.mapToPipeline(pipeline, pipeline.stages.map((stage) => this.mapToStage(stage)));
+        return this.mapToPipeline(
+            pipeline,
+            pipeline.stages.map((stage) => this.mapToStage(stage)),
+        );
     }
 
     async delete(id: string): Promise<void> {

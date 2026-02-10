@@ -9,6 +9,11 @@ import type {
     UpdateEmailTemplateInput,
 } from "~/domain/email";
 
+function toDateString(d: Date | null | undefined): string | undefined {
+    if (d == null) return undefined;
+    return d instanceof Date ? d.toISOString() : String(d);
+}
+
 export class EmailRepositoryImpl implements EmailRepository {
     constructor(private readonly databaseUrl?: string) {}
 
@@ -49,14 +54,14 @@ export class EmailRepositoryImpl implements EmailRepository {
             textContent: data.textContent ?? undefined,
             status: data.status as EmailStatus,
             errorMessage: data.errorMessage ?? undefined,
-            sentAt: data.sentAt ?? undefined,
-            deliveredAt: data.deliveredAt ?? undefined,
-            openedAt: data.openedAt ?? undefined,
-            clickedAt: data.clickedAt ?? undefined,
-            bouncedAt: data.bouncedAt ?? undefined,
+            sentAt: toDateString(data.sentAt),
+            deliveredAt: toDateString(data.deliveredAt),
+            openedAt: toDateString(data.openedAt),
+            clickedAt: toDateString(data.clickedAt),
+            bouncedAt: toDateString(data.bouncedAt),
             metadata: data.metadata ? JSON.parse(data.metadata) : undefined,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
+            createdAt: toDateString(data.createdAt) ?? "",
+            updatedAt: toDateString(data.updatedAt) ?? "",
         };
     }
 
@@ -85,8 +90,8 @@ export class EmailRepositoryImpl implements EmailRepository {
             textContent: data.textContent ?? undefined,
             variables: data.variables ? JSON.parse(data.variables) : undefined,
             isActive: data.isActive,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
+            createdAt: toDateString(data.createdAt) ?? "",
+            updatedAt: toDateString(data.updatedAt) ?? "",
         };
     }
 
@@ -122,21 +127,23 @@ export class EmailRepositoryImpl implements EmailRepository {
 
     async createLog(log: Omit<EmailLog, "id" | "createdAt" | "updatedAt">): Promise<EmailLog> {
         const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const sentAt =
+            log.sentAt == null ? null : new Date(log.sentAt as string);
         const created = await prisma.emailLog.create({
             data: {
-                customerId: log.customerId,
-                templateId: log.templateId,
-                resendId: log.resendId,
-                fromEmail: log.fromEmail,
-                toEmail: log.toEmail,
-                ccEmail: log.ccEmail,
-                bccEmail: log.bccEmail,
-                subject: log.subject,
-                htmlContent: log.htmlContent,
-                textContent: log.textContent,
-                status: log.status,
-                errorMessage: log.errorMessage,
-                sentAt: log.sentAt,
+                customerId: (log.customerId ?? null) as string | null,
+                templateId: (log.templateId ?? null) as string | null,
+                resendId: (log.resendId ?? null) as string | null,
+                fromEmail: log.fromEmail as string,
+                toEmail: log.toEmail as string,
+                ccEmail: (log.ccEmail ?? null) as string | null,
+                bccEmail: (log.bccEmail ?? null) as string | null,
+                subject: log.subject as string,
+                htmlContent: (log.htmlContent ?? null) as string | null,
+                textContent: (log.textContent ?? null) as string | null,
+                status: log.status as EmailStatus,
+                errorMessage: (log.errorMessage ?? null) as string | null,
+                sentAt,
                 metadata: log.metadata ? JSON.stringify(log.metadata) : undefined,
             },
         });

@@ -1,7 +1,6 @@
-import { describe, expect, test, beforeEach, vi } from "vitest";
 import type { WebSocket as CFWebSocket, DurableObjectState } from "@cloudflare/workers-types";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Mock WebSocketPair globally before any imports
 class MockWebSocket {
     accept = vi.fn();
     send = vi.fn();
@@ -18,18 +17,25 @@ class MockWebSocket {
     readyState = 1;
 }
 
-global.WebSocketPair = class WebSocketPair {
+const MockWebSocketPair = class {
     "0": MockWebSocket;
     "1": MockWebSocket;
 
     constructor() {
-        this[0] = new MockWebSocket() as any;
-        this[1] = new MockWebSocket() as any;
+        this[0] = new MockWebSocket() as MockWebSocket & Record<string, unknown>;
+        this[1] = new MockWebSocket() as MockWebSocket & Record<string, unknown>;
     }
-} as any;
+};
 
-// Import after setting up global mocks
+(globalThis as unknown as { WebSocketPair: typeof MockWebSocketPair }).WebSocketPair = MockWebSocketPair;
+
 import { ChatRoomDO } from "./ChatRoomDO";
+
+/** Test-only: cast to access private sessions for assertions */
+type SessionsMap = Map<unknown, { webSocket: unknown; participantId: string; participantName: string; joinedAt: Date }>;
+function getSessions(room: ChatRoomDO): SessionsMap {
+    return (room as unknown as { sessions: SessionsMap }).sessions;
+}
 
 describe("ChatRoomDO", () => {
     let chatRoom: ChatRoomDO;
@@ -40,10 +46,8 @@ describe("ChatRoomDO", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Mock storage
         mockStorage = new Map();
 
-        // Mock DurableObjectState
         mockState = {
             id: {
                 toString: () => "test-room-id",
@@ -84,17 +88,14 @@ describe("ChatRoomDO", () => {
             abort: vi.fn(),
         } as unknown as DurableObjectState;
 
-        // Mock WebSocket
         mockWebSocket = new MockWebSocket() as unknown as CFWebSocket;
 
-        // Create ChatRoomDO instance
         chatRoom = new ChatRoomDO(mockState);
     });
 
     describe("fetch /websocket", () => {
         describe("正常系", () => {
             test("正常なリクエストで101を返しjoinをブロードキャストする", async () => {
-                // Given: 正常なWebSocketアップグレードリクエスト
                 const url = "http://localhost/websocket?participantId=user1&participantName=Alice&roomId=room1";
                 const request = new Request(url, {
                     headers: {
@@ -102,10 +103,8 @@ describe("ChatRoomDO", () => {
                     },
                 });
 
-                // When: WebSocket接続リクエストを処理
                 const response = await chatRoom.fetch(request);
 
-                // Then: 101 Switching Protocolsを返す
                 expect(response.status).toBe(101);
                 expect(mockState.acceptWebSocket).toHaveBeenCalledTimes(1);
             });
@@ -113,20 +112,16 @@ describe("ChatRoomDO", () => {
 
         describe("異常系", () => {
             test("Upgradeヘッダーがない場合は426を返す", async () => {
-                // Given: Upgradeヘッダーがないリクエスト
                 const url = "http://localhost/websocket?participantId=user1&roomId=room1";
                 const request = new Request(url);
 
-                // When: リクエストを処理
                 const response = await chatRoom.fetch(request);
 
-                // Then: 426 Upgrade Requiredを返す
                 expect(response.status).toBe(426);
                 expect(await response.text()).toBe("Expected WebSocket upgrade");
             });
 
             test("participantIdがない場合は400を返す", async () => {
-                // Given: participantIdが欠けているリクエスト
                 const url = "http://localhost/websocket?roomId=room1";
                 const request = new Request(url, {
                     headers: {
@@ -134,16 +129,13 @@ describe("ChatRoomDO", () => {
                     },
                 });
 
-                // When: リクエストを処理
                 const response = await chatRoom.fetch(request);
 
-                // Then: 400 Bad Requestを返す
                 expect(response.status).toBe(400);
                 expect(await response.text()).toBe("participantId is required");
             });
 
             test("roomIdがない場合は400を返す", async () => {
-                // Given: roomIdが欠けているリクエスト
                 const url = "http://localhost/websocket?participantId=user1";
                 const request = new Request(url, {
                     headers: {
@@ -151,10 +143,8 @@ describe("ChatRoomDO", () => {
                     },
                 });
 
-                // When: リクエストを処理
                 const response = await chatRoom.fetch(request);
 
-                // Then: 400 Bad Requestを返す
                 expect(response.status).toBe(400);
                 expect(await response.text()).toBe("roomId is required");
             });
@@ -162,7 +152,6 @@ describe("ChatRoomDO", () => {
 
         describe("境界値", () => {
             test("participantNameが空文字の場合はAnonymousになる", async () => {
-                // Given: participantNameが空文字のリクエスト
                 const url = "http://localhost/websocket?participantId=user1&participantName=&roomId=room1";
                 const request = new Request(url, {
                     headers: {
@@ -170,16 +159,13 @@ describe("ChatRoomDO", () => {
                     },
                 });
 
-                // When: リクエストを処理
                 const response = await chatRoom.fetch(request);
 
-                // Then: 101を返しAnonymousとしてセッションが作成される
                 expect(response.status).toBe(101);
                 expect(mockState.acceptWebSocket).toHaveBeenCalledTimes(1);
             });
 
             test("participantNameが指定されていない場合はAnonymousになる", async () => {
-                // Given: participantNameが指定されていないリクエスト
                 const url = "http://localhost/websocket?participantId=user1&roomId=room1";
                 const request = new Request(url, {
                     headers: {
@@ -187,10 +173,8 @@ describe("ChatRoomDO", () => {
                     },
                 });
 
-                // When: リクエストを処理
                 const response = await chatRoom.fetch(request);
 
-                // Then: 101を返しAnonymousとしてセッションが作成される
                 expect(response.status).toBe(101);
                 expect(mockState.acceptWebSocket).toHaveBeenCalledTimes(1);
             });
@@ -200,7 +184,6 @@ describe("ChatRoomDO", () => {
     describe("fetch /history", () => {
         describe("正常系", () => {
             test("メッセージ履歴を返す", async () => {
-                // Given: ストレージに保存されたメッセージ
                 const messages = [
                     {
                         id: "msg1",
@@ -219,23 +202,18 @@ describe("ChatRoomDO", () => {
                 ];
                 mockStorage.set("messages", messages);
 
-                // When: 履歴取得リクエストを処理
                 const request = new Request("http://localhost/history");
                 const response = await chatRoom.fetch(request);
 
-                // Then: メッセージ履歴をJSONで返す
                 expect(response.status).toBe(200);
                 expect(response.headers.get("Content-Type")).toBe("application/json");
                 expect(await response.json()).toEqual(messages);
             });
 
             test("メッセージがない場合は空配列を返す", async () => {
-                // Given: ストレージにメッセージがない
-                // When: 履歴取得リクエストを処理
                 const request = new Request("http://localhost/history");
                 const response = await chatRoom.fetch(request);
 
-                // Then: 空配列を返す
                 expect(response.status).toBe(200);
                 expect(await response.json()).toEqual([]);
             });
@@ -245,27 +223,24 @@ describe("ChatRoomDO", () => {
     describe("fetch /participants", () => {
         describe("正常系", () => {
             test("参加者リストを返す", async () => {
-                // Given: 複数の参加者がいる状態
                 const mockWs1 = new MockWebSocket();
                 const mockWs2 = new MockWebSocket();
-                chatRoom.sessions.set(mockWs1, {
+                getSessions(chatRoom).set(mockWs1, {
                     webSocket: mockWs1,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date("2024-01-01T00:00:00Z"),
                 });
-                chatRoom.sessions.set(mockWs2, {
+                getSessions(chatRoom).set(mockWs2, {
                     webSocket: mockWs2,
                     participantId: "user2",
                     participantName: "Bob",
                     joinedAt: new Date("2024-01-01T00:01:00Z"),
                 });
 
-                // When: 参加者リスト取得リクエストを処理
                 const request = new Request("http://localhost/participants");
                 const response = await chatRoom.fetch(request);
 
-                // Then: 参加者リストをJSONで返す
                 expect(response.status).toBe(200);
                 expect(response.headers.get("Content-Type")).toBe("application/json");
                 const participants = await response.json();
@@ -287,12 +262,9 @@ describe("ChatRoomDO", () => {
             });
 
             test("参加者がいない場合は空配列を返す", async () => {
-                // Given: 参加者がいない状態
-                // When: 参加者リスト取得リクエストを処理
                 const request = new Request("http://localhost/participants");
                 const response = await chatRoom.fetch(request);
 
-                // Then: 空配列を返す
                 expect(response.status).toBe(200);
                 expect(await response.json()).toEqual([]);
             });
@@ -302,13 +274,10 @@ describe("ChatRoomDO", () => {
     describe("fetch その他のパス", () => {
         describe("異常系", () => {
             test("存在しないパスは404を返す", async () => {
-                // Given: 存在しないパス
                 const request = new Request("http://localhost/unknown");
 
-                // When: リクエストを処理
                 const response = await chatRoom.fetch(request);
 
-                // Then: 404 Not Foundを返す
                 expect(response.status).toBe(404);
                 expect(await response.text()).toBe("Not found");
             });
@@ -318,24 +287,21 @@ describe("ChatRoomDO", () => {
     describe("webSocketMessage", () => {
         describe("正常系", () => {
             test("type: message - メッセージを保存してブロードキャストする", async () => {
-                // Given: 参加者のセッションが存在する
                 const session = {
                     webSocket: mockWebSocket,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date(),
                 };
-                chatRoom.sessions.set(mockWebSocket, session);
+                getSessions(chatRoom).set(mockWebSocket, session);
 
                 const message = JSON.stringify({
                     type: "message",
                     content: "Hello, World!",
                 });
 
-                // When: メッセージを受信
                 await chatRoom.webSocketMessage(mockWebSocket, message);
 
-                // Then: メッセージがストレージに保存される
                 expect(mockState.storage.put).toHaveBeenCalledWith(
                     "messages",
                     expect.arrayContaining([
@@ -347,22 +313,20 @@ describe("ChatRoomDO", () => {
                     ]),
                 );
 
-                // Then: WebSocketにブロードキャストされる
                 expect(mockWebSocket.send).toHaveBeenCalledWith(expect.stringContaining('"type":"message"'));
             });
 
             test("type: typing - 他の参加者にのみブロードキャストする", async () => {
-                // Given: 複数の参加者がいる
                 const sender = mockWebSocket;
                 const receiver = new MockWebSocket() as unknown as CFWebSocket;
 
-                chatRoom.sessions.set(sender, {
+                getSessions(chatRoom).set(sender, {
                     webSocket: sender,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date(),
                 });
-                chatRoom.sessions.set(receiver, {
+                getSessions(chatRoom).set(receiver, {
                     webSocket: receiver,
                     participantId: "user2",
                     participantName: "Bob",
@@ -373,54 +337,52 @@ describe("ChatRoomDO", () => {
                     type: "typing",
                 });
 
-                // When: typingメッセージを受信
                 await chatRoom.webSocketMessage(sender, message);
 
-                // Then: 送信者以外にブロードキャストされる
                 expect((sender as any).send).not.toHaveBeenCalled();
                 expect((receiver as any).send).toHaveBeenCalledWith(expect.stringContaining('"type":"typing"'));
             });
 
             test("type: read - 全参加者にブロードキャストする", async () => {
-                // Given: 参加者のセッションが存在する
                 const session = {
                     webSocket: mockWebSocket,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date(),
                 };
-                chatRoom.sessions.set(mockWebSocket, session);
+                getSessions(chatRoom).set(mockWebSocket, session);
 
                 const message = JSON.stringify({
                     type: "read",
                     messageId: "msg1",
                 });
 
-                // When: readメッセージを受信
                 await chatRoom.webSocketMessage(mockWebSocket, message);
 
-                // Then: 全参加者にブロードキャストされる
                 expect(mockWebSocket.send).toHaveBeenCalledWith(expect.stringContaining('"type":"read"'));
                 expect(mockWebSocket.send).toHaveBeenCalledWith(expect.stringContaining('"messageId":"msg1"'));
             });
 
             test("ArrayBuffer形式のメッセージを処理できる", async () => {
-                // Given: 参加者のセッションが存在する
                 const session = {
                     webSocket: mockWebSocket,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date(),
                 };
-                chatRoom.sessions.set(mockWebSocket, session);
+                getSessions(chatRoom).set(mockWebSocket, session);
 
                 const messageObj = { type: "message", content: "Hello" };
                 const messageBuffer = new TextEncoder().encode(JSON.stringify(messageObj));
 
-                // When: ArrayBuffer形式のメッセージを受信
-                await chatRoom.webSocketMessage(mockWebSocket, messageBuffer);
+                await chatRoom.webSocketMessage(
+                    mockWebSocket,
+                    messageBuffer.buffer.slice(
+                        messageBuffer.byteOffset,
+                        messageBuffer.byteOffset + messageBuffer.byteLength,
+                    ) as ArrayBuffer,
+                );
 
-                // Then: メッセージが正常に処理される
                 expect(mockState.storage.put).toHaveBeenCalled();
                 expect(mockWebSocket.send).toHaveBeenCalled();
             });
@@ -428,34 +390,28 @@ describe("ChatRoomDO", () => {
 
         describe("異常系", () => {
             test("無効なJSONはエラーを返す", async () => {
-                // Given: 参加者のセッションが存在する
                 const session = {
                     webSocket: mockWebSocket,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date(),
                 };
-                chatRoom.sessions.set(mockWebSocket, session);
+                getSessions(chatRoom).set(mockWebSocket, session);
 
                 const invalidMessage = "{ invalid json";
 
-                // When: 無効なJSONメッセージを受信
                 await chatRoom.webSocketMessage(mockWebSocket, invalidMessage);
 
-                // Then: エラーメッセージが送信される
                 expect(mockWebSocket.send).toHaveBeenCalledWith(
                     JSON.stringify({ type: "error", message: "Invalid message format" }),
                 );
             });
 
             test("セッションが存在しない場合は処理をスキップする", async () => {
-                // Given: セッションが存在しない
                 const message = JSON.stringify({ type: "message", content: "Hello" });
 
-                // When: メッセージを受信
                 await chatRoom.webSocketMessage(mockWebSocket, message);
 
-                // Then: 何も処理されない
                 expect(mockWebSocket.send).not.toHaveBeenCalled();
                 expect(mockState.storage.put).not.toHaveBeenCalled();
             });
@@ -463,45 +419,39 @@ describe("ChatRoomDO", () => {
 
         describe("エッジケース", () => {
             test("contentが空のmessageは保存されない", async () => {
-                // Given: 参加者のセッションが存在する
                 const session = {
                     webSocket: mockWebSocket,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date(),
                 };
-                chatRoom.sessions.set(mockWebSocket, session);
+                getSessions(chatRoom).set(mockWebSocket, session);
 
                 const message = JSON.stringify({
                     type: "message",
                     content: "",
                 });
 
-                // When: 空のcontentのメッセージを受信
                 await chatRoom.webSocketMessage(mockWebSocket, message);
 
-                // Then: メッセージは保存されない（contentがfalsyのため）
                 expect(mockState.storage.put).not.toHaveBeenCalled();
             });
 
             test("messageIdがないreadメッセージは処理されない", async () => {
-                // Given: 参加者のセッションが存在する
                 const session = {
                     webSocket: mockWebSocket,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date(),
                 };
-                chatRoom.sessions.set(mockWebSocket, session);
+                getSessions(chatRoom).set(mockWebSocket, session);
 
                 const message = JSON.stringify({
                     type: "read",
                 });
 
-                // When: messageIdがないreadメッセージを受信
                 await chatRoom.webSocketMessage(mockWebSocket, message);
 
-                // Then: ブロードキャストされない
                 expect(mockWebSocket.send).not.toHaveBeenCalled();
             });
         });
@@ -510,45 +460,38 @@ describe("ChatRoomDO", () => {
     describe("webSocketClose", () => {
         describe("正常系", () => {
             test("leaveをブロードキャストしてセッションを削除する", async () => {
-                // Given: 複数の参加者がいる
                 const closingWs = mockWebSocket;
                 const remainingWs = new MockWebSocket() as unknown as CFWebSocket;
 
-                chatRoom.sessions.set(closingWs, {
+                getSessions(chatRoom).set(closingWs, {
                     webSocket: closingWs,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date(),
                 });
-                chatRoom.sessions.set(remainingWs, {
+                getSessions(chatRoom).set(remainingWs, {
                     webSocket: remainingWs,
                     participantId: "user2",
                     participantName: "Bob",
                     joinedAt: new Date(),
                 });
 
-                // When: WebSocket接続が閉じられる
                 await chatRoom.webSocketClose(closingWs, 1000, "Normal closure");
 
-                // Then: leaveがブロードキャストされる
                 expect((remainingWs as any).send).toHaveBeenCalledWith(expect.stringContaining('"type":"leave"'));
                 expect((remainingWs as any).send).toHaveBeenCalledWith(
                     expect.stringContaining('"participantId":"user1"'),
                 );
 
-                // Then: セッションが削除される
-                expect(chatRoom.sessions.has(closingWs)).toBe(false);
-                expect(chatRoom.sessions.has(remainingWs)).toBe(true);
+                expect(getSessions(chatRoom).has(closingWs)).toBe(false);
+                expect(getSessions(chatRoom).has(remainingWs)).toBe(true);
             });
         });
 
         describe("エッジケース", () => {
             test("セッションが存在しない場合は何もしない", async () => {
-                // Given: セッションが存在しない
-                // When: WebSocket接続が閉じられる
                 await chatRoom.webSocketClose(mockWebSocket, 1000, "Normal closure");
 
-                // Then: 何も処理されない（エラーにならない）
                 expect(mockWebSocket.send).not.toHaveBeenCalled();
             });
         });
@@ -557,28 +500,24 @@ describe("ChatRoomDO", () => {
     describe("webSocketError", () => {
         describe("正常系", () => {
             test("セッションを削除する", async () => {
-                // Given: 参加者のセッションが存在する
                 const session = {
                     webSocket: mockWebSocket,
                     participantId: "user1",
                     participantName: "Alice",
                     joinedAt: new Date(),
                 };
-                chatRoom.sessions.set(mockWebSocket, session);
+                getSessions(chatRoom).set(mockWebSocket, session);
 
-                const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+                const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
-                // When: WebSocketエラーが発生
                 await chatRoom.webSocketError(mockWebSocket, new Error("Connection error"));
 
-                // Then: エラーログが出力される
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
                     "WebSocket error for participant user1:",
                     expect.any(Error),
                 );
 
-                // Then: セッションが削除される
-                expect(chatRoom.sessions.has(mockWebSocket)).toBe(false);
+                expect(getSessions(chatRoom).has(mockWebSocket)).toBe(false);
 
                 consoleErrorSpy.mockRestore();
             });
@@ -586,13 +525,10 @@ describe("ChatRoomDO", () => {
 
         describe("エッジケース", () => {
             test("セッションが存在しない場合は何もしない", async () => {
-                // Given: セッションが存在しない
-                const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+                const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
-                // When: WebSocketエラーが発生
                 await chatRoom.webSocketError(mockWebSocket, new Error("Connection error"));
 
-                // Then: エラーログは出力されない
                 expect(consoleErrorSpy).not.toHaveBeenCalled();
 
                 consoleErrorSpy.mockRestore();
@@ -603,7 +539,6 @@ describe("ChatRoomDO", () => {
     describe("メッセージストレージ", () => {
         describe("境界値", () => {
             test("1000件を超えるメッセージは古いものから削除される", async () => {
-                // Given: 1000件のメッセージが既に存在する
                 const existingMessages = Array.from({ length: 1000 }, (_, i) => ({
                     id: `msg${i}`,
                     participantId: "user1",
@@ -619,16 +554,14 @@ describe("ChatRoomDO", () => {
                     participantName: "Alice",
                     joinedAt: new Date(),
                 };
-                chatRoom.sessions.set(mockWebSocket, session);
+                getSessions(chatRoom).set(mockWebSocket, session);
 
-                // When: 新しいメッセージを追加
                 const message = JSON.stringify({
                     type: "message",
                     content: "New message",
                 });
                 await chatRoom.webSocketMessage(mockWebSocket, message);
 
-                // Then: 最古のメッセージが削除され、最新1000件が保持される
                 expect(mockState.storage.put).toHaveBeenCalledWith(
                     "messages",
                     expect.arrayContaining([
@@ -640,7 +573,7 @@ describe("ChatRoomDO", () => {
 
                 const savedMessages = mockStorage.get("messages") as any[];
                 expect(savedMessages.length).toBe(1000);
-                expect(savedMessages[0].id).toBe("msg1"); // msg0が削除されている
+                expect(savedMessages[0].id).toBe("msg1");
             });
         });
     });

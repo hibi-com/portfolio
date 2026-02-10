@@ -1,297 +1,267 @@
-import { describe, expect, test, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { inquiriesRouter } from "./inquiries";
 
-// DIContainerをモック
 vi.mock("~/di/container", () => ({
-	DIContainer: vi.fn().mockImplementation(() => ({
-		getGetInquiriesUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue([
-				{
-					id: "123e4567-e89b-12d3-a456-426614174000",
-					subject: "Test Inquiry",
-					content: "Test content",
-					status: "OPEN",
-					createdAt: "2024-01-01T00:00:00.000Z",
-					updatedAt: "2024-01-01T00:00:00.000Z",
-				},
-			]),
-		})),
-		getGetInquiryByIdUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue({
-				id: "123e4567-e89b-12d3-a456-426614174000",
-				subject: "Test Inquiry",
-				content: "Test content",
-				status: "OPEN",
-				createdAt: "2024-01-01T00:00:00.000Z",
-				updatedAt: "2024-01-01T00:00:00.000Z",
-			}),
-		})),
-		getCreateInquiryUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue({
-				id: "123e4567-e89b-12d3-a456-426614174000",
-				subject: "New Inquiry",
-				content: "New content",
-				status: "OPEN",
-				createdAt: "2024-01-01T00:00:00.000Z",
-				updatedAt: "2024-01-01T00:00:00.000Z",
-			}),
-		})),
-		getUpdateInquiryUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue({
-				id: "123e4567-e89b-12d3-a456-426614174000",
-				subject: "Updated Inquiry",
-				content: "Updated content",
-				status: "IN_PROGRESS",
-				createdAt: "2024-01-01T00:00:00.000Z",
-				updatedAt: "2024-01-01T00:00:00.000Z",
-			}),
-		})),
-		getDeleteInquiryUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue(undefined),
-		})),
-		getResolveInquiryUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue({
-				id: "123e4567-e89b-12d3-a456-426614174000",
-				subject: "Test Inquiry",
-				content: "Test content",
-				status: "RESOLVED",
-				createdAt: "2024-01-01T00:00:00.000Z",
-				updatedAt: "2024-01-01T00:00:00.000Z",
-			}),
-		})),
-		getCloseInquiryUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue({
-				id: "123e4567-e89b-12d3-a456-426614174000",
-				subject: "Test Inquiry",
-				content: "Test content",
-				status: "CLOSED",
-				createdAt: "2024-01-01T00:00:00.000Z",
-				updatedAt: "2024-01-01T00:00:00.000Z",
-			}),
-		})),
-		getGetInquiryResponsesUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue([
-				{
-					id: "response-123",
-					inquiryId: "123e4567-e89b-12d3-a456-426614174000",
-					content: "Response content",
-					isInternal: false,
-					createdAt: "2024-01-01T00:00:00.000Z",
-					updatedAt: "2024-01-01T00:00:00.000Z",
-				},
-			]),
-		})),
-		getAddInquiryResponseUseCase: vi.fn(() => ({
-			execute: vi.fn().mockResolvedValue({
-				id: "response-123",
-				inquiryId: "123e4567-e89b-12d3-a456-426614174000",
-				content: "New response",
-				isInternal: false,
-				createdAt: "2024-01-01T00:00:00.000Z",
-				updatedAt: "2024-01-01T00:00:00.000Z",
-			}),
-		})),
-	})),
+    DIContainer: vi.fn().mockImplementation(() => ({
+        getGetInquiriesUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue([
+                {
+                    id: "123e4567-e89b-12d3-a456-426614174000",
+                    subject: "Test Inquiry",
+                    content: "Test content",
+                    status: "OPEN",
+                    createdAt: "2024-01-01T00:00:00.000Z",
+                    updatedAt: "2024-01-01T00:00:00.000Z",
+                },
+            ]),
+        })),
+        getGetInquiryByIdUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue({
+                id: "123e4567-e89b-12d3-a456-426614174000",
+                subject: "Test Inquiry",
+                content: "Test content",
+                status: "OPEN",
+                createdAt: "2024-01-01T00:00:00.000Z",
+                updatedAt: "2024-01-01T00:00:00.000Z",
+            }),
+        })),
+        getCreateInquiryUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue({
+                id: "123e4567-e89b-12d3-a456-426614174000",
+                subject: "New Inquiry",
+                content: "New content",
+                status: "OPEN",
+                createdAt: "2024-01-01T00:00:00.000Z",
+                updatedAt: "2024-01-01T00:00:00.000Z",
+            }),
+        })),
+        getUpdateInquiryUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue({
+                id: "123e4567-e89b-12d3-a456-426614174000",
+                subject: "Updated Inquiry",
+                content: "Updated content",
+                status: "IN_PROGRESS",
+                createdAt: "2024-01-01T00:00:00.000Z",
+                updatedAt: "2024-01-01T00:00:00.000Z",
+            }),
+        })),
+        getDeleteInquiryUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue(undefined),
+        })),
+        getResolveInquiryUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue({
+                id: "123e4567-e89b-12d3-a456-426614174000",
+                subject: "Test Inquiry",
+                content: "Test content",
+                status: "RESOLVED",
+                createdAt: "2024-01-01T00:00:00.000Z",
+                updatedAt: "2024-01-01T00:00:00.000Z",
+            }),
+        })),
+        getCloseInquiryUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue({
+                id: "123e4567-e89b-12d3-a456-426614174000",
+                subject: "Test Inquiry",
+                content: "Test content",
+                status: "CLOSED",
+                createdAt: "2024-01-01T00:00:00.000Z",
+                updatedAt: "2024-01-01T00:00:00.000Z",
+            }),
+        })),
+        getGetInquiryResponsesUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue([
+                {
+                    id: "response-123",
+                    inquiryId: "123e4567-e89b-12d3-a456-426614174000",
+                    content: "Response content",
+                    isInternal: false,
+                    createdAt: "2024-01-01T00:00:00.000Z",
+                    updatedAt: "2024-01-01T00:00:00.000Z",
+                },
+            ]),
+        })),
+        getAddInquiryResponseUseCase: vi.fn(() => ({
+            execute: vi.fn().mockResolvedValue({
+                id: "response-123",
+                inquiryId: "123e4567-e89b-12d3-a456-426614174000",
+                content: "New response",
+                isInternal: false,
+                createdAt: "2024-01-01T00:00:00.000Z",
+                updatedAt: "2024-01-01T00:00:00.000Z",
+            }),
+        })),
+    })),
 }));
 
-// Logger & Metricsをモック
 vi.mock("~/lib/logger", () => ({
-	getLogger: vi.fn(() => ({
-		logError: vi.fn(),
-	})),
-	getMetrics: vi.fn(() => ({
-		httpRequestDuration: {
-			observe: vi.fn(),
-		},
-		httpRequestTotal: {
-			inc: vi.fn(),
-		},
-	})),
+    getLogger: vi.fn(() => ({
+        logError: vi.fn(),
+    })),
+    getMetrics: vi.fn(() => ({
+        httpRequestDuration: {
+            observe: vi.fn(),
+        },
+        httpRequestTotal: {
+            inc: vi.fn(),
+        },
+    })),
 }));
 
-// Validation utilityをモック
 vi.mock("~/lib/validation", () => ({
-	isValidUuid: vi.fn((str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)),
+    isValidUuid: vi.fn((str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)),
 }));
 
 describe("inquiriesRouter", () => {
-	const mockEnv = {
-		DATABASE_URL: "test-db-url",
-		CACHE_URL: "test-cache-url",
-	};
+    const mockEnv = {
+        DATABASE_URL: "test-db-url",
+        CACHE_URL: "test-cache-url",
+    };
 
-	beforeEach(() => {
-		vi.clearAllMocks();
-	});
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
-	describe("GET /inquiries", () => {
-		describe("正常系", () => {
-			test("問い合わせ一覧を200で返す", async () => {
-				// Given: モック環境
-				const req = new Request("http://localhost/inquiries", {
-					method: "GET",
-				});
+    describe("GET /inquiries", () => {
+        describe("正常系", () => {
+            test("問い合わせ一覧を200で返す", async () => {
+                const req = new Request("http://localhost/inquiries", {
+                    method: "GET",
+                });
 
-				// When: リクエスト実行
-				const res = await inquiriesRouter.request(req, mockEnv);
+                const res = await inquiriesRouter.request(req, undefined, mockEnv);
 
-				// Then: レスポンス検証
-				expect(res.status).toBe(200);
-				const json = await res.json();
-				expect(Array.isArray(json)).toBe(true);
-			});
-		});
-	});
+                expect(res.status).toBe(200);
+                const json = await res.json();
+                expect(Array.isArray(json)).toBe(true);
+            });
+        });
+    });
 
-	describe("GET /inquiries/:id", () => {
-		describe("正常系", () => {
-			test("指定されたIDの問い合わせを200で返す", async () => {
-				// Given: 有効なUUID
-				const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000", {
-					method: "GET",
-				});
+    describe("GET /inquiries/:id", () => {
+        describe("正常系", () => {
+            test("指定されたIDの問い合わせを200で返す", async () => {
+                const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000", {
+                    method: "GET",
+                });
 
-				// When: リクエスト実行
-				const res = await inquiriesRouter.request(req, mockEnv);
+                const res = await inquiriesRouter.request(req, undefined, mockEnv);
 
-				// Then: レスポンス検証
-				expect(res.status).toBe(200);
-				const json = await res.json();
-				expect(json).toHaveProperty("id");
-			});
-		});
+                expect(res.status).toBe(200);
+                const json = await res.json();
+                expect(json).toHaveProperty("id");
+            });
+        });
 
-		describe("異常系", () => {
-			test("無効なUUID形式の場合は400を返す", async () => {
-				// Given: 無効なUUID
-				const req = new Request("http://localhost/inquiries/invalid-uuid", {
-					method: "GET",
-				});
+        describe("異常系", () => {
+            test("無効なUUID形式の場合は400を返す", async () => {
+                const req = new Request("http://localhost/inquiries/invalid-uuid", {
+                    method: "GET",
+                });
 
-				// When: リクエスト実行
-				const res = await inquiriesRouter.request(req, mockEnv);
+                const res = await inquiriesRouter.request(req, undefined, mockEnv);
 
-				// Then: 400エラー
-				expect(res.status).toBe(400);
-			});
-		});
-	});
+                expect(res.status).toBe(400);
+            });
+        });
+    });
 
-	describe("POST /inquiries", () => {
-		describe("正常系", () => {
-			test("新しい問い合わせを201で作成する", async () => {
-				// Given: 有効な問い合わせデータ
-				const req = new Request("http://localhost/inquiries", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						subject: "New Inquiry",
-						content: "New content",
-					}),
-				});
+    describe("POST /inquiries", () => {
+        describe("正常系", () => {
+            test("新しい問い合わせを201で作成する", async () => {
+                const req = new Request("http://localhost/inquiries", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        subject: "New Inquiry",
+                        content: "New content",
+                    }),
+                });
 
-				// When: リクエスト実行
-				const res = await inquiriesRouter.request(req, mockEnv);
+                const res = await inquiriesRouter.request(req, undefined, mockEnv);
 
-				// Then: レスポンス検証
-				expect(res.status).toBe(201);
-			});
-		});
-	});
+                expect(res.status).toBe(201);
+            });
+        });
+    });
 
-	describe("POST /inquiries/:id/resolve", () => {
-		describe("正常系", () => {
-			test("問い合わせを解決済みにして200を返す", async () => {
-				// Given: 有効なUUID
-				const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000/resolve", {
-					method: "POST",
-				});
+    describe("POST /inquiries/:id/resolve", () => {
+        describe("正常系", () => {
+            test("問い合わせを解決済みにして200を返す", async () => {
+                const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000/resolve", {
+                    method: "POST",
+                });
 
-				// When: リクエスト実行
-				const res = await inquiriesRouter.request(req, mockEnv);
+                const res = await inquiriesRouter.request(req, undefined, mockEnv);
 
-				// Then: レスポンス検証
-				expect(res.status).toBe(200);
-				const json = await res.json();
-				expect(json).toHaveProperty("status", "RESOLVED");
-			});
-		});
-	});
+                expect(res.status).toBe(200);
+                const json = await res.json();
+                expect(json).toHaveProperty("status", "RESOLVED");
+            });
+        });
+    });
 
-	describe("POST /inquiries/:id/close", () => {
-		describe("正常系", () => {
-			test("問い合わせを終了して200を返す", async () => {
-				// Given: 有効なUUID
-				const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000/close", {
-					method: "POST",
-				});
+    describe("POST /inquiries/:id/close", () => {
+        describe("正常系", () => {
+            test("問い合わせを終了して200を返す", async () => {
+                const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000/close", {
+                    method: "POST",
+                });
 
-				// When: リクエスト実行
-				const res = await inquiriesRouter.request(req, mockEnv);
+                const res = await inquiriesRouter.request(req, undefined, mockEnv);
 
-				// Then: レスポンス検証
-				expect(res.status).toBe(200);
-				const json = await res.json();
-				expect(json).toHaveProperty("status", "CLOSED");
-			});
-		});
-	});
+                expect(res.status).toBe(200);
+                const json = await res.json();
+                expect(json).toHaveProperty("status", "CLOSED");
+            });
+        });
+    });
 
-	describe("GET /inquiries/:id/responses", () => {
-		describe("正常系", () => {
-			test("問い合わせへの返信一覧を200で返す", async () => {
-				// Given: 有効なUUID
-				const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000/responses", {
-					method: "GET",
-				});
+    describe("GET /inquiries/:id/responses", () => {
+        describe("正常系", () => {
+            test("問い合わせへの返信一覧を200で返す", async () => {
+                const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000/responses", {
+                    method: "GET",
+                });
 
-				// When: リクエスト実行
-				const res = await inquiriesRouter.request(req, mockEnv);
+                const res = await inquiriesRouter.request(req, undefined, mockEnv);
 
-				// Then: レスポンス検証
-				expect(res.status).toBe(200);
-				const json = await res.json();
-				expect(Array.isArray(json)).toBe(true);
-			});
-		});
-	});
+                expect(res.status).toBe(200);
+                const json = await res.json();
+                expect(Array.isArray(json)).toBe(true);
+            });
+        });
+    });
 
-	describe("POST /inquiries/:id/responses", () => {
-		describe("正常系", () => {
-			test("問い合わせに返信を201で追加する", async () => {
-				// Given: 有効な返信データ
-				const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000/responses", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						content: "New response",
-						isInternal: false,
-					}),
-				});
+    describe("POST /inquiries/:id/responses", () => {
+        describe("正常系", () => {
+            test("問い合わせに返信を201で追加する", async () => {
+                const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000/responses", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        content: "New response",
+                        isInternal: false,
+                    }),
+                });
 
-				// When: リクエスト実行
-				const res = await inquiriesRouter.request(req, mockEnv);
+                const res = await inquiriesRouter.request(req, undefined, mockEnv);
 
-				// Then: レスポンス検証
-				expect(res.status).toBe(201);
-			});
-		});
-	});
+                expect(res.status).toBe(201);
+            });
+        });
+    });
 
-	describe("DELETE /inquiries/:id", () => {
-		describe("正常系", () => {
-			test("問い合わせを204で削除する", async () => {
-				// Given: 削除対象ID
-				const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000", {
-					method: "DELETE",
-				});
+    describe("DELETE /inquiries/:id", () => {
+        describe("正常系", () => {
+            test("問い合わせを204で削除する", async () => {
+                const req = new Request("http://localhost/inquiries/123e4567-e89b-12d3-a456-426614174000", {
+                    method: "DELETE",
+                });
 
-				// When: リクエスト実行
-				const res = await inquiriesRouter.request(req, mockEnv);
+                const res = await inquiriesRouter.request(req, undefined, mockEnv);
 
-				// Then: 204 No Content
-				expect(res.status).toBe(204);
-			});
-		});
-	});
+                expect(res.status).toBe(204);
+            });
+        });
+    });
 });

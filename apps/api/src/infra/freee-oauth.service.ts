@@ -49,7 +49,7 @@ export class FreeeOAuthServiceImpl implements FreeeOAuthService {
             throw new Error(`Failed to exchange code for tokens: ${response.status} ${errorBody}`);
         }
 
-        const data = (await response.json()) as {
+        type TokenResponse = {
             access_token: string;
             refresh_token: string;
             expires_in: number;
@@ -57,6 +57,7 @@ export class FreeeOAuthServiceImpl implements FreeeOAuthService {
             scope: string;
             created_at: number;
         };
+        const data: TokenResponse = await response.json();
 
         return {
             accessToken: data.access_token,
@@ -88,7 +89,7 @@ export class FreeeOAuthServiceImpl implements FreeeOAuthService {
             throw new Error(`Failed to refresh tokens: ${response.status} ${errorBody}`);
         }
 
-        const data = (await response.json()) as {
+        type TokenResponse = {
             access_token: string;
             refresh_token: string;
             expires_in: number;
@@ -96,6 +97,7 @@ export class FreeeOAuthServiceImpl implements FreeeOAuthService {
             scope: string;
             created_at: number;
         };
+        const data: TokenResponse = await response.json();
 
         return {
             accessToken: data.access_token,
@@ -120,13 +122,14 @@ export class FreeeOAuthServiceImpl implements FreeeOAuthService {
             throw new Error(`Failed to get companies: ${response.status} ${errorBody}`);
         }
 
-        const data = (await response.json()) as {
+        type CompaniesResponse = {
             companies: Array<{
                 id: number;
                 display_name: string;
                 role: string;
             }>;
         };
+        const data: CompaniesResponse = await response.json();
 
         return data.companies.map((c) => ({
             id: c.id,

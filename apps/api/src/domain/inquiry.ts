@@ -1,20 +1,20 @@
 export type {
+    CreateInquiryInput,
+    CreateInquiryResponseInput,
     Inquiry,
     InquiryCategory,
     InquiryPriority,
     InquiryResponse,
     InquiryStatus,
-    CreateInquiryInput,
-    CreateInquiryResponseInput,
     UpdateInquiryInput,
 } from "@portfolio/api/generated/zod";
 
 import type {
+    CreateInquiryInput,
+    CreateInquiryResponseInput,
     Inquiry,
     InquiryResponse,
     InquiryStatus,
-    CreateInquiryInput,
-    CreateInquiryResponseInput,
     UpdateInquiryInput,
 } from "@portfolio/api/generated/zod";
 

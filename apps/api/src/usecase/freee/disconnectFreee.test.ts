@@ -10,12 +10,12 @@ describe("DisconnectFreeeUseCase", () => {
         companyName: "Test Company",
         accessToken: "access-token",
         refreshToken: "refresh-token",
-        tokenExpiresAt: new Date(),
+        tokenExpiresAt: new Date().toISOString(),
         scopes: ["read", "write"],
         isActive: false,
-        lastSyncAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        lastSyncAt: undefined,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
     };
 
     const createMockRepository = (overrides: Partial<FreeeRepository> = {}): FreeeRepository => ({

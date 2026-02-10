@@ -7,7 +7,9 @@ describe("HandleFreeeCallbackUseCase", () => {
         accessToken: "access-token-123",
         refreshToken: "refresh-token-123",
         expiresIn: 3600,
+        tokenType: "Bearer",
         scope: "read write",
+        createdAt: Date.now() / 1000,
     };
 
     const mockCompanies: FreeeCompany[] = [
@@ -25,12 +27,12 @@ describe("HandleFreeeCallbackUseCase", () => {
         companyName: "Test Company",
         accessToken: mockTokens.accessToken,
         refreshToken: mockTokens.refreshToken,
-        tokenExpiresAt: new Date(Date.now() + mockTokens.expiresIn * 1000),
+        tokenExpiresAt: new Date(Date.now() + mockTokens.expiresIn * 1000).toISOString(),
         scopes: ["read", "write"],
         isActive: true,
-        lastSyncAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        lastSyncAt: undefined,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
     };
 
     const createMockRepository = (overrides: Partial<FreeeRepository> = {}): FreeeRepository => ({
@@ -92,11 +94,11 @@ describe("HandleFreeeCallbackUseCase", () => {
                 expect(mockOAuthService.getCompanies).toHaveBeenCalledWith(mockTokens.accessToken);
                 expect(mockRepository.createIntegration).toHaveBeenCalledWith({
                     userId,
-                    companyId: mockCompanies[0].id,
-                    companyName: mockCompanies[0].displayName,
+                    companyId: mockCompanies[0]!.id,
+                    companyName: mockCompanies[0]!.displayName,
                     accessToken: mockTokens.accessToken,
                     refreshToken: mockTokens.refreshToken,
-                    tokenExpiresAt: expect.any(Date),
+                    tokenExpiresAt: expect.any(String),
                     scopes: ["read", "write"],
                 });
             });
@@ -126,7 +128,7 @@ describe("HandleFreeeCallbackUseCase", () => {
                 expect(mockRepository.updateTokens).toHaveBeenCalledWith(existingIntegration.id, {
                     accessToken: mockTokens.accessToken,
                     refreshToken: mockTokens.refreshToken,
-                    tokenExpiresAt: expect.any(Date),
+                    tokenExpiresAt: expect.any(String),
                 });
                 expect(mockRepository.createIntegration).not.toHaveBeenCalled();
             });
@@ -194,8 +196,8 @@ describe("HandleFreeeCallbackUseCase", () => {
                 // Then: 最初の会社で連携が作成される
                 expect(mockRepository.createIntegration).toHaveBeenCalledWith(
                     expect.objectContaining({
-                        companyId: multipleCompanies[0].id,
-                        companyName: multipleCompanies[0].displayName,
+                        companyId: multipleCompanies[0]!.id,
+                        companyName: multipleCompanies[0]!.displayName,
                     }),
                 );
             });

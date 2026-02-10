@@ -1,6 +1,34 @@
 import { createPrismaClient } from "@portfolio/db";
 import type { Post, PostRepository } from "~/domain/post";
 
+type PostRow = Awaited<
+    ReturnType<
+        ReturnType<typeof createPrismaClient>["post"]["findMany"]
+    >
+>[number] & {
+    tags: Array<{ tag: { name: string } }>;
+};
+
+function toPost(post: PostRow): Post {
+    return {
+        id: post.id,
+        title: post.title,
+        slug: post.slug,
+        date: post.date instanceof Date ? post.date.toISOString() : String(post.date),
+        description: post.description ?? undefined,
+        content: {
+            html: post.content,
+            raw: post.contentRaw ? (JSON.parse(post.contentRaw) as unknown) : undefined,
+        },
+        imageTemp: post.imageTemp,
+        sticky: post.sticky,
+        intro: post.intro ?? undefined,
+        tags: post.tags.map((postTag) => postTag.tag.name),
+        createdAt: post.createdAt instanceof Date ? post.createdAt.toISOString() : post.createdAt,
+        updatedAt: post.updatedAt instanceof Date ? post.updatedAt.toISOString() : post.updatedAt,
+    };
+}
+
 export class PostRepositoryImpl implements PostRepository {
     constructor(private readonly databaseUrl?: string) {}
 
@@ -18,21 +46,7 @@ export class PostRepositoryImpl implements PostRepository {
             },
         });
 
-        return posts.map((post) => ({
-            id: post.id,
-            title: post.title,
-            slug: post.slug,
-            date: post.date,
-            description: post.description ?? undefined,
-            content: post.content,
-            contentRaw: post.contentRaw ? JSON.parse(post.contentRaw) : undefined,
-            imageTemp: post.imageTemp,
-            sticky: post.sticky,
-            intro: post.intro ?? undefined,
-            tags: post.tags.map((postTag) => postTag.tag.name),
-            createdAt: post.createdAt,
-            updatedAt: post.updatedAt,
-        }));
+        return posts.map((row) => toPost(row as PostRow));
     }
 
     async findBySlug(slug: string): Promise<Post | null> {
@@ -51,21 +65,7 @@ export class PostRepositoryImpl implements PostRepository {
 
         if (!post) return null;
 
-        return {
-            id: post.id,
-            title: post.title,
-            slug: post.slug,
-            date: post.date,
-            description: post.description ?? undefined,
-            content: post.content,
-            contentRaw: post.contentRaw ? JSON.parse(post.contentRaw) : undefined,
-            imageTemp: post.imageTemp,
-            sticky: post.sticky,
-            intro: post.intro ?? undefined,
-            tags: post.tags.map((postTag) => postTag.tag.name),
-            createdAt: post.createdAt,
-            updatedAt: post.updatedAt,
-        };
+        return toPost(post as PostRow);
     }
 
     async findById(id: string): Promise<Post | null> {
@@ -84,20 +84,6 @@ export class PostRepositoryImpl implements PostRepository {
 
         if (!post) return null;
 
-        return {
-            id: post.id,
-            title: post.title,
-            slug: post.slug,
-            date: post.date,
-            description: post.description ?? undefined,
-            content: post.content,
-            contentRaw: post.contentRaw ? JSON.parse(post.contentRaw) : undefined,
-            imageTemp: post.imageTemp,
-            sticky: post.sticky,
-            intro: post.intro ?? undefined,
-            tags: post.tags.map((postTag) => postTag.tag.name),
-            createdAt: post.createdAt,
-            updatedAt: post.updatedAt,
-        };
+        return toPost(post as PostRow);
     }
 }

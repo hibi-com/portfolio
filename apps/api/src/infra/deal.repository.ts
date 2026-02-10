@@ -2,6 +2,11 @@ import type { Prisma } from "@portfolio/db";
 import { createPrismaClient } from "@portfolio/db";
 import type { CreateDealInput, Deal, DealRepository, DealStatus, UpdateDealInput } from "~/domain/deal";
 
+function toDateString(d: Date | null | undefined): string | undefined {
+    if (d == null) return undefined;
+    return d instanceof Date ? d.toISOString() : String(d);
+}
+
 export class DealRepositoryImpl implements DealRepository {
     constructor(private readonly databaseUrl?: string) {}
 
@@ -29,13 +34,13 @@ export class DealRepositoryImpl implements DealRepository {
             name: data.name,
             value: data.value ? Number(data.value) : undefined,
             currency: data.currency,
-            expectedCloseDate: data.expectedCloseDate ?? undefined,
-            actualCloseDate: data.actualCloseDate ?? undefined,
+            expectedCloseDate: toDateString(data.expectedCloseDate),
+            actualCloseDate: toDateString(data.actualCloseDate),
             status: data.status as DealStatus,
             notes: data.notes ?? undefined,
             lostReason: data.lostReason ?? undefined,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
+            createdAt: toDateString(data.createdAt) ?? "",
+            updatedAt: toDateString(data.updatedAt) ?? "",
         };
     }
 

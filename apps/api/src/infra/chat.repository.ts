@@ -32,6 +32,11 @@ export class ChatRepositoryImpl implements ChatRepository {
         return JSON.stringify(value);
     }
 
+    private toDateString(d: Date | null | undefined): string | undefined {
+        if (d == null) return undefined;
+        return d instanceof Date ? d.toISOString() : String(d);
+    }
+
     private mapToChatRoom(record: {
         id: string;
         customerId: string | null;
@@ -50,9 +55,9 @@ export class ChatRepositoryImpl implements ChatRepository {
             name: record.name ?? undefined,
             status: record.status as ChatRoomStatus,
             metadata: this.parseJsonField<Record<string, unknown>>(record.metadata),
-            closedAt: record.closedAt ?? undefined,
-            createdAt: record.createdAt,
-            updatedAt: record.updatedAt,
+            closedAt: this.toDateString(record.closedAt),
+            createdAt: this.toDateString(record.createdAt) ?? "",
+            updatedAt: this.toDateString(record.updatedAt) ?? "",
         };
     }
 
@@ -76,11 +81,11 @@ export class ChatRepositoryImpl implements ChatRepository {
             name: record.name,
             role: record.role as ChatParticipant["role"],
             isOnline: record.isOnline,
-            lastSeenAt: record.lastSeenAt ?? undefined,
-            joinedAt: record.joinedAt,
-            leftAt: record.leftAt ?? undefined,
-            createdAt: record.createdAt,
-            updatedAt: record.updatedAt,
+            lastSeenAt: this.toDateString(record.lastSeenAt),
+            joinedAt: this.toDateString(record.joinedAt) ?? "",
+            leftAt: this.toDateString(record.leftAt),
+            createdAt: this.toDateString(record.createdAt) ?? "",
+            updatedAt: this.toDateString(record.updatedAt) ?? "",
         };
     }
 
@@ -103,8 +108,8 @@ export class ChatRepositoryImpl implements ChatRepository {
             content: record.content,
             metadata: this.parseJsonField<Record<string, unknown>>(record.metadata),
             readBy: this.parseJsonField<string[]>(record.readBy),
-            createdAt: record.createdAt,
-            updatedAt: record.updatedAt,
+            createdAt: this.toDateString(record.createdAt) ?? "",
+            updatedAt: this.toDateString(record.updatedAt) ?? "",
         };
     }
 
@@ -262,7 +267,7 @@ export class ChatRepositoryImpl implements ChatRepository {
                 where: { id: messageId },
             });
 
-            if (message && message.chatRoomId === chatRoomId) {
+            if (message?.chatRoomId === chatRoomId && message) {
                 const currentReadBy = this.parseJsonField<string[]>(message.readBy) ?? [];
                 if (!currentReadBy.includes(participantId)) {
                     currentReadBy.push(participantId);

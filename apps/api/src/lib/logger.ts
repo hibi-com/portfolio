@@ -30,12 +30,10 @@ export function initLogger(env: { SENTRY_DSN?: string; NODE_ENV?: string; APP_VE
 }
 
 export function getLogger(): Logger {
-    if (!logger) {
-        logger = new Logger({
-            minLevel: LogLevel.INFO,
-            defaultContext: { service: "api" },
-        });
-    }
+    logger ??= new Logger({
+        minLevel: LogLevel.INFO,
+        defaultContext: { service: "api" },
+    });
     return logger;
 }
 
