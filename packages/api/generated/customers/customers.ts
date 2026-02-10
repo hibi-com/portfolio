@@ -5,93 +5,84 @@
  * OpenAPI spec version: 0.0.0
  */
 import type {
-    CreateCustomerInput,
-    Customer,
-    CustomersListCustomers200,
-    CustomersListCustomersParams,
-    UpdateCustomerInput,
-} from "../api.schemas";
-import { customInstance } from ".././mutator";
+  CreateCustomerInput,
+  Customer,
+  CustomersListCustomers200,
+  CustomersListCustomersParams,
+  UpdateCustomerInput
+} from '../api.schemas';
+
+import { customInstance } from '.././mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-export const getCustomers = () => {
-    /**
-     * @summary Get all customers
-     */
-    const customersListCustomers = (
-        params?: CustomersListCustomersParams,
-        options?: SecondParameter<typeof customInstance<CustomersListCustomers200>>,
-    ) => {
-        return customInstance<CustomersListCustomers200>({ url: "/api/crm/customers", method: "GET", params }, options);
-    };
-    /**
-     * @summary Create a new customer
-     */
-    const customersCreateCustomer = (
-        createCustomerInput: CreateCustomerInput,
-        options?: SecondParameter<typeof customInstance<Customer>>,
-    ) => {
-        return customInstance<Customer>(
-            {
-                url: "/api/crm/customers",
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                data: createCustomerInput,
-            },
-            options,
-        );
-    };
-    /**
-     * @summary Get a customer by ID
-     */
-    const customersGetCustomerById = (id: string, options?: SecondParameter<typeof customInstance<Customer>>) => {
-        return customInstance<Customer>({ url: `/api/crm/customers/${id}`, method: "GET" }, options);
-    };
-    /**
-     * @summary Update a customer
-     */
-    const customersUpdateCustomer = (
-        id: string,
-        updateCustomerInput: UpdateCustomerInput,
-        options?: SecondParameter<typeof customInstance<Customer>>,
-    ) => {
-        return customInstance<Customer>(
-            {
-                url: `/api/crm/customers/${id}`,
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                data: updateCustomerInput,
-            },
-            options,
-        );
-    };
-    /**
-     * @summary Delete a customer
-     */
-    const customersDeleteCustomer = (id: string, options?: SecondParameter<typeof customInstance<void>>) => {
-        return customInstance<void>({ url: `/api/crm/customers/${id}`, method: "DELETE" }, options);
-    };
-    return {
-        customersListCustomers,
-        customersCreateCustomer,
-        customersGetCustomerById,
-        customersUpdateCustomer,
-        customersDeleteCustomer,
-    };
-};
-export type CustomersListCustomersResult = NonNullable<
-    Awaited<ReturnType<ReturnType<typeof getCustomers>["customersListCustomers"]>>
->;
-export type CustomersCreateCustomerResult = NonNullable<
-    Awaited<ReturnType<ReturnType<typeof getCustomers>["customersCreateCustomer"]>>
->;
-export type CustomersGetCustomerByIdResult = NonNullable<
-    Awaited<ReturnType<ReturnType<typeof getCustomers>["customersGetCustomerById"]>>
->;
-export type CustomersUpdateCustomerResult = NonNullable<
-    Awaited<ReturnType<ReturnType<typeof getCustomers>["customersUpdateCustomer"]>>
->;
-export type CustomersDeleteCustomerResult = NonNullable<
-    Awaited<ReturnType<ReturnType<typeof getCustomers>["customersDeleteCustomer"]>>
->;
+
+  export const getCustomers = () => {
+/**
+ * @summary Get all customers
+ */
+const customersListCustomers = (
+    params?: CustomersListCustomersParams,
+ options?: SecondParameter<typeof customInstance<CustomersListCustomers200>>,) => {
+      return customInstance<CustomersListCustomers200>(
+      {url: `/api/crm/customers`, method: 'GET',
+        params
+    },
+      options);
+    }
+  /**
+ * @summary Create a new customer
+ */
+const customersCreateCustomer = (
+    createCustomerInput: CreateCustomerInput,
+ options?: SecondParameter<typeof customInstance<Customer>>,) => {
+      return customInstance<Customer>(
+      {url: `/api/crm/customers`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createCustomerInput
+    },
+      options);
+    }
+  /**
+ * @summary Get a customer by ID
+ */
+const customersGetCustomerById = (
+    id: string,
+ options?: SecondParameter<typeof customInstance<Customer>>,) => {
+      return customInstance<Customer>(
+      {url: `/api/crm/customers/${id}`, method: 'GET'
+    },
+      options);
+    }
+  /**
+ * @summary Update a customer
+ */
+const customersUpdateCustomer = (
+    id: string,
+    updateCustomerInput: UpdateCustomerInput,
+ options?: SecondParameter<typeof customInstance<Customer>>,) => {
+      return customInstance<Customer>(
+      {url: `/api/crm/customers/${id}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCustomerInput
+    },
+      options);
+    }
+  /**
+ * @summary Delete a customer
+ */
+const customersDeleteCustomer = (
+    id: string,
+ options?: SecondParameter<typeof customInstance<void>>,) => {
+      return customInstance<void>(
+      {url: `/api/crm/customers/${id}`, method: 'DELETE'
+    },
+      options);
+    }
+  return {customersListCustomers,customersCreateCustomer,customersGetCustomerById,customersUpdateCustomer,customersDeleteCustomer}};
+export type CustomersListCustomersResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getCustomers>['customersListCustomers']>>>
+export type CustomersCreateCustomerResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getCustomers>['customersCreateCustomer']>>>
+export type CustomersGetCustomerByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getCustomers>['customersGetCustomerById']>>>
+export type CustomersUpdateCustomerResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getCustomers>['customersUpdateCustomer']>>>
+export type CustomersDeleteCustomerResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getCustomers>['customersDeleteCustomer']>>>

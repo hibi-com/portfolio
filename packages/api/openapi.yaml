@@ -12,6 +12,7 @@ tags:
   - name: Inquiries
   - name: Chats
   - name: Emails
+  - name: Freee
 paths:
   /api/chat/rooms:
     get:
@@ -1876,6 +1877,321 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateInquiryResponseInput'
+  /freee/auth/callback:
+    post:
+      operationId: Freee_handleCallback
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeeIntegration'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FreeeCallbackInput'
+  /freee/auth/url:
+    get:
+      operationId: Freee_getAuthUrl
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeeAuthUrlResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+  /freee/companies:
+    get:
+      operationId: Freee_getCompanies
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/FreeeCompany'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+  /freee/integration:
+    get:
+      operationId: Freee_getIntegration
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeeIntegration'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+    delete:
+      operationId: Freee_disconnectIntegration
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+      tags:
+        - Freee
+  /freee/integrations:
+    post:
+      operationId: Freee_createIntegration
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeeIntegration'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFreeeIntegrationInput'
+  /freee/mappings/customers:
+    get:
+      operationId: Freee_getCustomerMappings
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/CustomerFreeeMapping'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+    post:
+      operationId: Freee_createCustomerMapping
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/CustomerFreeeMapping'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerMappingInput'
+  /freee/mappings/deals:
+    get:
+      operationId: Freee_getDealMappings
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/DealFreeeMapping'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+    post:
+      operationId: Freee_createDealMapping
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/DealFreeeMapping'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDealMappingInput'
+  /freee/partners:
+    get:
+      operationId: Freee_getPartners
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/FreeePartner'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+  /freee/sync/logs:
+    get:
+      operationId: Freee_getSyncLogs
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/FreeeSyncLog'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+    post:
+      operationId: Freee_createSyncLog
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeeSyncLog'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSyncLogInput'
+  /freee/sync/logs/{id}:
+    put:
+      operationId: Freee_updateSyncLog
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeeSyncLog'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSyncLogInput'
+  /freee/sync/partners/export:
+    post:
+      operationId: Freee_syncPartnersToFreee
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeeSyncLog'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+  /freee/sync/partners/import:
+    post:
+      operationId: Freee_syncPartnersFromFreee
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeeSyncLog'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+  /freee/tokens:
+    put:
+      operationId: Freee_updateTokens
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeeOAuthTokens'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Freee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFreeeTokensInput'
 components:
   schemas:
     AddParticipantInput:
@@ -2083,6 +2399,23 @@ components:
         customFields:
           type: object
           additionalProperties: {}
+    CreateCustomerMappingInput:
+      type: object
+      required:
+        - customerId
+        - freeePartnerId
+        - freeeCompanyId
+      properties:
+        customerId:
+          type: string
+        freeePartnerId:
+          type: integer
+          format: int32
+        freeeCompanyId:
+          type: integer
+          format: int32
+        syncHash:
+          type: string
     CreateDealInput:
       type: object
       required:
@@ -2107,6 +2440,23 @@ components:
         status:
           $ref: '#/components/schemas/DealStatus'
         notes:
+          type: string
+    CreateDealMappingInput:
+      type: object
+      required:
+        - dealId
+        - freeeDealId
+        - freeeCompanyId
+      properties:
+        dealId:
+          type: string
+        freeeDealId:
+          type: integer
+          format: int32
+        freeeCompanyId:
+          type: integer
+          format: int32
+        syncHash:
           type: string
     CreateEmailTemplateInput:
       type: object
@@ -2136,6 +2486,32 @@ components:
             type: string
         isActive:
           type: boolean
+    CreateFreeeIntegrationInput:
+      type: object
+      required:
+        - userId
+        - companyId
+        - accessToken
+        - refreshToken
+        - tokenExpiresAt
+      properties:
+        userId:
+          type: string
+        companyId:
+          type: integer
+          format: int32
+        companyName:
+          type: string
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenExpiresAt:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
     CreateInquiryInput:
       type: object
       required:
@@ -2237,6 +2613,19 @@ components:
           format: double
         color:
           type: string
+    CreateSyncLogInput:
+      type: object
+      required:
+        - integrationId
+        - direction
+        - entityType
+      properties:
+        integrationId:
+          type: string
+        direction:
+          $ref: '#/components/schemas/SyncDirection'
+        entityType:
+          type: string
     Customer:
       type: object
       required:
@@ -2271,6 +2660,35 @@ components:
         customFields:
           type: object
           additionalProperties: {}
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    CustomerFreeeMapping:
+      type: object
+      required:
+        - id
+        - customerId
+        - freeePartnerId
+        - freeeCompanyId
+        - lastSyncAt
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        customerId:
+          type: string
+        freeePartnerId:
+          type: integer
+          format: int32
+        freeeCompanyId:
+          type: integer
+          format: int32
+        lastSyncAt:
+          type: string
+        syncHash:
+          type: string
         createdAt:
           type: string
         updatedAt:
@@ -2317,6 +2735,35 @@ components:
         notes:
           type: string
         lostReason:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    DealFreeeMapping:
+      type: object
+      required:
+        - id
+        - dealId
+        - freeeDealId
+        - freeeCompanyId
+        - lastSyncAt
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        dealId:
+          type: string
+        freeeDealId:
+          type: integer
+          format: int32
+        freeeCompanyId:
+          type: integer
+          format: int32
+        lastSyncAt:
+          type: string
+        syncHash:
           type: string
         createdAt:
           type: string
@@ -2445,6 +2892,177 @@ components:
         error:
           type: string
         details: {}
+    FreeeAuthUrlResponse:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+    FreeeCallbackInput:
+      type: object
+      required:
+        - code
+        - state
+      properties:
+        code:
+          type: string
+        state:
+          type: string
+    FreeeCompany:
+      type: object
+      required:
+        - id
+        - displayName
+        - role
+      properties:
+        id:
+          type: integer
+          format: int32
+        displayName:
+          type: string
+        role:
+          type: string
+    FreeeIntegration:
+      type: object
+      required:
+        - id
+        - userId
+        - companyId
+        - accessToken
+        - refreshToken
+        - tokenExpiresAt
+        - isActive
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        companyId:
+          type: integer
+          format: int32
+        companyName:
+          type: string
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenExpiresAt:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        lastSyncAt:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    FreeeOAuthTokens:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+        - expiresIn
+        - tokenType
+        - scope
+        - createdAt
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          format: int32
+        tokenType:
+          type: string
+        scope:
+          type: string
+        createdAt:
+          type: integer
+          format: int32
+    FreeePartner:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        code:
+          type: string
+        shortcut1:
+          type: string
+        shortcut2:
+          type: string
+        orgCode:
+          type: integer
+          format: int32
+        countryCode:
+          type: string
+        addressRegionCode:
+          type: string
+        streetName1:
+          type: string
+        streetName2:
+          type: string
+        zipcode:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+    FreeeSyncLog:
+      type: object
+      required:
+        - id
+        - integrationId
+        - direction
+        - status
+        - entityType
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        integrationId:
+          type: string
+        direction:
+          $ref: '#/components/schemas/SyncDirection'
+        status:
+          $ref: '#/components/schemas/SyncStatus'
+        entityType:
+          type: string
+        totalRecords:
+          type: integer
+          format: int32
+        successCount:
+          type: integer
+          format: int32
+        errorCount:
+          type: integer
+          format: int32
+        errorDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncErrorDetail'
+        startedAt:
+          type: string
+        completedAt:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
     Inquiry:
       type: object
       required:
@@ -2802,6 +3420,29 @@ components:
         metadata:
           type: object
           additionalProperties: {}
+    SyncDirection:
+      type: string
+      enum:
+        - IMPORT
+        - EXPORT
+        - BIDIRECTIONAL
+    SyncErrorDetail:
+      type: object
+      required:
+        - record
+        - error
+      properties:
+        record:
+          type: string
+        error:
+          type: string
+    SyncStatus:
+      type: string
+      enum:
+        - PENDING
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
     UpdateCustomerInput:
       type: object
       properties:
@@ -2875,6 +3516,19 @@ components:
             type: string
         isActive:
           type: boolean
+    UpdateFreeeTokensInput:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+        - tokenExpiresAt
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenExpiresAt:
+          type: string
     UpdateInquiryInput:
       type: object
       properties:
@@ -2944,6 +3598,28 @@ components:
           type: number
           format: double
         color:
+          type: string
+    UpdateSyncLogInput:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SyncStatus'
+        totalRecords:
+          type: integer
+          format: int32
+        successCount:
+          type: integer
+          format: int32
+        errorCount:
+          type: integer
+          format: int32
+        errorDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncErrorDetail'
+        startedAt:
+          type: string
+        completedAt:
           type: string
 servers:
   - url: https://api.example.com

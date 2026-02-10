@@ -3,11 +3,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 let content = readFileSync("generated/zod/schemas.ts", "utf-8");
 
 content = content.replaceAll(/import \{ makeApi, Zodios, type ZodiosOptions \} from "@zodios\/core";\n/gm, "");
-content = content.replaceAll(/^const ([A-Z]\w*) = z([.\n])/gm, "export const $1 = z$2");
+content = content.replaceAll(/^const ([A-Z]\w*) = z([.\n])/gm, "export const $1Schema = z$2");
 content = content.replaceAll("z.record(z.string())", "z.record(z.string(), z.string())");
 
 const schemaNames: string[] = [];
-const constRegex = /^export const ([A-Z]\w*) = z/gm;
+const constRegex = /^export const ([A-Z]\w*)Schema = z/gm;
 let match = constRegex.exec(content);
 while (match !== null) {
     const name = match[1];
@@ -17,10 +17,11 @@ while (match !== null) {
     match = constRegex.exec(content);
 }
 
-const typeExports = schemaNames.map((name) => `export type ${name}Type = z.infer<typeof ${name}>;`).join("\n");
-
+const typeExports = schemaNames.map((name) => `export type ${name} = z.infer<typeof ${name}Schema>;`).join("\n");
 content = content.replace(/const endpoints = makeApi\(\[[\s\S]*?\]\);[\s\S]*$/, "");
-content = `${content.trim()}\n\n// Type inference exports\n${typeExports}\n`;
+
+const schemasObject = `export const schemas = {\n${schemaNames.map((name) => `    ${name}: ${name}Schema,`).join("\n")}\n};`;
+content = `${content.trim()}\n\n${schemasObject}\n\n// Type inference exports\n${typeExports}\n`;
 
 writeFileSync("generated/zod/index.ts", content);
 

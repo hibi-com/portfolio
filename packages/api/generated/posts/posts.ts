@@ -4,30 +4,42 @@
  * Portfolio API
  * OpenAPI spec version: 0.0.0
  */
-import type { Post, PostsListPosts200, PostsListPostsParams } from "../api.schemas";
-import { customInstance } from ".././mutator";
+import type {
+  Post,
+  PostsListPosts200,
+  PostsListPostsParams
+} from '../api.schemas';
+
+import { customInstance } from '.././mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-export const getPosts = () => {
-    /**
-     * @summary Get a post by slug
-     */
-    const postsGetPostBySlug = (slug: string, options?: SecondParameter<typeof customInstance<Post>>) => {
-        return customInstance<Post>({ url: `/api/post/${slug}`, method: "GET" }, options);
-    };
-    /**
-     * @summary Get all posts
-     */
-    const postsListPosts = (
-        params?: PostsListPostsParams,
-        options?: SecondParameter<typeof customInstance<PostsListPosts200>>,
-    ) => {
-        return customInstance<PostsListPosts200>({ url: "/api/posts", method: "GET", params }, options);
-    };
-    return { postsGetPostBySlug, postsListPosts };
-};
-export type PostsGetPostBySlugResult = NonNullable<
-    Awaited<ReturnType<ReturnType<typeof getPosts>["postsGetPostBySlug"]>>
->;
-export type PostsListPostsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPosts>["postsListPosts"]>>>;
+
+  export const getPosts = () => {
+/**
+ * @summary Get a post by slug
+ */
+const postsGetPostBySlug = (
+    slug: string,
+ options?: SecondParameter<typeof customInstance<Post>>,) => {
+      return customInstance<Post>(
+      {url: `/api/post/${slug}`, method: 'GET'
+    },
+      options);
+    }
+  /**
+ * @summary Get all posts
+ */
+const postsListPosts = (
+    params?: PostsListPostsParams,
+ options?: SecondParameter<typeof customInstance<PostsListPosts200>>,) => {
+      return customInstance<PostsListPosts200>(
+      {url: `/api/posts`, method: 'GET',
+        params
+    },
+      options);
+    }
+  return {postsGetPostBySlug,postsListPosts}};
+export type PostsGetPostBySlugResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPosts>['postsGetPostBySlug']>>>
+export type PostsListPostsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPosts>['postsListPosts']>>>

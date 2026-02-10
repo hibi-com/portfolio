@@ -4,79 +4,97 @@
  * Portfolio API
  * OpenAPI spec version: 0.0.0
  */
-import type { CreateLeadInput, Lead, LeadsListLeads200, LeadsListLeadsParams, UpdateLeadInput } from "../api.schemas";
-import { customInstance } from ".././mutator";
+import type {
+  CreateLeadInput,
+  Lead,
+  LeadsListLeads200,
+  LeadsListLeadsParams,
+  UpdateLeadInput
+} from '../api.schemas';
+
+import { customInstance } from '.././mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-export const getLeads = () => {
-    /**
-     * @summary Get all leads
-     */
-    const leadsListLeads = (
-        params?: LeadsListLeadsParams,
-        options?: SecondParameter<typeof customInstance<LeadsListLeads200>>,
-    ) => {
-        return customInstance<LeadsListLeads200>({ url: "/api/crm/leads", method: "GET", params }, options);
-    };
-    /**
-     * @summary Create a new lead
-     */
-    const leadsCreateLead = (
-        createLeadInput: CreateLeadInput,
-        options?: SecondParameter<typeof customInstance<Lead>>,
-    ) => {
-        return customInstance<Lead>(
-            {
-                url: "/api/crm/leads",
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                data: createLeadInput,
-            },
-            options,
-        );
-    };
-    /**
-     * @summary Get a lead by ID
-     */
-    const leadsGetLeadById = (id: string, options?: SecondParameter<typeof customInstance<Lead>>) => {
-        return customInstance<Lead>({ url: `/api/crm/leads/${id}`, method: "GET" }, options);
-    };
-    /**
-     * @summary Update a lead
-     */
-    const leadsUpdateLead = (
-        id: string,
-        updateLeadInput: UpdateLeadInput,
-        options?: SecondParameter<typeof customInstance<Lead>>,
-    ) => {
-        return customInstance<Lead>(
-            {
-                url: `/api/crm/leads/${id}`,
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                data: updateLeadInput,
-            },
-            options,
-        );
-    };
-    /**
-     * @summary Delete a lead
-     */
-    const leadsDeleteLead = (id: string, options?: SecondParameter<typeof customInstance<void>>) => {
-        return customInstance<void>({ url: `/api/crm/leads/${id}`, method: "DELETE" }, options);
-    };
-    /**
-     * @summary Convert a lead to a deal
-     */
-    const leadsConvertLead = (id: string, options?: SecondParameter<typeof customInstance<Lead>>) => {
-        return customInstance<Lead>({ url: `/api/crm/leads/${id}/convert`, method: "POST" }, options);
-    };
-    return { leadsListLeads, leadsCreateLead, leadsGetLeadById, leadsUpdateLead, leadsDeleteLead, leadsConvertLead };
-};
-export type LeadsListLeadsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>["leadsListLeads"]>>>;
-export type LeadsCreateLeadResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>["leadsCreateLead"]>>>;
-export type LeadsGetLeadByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>["leadsGetLeadById"]>>>;
-export type LeadsUpdateLeadResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>["leadsUpdateLead"]>>>;
-export type LeadsDeleteLeadResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>["leadsDeleteLead"]>>>;
-export type LeadsConvertLeadResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>["leadsConvertLead"]>>>;
+
+  export const getLeads = () => {
+/**
+ * @summary Get all leads
+ */
+const leadsListLeads = (
+    params?: LeadsListLeadsParams,
+ options?: SecondParameter<typeof customInstance<LeadsListLeads200>>,) => {
+      return customInstance<LeadsListLeads200>(
+      {url: `/api/crm/leads`, method: 'GET',
+        params
+    },
+      options);
+    }
+  /**
+ * @summary Create a new lead
+ */
+const leadsCreateLead = (
+    createLeadInput: CreateLeadInput,
+ options?: SecondParameter<typeof customInstance<Lead>>,) => {
+      return customInstance<Lead>(
+      {url: `/api/crm/leads`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createLeadInput
+    },
+      options);
+    }
+  /**
+ * @summary Get a lead by ID
+ */
+const leadsGetLeadById = (
+    id: string,
+ options?: SecondParameter<typeof customInstance<Lead>>,) => {
+      return customInstance<Lead>(
+      {url: `/api/crm/leads/${id}`, method: 'GET'
+    },
+      options);
+    }
+  /**
+ * @summary Update a lead
+ */
+const leadsUpdateLead = (
+    id: string,
+    updateLeadInput: UpdateLeadInput,
+ options?: SecondParameter<typeof customInstance<Lead>>,) => {
+      return customInstance<Lead>(
+      {url: `/api/crm/leads/${id}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateLeadInput
+    },
+      options);
+    }
+  /**
+ * @summary Delete a lead
+ */
+const leadsDeleteLead = (
+    id: string,
+ options?: SecondParameter<typeof customInstance<void>>,) => {
+      return customInstance<void>(
+      {url: `/api/crm/leads/${id}`, method: 'DELETE'
+    },
+      options);
+    }
+  /**
+ * @summary Convert a lead to a deal
+ */
+const leadsConvertLead = (
+    id: string,
+ options?: SecondParameter<typeof customInstance<Lead>>,) => {
+      return customInstance<Lead>(
+      {url: `/api/crm/leads/${id}/convert`, method: 'POST'
+    },
+      options);
+    }
+  return {leadsListLeads,leadsCreateLead,leadsGetLeadById,leadsUpdateLead,leadsDeleteLead,leadsConvertLead}};
+export type LeadsListLeadsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>['leadsListLeads']>>>
+export type LeadsCreateLeadResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>['leadsCreateLead']>>>
+export type LeadsGetLeadByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>['leadsGetLeadById']>>>
+export type LeadsUpdateLeadResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>['leadsUpdateLead']>>>
+export type LeadsDeleteLeadResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>['leadsDeleteLead']>>>
+export type LeadsConvertLeadResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getLeads>['leadsConvertLead']>>>

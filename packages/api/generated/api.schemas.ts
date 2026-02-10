@@ -5,732 +5,945 @@
  * OpenAPI spec version: 0.0.0
  */
 export interface AddParticipantInput {
-    chatRoomId: string;
-    userId?: string;
-    name: string;
-    role?: ChatParticipantRole;
+  chatRoomId: string;
+  userId?: string;
+  name: string;
+  role?: ChatParticipantRole;
 }
 
 export interface Asset {
-    url: string;
+  url: string;
 }
 
-export type ChatMessageMetadata = { [key: string]: unknown };
+export type ChatMessageMetadata = {[key: string]: unknown};
 
 export interface ChatMessage {
-    id: string;
-    chatRoomId: string;
-    participantId: string;
-    type: ChatMessageType;
-    content: string;
-    metadata?: ChatMessageMetadata;
-    readBy?: string[];
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  chatRoomId: string;
+  participantId: string;
+  type: ChatMessageType;
+  content: string;
+  metadata?: ChatMessageMetadata;
+  readBy?: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type ChatMessageType = (typeof ChatMessageType)[keyof typeof ChatMessageType];
+export type ChatMessageType = typeof ChatMessageType[keyof typeof ChatMessageType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ChatMessageType = {
-    TEXT: "TEXT",
-    IMAGE: "IMAGE",
-    FILE: "FILE",
-    SYSTEM: "SYSTEM",
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  FILE: 'FILE',
+  SYSTEM: 'SYSTEM',
 } as const;
 
 export interface ChatParticipant {
-    id: string;
-    chatRoomId: string;
-    userId?: string;
-    name: string;
-    role: ChatParticipantRole;
-    isOnline: boolean;
-    lastSeenAt?: string;
-    joinedAt: string;
-    leftAt?: string;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  chatRoomId: string;
+  userId?: string;
+  name: string;
+  role: ChatParticipantRole;
+  isOnline: boolean;
+  lastSeenAt?: string;
+  joinedAt: string;
+  leftAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type ChatParticipantRole = (typeof ChatParticipantRole)[keyof typeof ChatParticipantRole];
+export type ChatParticipantRole = typeof ChatParticipantRole[keyof typeof ChatParticipantRole];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ChatParticipantRole = {
-    CUSTOMER: "CUSTOMER",
-    AGENT: "AGENT",
-    OBSERVER: "OBSERVER",
+  CUSTOMER: 'CUSTOMER',
+  AGENT: 'AGENT',
+  OBSERVER: 'OBSERVER',
 } as const;
 
-export type ChatRoomMetadata = { [key: string]: unknown };
+export type ChatRoomMetadata = {[key: string]: unknown};
 
 export interface ChatRoom {
-    id: string;
-    customerId?: string;
-    inquiryId?: string;
-    name?: string;
-    status: ChatRoomStatus;
-    metadata?: ChatRoomMetadata;
-    closedAt?: string;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  customerId?: string;
+  inquiryId?: string;
+  name?: string;
+  status: ChatRoomStatus;
+  metadata?: ChatRoomMetadata;
+  closedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type ChatRoomStatus = (typeof ChatRoomStatus)[keyof typeof ChatRoomStatus];
+export type ChatRoomStatus = typeof ChatRoomStatus[keyof typeof ChatRoomStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ChatRoomStatus = {
-    ACTIVE: "ACTIVE",
-    ARCHIVED: "ARCHIVED",
-    CLOSED: "CLOSED",
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED',
+  CLOSED: 'CLOSED',
 } as const;
 
-export type ChatRoomWithParticipantsMetadata = { [key: string]: unknown };
+export type ChatRoomWithParticipantsMetadata = {[key: string]: unknown};
 
 export interface ChatRoomWithParticipants {
-    id: string;
-    customerId?: string;
-    inquiryId?: string;
-    name?: string;
-    status: ChatRoomStatus;
-    metadata?: ChatRoomWithParticipantsMetadata;
-    closedAt?: string;
-    createdAt: string;
-    updatedAt: string;
-    participants: ChatParticipant[];
+  id: string;
+  customerId?: string;
+  inquiryId?: string;
+  name?: string;
+  status: ChatRoomStatus;
+  metadata?: ChatRoomWithParticipantsMetadata;
+  closedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  participants: ChatParticipant[];
 }
 
-export type CreateChatRoomInputMetadata = { [key: string]: unknown };
+export type CreateChatRoomInputMetadata = {[key: string]: unknown};
 
 export interface CreateChatRoomInput {
-    customerId?: string;
-    inquiryId?: string;
-    name?: string;
-    metadata?: CreateChatRoomInputMetadata;
+  customerId?: string;
+  inquiryId?: string;
+  name?: string;
+  metadata?: CreateChatRoomInputMetadata;
 }
 
-export type CreateCustomerInputCustomFields = { [key: string]: unknown };
+export type CreateCustomerInputCustomFields = {[key: string]: unknown};
 
 export interface CreateCustomerInput {
-    name: string;
-    email?: string;
-    phone?: string;
-    company?: string;
-    website?: string;
-    address?: string;
-    notes?: string;
-    status?: CustomerStatus;
-    tags?: string[];
-    customFields?: CreateCustomerInputCustomFields;
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  website?: string;
+  address?: string;
+  notes?: string;
+  status?: CustomerStatus;
+  tags?: string[];
+  customFields?: CreateCustomerInputCustomFields;
+}
+
+export interface CreateCustomerMappingInput {
+  customerId: string;
+  freeePartnerId: number;
+  freeeCompanyId: number;
+  syncHash?: string;
 }
 
 export interface CreateDealInput {
-    customerId?: string;
-    leadId?: string;
-    stageId: string;
-    name: string;
-    value?: number;
-    currency?: string;
-    expectedCloseDate?: string;
-    status?: DealStatus;
-    notes?: string;
+  customerId?: string;
+  leadId?: string;
+  stageId: string;
+  name: string;
+  value?: number;
+  currency?: string;
+  expectedCloseDate?: string;
+  status?: DealStatus;
+  notes?: string;
+}
+
+export interface CreateDealMappingInput {
+  dealId: string;
+  freeeDealId: number;
+  freeeCompanyId: number;
+  syncHash?: string;
 }
 
 export interface CreateEmailTemplateInput {
-    name: string;
-    slug: string;
-    description?: string;
-    category?: EmailTemplateCategory;
-    subject: string;
-    htmlContent: string;
-    textContent?: string;
-    variables?: string[];
-    isActive?: boolean;
+  name: string;
+  slug: string;
+  description?: string;
+  category?: EmailTemplateCategory;
+  subject: string;
+  htmlContent: string;
+  textContent?: string;
+  variables?: string[];
+  isActive?: boolean;
 }
 
-export type CreateInquiryInputMetadata = { [key: string]: unknown };
+export interface CreateFreeeIntegrationInput {
+  userId: string;
+  companyId: number;
+  companyName?: string;
+  accessToken: string;
+  refreshToken: string;
+  tokenExpiresAt: string;
+  scopes?: string[];
+}
+
+export type CreateInquiryInputMetadata = {[key: string]: unknown};
 
 export interface CreateInquiryInput {
-    customerId?: string;
-    assigneeId?: string;
-    subject: string;
-    content: string;
-    status?: InquiryStatus;
-    priority?: InquiryPriority;
-    category?: InquiryCategory;
-    tags?: string[];
-    source?: string;
-    metadata?: CreateInquiryInputMetadata;
+  customerId?: string;
+  assigneeId?: string;
+  subject: string;
+  content: string;
+  status?: InquiryStatus;
+  priority?: InquiryPriority;
+  category?: InquiryCategory;
+  tags?: string[];
+  source?: string;
+  metadata?: CreateInquiryInputMetadata;
 }
 
 export interface CreateInquiryResponseInput {
-    inquiryId: string;
-    userId?: string;
-    content: string;
-    isInternal?: boolean;
-    attachments?: string[];
+  inquiryId: string;
+  userId?: string;
+  content: string;
+  isInternal?: boolean;
+  attachments?: string[];
 }
 
 export interface CreateLeadInput {
-    customerId?: string;
-    name: string;
-    email?: string;
-    phone?: string;
-    company?: string;
-    source?: string;
-    status?: LeadStatus;
-    score?: number;
-    notes?: string;
+  customerId?: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  source?: string;
+  status?: LeadStatus;
+  score?: number;
+  notes?: string;
 }
 
 export interface CreatePipelineInput {
-    name: string;
-    description?: string;
-    isDefault?: boolean;
+  name: string;
+  description?: string;
+  isDefault?: boolean;
 }
 
 export interface CreatePipelineStageInput {
-    pipelineId: string;
-    name: string;
-    order: number;
-    probability?: number;
-    color?: string;
+  pipelineId: string;
+  name: string;
+  order: number;
+  probability?: number;
+  color?: string;
 }
 
-export type CustomerCustomFields = { [key: string]: unknown };
+export interface CreateSyncLogInput {
+  integrationId: string;
+  direction: SyncDirection;
+  entityType: string;
+}
+
+export type CustomerCustomFields = {[key: string]: unknown};
 
 export interface Customer {
-    id: string;
-    name: string;
-    email?: string;
-    phone?: string;
-    company?: string;
-    website?: string;
-    address?: string;
-    notes?: string;
-    status: CustomerStatus;
-    tags?: string[];
-    customFields?: CustomerCustomFields;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  website?: string;
+  address?: string;
+  notes?: string;
+  status: CustomerStatus;
+  tags?: string[];
+  customFields?: CustomerCustomFields;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type CustomerStatus = (typeof CustomerStatus)[keyof typeof CustomerStatus];
+export interface CustomerFreeeMapping {
+  id: string;
+  customerId: string;
+  freeePartnerId: number;
+  freeeCompanyId: number;
+  lastSyncAt: string;
+  syncHash?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CustomerStatus = typeof CustomerStatus[keyof typeof CustomerStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CustomerStatus = {
-    ACTIVE: "ACTIVE",
-    INACTIVE: "INACTIVE",
-    PROSPECT: "PROSPECT",
-    CHURNED: "CHURNED",
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  PROSPECT: 'PROSPECT',
+  CHURNED: 'CHURNED',
 } as const;
 
 export interface Deal {
-    id: string;
-    customerId?: string;
-    leadId?: string;
-    stageId: string;
-    name: string;
-    value?: number;
-    currency: string;
-    expectedCloseDate?: string;
-    actualCloseDate?: string;
-    status: DealStatus;
-    notes?: string;
-    lostReason?: string;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  customerId?: string;
+  leadId?: string;
+  stageId: string;
+  name: string;
+  value?: number;
+  currency: string;
+  expectedCloseDate?: string;
+  actualCloseDate?: string;
+  status: DealStatus;
+  notes?: string;
+  lostReason?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type DealStatus = (typeof DealStatus)[keyof typeof DealStatus];
+export interface DealFreeeMapping {
+  id: string;
+  dealId: string;
+  freeeDealId: number;
+  freeeCompanyId: number;
+  lastSyncAt: string;
+  syncHash?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DealStatus = typeof DealStatus[keyof typeof DealStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DealStatus = {
-    OPEN: "OPEN",
-    WON: "WON",
-    LOST: "LOST",
-    STALLED: "STALLED",
+  OPEN: 'OPEN',
+  WON: 'WON',
+  LOST: 'LOST',
+  STALLED: 'STALLED',
 } as const;
 
-export type EmailLogMetadata = { [key: string]: unknown };
+export type EmailLogMetadata = {[key: string]: unknown};
 
 export interface EmailLog {
-    id: string;
-    customerId?: string;
-    templateId?: string;
-    resendId?: string;
-    fromEmail: string;
-    toEmail: string;
-    ccEmail?: string;
-    bccEmail?: string;
-    subject: string;
-    htmlContent?: string;
-    textContent?: string;
-    status: EmailStatus;
-    errorMessage?: string;
-    sentAt?: string;
-    deliveredAt?: string;
-    openedAt?: string;
-    clickedAt?: string;
-    bouncedAt?: string;
-    metadata?: EmailLogMetadata;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  customerId?: string;
+  templateId?: string;
+  resendId?: string;
+  fromEmail: string;
+  toEmail: string;
+  ccEmail?: string;
+  bccEmail?: string;
+  subject: string;
+  htmlContent?: string;
+  textContent?: string;
+  status: EmailStatus;
+  errorMessage?: string;
+  sentAt?: string;
+  deliveredAt?: string;
+  openedAt?: string;
+  clickedAt?: string;
+  bouncedAt?: string;
+  metadata?: EmailLogMetadata;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type EmailStatus = (typeof EmailStatus)[keyof typeof EmailStatus];
+export type EmailStatus = typeof EmailStatus[keyof typeof EmailStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const EmailStatus = {
-    PENDING: "PENDING",
-    SENT: "SENT",
-    DELIVERED: "DELIVERED",
-    BOUNCED: "BOUNCED",
-    FAILED: "FAILED",
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  BOUNCED: 'BOUNCED',
+  FAILED: 'FAILED',
 } as const;
 
 export interface EmailTemplate {
-    id: string;
-    name: string;
-    slug: string;
-    description?: string;
-    category: EmailTemplateCategory;
-    subject: string;
-    htmlContent: string;
-    textContent?: string;
-    variables?: string[];
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  category: EmailTemplateCategory;
+  subject: string;
+  htmlContent: string;
+  textContent?: string;
+  variables?: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type EmailTemplateCategory = (typeof EmailTemplateCategory)[keyof typeof EmailTemplateCategory];
+export type EmailTemplateCategory = typeof EmailTemplateCategory[keyof typeof EmailTemplateCategory];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const EmailTemplateCategory = {
-    MARKETING: "MARKETING",
-    TRANSACTIONAL: "TRANSACTIONAL",
-    SUPPORT: "SUPPORT",
-    NOTIFICATION: "NOTIFICATION",
+  MARKETING: 'MARKETING',
+  TRANSACTIONAL: 'TRANSACTIONAL',
+  SUPPORT: 'SUPPORT',
+  NOTIFICATION: 'NOTIFICATION',
 } as const;
 
 export interface ErrorResponse {
-    error: string;
-    details?: unknown;
+  error: string;
+  details?: unknown;
 }
 
-export type InquiryMetadata = { [key: string]: unknown };
+export interface FreeeAuthUrlResponse {
+  url: string;
+}
+
+export interface FreeeCallbackInput {
+  code: string;
+  state: string;
+}
+
+export interface FreeeCompany {
+  id: number;
+  displayName: string;
+  role: string;
+}
+
+export interface FreeeIntegration {
+  id: string;
+  userId: string;
+  companyId: number;
+  companyName?: string;
+  accessToken: string;
+  refreshToken: string;
+  tokenExpiresAt: string;
+  scopes?: string[];
+  isActive: boolean;
+  lastSyncAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FreeeOAuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  tokenType: string;
+  scope: string;
+  createdAt: number;
+}
+
+export interface FreeePartner {
+  id: number;
+  name: string;
+  code?: string;
+  shortcut1?: string;
+  shortcut2?: string;
+  orgCode?: number;
+  countryCode?: string;
+  addressRegionCode?: string;
+  streetName1?: string;
+  streetName2?: string;
+  zipcode?: string;
+  phone?: string;
+  email?: string;
+}
+
+export interface FreeeSyncLog {
+  id: string;
+  integrationId: string;
+  direction: SyncDirection;
+  status: SyncStatus;
+  entityType: string;
+  totalRecords?: number;
+  successCount?: number;
+  errorCount?: number;
+  errorDetails?: SyncErrorDetail[];
+  startedAt?: string;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type InquiryMetadata = {[key: string]: unknown};
 
 export interface Inquiry {
-    id: string;
-    customerId?: string;
-    assigneeId?: string;
-    subject: string;
-    content: string;
-    status: InquiryStatus;
-    priority: InquiryPriority;
-    category: InquiryCategory;
-    tags?: string[];
-    source?: string;
-    metadata?: InquiryMetadata;
-    resolvedAt?: string;
-    closedAt?: string;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  customerId?: string;
+  assigneeId?: string;
+  subject: string;
+  content: string;
+  status: InquiryStatus;
+  priority: InquiryPriority;
+  category: InquiryCategory;
+  tags?: string[];
+  source?: string;
+  metadata?: InquiryMetadata;
+  resolvedAt?: string;
+  closedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type InquiryCategory = (typeof InquiryCategory)[keyof typeof InquiryCategory];
+export type InquiryCategory = typeof InquiryCategory[keyof typeof InquiryCategory];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InquiryCategory = {
-    GENERAL: "GENERAL",
-    TECHNICAL: "TECHNICAL",
-    BILLING: "BILLING",
-    SALES: "SALES",
-    COMPLAINT: "COMPLAINT",
-    FEATURE_REQUEST: "FEATURE_REQUEST",
-    OTHER: "OTHER",
+  GENERAL: 'GENERAL',
+  TECHNICAL: 'TECHNICAL',
+  BILLING: 'BILLING',
+  SALES: 'SALES',
+  COMPLAINT: 'COMPLAINT',
+  FEATURE_REQUEST: 'FEATURE_REQUEST',
+  OTHER: 'OTHER',
 } as const;
 
-export type InquiryPriority = (typeof InquiryPriority)[keyof typeof InquiryPriority];
+export type InquiryPriority = typeof InquiryPriority[keyof typeof InquiryPriority];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InquiryPriority = {
-    LOW: "LOW",
-    MEDIUM: "MEDIUM",
-    HIGH: "HIGH",
-    URGENT: "URGENT",
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  URGENT: 'URGENT',
 } as const;
 
 export interface InquiryResponse {
-    id: string;
-    inquiryId: string;
-    userId?: string;
-    content: string;
-    isInternal: boolean;
-    attachments?: string[];
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  inquiryId: string;
+  userId?: string;
+  content: string;
+  isInternal: boolean;
+  attachments?: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type InquiryStatus = (typeof InquiryStatus)[keyof typeof InquiryStatus];
+export type InquiryStatus = typeof InquiryStatus[keyof typeof InquiryStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InquiryStatus = {
-    OPEN: "OPEN",
-    IN_PROGRESS: "IN_PROGRESS",
-    WAITING_CUSTOMER: "WAITING_CUSTOMER",
-    RESOLVED: "RESOLVED",
-    CLOSED: "CLOSED",
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  WAITING_CUSTOMER: 'WAITING_CUSTOMER',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED',
 } as const;
 
 export interface Lead {
-    id: string;
-    customerId?: string;
-    name: string;
-    email?: string;
-    phone?: string;
-    company?: string;
-    source?: string;
-    status: LeadStatus;
-    score?: number;
-    notes?: string;
-    convertedAt?: string;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  customerId?: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  source?: string;
+  status: LeadStatus;
+  score?: number;
+  notes?: string;
+  convertedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus];
+export type LeadStatus = typeof LeadStatus[keyof typeof LeadStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const LeadStatus = {
-    NEW: "NEW",
-    CONTACTED: "CONTACTED",
-    QUALIFIED: "QUALIFIED",
-    UNQUALIFIED: "UNQUALIFIED",
-    CONVERTED: "CONVERTED",
+  NEW: 'NEW',
+  CONTACTED: 'CONTACTED',
+  QUALIFIED: 'QUALIFIED',
+  UNQUALIFIED: 'UNQUALIFIED',
+  CONVERTED: 'CONVERTED',
 } as const;
 
 export interface PaginationMeta {
-    page: number;
-    perPage: number;
-    total: number;
-    totalPages: number;
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
 }
 
 export interface Pipeline {
-    id: string;
-    name: string;
-    description?: string;
-    isDefault: boolean;
-    stages: PipelineStage[];
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  name: string;
+  description?: string;
+  isDefault: boolean;
+  stages: PipelineStage[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PipelineStage {
-    id: string;
-    pipelineId: string;
-    name: string;
-    order: number;
-    probability?: number;
-    color?: string;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  pipelineId: string;
+  name: string;
+  order: number;
+  probability?: number;
+  color?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Portfolio {
-    id?: string;
-    title: string;
-    slug: string;
-    company: string;
-    date: string;
-    current: boolean;
-    overview?: string;
-    description?: string;
-    content?: PortfolioContent;
-    thumbnailTemp?: string;
-    images?: Asset[];
-    intro?: string;
+  id?: string;
+  title: string;
+  slug: string;
+  company: string;
+  date: string;
+  current: boolean;
+  overview?: string;
+  description?: string;
+  content?: PortfolioContent;
+  thumbnailTemp?: string;
+  images?: Asset[];
+  intro?: string;
 }
 
 export interface PortfolioContent {
-    html: string;
+  html: string;
 }
 
 export interface Post {
-    id: string;
-    title: string;
-    slug: string;
-    date: string;
-    description?: string;
-    content: PostContent;
-    imageTemp: string;
-    tags: string[];
-    sticky: boolean;
-    intro?: string;
-    createdAt?: string;
-    updatedAt?: string;
-    images?: Asset[];
+  id: string;
+  title: string;
+  slug: string;
+  date: string;
+  description?: string;
+  content: PostContent;
+  imageTemp: string;
+  tags: string[];
+  sticky: boolean;
+  intro?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  images?: Asset[];
 }
 
 export interface PostContent {
-    html: string;
-    raw?: unknown;
+  html: string;
+  raw?: unknown;
 }
 
-export type SendEmailInputVariables = { [key: string]: string };
+export type SendEmailInputVariables = {[key: string]: string};
 
-export type SendEmailInputMetadata = { [key: string]: unknown };
+export type SendEmailInputMetadata = {[key: string]: unknown};
 
 export interface SendEmailInput {
-    customerId?: string;
-    templateId?: string;
-    fromEmail?: string;
-    toEmail: string;
-    ccEmail?: string;
-    bccEmail?: string;
-    subject: string;
-    htmlContent?: string;
-    textContent?: string;
-    variables?: SendEmailInputVariables;
-    metadata?: SendEmailInputMetadata;
+  customerId?: string;
+  templateId?: string;
+  fromEmail?: string;
+  toEmail: string;
+  ccEmail?: string;
+  bccEmail?: string;
+  subject: string;
+  htmlContent?: string;
+  textContent?: string;
+  variables?: SendEmailInputVariables;
+  metadata?: SendEmailInputMetadata;
 }
 
-export type SendMessageInputMetadata = { [key: string]: unknown };
+export type SendMessageInputMetadata = {[key: string]: unknown};
 
 export interface SendMessageInput {
-    chatRoomId: string;
-    participantId: string;
-    type?: ChatMessageType;
-    content: string;
-    metadata?: SendMessageInputMetadata;
+  chatRoomId: string;
+  participantId: string;
+  type?: ChatMessageType;
+  content: string;
+  metadata?: SendMessageInputMetadata;
 }
 
-export type UpdateCustomerInputCustomFields = { [key: string]: unknown };
+export type SyncDirection = typeof SyncDirection[keyof typeof SyncDirection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SyncDirection = {
+  IMPORT: 'IMPORT',
+  EXPORT: 'EXPORT',
+  BIDIRECTIONAL: 'BIDIRECTIONAL',
+} as const;
+
+export interface SyncErrorDetail {
+  record: string;
+  error: string;
+}
+
+export type SyncStatus = typeof SyncStatus[keyof typeof SyncStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SyncStatus = {
+  PENDING: 'PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+} as const;
+
+export type UpdateCustomerInputCustomFields = {[key: string]: unknown};
 
 export interface UpdateCustomerInput {
-    name?: string;
-    email?: string;
-    phone?: string;
-    company?: string;
-    website?: string;
-    address?: string;
-    notes?: string;
-    status?: CustomerStatus;
-    tags?: string[];
-    customFields?: UpdateCustomerInputCustomFields;
+  name?: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  website?: string;
+  address?: string;
+  notes?: string;
+  status?: CustomerStatus;
+  tags?: string[];
+  customFields?: UpdateCustomerInputCustomFields;
 }
 
 export interface UpdateDealInput {
-    customerId?: string;
-    stageId?: string;
-    name?: string;
-    value?: number;
-    currency?: string;
-    expectedCloseDate?: string;
-    actualCloseDate?: string;
-    status?: DealStatus;
-    notes?: string;
-    lostReason?: string;
+  customerId?: string;
+  stageId?: string;
+  name?: string;
+  value?: number;
+  currency?: string;
+  expectedCloseDate?: string;
+  actualCloseDate?: string;
+  status?: DealStatus;
+  notes?: string;
+  lostReason?: string;
 }
 
 export interface UpdateEmailTemplateInput {
-    name?: string;
-    slug?: string;
-    description?: string;
-    category?: EmailTemplateCategory;
-    subject?: string;
-    htmlContent?: string;
-    textContent?: string;
-    variables?: string[];
-    isActive?: boolean;
+  name?: string;
+  slug?: string;
+  description?: string;
+  category?: EmailTemplateCategory;
+  subject?: string;
+  htmlContent?: string;
+  textContent?: string;
+  variables?: string[];
+  isActive?: boolean;
 }
 
-export type UpdateInquiryInputMetadata = { [key: string]: unknown };
+export interface UpdateFreeeTokensInput {
+  accessToken: string;
+  refreshToken: string;
+  tokenExpiresAt: string;
+}
+
+export type UpdateInquiryInputMetadata = {[key: string]: unknown};
 
 export interface UpdateInquiryInput {
-    customerId?: string;
-    assigneeId?: string;
-    subject?: string;
-    content?: string;
-    status?: InquiryStatus;
-    priority?: InquiryPriority;
-    category?: InquiryCategory;
-    tags?: string[];
-    source?: string;
-    metadata?: UpdateInquiryInputMetadata;
+  customerId?: string;
+  assigneeId?: string;
+  subject?: string;
+  content?: string;
+  status?: InquiryStatus;
+  priority?: InquiryPriority;
+  category?: InquiryCategory;
+  tags?: string[];
+  source?: string;
+  metadata?: UpdateInquiryInputMetadata;
 }
 
 export interface UpdateLeadInput {
-    customerId?: string;
-    name?: string;
-    email?: string;
-    phone?: string;
-    company?: string;
-    source?: string;
-    status?: LeadStatus;
-    score?: number;
-    notes?: string;
+  customerId?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  source?: string;
+  status?: LeadStatus;
+  score?: number;
+  notes?: string;
 }
 
 export interface UpdatePipelineInput {
-    name?: string;
-    description?: string;
-    isDefault?: boolean;
+  name?: string;
+  description?: string;
+  isDefault?: boolean;
 }
 
 export interface UpdatePipelineStageInput {
-    name?: string;
-    order?: number;
-    probability?: number;
-    color?: string;
+  name?: string;
+  order?: number;
+  probability?: number;
+  color?: string;
+}
+
+export interface UpdateSyncLogInput {
+  status?: SyncStatus;
+  totalRecords?: number;
+  successCount?: number;
+  errorCount?: number;
+  errorDetails?: SyncErrorDetail[];
+  startedAt?: string;
+  completedAt?: string;
 }
 
 export type ChatsListChatRoomsParams = {
-    page?: number;
-    perPage?: number;
-    status?: ChatRoomStatus;
-    customerId?: string;
+page?: number;
+perPage?: number;
+status?: ChatRoomStatus;
+customerId?: string;
 };
 
 export type ChatsListChatRooms200AnyOf = {
-    data: ChatRoom[];
-    meta: PaginationMeta;
+  data: ChatRoom[];
+  meta: PaginationMeta;
 };
 
 export type ChatsListChatRooms200 = ChatRoom[] | ChatsListChatRooms200AnyOf;
 
 export type ChatsGetChatRoomMessagesParams = {
-    limit?: number;
-    before?: string;
+limit?: number;
+before?: string;
 };
 
 export type ChatsMarkMessagesAsReadParams = {
-    participantId: string;
+participantId: string;
 };
 
 export type ChatsMarkMessagesAsReadBody = {
-    messageIds: string[];
+  messageIds: string[];
 };
 
 export type CustomersListCustomersParams = {
-    page?: number;
-    perPage?: number;
-    status?: CustomerStatus;
+page?: number;
+perPage?: number;
+status?: CustomerStatus;
 };
 
 export type CustomersListCustomers200AnyOf = {
-    data: Customer[];
-    meta: PaginationMeta;
+  data: Customer[];
+  meta: PaginationMeta;
 };
 
 export type CustomersListCustomers200 = Customer[] | CustomersListCustomers200AnyOf;
 
 export type DealsListDealsParams = {
-    page?: number;
-    perPage?: number;
-    status?: DealStatus;
-    customerId?: string;
-    stageId?: string;
+page?: number;
+perPage?: number;
+status?: DealStatus;
+customerId?: string;
+stageId?: string;
 };
 
 export type DealsListDeals200AnyOf = {
-    data: Deal[];
-    meta: PaginationMeta;
+  data: Deal[];
+  meta: PaginationMeta;
 };
 
 export type DealsListDeals200 = Deal[] | DealsListDeals200AnyOf;
 
 export type DealsMarkDealAsLostParams = {
-    reason?: string;
+reason?: string;
 };
 
 export type DealsMoveDealToStageBody = {
-    stageId: string;
+  stageId: string;
 };
 
 export type LeadsListLeadsParams = {
-    page?: number;
-    perPage?: number;
-    status?: LeadStatus;
-    customerId?: string;
+page?: number;
+perPage?: number;
+status?: LeadStatus;
+customerId?: string;
 };
 
 export type LeadsListLeads200AnyOf = {
-    data: Lead[];
-    meta: PaginationMeta;
+  data: Lead[];
+  meta: PaginationMeta;
 };
 
 export type LeadsListLeads200 = Lead[] | LeadsListLeads200AnyOf;
 
 export type EmailsListEmailLogsParams = {
-    page?: number;
-    perPage?: number;
-    status?: EmailStatus;
-    customerId?: string;
+page?: number;
+perPage?: number;
+status?: EmailStatus;
+customerId?: string;
 };
 
 export type EmailsListEmailLogs200AnyOf = {
-    data: EmailLog[];
-    meta: PaginationMeta;
+  data: EmailLog[];
+  meta: PaginationMeta;
 };
 
 export type EmailsListEmailLogs200 = EmailLog[] | EmailsListEmailLogs200AnyOf;
 
 export type EmailsSendEmailWithTemplateParams = {
-    templateSlug: string;
-    toEmail: string;
-    customerId?: string;
+templateSlug: string;
+toEmail: string;
+customerId?: string;
 };
 
-export type EmailsSendEmailWithTemplateBodyVariables = { [key: string]: string };
+export type EmailsSendEmailWithTemplateBodyVariables = {[key: string]: string};
 
 export type EmailsSendEmailWithTemplateBody = {
-    variables?: EmailsSendEmailWithTemplateBodyVariables;
+  variables?: EmailsSendEmailWithTemplateBodyVariables;
 };
 
 export type EmailsListEmailTemplatesParams = {
-    category?: EmailTemplateCategory;
-    isActive?: boolean;
+category?: EmailTemplateCategory;
+isActive?: boolean;
 };
 
 export type PortfoliosListPortfoliosParams = {
-    page?: number;
-    perPage?: number;
+page?: number;
+perPage?: number;
 };
 
 export type PortfoliosListPortfolios200AnyOf = {
-    data: Portfolio[];
-    meta: PaginationMeta;
+  data: Portfolio[];
+  meta: PaginationMeta;
 };
 
 export type PortfoliosListPortfolios200 = Portfolio[] | PortfoliosListPortfolios200AnyOf;
 
 export type PostsListPostsParams = {
-    page?: number;
-    perPage?: number;
-    tag?: string;
+page?: number;
+perPage?: number;
+tag?: string;
 };
 
 export type PostsListPosts200AnyOf = {
-    data: Post[];
-    meta: PaginationMeta;
+  data: Post[];
+  meta: PaginationMeta;
 };
 
 export type PostsListPosts200 = Post[] | PostsListPosts200AnyOf;
 
 export type InquiriesListInquiriesParams = {
-    page?: number;
-    perPage?: number;
-    status?: InquiryStatus;
-    customerId?: string;
-    assigneeId?: string;
+page?: number;
+perPage?: number;
+status?: InquiryStatus;
+customerId?: string;
+assigneeId?: string;
 };
 
 export type InquiriesListInquiries200AnyOf = {
-    data: Inquiry[];
-    meta: PaginationMeta;
+  data: Inquiry[];
+  meta: PaginationMeta;
 };
 
 export type InquiriesListInquiries200 = Inquiry[] | InquiriesListInquiries200AnyOf;
+
+export type FreeeHandleCallback200 = FreeeIntegration | ErrorResponse;
+
+export type FreeeGetAuthUrl200 = FreeeAuthUrlResponse | ErrorResponse;
+
+export type FreeeGetCompanies200 = FreeeCompany[] | ErrorResponse;
+
+export type FreeeGetIntegration200 = FreeeIntegration | ErrorResponse;
+
+export type FreeeCreateIntegration200 = FreeeIntegration | ErrorResponse;
+
+export type FreeeGetCustomerMappings200 = CustomerFreeeMapping[] | ErrorResponse;
+
+export type FreeeCreateCustomerMapping200 = CustomerFreeeMapping | ErrorResponse;
+
+export type FreeeGetDealMappings200 = DealFreeeMapping[] | ErrorResponse;
+
+export type FreeeCreateDealMapping200 = DealFreeeMapping | ErrorResponse;
+
+export type FreeeGetPartners200 = FreeePartner[] | ErrorResponse;
+
+export type FreeeGetSyncLogsParams = {
+limit?: number;
+};
+
+export type FreeeGetSyncLogs200 = FreeeSyncLog[] | ErrorResponse;
+
+export type FreeeCreateSyncLog200 = FreeeSyncLog | ErrorResponse;
+
+export type FreeeUpdateSyncLog200 = FreeeSyncLog | ErrorResponse;
+
+export type FreeeSyncPartnersToFreee200 = FreeeSyncLog | ErrorResponse;
+
+export type FreeeSyncPartnersFromFreee200 = FreeeSyncLog | ErrorResponse;
+
+export type FreeeUpdateTokens200 = FreeeOAuthTokens | ErrorResponse;
+
