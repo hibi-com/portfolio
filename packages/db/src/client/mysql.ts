@@ -1,29 +1,30 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaClient } from "../../generated/prisma/client.js";
 
 export interface CreatePrismaClientOptions {
-	databaseUrl?: string;
+    databaseUrl?: string;
 }
 
 let prismaInstance: PrismaClient | null = null;
 
-export function createPrismaClient(
-	options: CreatePrismaClientOptions = {},
-): PrismaClient {
-	const { databaseUrl } = options;
+export function createPrismaClient(options: CreatePrismaClientOptions = {}): PrismaClient {
+    const url = options.databaseUrl ?? process.env.DATABASE_URL;
+    if (!url) {
+        throw new Error("DATABASE_URL or databaseUrl option is required");
+    }
 
-	if (prismaInstance) {
-		return prismaInstance;
-	}
+    if (prismaInstance) {
+        return prismaInstance;
+    }
 
-	prismaInstance = new PrismaClient({
-		datasources: {
-			db: {
-				url: databaseUrl || process.env.DATABASE_URL,
-			},
-		},
-	});
+    const adapter = new PrismaMariaDb(url);
+    prismaInstance = new PrismaClient({ adapter });
 
-	return prismaInstance;
+    return prismaInstance;
 }
 
 export type PrismaClientType = ReturnType<typeof createPrismaClient>;
+
+export function resetPrismaInstance(): void {
+    prismaInstance = null;
+}

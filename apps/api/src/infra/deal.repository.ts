@@ -1,5 +1,5 @@
+import type { Prisma } from "@portfolio/db";
 import { createPrismaClient } from "@portfolio/db";
-import type { Decimal } from "@prisma/client/runtime/library";
 import type { CreateDealInput, Deal, DealRepository, DealStatus, UpdateDealInput } from "~/domain/deal";
 
 export class DealRepositoryImpl implements DealRepository {
@@ -11,7 +11,7 @@ export class DealRepositoryImpl implements DealRepository {
         leadId: string | null;
         stageId: string;
         name: string;
-        value: Decimal | null;
+        value: Prisma.Decimal | null;
         currency: string;
         expectedCloseDate: Date | null;
         actualCloseDate: Date | null;

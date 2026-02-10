@@ -144,7 +144,7 @@ erDiagram
   String lead_id FK,UK "nullable"
   String stage_id FK
   String name
-  Decimal value "nullable"
+  Decimal(15) value "nullable"
   String currency
   DateTime expected_close_date "nullable"
   DateTime actual_close_date "nullable"

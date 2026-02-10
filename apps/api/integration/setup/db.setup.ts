@@ -1,60 +1,33 @@
-/**
- * Medium Test用テストDB セットアップ
- *
- * テスト用のSQLiteデータベースを初期化し、テストデータの投入・削除を行う
- */
-
-import { PrismaClient } from "@prisma/client";
+import { createPrismaClient, type PrismaClient, resetPrismaInstance } from "@portfolio/db";
 
 let prisma: PrismaClient | null = null;
 
-/**
- * テスト用データベースのURLを取得
- * 環境変数が設定されていない場合はインメモリSQLiteを使用
- */
 function getTestDatabaseUrl(): string {
     return process.env.TEST_DATABASE_URL || "file::memory:?cache=shared";
 }
 
-/**
- * テストデータベースを初期化
- */
 export async function setupTestDb(): Promise<PrismaClient> {
     const databaseUrl = getTestDatabaseUrl();
 
-    prisma = new PrismaClient({
-        datasources: {
-            db: {
-                url: databaseUrl,
-            },
-        },
-        log: process.env.DEBUG_TEST ? ["query", "info", "warn", "error"] : ["error"],
-    });
-
+    prisma = createPrismaClient({ databaseUrl });
     await prisma.$connect();
 
     return prisma;
 }
 
-/**
- * テストデータベースをクリーンアップ
- */
 export async function teardownTestDb(): Promise<void> {
     if (prisma) {
         await prisma.$disconnect();
         prisma = null;
     }
+    resetPrismaInstance();
 }
 
-/**
- * テストデータベースの全テーブルをクリア
- */
 export async function clearTestDb(): Promise<void> {
     if (!prisma) {
         throw new Error("Database not initialized. Call setupTestDb first.");
     }
 
-    // 外部キー制約を考慮した順序でテーブルをクリア
     const tableNames = [
         "post_tags",
         "post_images",
@@ -90,9 +63,6 @@ export async function clearTestDb(): Promise<void> {
     }
 }
 
-/**
- * テストデータを投入
- */
 export interface TestSeedData {
     posts?: Array<{
         id: string;
@@ -134,12 +104,7 @@ export interface TestSeedData {
         name: string;
         description?: string;
         isDefault?: boolean;
-        stages?: Array<{
-            id: string;
-            name: string;
-            order: number;
-            probability?: number;
-        }>;
+        stages?: Array<{ id: string; name: string; order: number; probability?: number }>;
     }>;
     deals?: Array<{
         id: string;
@@ -155,9 +120,9 @@ export interface TestSeedData {
         customerId?: string;
         subject: string;
         content: string;
-        category?: "GENERAL" | "TECHNICAL" | "BILLING" | "SALES" | "COMPLAINT" | "FEATURE_REQUEST" | "OTHER";
+        category?: string;
         priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-        status?: "OPEN" | "IN_PROGRESS" | "WAITING_CUSTOMER" | "RESOLVED" | "CLOSED";
+        status?: string;
     }>;
 }
 
@@ -166,7 +131,6 @@ export async function seedTestData(data: TestSeedData): Promise<void> {
         throw new Error("Database not initialized. Call setupTestDb first.");
     }
 
-    // Posts
     if (data.posts) {
         for (const post of data.posts) {
             await prisma.post.create({
@@ -184,7 +148,6 @@ export async function seedTestData(data: TestSeedData): Promise<void> {
         }
     }
 
-    // Portfolios
     if (data.portfolios) {
         for (const portfolio of data.portfolios) {
             await prisma.portfolio.create({
@@ -201,7 +164,6 @@ export async function seedTestData(data: TestSeedData): Promise<void> {
         }
     }
 
-    // Customers
     if (data.customers) {
         for (const customer of data.customers) {
             await prisma.customer.create({
@@ -217,7 +179,6 @@ export async function seedTestData(data: TestSeedData): Promise<void> {
         }
     }
 
-    // Pipelines (with stages)
     if (data.pipelines) {
         for (const pipeline of data.pipelines) {
             await prisma.pipeline.create({
@@ -228,11 +189,11 @@ export async function seedTestData(data: TestSeedData): Promise<void> {
                     isDefault: pipeline.isDefault || false,
                     stages: pipeline.stages
                         ? {
-                              create: pipeline.stages.map((stage) => ({
-                                  id: stage.id,
-                                  name: stage.name,
-                                  order: stage.order,
-                                  probability: stage.probability,
+                              create: pipeline.stages.map((s) => ({
+                                  id: s.id,
+                                  name: s.name,
+                                  order: s.order,
+                                  probability: s.probability,
                               })),
                           }
                         : undefined,
@@ -241,7 +202,6 @@ export async function seedTestData(data: TestSeedData): Promise<void> {
         }
     }
 
-    // Leads
     if (data.leads) {
         for (const lead of data.leads) {
             await prisma.lead.create({
@@ -257,7 +217,6 @@ export async function seedTestData(data: TestSeedData): Promise<void> {
         }
     }
 
-    // Deals
     if (data.deals) {
         for (const deal of data.deals) {
             await prisma.deal.create({
@@ -274,7 +233,6 @@ export async function seedTestData(data: TestSeedData): Promise<void> {
         }
     }
 
-    // Inquiries
     if (data.inquiries) {
         for (const inquiry of data.inquiries) {
             await prisma.inquiry.create({
@@ -292,19 +250,11 @@ export async function seedTestData(data: TestSeedData): Promise<void> {
     }
 }
 
-/**
- * Prismaクライアントを取得
- */
 export function getPrismaClient(): PrismaClient {
-    if (!prisma) {
-        throw new Error("Database not initialized. Call setupTestDb first.");
-    }
+    if (!prisma) throw new Error("Database not initialized. Call setupTestDb first.");
     return prisma;
 }
 
-/**
- * テストデータベースURLを取得
- */
 export function getTestDatabaseUrlForContainer(): string {
     return getTestDatabaseUrl();
 }

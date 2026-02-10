@@ -1,0 +1,1476 @@
+import type * as runtime from "@prisma/client/runtime/client";
+import type * as Prisma from "../internal/prismaNamespace";
+/**
+ * Model FreeeIntegration
+ *
+ */
+export type FreeeIntegrationModel = runtime.Types.Result.DefaultSelection<Prisma.$FreeeIntegrationPayload>;
+export type AggregateFreeeIntegration = {
+    _count: FreeeIntegrationCountAggregateOutputType | null;
+    _avg: FreeeIntegrationAvgAggregateOutputType | null;
+    _sum: FreeeIntegrationSumAggregateOutputType | null;
+    _min: FreeeIntegrationMinAggregateOutputType | null;
+    _max: FreeeIntegrationMaxAggregateOutputType | null;
+};
+export type FreeeIntegrationAvgAggregateOutputType = {
+    companyId: number | null;
+};
+export type FreeeIntegrationSumAggregateOutputType = {
+    companyId: number | null;
+};
+export type FreeeIntegrationMinAggregateOutputType = {
+    id: string | null;
+    userId: string | null;
+    companyId: number | null;
+    companyName: string | null;
+    accessToken: string | null;
+    refreshToken: string | null;
+    tokenExpiresAt: Date | null;
+    scopes: string | null;
+    isActive: boolean | null;
+    lastSyncAt: Date | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type FreeeIntegrationMaxAggregateOutputType = {
+    id: string | null;
+    userId: string | null;
+    companyId: number | null;
+    companyName: string | null;
+    accessToken: string | null;
+    refreshToken: string | null;
+    tokenExpiresAt: Date | null;
+    scopes: string | null;
+    isActive: boolean | null;
+    lastSyncAt: Date | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type FreeeIntegrationCountAggregateOutputType = {
+    id: number;
+    userId: number;
+    companyId: number;
+    companyName: number;
+    accessToken: number;
+    refreshToken: number;
+    tokenExpiresAt: number;
+    scopes: number;
+    isActive: number;
+    lastSyncAt: number;
+    createdAt: number;
+    updatedAt: number;
+    _all: number;
+};
+export type FreeeIntegrationAvgAggregateInputType = {
+    companyId?: true;
+};
+export type FreeeIntegrationSumAggregateInputType = {
+    companyId?: true;
+};
+export type FreeeIntegrationMinAggregateInputType = {
+    id?: true;
+    userId?: true;
+    companyId?: true;
+    companyName?: true;
+    accessToken?: true;
+    refreshToken?: true;
+    tokenExpiresAt?: true;
+    scopes?: true;
+    isActive?: true;
+    lastSyncAt?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type FreeeIntegrationMaxAggregateInputType = {
+    id?: true;
+    userId?: true;
+    companyId?: true;
+    companyName?: true;
+    accessToken?: true;
+    refreshToken?: true;
+    tokenExpiresAt?: true;
+    scopes?: true;
+    isActive?: true;
+    lastSyncAt?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type FreeeIntegrationCountAggregateInputType = {
+    id?: true;
+    userId?: true;
+    companyId?: true;
+    companyName?: true;
+    accessToken?: true;
+    refreshToken?: true;
+    tokenExpiresAt?: true;
+    scopes?: true;
+    isActive?: true;
+    lastSyncAt?: true;
+    createdAt?: true;
+    updatedAt?: true;
+    _all?: true;
+};
+export type FreeeIntegrationAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which FreeeIntegration to aggregate.
+     */
+    where?: Prisma.FreeeIntegrationWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of FreeeIntegrations to fetch.
+     */
+    orderBy?: Prisma.FreeeIntegrationOrderByWithRelationInput | Prisma.FreeeIntegrationOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: Prisma.FreeeIntegrationWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` FreeeIntegrations from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` FreeeIntegrations.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned FreeeIntegrations
+    **/
+    _count?: true | FreeeIntegrationCountAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to average
+    **/
+    _avg?: FreeeIntegrationAvgAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to sum
+    **/
+    _sum?: FreeeIntegrationSumAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: FreeeIntegrationMinAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: FreeeIntegrationMaxAggregateInputType;
+};
+export type GetFreeeIntegrationAggregateType<T extends FreeeIntegrationAggregateArgs> = {
+    [P in keyof T & keyof AggregateFreeeIntegration]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateFreeeIntegration[P]> : Prisma.GetScalarType<T[P], AggregateFreeeIntegration[P]>;
+};
+export type FreeeIntegrationGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.FreeeIntegrationWhereInput;
+    orderBy?: Prisma.FreeeIntegrationOrderByWithAggregationInput | Prisma.FreeeIntegrationOrderByWithAggregationInput[];
+    by: Prisma.FreeeIntegrationScalarFieldEnum[] | Prisma.FreeeIntegrationScalarFieldEnum;
+    having?: Prisma.FreeeIntegrationScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: FreeeIntegrationCountAggregateInputType | true;
+    _avg?: FreeeIntegrationAvgAggregateInputType;
+    _sum?: FreeeIntegrationSumAggregateInputType;
+    _min?: FreeeIntegrationMinAggregateInputType;
+    _max?: FreeeIntegrationMaxAggregateInputType;
+};
+export type FreeeIntegrationGroupByOutputType = {
+    id: string;
+    userId: string;
+    companyId: number;
+    companyName: string | null;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date;
+    scopes: string | null;
+    isActive: boolean;
+    lastSyncAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+    _count: FreeeIntegrationCountAggregateOutputType | null;
+    _avg: FreeeIntegrationAvgAggregateOutputType | null;
+    _sum: FreeeIntegrationSumAggregateOutputType | null;
+    _min: FreeeIntegrationMinAggregateOutputType | null;
+    _max: FreeeIntegrationMaxAggregateOutputType | null;
+};
+type GetFreeeIntegrationGroupByPayload<T extends FreeeIntegrationGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<FreeeIntegrationGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof FreeeIntegrationGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], FreeeIntegrationGroupByOutputType[P]> : Prisma.GetScalarType<T[P], FreeeIntegrationGroupByOutputType[P]>;
+}>>;
+export type FreeeIntegrationWhereInput = {
+    AND?: Prisma.FreeeIntegrationWhereInput | Prisma.FreeeIntegrationWhereInput[];
+    OR?: Prisma.FreeeIntegrationWhereInput[];
+    NOT?: Prisma.FreeeIntegrationWhereInput | Prisma.FreeeIntegrationWhereInput[];
+    id?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    userId?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    companyId?: Prisma.IntFilter<"FreeeIntegration"> | number;
+    companyName?: Prisma.StringNullableFilter<"FreeeIntegration"> | string | null;
+    accessToken?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    refreshToken?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    tokenExpiresAt?: Prisma.DateTimeFilter<"FreeeIntegration"> | Date | string;
+    scopes?: Prisma.StringNullableFilter<"FreeeIntegration"> | string | null;
+    isActive?: Prisma.BoolFilter<"FreeeIntegration"> | boolean;
+    lastSyncAt?: Prisma.DateTimeNullableFilter<"FreeeIntegration"> | Date | string | null;
+    createdAt?: Prisma.DateTimeFilter<"FreeeIntegration"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"FreeeIntegration"> | Date | string;
+    user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
+    syncLogs?: Prisma.FreeeSyncLogListRelationFilter;
+};
+export type FreeeIntegrationOrderByWithRelationInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    companyId?: Prisma.SortOrder;
+    companyName?: Prisma.SortOrderInput | Prisma.SortOrder;
+    accessToken?: Prisma.SortOrder;
+    refreshToken?: Prisma.SortOrder;
+    tokenExpiresAt?: Prisma.SortOrder;
+    scopes?: Prisma.SortOrderInput | Prisma.SortOrder;
+    isActive?: Prisma.SortOrder;
+    lastSyncAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    user?: Prisma.UserOrderByWithRelationInput;
+    syncLogs?: Prisma.FreeeSyncLogOrderByRelationAggregateInput;
+    _relevance?: Prisma.FreeeIntegrationOrderByRelevanceInput;
+};
+export type FreeeIntegrationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string;
+    userId_companyId?: Prisma.FreeeIntegrationUserIdCompanyIdCompoundUniqueInput;
+    AND?: Prisma.FreeeIntegrationWhereInput | Prisma.FreeeIntegrationWhereInput[];
+    OR?: Prisma.FreeeIntegrationWhereInput[];
+    NOT?: Prisma.FreeeIntegrationWhereInput | Prisma.FreeeIntegrationWhereInput[];
+    userId?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    companyId?: Prisma.IntFilter<"FreeeIntegration"> | number;
+    companyName?: Prisma.StringNullableFilter<"FreeeIntegration"> | string | null;
+    accessToken?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    refreshToken?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    tokenExpiresAt?: Prisma.DateTimeFilter<"FreeeIntegration"> | Date | string;
+    scopes?: Prisma.StringNullableFilter<"FreeeIntegration"> | string | null;
+    isActive?: Prisma.BoolFilter<"FreeeIntegration"> | boolean;
+    lastSyncAt?: Prisma.DateTimeNullableFilter<"FreeeIntegration"> | Date | string | null;
+    createdAt?: Prisma.DateTimeFilter<"FreeeIntegration"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"FreeeIntegration"> | Date | string;
+    user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
+    syncLogs?: Prisma.FreeeSyncLogListRelationFilter;
+}, "id" | "userId_companyId">;
+export type FreeeIntegrationOrderByWithAggregationInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    companyId?: Prisma.SortOrder;
+    companyName?: Prisma.SortOrderInput | Prisma.SortOrder;
+    accessToken?: Prisma.SortOrder;
+    refreshToken?: Prisma.SortOrder;
+    tokenExpiresAt?: Prisma.SortOrder;
+    scopes?: Prisma.SortOrderInput | Prisma.SortOrder;
+    isActive?: Prisma.SortOrder;
+    lastSyncAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    _count?: Prisma.FreeeIntegrationCountOrderByAggregateInput;
+    _avg?: Prisma.FreeeIntegrationAvgOrderByAggregateInput;
+    _max?: Prisma.FreeeIntegrationMaxOrderByAggregateInput;
+    _min?: Prisma.FreeeIntegrationMinOrderByAggregateInput;
+    _sum?: Prisma.FreeeIntegrationSumOrderByAggregateInput;
+};
+export type FreeeIntegrationScalarWhereWithAggregatesInput = {
+    AND?: Prisma.FreeeIntegrationScalarWhereWithAggregatesInput | Prisma.FreeeIntegrationScalarWhereWithAggregatesInput[];
+    OR?: Prisma.FreeeIntegrationScalarWhereWithAggregatesInput[];
+    NOT?: Prisma.FreeeIntegrationScalarWhereWithAggregatesInput | Prisma.FreeeIntegrationScalarWhereWithAggregatesInput[];
+    id?: Prisma.StringWithAggregatesFilter<"FreeeIntegration"> | string;
+    userId?: Prisma.StringWithAggregatesFilter<"FreeeIntegration"> | string;
+    companyId?: Prisma.IntWithAggregatesFilter<"FreeeIntegration"> | number;
+    companyName?: Prisma.StringNullableWithAggregatesFilter<"FreeeIntegration"> | string | null;
+    accessToken?: Prisma.StringWithAggregatesFilter<"FreeeIntegration"> | string;
+    refreshToken?: Prisma.StringWithAggregatesFilter<"FreeeIntegration"> | string;
+    tokenExpiresAt?: Prisma.DateTimeWithAggregatesFilter<"FreeeIntegration"> | Date | string;
+    scopes?: Prisma.StringNullableWithAggregatesFilter<"FreeeIntegration"> | string | null;
+    isActive?: Prisma.BoolWithAggregatesFilter<"FreeeIntegration"> | boolean;
+    lastSyncAt?: Prisma.DateTimeNullableWithAggregatesFilter<"FreeeIntegration"> | Date | string | null;
+    createdAt?: Prisma.DateTimeWithAggregatesFilter<"FreeeIntegration"> | Date | string;
+    updatedAt?: Prisma.DateTimeWithAggregatesFilter<"FreeeIntegration"> | Date | string;
+};
+export type FreeeIntegrationCreateInput = {
+    id?: string;
+    companyId: number;
+    companyName?: string | null;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date | string;
+    scopes?: string | null;
+    isActive?: boolean;
+    lastSyncAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutFreeeIntegrationsInput;
+    syncLogs?: Prisma.FreeeSyncLogCreateNestedManyWithoutIntegrationInput;
+};
+export type FreeeIntegrationUncheckedCreateInput = {
+    id?: string;
+    userId: string;
+    companyId: number;
+    companyName?: string | null;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date | string;
+    scopes?: string | null;
+    isActive?: boolean;
+    lastSyncAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    syncLogs?: Prisma.FreeeSyncLogUncheckedCreateNestedManyWithoutIntegrationInput;
+};
+export type FreeeIntegrationUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyId?: Prisma.IntFieldUpdateOperationsInput | number;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accessToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    tokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    scopes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutFreeeIntegrationsNestedInput;
+    syncLogs?: Prisma.FreeeSyncLogUpdateManyWithoutIntegrationNestedInput;
+};
+export type FreeeIntegrationUncheckedUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyId?: Prisma.IntFieldUpdateOperationsInput | number;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accessToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    tokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    scopes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    syncLogs?: Prisma.FreeeSyncLogUncheckedUpdateManyWithoutIntegrationNestedInput;
+};
+export type FreeeIntegrationCreateManyInput = {
+    id?: string;
+    userId: string;
+    companyId: number;
+    companyName?: string | null;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date | string;
+    scopes?: string | null;
+    isActive?: boolean;
+    lastSyncAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type FreeeIntegrationUpdateManyMutationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyId?: Prisma.IntFieldUpdateOperationsInput | number;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accessToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    tokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    scopes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type FreeeIntegrationUncheckedUpdateManyInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyId?: Prisma.IntFieldUpdateOperationsInput | number;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accessToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    tokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    scopes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type FreeeIntegrationListRelationFilter = {
+    every?: Prisma.FreeeIntegrationWhereInput;
+    some?: Prisma.FreeeIntegrationWhereInput;
+    none?: Prisma.FreeeIntegrationWhereInput;
+};
+export type FreeeIntegrationOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
+};
+export type FreeeIntegrationOrderByRelevanceInput = {
+    fields: Prisma.FreeeIntegrationOrderByRelevanceFieldEnum | Prisma.FreeeIntegrationOrderByRelevanceFieldEnum[];
+    sort: Prisma.SortOrder;
+    search: string;
+};
+export type FreeeIntegrationUserIdCompanyIdCompoundUniqueInput = {
+    userId: string;
+    companyId: number;
+};
+export type FreeeIntegrationCountOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    companyId?: Prisma.SortOrder;
+    companyName?: Prisma.SortOrder;
+    accessToken?: Prisma.SortOrder;
+    refreshToken?: Prisma.SortOrder;
+    tokenExpiresAt?: Prisma.SortOrder;
+    scopes?: Prisma.SortOrder;
+    isActive?: Prisma.SortOrder;
+    lastSyncAt?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type FreeeIntegrationAvgOrderByAggregateInput = {
+    companyId?: Prisma.SortOrder;
+};
+export type FreeeIntegrationMaxOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    companyId?: Prisma.SortOrder;
+    companyName?: Prisma.SortOrder;
+    accessToken?: Prisma.SortOrder;
+    refreshToken?: Prisma.SortOrder;
+    tokenExpiresAt?: Prisma.SortOrder;
+    scopes?: Prisma.SortOrder;
+    isActive?: Prisma.SortOrder;
+    lastSyncAt?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type FreeeIntegrationMinOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    companyId?: Prisma.SortOrder;
+    companyName?: Prisma.SortOrder;
+    accessToken?: Prisma.SortOrder;
+    refreshToken?: Prisma.SortOrder;
+    tokenExpiresAt?: Prisma.SortOrder;
+    scopes?: Prisma.SortOrder;
+    isActive?: Prisma.SortOrder;
+    lastSyncAt?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type FreeeIntegrationSumOrderByAggregateInput = {
+    companyId?: Prisma.SortOrder;
+};
+export type FreeeIntegrationScalarRelationFilter = {
+    is?: Prisma.FreeeIntegrationWhereInput;
+    isNot?: Prisma.FreeeIntegrationWhereInput;
+};
+export type FreeeIntegrationCreateNestedManyWithoutUserInput = {
+    create?: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutUserInput, Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput> | Prisma.FreeeIntegrationCreateWithoutUserInput[] | Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.FreeeIntegrationCreateOrConnectWithoutUserInput | Prisma.FreeeIntegrationCreateOrConnectWithoutUserInput[];
+    createMany?: Prisma.FreeeIntegrationCreateManyUserInputEnvelope;
+    connect?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+};
+export type FreeeIntegrationUncheckedCreateNestedManyWithoutUserInput = {
+    create?: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutUserInput, Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput> | Prisma.FreeeIntegrationCreateWithoutUserInput[] | Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.FreeeIntegrationCreateOrConnectWithoutUserInput | Prisma.FreeeIntegrationCreateOrConnectWithoutUserInput[];
+    createMany?: Prisma.FreeeIntegrationCreateManyUserInputEnvelope;
+    connect?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+};
+export type FreeeIntegrationUpdateManyWithoutUserNestedInput = {
+    create?: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutUserInput, Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput> | Prisma.FreeeIntegrationCreateWithoutUserInput[] | Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.FreeeIntegrationCreateOrConnectWithoutUserInput | Prisma.FreeeIntegrationCreateOrConnectWithoutUserInput[];
+    upsert?: Prisma.FreeeIntegrationUpsertWithWhereUniqueWithoutUserInput | Prisma.FreeeIntegrationUpsertWithWhereUniqueWithoutUserInput[];
+    createMany?: Prisma.FreeeIntegrationCreateManyUserInputEnvelope;
+    set?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+    disconnect?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+    delete?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+    connect?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+    update?: Prisma.FreeeIntegrationUpdateWithWhereUniqueWithoutUserInput | Prisma.FreeeIntegrationUpdateWithWhereUniqueWithoutUserInput[];
+    updateMany?: Prisma.FreeeIntegrationUpdateManyWithWhereWithoutUserInput | Prisma.FreeeIntegrationUpdateManyWithWhereWithoutUserInput[];
+    deleteMany?: Prisma.FreeeIntegrationScalarWhereInput | Prisma.FreeeIntegrationScalarWhereInput[];
+};
+export type FreeeIntegrationUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutUserInput, Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput> | Prisma.FreeeIntegrationCreateWithoutUserInput[] | Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.FreeeIntegrationCreateOrConnectWithoutUserInput | Prisma.FreeeIntegrationCreateOrConnectWithoutUserInput[];
+    upsert?: Prisma.FreeeIntegrationUpsertWithWhereUniqueWithoutUserInput | Prisma.FreeeIntegrationUpsertWithWhereUniqueWithoutUserInput[];
+    createMany?: Prisma.FreeeIntegrationCreateManyUserInputEnvelope;
+    set?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+    disconnect?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+    delete?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+    connect?: Prisma.FreeeIntegrationWhereUniqueInput | Prisma.FreeeIntegrationWhereUniqueInput[];
+    update?: Prisma.FreeeIntegrationUpdateWithWhereUniqueWithoutUserInput | Prisma.FreeeIntegrationUpdateWithWhereUniqueWithoutUserInput[];
+    updateMany?: Prisma.FreeeIntegrationUpdateManyWithWhereWithoutUserInput | Prisma.FreeeIntegrationUpdateManyWithWhereWithoutUserInput[];
+    deleteMany?: Prisma.FreeeIntegrationScalarWhereInput | Prisma.FreeeIntegrationScalarWhereInput[];
+};
+export type FreeeIntegrationCreateNestedOneWithoutSyncLogsInput = {
+    create?: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutSyncLogsInput, Prisma.FreeeIntegrationUncheckedCreateWithoutSyncLogsInput>;
+    connectOrCreate?: Prisma.FreeeIntegrationCreateOrConnectWithoutSyncLogsInput;
+    connect?: Prisma.FreeeIntegrationWhereUniqueInput;
+};
+export type FreeeIntegrationUpdateOneRequiredWithoutSyncLogsNestedInput = {
+    create?: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutSyncLogsInput, Prisma.FreeeIntegrationUncheckedCreateWithoutSyncLogsInput>;
+    connectOrCreate?: Prisma.FreeeIntegrationCreateOrConnectWithoutSyncLogsInput;
+    upsert?: Prisma.FreeeIntegrationUpsertWithoutSyncLogsInput;
+    connect?: Prisma.FreeeIntegrationWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.FreeeIntegrationUpdateToOneWithWhereWithoutSyncLogsInput, Prisma.FreeeIntegrationUpdateWithoutSyncLogsInput>, Prisma.FreeeIntegrationUncheckedUpdateWithoutSyncLogsInput>;
+};
+export type FreeeIntegrationCreateWithoutUserInput = {
+    id?: string;
+    companyId: number;
+    companyName?: string | null;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date | string;
+    scopes?: string | null;
+    isActive?: boolean;
+    lastSyncAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    syncLogs?: Prisma.FreeeSyncLogCreateNestedManyWithoutIntegrationInput;
+};
+export type FreeeIntegrationUncheckedCreateWithoutUserInput = {
+    id?: string;
+    companyId: number;
+    companyName?: string | null;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date | string;
+    scopes?: string | null;
+    isActive?: boolean;
+    lastSyncAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    syncLogs?: Prisma.FreeeSyncLogUncheckedCreateNestedManyWithoutIntegrationInput;
+};
+export type FreeeIntegrationCreateOrConnectWithoutUserInput = {
+    where: Prisma.FreeeIntegrationWhereUniqueInput;
+    create: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutUserInput, Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput>;
+};
+export type FreeeIntegrationCreateManyUserInputEnvelope = {
+    data: Prisma.FreeeIntegrationCreateManyUserInput | Prisma.FreeeIntegrationCreateManyUserInput[];
+    skipDuplicates?: boolean;
+};
+export type FreeeIntegrationUpsertWithWhereUniqueWithoutUserInput = {
+    where: Prisma.FreeeIntegrationWhereUniqueInput;
+    update: Prisma.XOR<Prisma.FreeeIntegrationUpdateWithoutUserInput, Prisma.FreeeIntegrationUncheckedUpdateWithoutUserInput>;
+    create: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutUserInput, Prisma.FreeeIntegrationUncheckedCreateWithoutUserInput>;
+};
+export type FreeeIntegrationUpdateWithWhereUniqueWithoutUserInput = {
+    where: Prisma.FreeeIntegrationWhereUniqueInput;
+    data: Prisma.XOR<Prisma.FreeeIntegrationUpdateWithoutUserInput, Prisma.FreeeIntegrationUncheckedUpdateWithoutUserInput>;
+};
+export type FreeeIntegrationUpdateManyWithWhereWithoutUserInput = {
+    where: Prisma.FreeeIntegrationScalarWhereInput;
+    data: Prisma.XOR<Prisma.FreeeIntegrationUpdateManyMutationInput, Prisma.FreeeIntegrationUncheckedUpdateManyWithoutUserInput>;
+};
+export type FreeeIntegrationScalarWhereInput = {
+    AND?: Prisma.FreeeIntegrationScalarWhereInput | Prisma.FreeeIntegrationScalarWhereInput[];
+    OR?: Prisma.FreeeIntegrationScalarWhereInput[];
+    NOT?: Prisma.FreeeIntegrationScalarWhereInput | Prisma.FreeeIntegrationScalarWhereInput[];
+    id?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    userId?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    companyId?: Prisma.IntFilter<"FreeeIntegration"> | number;
+    companyName?: Prisma.StringNullableFilter<"FreeeIntegration"> | string | null;
+    accessToken?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    refreshToken?: Prisma.StringFilter<"FreeeIntegration"> | string;
+    tokenExpiresAt?: Prisma.DateTimeFilter<"FreeeIntegration"> | Date | string;
+    scopes?: Prisma.StringNullableFilter<"FreeeIntegration"> | string | null;
+    isActive?: Prisma.BoolFilter<"FreeeIntegration"> | boolean;
+    lastSyncAt?: Prisma.DateTimeNullableFilter<"FreeeIntegration"> | Date | string | null;
+    createdAt?: Prisma.DateTimeFilter<"FreeeIntegration"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"FreeeIntegration"> | Date | string;
+};
+export type FreeeIntegrationCreateWithoutSyncLogsInput = {
+    id?: string;
+    companyId: number;
+    companyName?: string | null;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date | string;
+    scopes?: string | null;
+    isActive?: boolean;
+    lastSyncAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutFreeeIntegrationsInput;
+};
+export type FreeeIntegrationUncheckedCreateWithoutSyncLogsInput = {
+    id?: string;
+    userId: string;
+    companyId: number;
+    companyName?: string | null;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date | string;
+    scopes?: string | null;
+    isActive?: boolean;
+    lastSyncAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type FreeeIntegrationCreateOrConnectWithoutSyncLogsInput = {
+    where: Prisma.FreeeIntegrationWhereUniqueInput;
+    create: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutSyncLogsInput, Prisma.FreeeIntegrationUncheckedCreateWithoutSyncLogsInput>;
+};
+export type FreeeIntegrationUpsertWithoutSyncLogsInput = {
+    update: Prisma.XOR<Prisma.FreeeIntegrationUpdateWithoutSyncLogsInput, Prisma.FreeeIntegrationUncheckedUpdateWithoutSyncLogsInput>;
+    create: Prisma.XOR<Prisma.FreeeIntegrationCreateWithoutSyncLogsInput, Prisma.FreeeIntegrationUncheckedCreateWithoutSyncLogsInput>;
+    where?: Prisma.FreeeIntegrationWhereInput;
+};
+export type FreeeIntegrationUpdateToOneWithWhereWithoutSyncLogsInput = {
+    where?: Prisma.FreeeIntegrationWhereInput;
+    data: Prisma.XOR<Prisma.FreeeIntegrationUpdateWithoutSyncLogsInput, Prisma.FreeeIntegrationUncheckedUpdateWithoutSyncLogsInput>;
+};
+export type FreeeIntegrationUpdateWithoutSyncLogsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyId?: Prisma.IntFieldUpdateOperationsInput | number;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accessToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    tokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    scopes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutFreeeIntegrationsNestedInput;
+};
+export type FreeeIntegrationUncheckedUpdateWithoutSyncLogsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyId?: Prisma.IntFieldUpdateOperationsInput | number;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accessToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    tokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    scopes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type FreeeIntegrationCreateManyUserInput = {
+    id?: string;
+    companyId: number;
+    companyName?: string | null;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date | string;
+    scopes?: string | null;
+    isActive?: boolean;
+    lastSyncAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type FreeeIntegrationUpdateWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyId?: Prisma.IntFieldUpdateOperationsInput | number;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accessToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    tokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    scopes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    syncLogs?: Prisma.FreeeSyncLogUpdateManyWithoutIntegrationNestedInput;
+};
+export type FreeeIntegrationUncheckedUpdateWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyId?: Prisma.IntFieldUpdateOperationsInput | number;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accessToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    tokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    scopes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    syncLogs?: Prisma.FreeeSyncLogUncheckedUpdateManyWithoutIntegrationNestedInput;
+};
+export type FreeeIntegrationUncheckedUpdateManyWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyId?: Prisma.IntFieldUpdateOperationsInput | number;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accessToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
+    tokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    scopes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+/**
+ * Count Type FreeeIntegrationCountOutputType
+ */
+export type FreeeIntegrationCountOutputType = {
+    syncLogs: number;
+};
+export type FreeeIntegrationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    syncLogs?: boolean | FreeeIntegrationCountOutputTypeCountSyncLogsArgs;
+};
+/**
+ * FreeeIntegrationCountOutputType without action
+ */
+export type FreeeIntegrationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegrationCountOutputType
+     */
+    select?: Prisma.FreeeIntegrationCountOutputTypeSelect<ExtArgs> | null;
+};
+/**
+ * FreeeIntegrationCountOutputType without action
+ */
+export type FreeeIntegrationCountOutputTypeCountSyncLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.FreeeSyncLogWhereInput;
+};
+export type FreeeIntegrationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    userId?: boolean;
+    companyId?: boolean;
+    companyName?: boolean;
+    accessToken?: boolean;
+    refreshToken?: boolean;
+    tokenExpiresAt?: boolean;
+    scopes?: boolean;
+    isActive?: boolean;
+    lastSyncAt?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    syncLogs?: boolean | Prisma.FreeeIntegration$syncLogsArgs<ExtArgs>;
+    _count?: boolean | Prisma.FreeeIntegrationCountOutputTypeDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["freeeIntegration"]>;
+export type FreeeIntegrationSelectScalar = {
+    id?: boolean;
+    userId?: boolean;
+    companyId?: boolean;
+    companyName?: boolean;
+    accessToken?: boolean;
+    refreshToken?: boolean;
+    tokenExpiresAt?: boolean;
+    scopes?: boolean;
+    isActive?: boolean;
+    lastSyncAt?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+};
+export type FreeeIntegrationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "companyId" | "companyName" | "accessToken" | "refreshToken" | "tokenExpiresAt" | "scopes" | "isActive" | "lastSyncAt" | "createdAt" | "updatedAt", ExtArgs["result"]["freeeIntegration"]>;
+export type FreeeIntegrationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    syncLogs?: boolean | Prisma.FreeeIntegration$syncLogsArgs<ExtArgs>;
+    _count?: boolean | Prisma.FreeeIntegrationCountOutputTypeDefaultArgs<ExtArgs>;
+};
+export type $FreeeIntegrationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    name: "FreeeIntegration";
+    objects: {
+        user: Prisma.$UserPayload<ExtArgs>;
+        syncLogs: Prisma.$FreeeSyncLogPayload<ExtArgs>[];
+    };
+    scalars: runtime.Types.Extensions.GetPayloadResult<{
+        id: string;
+        userId: string;
+        companyId: number;
+        companyName: string | null;
+        accessToken: string;
+        refreshToken: string;
+        tokenExpiresAt: Date;
+        scopes: string | null;
+        isActive: boolean;
+        lastSyncAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }, ExtArgs["result"]["freeeIntegration"]>;
+    composites: {};
+};
+export type FreeeIntegrationGetPayload<S extends boolean | null | undefined | FreeeIntegrationDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload, S>;
+export type FreeeIntegrationCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<FreeeIntegrationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: FreeeIntegrationCountAggregateInputType | true;
+};
+export interface FreeeIntegrationDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: {
+        types: Prisma.TypeMap<ExtArgs>['model']['FreeeIntegration'];
+        meta: {
+            name: 'FreeeIntegration';
+        };
+    };
+    /**
+     * Find zero or one FreeeIntegration that matches the filter.
+     * @param {FreeeIntegrationFindUniqueArgs} args - Arguments to find a FreeeIntegration
+     * @example
+     * // Get one FreeeIntegration
+     * const freeeIntegration = await prisma.freeeIntegration.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FreeeIntegrationFindUniqueArgs>(args: Prisma.SelectSubset<T, FreeeIntegrationFindUniqueArgs<ExtArgs>>): Prisma.Prisma__FreeeIntegrationClient<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find one FreeeIntegration that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FreeeIntegrationFindUniqueOrThrowArgs} args - Arguments to find a FreeeIntegration
+     * @example
+     * // Get one FreeeIntegration
+     * const freeeIntegration = await prisma.freeeIntegration.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FreeeIntegrationFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, FreeeIntegrationFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__FreeeIntegrationClient<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first FreeeIntegration that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FreeeIntegrationFindFirstArgs} args - Arguments to find a FreeeIntegration
+     * @example
+     * // Get one FreeeIntegration
+     * const freeeIntegration = await prisma.freeeIntegration.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FreeeIntegrationFindFirstArgs>(args?: Prisma.SelectSubset<T, FreeeIntegrationFindFirstArgs<ExtArgs>>): Prisma.Prisma__FreeeIntegrationClient<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first FreeeIntegration that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FreeeIntegrationFindFirstOrThrowArgs} args - Arguments to find a FreeeIntegration
+     * @example
+     * // Get one FreeeIntegration
+     * const freeeIntegration = await prisma.freeeIntegration.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FreeeIntegrationFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, FreeeIntegrationFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__FreeeIntegrationClient<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find zero or more FreeeIntegrations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FreeeIntegrationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FreeeIntegrations
+     * const freeeIntegrations = await prisma.freeeIntegration.findMany()
+     *
+     * // Get first 10 FreeeIntegrations
+     * const freeeIntegrations = await prisma.freeeIntegration.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const freeeIntegrationWithIdOnly = await prisma.freeeIntegration.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends FreeeIntegrationFindManyArgs>(args?: Prisma.SelectSubset<T, FreeeIntegrationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>;
+    /**
+     * Create a FreeeIntegration.
+     * @param {FreeeIntegrationCreateArgs} args - Arguments to create a FreeeIntegration.
+     * @example
+     * // Create one FreeeIntegration
+     * const FreeeIntegration = await prisma.freeeIntegration.create({
+     *   data: {
+     *     // ... data to create a FreeeIntegration
+     *   }
+     * })
+     *
+     */
+    create<T extends FreeeIntegrationCreateArgs>(args: Prisma.SelectSubset<T, FreeeIntegrationCreateArgs<ExtArgs>>): Prisma.Prisma__FreeeIntegrationClient<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Create many FreeeIntegrations.
+     * @param {FreeeIntegrationCreateManyArgs} args - Arguments to create many FreeeIntegrations.
+     * @example
+     * // Create many FreeeIntegrations
+     * const freeeIntegration = await prisma.freeeIntegration.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends FreeeIntegrationCreateManyArgs>(args?: Prisma.SelectSubset<T, FreeeIntegrationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Delete a FreeeIntegration.
+     * @param {FreeeIntegrationDeleteArgs} args - Arguments to delete one FreeeIntegration.
+     * @example
+     * // Delete one FreeeIntegration
+     * const FreeeIntegration = await prisma.freeeIntegration.delete({
+     *   where: {
+     *     // ... filter to delete one FreeeIntegration
+     *   }
+     * })
+     *
+     */
+    delete<T extends FreeeIntegrationDeleteArgs>(args: Prisma.SelectSubset<T, FreeeIntegrationDeleteArgs<ExtArgs>>): Prisma.Prisma__FreeeIntegrationClient<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Update one FreeeIntegration.
+     * @param {FreeeIntegrationUpdateArgs} args - Arguments to update one FreeeIntegration.
+     * @example
+     * // Update one FreeeIntegration
+     * const freeeIntegration = await prisma.freeeIntegration.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends FreeeIntegrationUpdateArgs>(args: Prisma.SelectSubset<T, FreeeIntegrationUpdateArgs<ExtArgs>>): Prisma.Prisma__FreeeIntegrationClient<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Delete zero or more FreeeIntegrations.
+     * @param {FreeeIntegrationDeleteManyArgs} args - Arguments to filter FreeeIntegrations to delete.
+     * @example
+     * // Delete a few FreeeIntegrations
+     * const { count } = await prisma.freeeIntegration.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends FreeeIntegrationDeleteManyArgs>(args?: Prisma.SelectSubset<T, FreeeIntegrationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more FreeeIntegrations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FreeeIntegrationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FreeeIntegrations
+     * const freeeIntegration = await prisma.freeeIntegration.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends FreeeIntegrationUpdateManyArgs>(args: Prisma.SelectSubset<T, FreeeIntegrationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Create or update one FreeeIntegration.
+     * @param {FreeeIntegrationUpsertArgs} args - Arguments to update or create a FreeeIntegration.
+     * @example
+     * // Update or create a FreeeIntegration
+     * const freeeIntegration = await prisma.freeeIntegration.upsert({
+     *   create: {
+     *     // ... data to create a FreeeIntegration
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FreeeIntegration we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FreeeIntegrationUpsertArgs>(args: Prisma.SelectSubset<T, FreeeIntegrationUpsertArgs<ExtArgs>>): Prisma.Prisma__FreeeIntegrationClient<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Count the number of FreeeIntegrations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FreeeIntegrationCountArgs} args - Arguments to filter FreeeIntegrations to count.
+     * @example
+     * // Count the number of FreeeIntegrations
+     * const count = await prisma.freeeIntegration.count({
+     *   where: {
+     *     // ... the filter for the FreeeIntegrations we want to count
+     *   }
+     * })
+    **/
+    count<T extends FreeeIntegrationCountArgs>(args?: Prisma.Subset<T, FreeeIntegrationCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], FreeeIntegrationCountAggregateOutputType> : number>;
+    /**
+     * Allows you to perform aggregations operations on a FreeeIntegration.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FreeeIntegrationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FreeeIntegrationAggregateArgs>(args: Prisma.Subset<T, FreeeIntegrationAggregateArgs>): Prisma.PrismaPromise<GetFreeeIntegrationAggregateType<T>>;
+    /**
+     * Group by FreeeIntegration.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FreeeIntegrationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<T extends FreeeIntegrationGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: FreeeIntegrationGroupByArgs['orderBy'];
+    } : {
+        orderBy?: FreeeIntegrationGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
+            Error,
+            'Field ',
+            P,
+            ` in "having" needs to be provided in "by"`
+        ];
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields]>(args: Prisma.SubsetIntersection<T, FreeeIntegrationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFreeeIntegrationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>;
+    /**
+     * Fields of the FreeeIntegration model
+     */
+    readonly fields: FreeeIntegrationFieldRefs;
+}
+/**
+ * The delegate class that acts as a "Promise-like" for FreeeIntegration.
+ * Why is this prefixed with `Prisma__`?
+ * Because we want to prevent naming conflicts as mentioned in
+ * https://github.com/prisma/prisma-client-js/issues/707
+ */
+export interface Prisma__FreeeIntegrationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise";
+    user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    syncLogs<T extends Prisma.FreeeIntegration$syncLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FreeeIntegration$syncLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FreeeSyncLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
+}
+/**
+ * Fields of the FreeeIntegration model
+ */
+export interface FreeeIntegrationFieldRefs {
+    readonly id: Prisma.FieldRef<"FreeeIntegration", 'String'>;
+    readonly userId: Prisma.FieldRef<"FreeeIntegration", 'String'>;
+    readonly companyId: Prisma.FieldRef<"FreeeIntegration", 'Int'>;
+    readonly companyName: Prisma.FieldRef<"FreeeIntegration", 'String'>;
+    readonly accessToken: Prisma.FieldRef<"FreeeIntegration", 'String'>;
+    readonly refreshToken: Prisma.FieldRef<"FreeeIntegration", 'String'>;
+    readonly tokenExpiresAt: Prisma.FieldRef<"FreeeIntegration", 'DateTime'>;
+    readonly scopes: Prisma.FieldRef<"FreeeIntegration", 'String'>;
+    readonly isActive: Prisma.FieldRef<"FreeeIntegration", 'Boolean'>;
+    readonly lastSyncAt: Prisma.FieldRef<"FreeeIntegration", 'DateTime'>;
+    readonly createdAt: Prisma.FieldRef<"FreeeIntegration", 'DateTime'>;
+    readonly updatedAt: Prisma.FieldRef<"FreeeIntegration", 'DateTime'>;
+}
+/**
+ * FreeeIntegration findUnique
+ */
+export type FreeeIntegrationFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+    /**
+     * Filter, which FreeeIntegration to fetch.
+     */
+    where: Prisma.FreeeIntegrationWhereUniqueInput;
+};
+/**
+ * FreeeIntegration findUniqueOrThrow
+ */
+export type FreeeIntegrationFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+    /**
+     * Filter, which FreeeIntegration to fetch.
+     */
+    where: Prisma.FreeeIntegrationWhereUniqueInput;
+};
+/**
+ * FreeeIntegration findFirst
+ */
+export type FreeeIntegrationFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+    /**
+     * Filter, which FreeeIntegration to fetch.
+     */
+    where?: Prisma.FreeeIntegrationWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of FreeeIntegrations to fetch.
+     */
+    orderBy?: Prisma.FreeeIntegrationOrderByWithRelationInput | Prisma.FreeeIntegrationOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for FreeeIntegrations.
+     */
+    cursor?: Prisma.FreeeIntegrationWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` FreeeIntegrations from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` FreeeIntegrations.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of FreeeIntegrations.
+     */
+    distinct?: Prisma.FreeeIntegrationScalarFieldEnum | Prisma.FreeeIntegrationScalarFieldEnum[];
+};
+/**
+ * FreeeIntegration findFirstOrThrow
+ */
+export type FreeeIntegrationFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+    /**
+     * Filter, which FreeeIntegration to fetch.
+     */
+    where?: Prisma.FreeeIntegrationWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of FreeeIntegrations to fetch.
+     */
+    orderBy?: Prisma.FreeeIntegrationOrderByWithRelationInput | Prisma.FreeeIntegrationOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for FreeeIntegrations.
+     */
+    cursor?: Prisma.FreeeIntegrationWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` FreeeIntegrations from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` FreeeIntegrations.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of FreeeIntegrations.
+     */
+    distinct?: Prisma.FreeeIntegrationScalarFieldEnum | Prisma.FreeeIntegrationScalarFieldEnum[];
+};
+/**
+ * FreeeIntegration findMany
+ */
+export type FreeeIntegrationFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+    /**
+     * Filter, which FreeeIntegrations to fetch.
+     */
+    where?: Prisma.FreeeIntegrationWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of FreeeIntegrations to fetch.
+     */
+    orderBy?: Prisma.FreeeIntegrationOrderByWithRelationInput | Prisma.FreeeIntegrationOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing FreeeIntegrations.
+     */
+    cursor?: Prisma.FreeeIntegrationWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` FreeeIntegrations from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` FreeeIntegrations.
+     */
+    skip?: number;
+    distinct?: Prisma.FreeeIntegrationScalarFieldEnum | Prisma.FreeeIntegrationScalarFieldEnum[];
+};
+/**
+ * FreeeIntegration create
+ */
+export type FreeeIntegrationCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+    /**
+     * The data needed to create a FreeeIntegration.
+     */
+    data: Prisma.XOR<Prisma.FreeeIntegrationCreateInput, Prisma.FreeeIntegrationUncheckedCreateInput>;
+};
+/**
+ * FreeeIntegration createMany
+ */
+export type FreeeIntegrationCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FreeeIntegrations.
+     */
+    data: Prisma.FreeeIntegrationCreateManyInput | Prisma.FreeeIntegrationCreateManyInput[];
+    skipDuplicates?: boolean;
+};
+/**
+ * FreeeIntegration update
+ */
+export type FreeeIntegrationUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+    /**
+     * The data needed to update a FreeeIntegration.
+     */
+    data: Prisma.XOR<Prisma.FreeeIntegrationUpdateInput, Prisma.FreeeIntegrationUncheckedUpdateInput>;
+    /**
+     * Choose, which FreeeIntegration to update.
+     */
+    where: Prisma.FreeeIntegrationWhereUniqueInput;
+};
+/**
+ * FreeeIntegration updateMany
+ */
+export type FreeeIntegrationUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FreeeIntegrations.
+     */
+    data: Prisma.XOR<Prisma.FreeeIntegrationUpdateManyMutationInput, Prisma.FreeeIntegrationUncheckedUpdateManyInput>;
+    /**
+     * Filter which FreeeIntegrations to update
+     */
+    where?: Prisma.FreeeIntegrationWhereInput;
+    /**
+     * Limit how many FreeeIntegrations to update.
+     */
+    limit?: number;
+};
+/**
+ * FreeeIntegration upsert
+ */
+export type FreeeIntegrationUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+    /**
+     * The filter to search for the FreeeIntegration to update in case it exists.
+     */
+    where: Prisma.FreeeIntegrationWhereUniqueInput;
+    /**
+     * In case the FreeeIntegration found by the `where` argument doesn't exist, create a new FreeeIntegration with this data.
+     */
+    create: Prisma.XOR<Prisma.FreeeIntegrationCreateInput, Prisma.FreeeIntegrationUncheckedCreateInput>;
+    /**
+     * In case the FreeeIntegration was found with the provided `where` argument, update it with this data.
+     */
+    update: Prisma.XOR<Prisma.FreeeIntegrationUpdateInput, Prisma.FreeeIntegrationUncheckedUpdateInput>;
+};
+/**
+ * FreeeIntegration delete
+ */
+export type FreeeIntegrationDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+    /**
+     * Filter which FreeeIntegration to delete.
+     */
+    where: Prisma.FreeeIntegrationWhereUniqueInput;
+};
+/**
+ * FreeeIntegration deleteMany
+ */
+export type FreeeIntegrationDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which FreeeIntegrations to delete
+     */
+    where?: Prisma.FreeeIntegrationWhereInput;
+    /**
+     * Limit how many FreeeIntegrations to delete.
+     */
+    limit?: number;
+};
+/**
+ * FreeeIntegration.syncLogs
+ */
+export type FreeeIntegration$syncLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeSyncLog
+     */
+    select?: Prisma.FreeeSyncLogSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeSyncLog
+     */
+    omit?: Prisma.FreeeSyncLogOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeSyncLogInclude<ExtArgs> | null;
+    where?: Prisma.FreeeSyncLogWhereInput;
+    orderBy?: Prisma.FreeeSyncLogOrderByWithRelationInput | Prisma.FreeeSyncLogOrderByWithRelationInput[];
+    cursor?: Prisma.FreeeSyncLogWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.FreeeSyncLogScalarFieldEnum | Prisma.FreeeSyncLogScalarFieldEnum[];
+};
+/**
+ * FreeeIntegration without action
+ */
+export type FreeeIntegrationDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FreeeIntegration
+     */
+    select?: Prisma.FreeeIntegrationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the FreeeIntegration
+     */
+    omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.FreeeIntegrationInclude<ExtArgs> | null;
+};
+export {};
+//# sourceMappingURL=FreeeIntegration.d.ts.map

@@ -1,6 +1,3 @@
-// Integration Schema (freee API Integration)
-
-// 同期ステータス
 enum SyncStatus {
     PENDING
     IN_PROGRESS
@@ -10,25 +7,23 @@ enum SyncStatus {
     @@map("sync_status")
 }
 
-// 同期方向
 enum SyncDirection {
-    IMPORT  // freee -> CRM
-    EXPORT  // CRM -> freee
+    IMPORT
+    EXPORT
     BIDIRECTIONAL
 
     @@map("sync_direction")
 }
 
-// freee連携設定
 model FreeeIntegration {
     id                String    @id @default(uuid())
     userId            String    @map("user_id")
-    companyId         Int       @map("company_id") // freee事業所ID
+    companyId         Int       @map("company_id")
     companyName       String?   @map("company_name")
     accessToken       String    @map("access_token") @db.Text
     refreshToken      String    @map("refresh_token") @db.Text
     tokenExpiresAt    DateTime  @map("token_expires_at")
-    scopes            String?   // JSON array of granted scopes
+    scopes            String?
     isActive          Boolean   @default(true) @map("is_active")
     lastSyncAt        DateTime? @map("last_sync_at")
     createdAt         DateTime  @default(now()) @map("created_at")
@@ -43,17 +38,16 @@ model FreeeIntegration {
     @@map("freee_integrations")
 }
 
-// freee同期ログ
 model FreeeSyncLog {
     id             String        @id @default(uuid())
     integrationId  String        @map("integration_id")
     direction      SyncDirection
     status         SyncStatus    @default(PENDING)
-    entityType     String        @map("entity_type") // "partner", "deal", etc.
+    entityType     String        @map("entity_type")
     totalRecords   Int?          @map("total_records")
     successCount   Int?          @map("success_count")
     errorCount     Int?          @map("error_count")
-    errorDetails   String?       @map("error_details") @db.Text // JSON array
+    errorDetails   String?       @map("error_details") @db.Text
     startedAt      DateTime?     @map("started_at")
     completedAt    DateTime?     @map("completed_at")
     createdAt      DateTime      @default(now()) @map("created_at")
@@ -67,14 +61,13 @@ model FreeeSyncLog {
     @@map("freee_sync_logs")
 }
 
-// 顧客 - freee取引先マッピング
 model CustomerFreeeMapping {
     id              String   @id @default(uuid())
     customerId      String   @map("customer_id")
     freeePartnerId  Int      @map("freee_partner_id")
     freeeCompanyId  Int      @map("freee_company_id")
     lastSyncAt      DateTime @map("last_sync_at")
-    syncHash        String?  @map("sync_hash") // 変更検出用ハッシュ
+    syncHash        String?  @map("sync_hash")
     createdAt       DateTime @default(now()) @map("created_at")
     updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -86,14 +79,13 @@ model CustomerFreeeMapping {
     @@map("customer_freee_mappings")
 }
 
-// 商談 - freee取引マッピング
 model DealFreeeMapping {
     id             String   @id @default(uuid())
     dealId         String   @map("deal_id")
     freeeDealId    Int      @map("freee_deal_id")
     freeeCompanyId Int      @map("freee_company_id")
     lastSyncAt     DateTime @map("last_sync_at")
-    syncHash       String?  @map("sync_hash") // 変更検出用ハッシュ
+    syncHash       String?  @map("sync_hash")
     createdAt      DateTime @default(now()) @map("created_at")
     updatedAt      DateTime @updatedAt @map("updated_at")
 

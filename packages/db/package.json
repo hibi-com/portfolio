@@ -32,7 +32,8 @@
     "with-env": "env --"
   },
   "dependencies": {
-    "@prisma/client": "5.22.0"
+    "@prisma/client": "7.3.0",
+    "@prisma/adapter-mariadb": "7.3.0"
   },
   "devDependencies": {
     "@portfolio/biome-config": "workspace:*",
@@ -40,7 +41,7 @@
     "@portfolio/prisma-markdown": "workspace:*",
     "@portfolio/tsconfig": "workspace:*",
     "@portfolio/vitest-config": "workspace:*",
-    "prisma": "5.22.0",
+    "prisma": "7.3.0",
     "typescript": "5.9.3",
     "vitest": "3.2.4",
     "vitest-environment-miniflare": "2.14.4"

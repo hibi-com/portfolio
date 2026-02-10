@@ -5,11 +5,10 @@ generator markdown {
 }
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["prismaSchemaFolder"]
+  provider = "prisma-client"
+  output   = "../../generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }

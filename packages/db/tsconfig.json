@@ -3,13 +3,11 @@
     "extends": ["@portfolio/tsconfig/compiled-package.json"],
     "compilerOptions": {
         "baseUrl": ".",
-        "paths": {
-            "~/*": ["./src/*"]
-        },
-        "rootDir": "./src",
+        "paths": { "~/*": ["./src/*"] },
+        "rootDir": ".",
         "typeRoots": ["../../node_modules"],
         "types": ["@cloudflare/workers-types", "vitest/globals"]
     },
     "exclude": ["node_modules", "dist"],
-    "include": ["src/**/*.ts", "prisma/user.ts"]
+    "include": ["src/**/*.ts", "generated/prisma/**/*.ts"]
 }

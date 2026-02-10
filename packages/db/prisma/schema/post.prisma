@@ -4,8 +4,8 @@ model Post {
     slug        String   @unique
     date        DateTime
     description String?
-    content     String   // HTML content
-    contentRaw  String?  @map("content_raw") // Raw JSON content
+    content     String
+    contentRaw  String?  @map("content_raw")
     imageTemp   String   @map("image_temp")
     sticky      Boolean  @default(false)
     intro       String?

@@ -1,6 +1,3 @@
-// CRM (Customer Relationship Management) Schema
-
-// 顧客ステータス
 enum CustomerStatus {
     ACTIVE
     INACTIVE
@@ -10,7 +7,6 @@ enum CustomerStatus {
     @@map("customer_status")
 }
 
-// リードステータス
 enum LeadStatus {
     NEW
     CONTACTED
@@ -21,7 +17,6 @@ enum LeadStatus {
     @@map("lead_status")
 }
 
-// 商談ステータス
 enum DealStatus {
     OPEN
     WON
@@ -31,7 +26,6 @@ enum DealStatus {
     @@map("deal_status")
 }
 
-// コンタクト種別
 enum ContactType {
     EMAIL
     PHONE
@@ -43,7 +37,6 @@ enum ContactType {
     @@map("contact_type")
 }
 
-// 顧客
 model Customer {
     id             String         @id @default(uuid())
     name           String
@@ -54,8 +47,8 @@ model Customer {
     address        String?        @db.Text
     notes          String?        @db.Text
     status         CustomerStatus @default(PROSPECT)
-    tags           String?        // JSON array as string
-    customFields   String?        @map("custom_fields") @db.Text // JSON object as string
+    tags           String?
+    customFields   String?        @map("custom_fields") @db.Text
     createdAt      DateTime       @default(now()) @map("created_at")
     updatedAt      DateTime       @updatedAt @map("updated_at")
 
@@ -72,7 +65,6 @@ model Customer {
     @@map("customers")
 }
 
-// リード（見込み客）
 model Lead {
     id           String     @id @default(uuid())
     customerId   String?    @map("customer_id")
@@ -80,9 +72,9 @@ model Lead {
     email        String?
     phone        String?
     company      String?
-    source       String?    // 流入元 (web, referral, ad, etc.)
+    source       String?
     status       LeadStatus @default(NEW)
-    score        Int?       // リードスコア
+    score        Int?
     notes        String?    @db.Text
     convertedAt  DateTime?  @map("converted_at")
     createdAt    DateTime   @default(now()) @map("created_at")
@@ -96,7 +88,6 @@ model Lead {
     @@map("leads")
 }
 
-// パイプライン
 model Pipeline {
     id          String   @id @default(uuid())
     name        String
@@ -110,14 +101,13 @@ model Pipeline {
     @@map("pipelines")
 }
 
-// パイプラインステージ
 model PipelineStage {
     id          String   @id @default(uuid())
     pipelineId  String   @map("pipeline_id")
     name        String
     order       Int
-    probability Int?     // 成約確率 (0-100)
-    color       String?  // ステージの色 (hex)
+    probability Int?
+    color       String?
     createdAt   DateTime @default(now()) @map("created_at")
     updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -128,14 +118,13 @@ model PipelineStage {
     @@map("pipeline_stages")
 }
 
-// 商談
 model Deal {
     id             String     @id @default(uuid())
     customerId     String?    @map("customer_id")
     leadId         String?    @unique @map("lead_id")
     stageId        String     @map("stage_id")
     name           String
-    value          Decimal?   @db.Decimal(15, 2) // 商談金額
+    value          Decimal?   @db.Decimal(15, 2)
     currency       String     @default("JPY")
     expectedCloseDate DateTime? @map("expected_close_date")
     actualCloseDate DateTime? @map("actual_close_date")
@@ -156,11 +145,10 @@ model Deal {
     @@map("deals")
 }
 
-// コンタクト履歴
 model ContactHistory {
     id          String      @id @default(uuid())
     customerId  String      @map("customer_id")
-    userId      String?     @map("user_id") // 担当者
+    userId      String?     @map("user_id")
     type        ContactType
     subject     String?
     content     String?     @db.Text

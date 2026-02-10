@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@portfolio/db";
 import type {
     AddParticipantInput,
     ChatMessage,

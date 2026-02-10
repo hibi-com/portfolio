@@ -8,9 +8,9 @@ model UserExperience {
     dateStart   DateTime? @map("date_start")
     dateEnd     DateTime? @map("date_end")
     description String
-    highlights  String    // JSON array as string
+    highlights  String
     image       String?
-    tags        String    // JSON array as string
+    tags        String
     title       String
     createdAt   DateTime  @default(now()) @map("created_at")
     updatedAt   DateTime  @updatedAt @map("updated_at")

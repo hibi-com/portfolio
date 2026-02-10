@@ -7,7 +7,7 @@ model Portfolio {
     current       Boolean  @default(false)
     overview      String?
     description   String?
-    content       String?  // HTML content
+    content       String?
     thumbnailTemp String?  @map("thumbnail_temp")
     intro         String?
     createdAt     DateTime @default(now()) @map("created_at")

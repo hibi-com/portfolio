@@ -1,4 +1,3 @@
-
 model User {
   id            String           @id
   name          String           @db.Text
@@ -12,8 +11,6 @@ model User {
   accounts      Account[]
   experiences   UserExperience[]
   socials       UserSocial[]
-
-  // CRM Relations
   contactHistories   ContactHistory[]
   assignedInquiries  Inquiry[]
   inquiryResponses   InquiryResponse[]
