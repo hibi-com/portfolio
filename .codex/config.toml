@@ -1,0 +1,13 @@
+model = "gpt-5.3-codex"
+model_verbosity = "medium"
+sandbox_mode = "read-only"
+approval_policy = "untrusted"
+notify = ["afplay /System/Library/Sounds/Ping.aiff"]
+
+[tui]
+notifications = ["agent-turn-complete", "approval-requested"]
+
+[shell_environment_policy]
+inherit = "core"
+include_only = ["PATH", "HOME", "USER"]
+exclude = ["AWS_*", "AZURE_*", "*TOKEN*", "*SECRET*", "*KEY*"]

@@ -1,6 +1,6 @@
 # Portfolio Project
 
-> Turborepo + Bun + Cloudflare で構築されたフルスタックポートフォリオサイト
+個人ポートフォリオサイト。ブログ、ポートフォリオ、CRM機能を持つフルスタックアプリケーション。
 
 ## IMPORTANT: 最優先ルール
 
@@ -8,59 +8,72 @@
 2. **不明点はユーザーに確認** → 推測で実装しない
 3. **日本語でコミュニケーション** → 報告・計画・ドキュメントすべて日本語
 
-## 頻出コマンド
+## WHAT: プロジェクト構造
+
+```text
+apps/
+├── api/      # Hono + DDD - REST APIサーバー（Cloudflare Workers）
+├── web/      # Remix + FSD - 公開サイト（Cloudflare Pages）
+└── admin/    # TanStack Router + FSD - 管理画面（Cloudflare Pages）
+
+packages/
+├── db/         # Prisma - データベーススキーマ・クライアント
+├── api/        # Hono RPC - 型安全APIクライアント
+├── validation/ # Zod - バリデーションスキーマ
+├── auth/       # 認証ユーティリティ
+└── ui/         # shadcn/ui - 共通UIコンポーネント
+
+docs/
+├── sequence/   # シーケンス図 - 実装フローの可視化
+├── specs/      # API・DB仕様書
+└── user-stories/ # ユーザーストーリー
+```
+
+## WHY: 設計思想
+
+- **Monorepo（Turborepo）**: パッケージ間の型共有、一括ビルド・テスト
+- **DDD（API）**: ドメイン知識の集約、依存関係の明確化
+- **FSD（Frontend）**: 機能単位のモジュール化、レイヤー間依存の制御
+- **Cloudflare**: エッジでの高速配信、D1/KVによるデータ管理
+
+## HOW: 変更の検証
+
+変更が正しいか確認するコマンド:
+
+```bash
+bun run fmt:check    # ① フォーマット - スタイル違反がないこと
+bun run lint         # ② リント - スタイル違反がないこと
+bun run typecheck    # ③ 型チェック - 型エラーがないこと
+bun run test         # ④ ユニットテスト - 全テスト通過
+bun run build        # ⑤ ビルド - 本番ビルドが成功すること
+```
+
+すべてのコマンドが成功 = 変更OK
+
+## 開発コマンド
 
 ```bash
 bun install          # 依存関係インストール
-bun run dev          # 開発サーバー起動
-bun run test         # ユニットテスト
-bun run lint         # リント
-bun run e2e          # E2Eテスト
+bun run dev          # 開発サーバー起動（全アプリ）
+bun run db:generate  # Prisma型生成
+bun run e2e          # E2Eテスト（Playwright）
 ```
 
-## アーキテクチャ
+## 重要な規約
 
-| パス | 技術スタック |
-| ---- | ------------ |
-| apps/api | Hono + DDD |
-| apps/web | Remix + FSD |
-| apps/admin | TanStack Router + FSD |
-| packages/ | 共通パッケージ（db, api, auth, ui, validation） |
+| 状況 | 行動 |
+| ---- | ---- |
+| 実装前 | `docs/sequence/`, `docs/specs/` を確認 |
+| 不明点 | 推測せずユーザーに質問 |
+| コミット | Conventional Commits形式 |
 
-詳細 → `docs/architecture/`
+詳細 → `.claude/rules/`
 
-## プロジェクト固有の罠（トリガー＆アクション）
+## 禁止
 
-### DB操作
-
-- `schema.prisma` を変更するとき → `packages/db/prisma/schema/*.prisma` を編集して `bun run db:generate` を実行
-
-### API実装
-
-- 新しいAPIエンドポイントを追加するとき → `docs/sequence/api/` にシーケンス図を先に作成
-- UseCaseを実装するとき → DIコンテナ経由でRepositoryを注入（直接newしない）
-
-### フロントエンド
-
-- Cloudflare環境で環境変数を使うとき → `process.env` ではなく `import.meta.env` を使用
-- コンポーネントを作成するとき → FSD構造に従い `features/`, `entities/`, `shared/` に配置
-
-### テスト
-
-- 新機能を実装するとき → テストを先に書く（TDD: Red → Green → Refactor）
-- Medium Testを書くとき → 対応するシーケンス図のパスを `@sequence` JSDocで記載
-
-### Git
-
-- コミットするとき → Conventional Commits形式（`feat:`, `fix:`, `docs:`, `refactor:`）
-- PRを作成するとき → 全テスト通過を確認してから作成
-
-## 禁止事項
-
-- `vim`, `nano`, `emacs` → シェルがフリーズする
-- `less`, `more` → `cat` を使用
+- `vim`, `nano`, `less`, `more` → シェルがフリーズ
 - `rm -rf /`, `git push --force` → 破壊的操作
-- 認証情報のハードコード → 環境変数を使用
+- 認証情報のハードコード
 
 ## 作業ログ
 
