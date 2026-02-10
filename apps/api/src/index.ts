@@ -4,10 +4,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 import { openapiRouter } from "./interface/openapi";
-import { ChatRoomDO } from "./interface/websocket/ChatRoomDO";
 import { getLogger, initLogger } from "./lib/logger";
 
-export { ChatRoomDO };
+export { ChatRoomDO } from "./interface/websocket/ChatRoomDO";
 
 type Env = {
     DATABASE_URL: string;
