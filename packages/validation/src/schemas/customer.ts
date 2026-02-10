@@ -5,10 +5,10 @@ export const customerStatusSchema = z.enum(["ACTIVE", "INACTIVE", "PROSPECT", "C
 export const customerSchema = z.object({
     id: z.string().min(1),
     name: z.string().min(1),
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     phone: z.string().optional(),
     company: z.string().optional(),
-    website: z.string().url().optional(),
+    website: z.url().optional(),
     address: z.string().optional(),
     notes: z.string().optional(),
     status: customerStatusSchema,
@@ -20,10 +20,10 @@ export const customerSchema = z.object({
 
 export const createCustomerInputSchema = z.object({
     name: z.string().min(1),
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     phone: z.string().optional(),
     company: z.string().optional(),
-    website: z.string().url().optional(),
+    website: z.url().optional(),
     address: z.string().optional(),
     notes: z.string().optional(),
     status: customerStatusSchema.optional(),
@@ -33,10 +33,10 @@ export const createCustomerInputSchema = z.object({
 
 export const updateCustomerInputSchema = z.object({
     name: z.string().min(1).optional(),
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     phone: z.string().optional(),
     company: z.string().optional(),
-    website: z.string().url().optional(),
+    website: z.url().optional(),
     address: z.string().optional(),
     notes: z.string().optional(),
     status: customerStatusSchema.optional(),

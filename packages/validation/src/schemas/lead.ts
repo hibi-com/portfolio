@@ -6,7 +6,7 @@ export const leadSchema = z.object({
     id: z.string().min(1),
     customerId: z.string().optional(),
     name: z.string().min(1),
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     phone: z.string().optional(),
     company: z.string().optional(),
     source: z.string().optional(),
@@ -21,7 +21,7 @@ export const leadSchema = z.object({
 export const createLeadInputSchema = z.object({
     customerId: z.string().optional(),
     name: z.string().min(1),
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     phone: z.string().optional(),
     company: z.string().optional(),
     source: z.string().optional(),
@@ -33,7 +33,7 @@ export const createLeadInputSchema = z.object({
 export const updateLeadInputSchema = z.object({
     customerId: z.string().optional(),
     name: z.string().min(1).optional(),
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     phone: z.string().optional(),
     company: z.string().optional(),
     source: z.string().optional(),
