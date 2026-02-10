@@ -6,11 +6,10 @@ title: "Git Commit ガイドライン"
 
 このプロジェクトでは[Conventional Commits](https://www.conventionalcommits.org/)形式に基づいた
 コミットメッセージを使用します。
-`commitlint.config.js`の設定に従い、一貫性のあるコミット履歴を維持します。
 
 ## コミットメッセージの形式
 
-`commitlint.config.js`の設定では、**コミットタイプ（type）のみが必須**です。
+コミットタイプ（type）のみが必須です。
 
 ### 形式
 
@@ -22,7 +21,7 @@ title: "Git Commit ガイドライン"
 
 ## コミットタイプ
 
-`commitlint.config.js`で許可されている次の13種類のタイプを使用します。
+許可しているのは以下の13種類のタイプのみです。
 
 ### feat - 新機能
 
@@ -145,7 +144,7 @@ security
 
 ### 重要なポイント
 
-`commitlint.config.js`の設定では、**コミットタイプ（type）のみが必須**です。
+コミットタイプ（type）のみが必須です。
 
 - **type**: 必須。次の13種類から選択
 

@@ -52,8 +52,6 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.29.8",
-    "@commitlint/cli": "20.3.0",
-    "@commitlint/config-conventional": "20.3.0",
     "@portfolio/changelog-config": "workspace:*",
     "@portfolio/scripts-check": "workspace:*",
     "@portfolio/scripts-workspace": "workspace:*",
