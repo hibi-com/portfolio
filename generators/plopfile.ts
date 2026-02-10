@@ -317,14 +317,14 @@ export default function plopfile(plop: NodePlopAPI) {
 
     plop.setHelper("kebabCase", (text: string) => {
         return text
-            .replace(/([a-z])([A-Z])/g, "$1-$2")
-            .replace(/\s+/g, "-")
+            .replaceAll(/([a-z])([A-Z])/g, "$1-$2")
+            .replaceAll(/\s+/g, "-")
             .toLowerCase();
     });
 
     plop.setHelper("camelCase", (text: string) => {
         return text
-            .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
-            .replace(/^[A-Z]/, (letter) => letter.toLowerCase());
+            .replaceAll(/-([a-z])/g, (_, letter) => letter.toUpperCase())
+            .replaceAll(/^[A-Z]/g, (letter) => letter.toLowerCase());
     });
 }
