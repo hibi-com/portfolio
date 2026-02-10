@@ -3,8 +3,6 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { oAuthProxy } from "better-auth/plugins";
 
-// better-auth CLI は設定ファイルを読み込むだけで実行しないため、
-// ダミーの Prisma クライアントを使用します
 const dummyPrisma = {} as any;
 
 export const auth = betterAuth({
