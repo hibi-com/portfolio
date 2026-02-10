@@ -38,6 +38,7 @@ const isPreview = process.argv.includes("preview");
 export default defineConfig({
     site: "https://wiki.ageha734.jp",
     output: "static",
+    outDir: "build",
     adapter: isPreview ? undefined : cloudflare(),
     integrations: [
         react(),

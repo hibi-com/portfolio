@@ -9,6 +9,6 @@
             "~/*": ["./app/*"]
         }
     },
-    "exclude": ["node_modules", "dist", ".tanstack", "../../packages/api/dist/generated"],
+    "exclude": ["node_modules", "build", ".tanstack", "../../packages/api/dist/generated"],
     "include": ["app/**/*", ".storybook", "vite.config.ts", "env.d.ts", "functions/**/*", "integration/**/*"]
 }

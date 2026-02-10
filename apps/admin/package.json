@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "bun run with-env vite build",
-    "clean:build": "git clean -xdf .tanstack .wrangler",
+    "clean:build": "git clean -xdf .tanstack .wrangler build",
     "clean:cache": "git clean -xdf .cache .turbo",
-    "clean:pkg": "git clean -xdf node_modules dist",
+    "clean:pkg": "git clean -xdf node_modules build",
     "coverage": "vitest run --coverage",
     "deploy": "wrangler pages deploy --project-name portfolio-admin-o1dhv1 --branch master",
     "dev": "bun run with-env vite",

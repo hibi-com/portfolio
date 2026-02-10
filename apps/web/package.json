@@ -9,7 +9,7 @@
     "build:ui": "storybook build -o ../wiki/design/web",
     "clean:build": "git clean -xdf .cache build .wrangler",
     "clean:cache": "git clean -xdf .cache .turbo",
-    "clean:pkg": "git clean -xdf node_modules dist",
+    "clean:pkg": "git clean -xdf node_modules build",
     "coverage": "vitest run --coverage",
     "deploy": "wrangler pages deploy --project-name portfolio-web-9xkcig --branch master",
     "dev": "bun run with-env remix vite:dev",

@@ -31,7 +31,7 @@ RUN jq 'del(.devDependencies) | '\
 
 FROM nginx:alpine-slim
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/build /usr/share/nginx/html
 
 RUN printf "%s" \
   "server{listen 80;root /usr/share/nginx/html;index index.html;" \

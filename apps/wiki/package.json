@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "astro build",
-    "clean:build": "git clean -xdf .cache .astro .wrangler",
+    "clean:build": "git clean -xdf .cache .astro .wrangler build",
     "clean:cache": "git clean -xdf .cache .turbo",
-    "clean:pkg": "git clean -xdf node_modules dist",
+    "clean:pkg": "git clean -xdf node_modules build",
     "deploy": "wrangler pages deploy --project-name portfolio-wiki-x6z33n --branch master",
     "fmt": "biome format --write .",
     "fmt:check": "biome format .",

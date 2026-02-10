@@ -27,6 +27,7 @@ export default defineConfig({
         external: ["@sentry/node"],
     },
     build: {
+        outDir: "build",
         rollupOptions: {
             external: (id) => {
                 if (id === "@sentry/node" || id.startsWith("@sentry/node/")) {
