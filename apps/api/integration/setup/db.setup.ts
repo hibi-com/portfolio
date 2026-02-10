@@ -1,4 +1,10 @@
-import { createPrismaClient, type PrismaClient, resetPrismaInstance } from "@portfolio/db";
+import {
+    createPrismaClient,
+    type InquiryCategory,
+    type InquiryStatus,
+    type PrismaClient,
+    resetPrismaInstance,
+} from "@portfolio/db";
 
 let prisma: PrismaClient | null = null;
 
@@ -126,128 +132,135 @@ export interface TestSeedData {
     }>;
 }
 
+async function seedPosts(rows: NonNullable<TestSeedData["posts"]>): Promise<void> {
+    for (const post of rows) {
+        await prisma!.post.create({
+            data: {
+                id: post.id,
+                title: post.title,
+                slug: post.slug,
+                content: post.content ?? "",
+                description: post.description,
+                imageTemp: post.imageTemp ?? "",
+                sticky: post.sticky ?? false,
+                date: post.date ?? new Date(),
+            },
+        });
+    }
+}
+
+async function seedPortfolios(rows: NonNullable<TestSeedData["portfolios"]>): Promise<void> {
+    for (const portfolio of rows) {
+        await prisma!.portfolio.create({
+            data: {
+                id: portfolio.id,
+                title: portfolio.title,
+                slug: portfolio.slug,
+                company: portfolio.company ?? "",
+                description: portfolio.description,
+                thumbnailTemp: portfolio.thumbnailTemp,
+                date: portfolio.date ?? new Date(),
+            },
+        });
+    }
+}
+
+async function seedCustomers(rows: NonNullable<TestSeedData["customers"]>): Promise<void> {
+    for (const customer of rows) {
+        await prisma!.customer.create({
+            data: {
+                id: customer.id,
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone,
+                company: customer.company,
+                status: customer.status ?? "PROSPECT",
+            },
+        });
+    }
+}
+
+async function seedPipelines(rows: NonNullable<TestSeedData["pipelines"]>): Promise<void> {
+    for (const pipeline of rows) {
+        await prisma!.pipeline.create({
+            data: {
+                id: pipeline.id,
+                name: pipeline.name,
+                description: pipeline.description,
+                isDefault: pipeline.isDefault ?? false,
+                stages: pipeline.stages
+                    ? {
+                          create: pipeline.stages.map((s) => ({
+                              id: s.id,
+                              name: s.name,
+                              order: s.order,
+                              probability: s.probability,
+                          })),
+                      }
+                    : undefined,
+            },
+        });
+    }
+}
+
+async function seedLeads(rows: NonNullable<TestSeedData["leads"]>): Promise<void> {
+    for (const lead of rows) {
+        await prisma!.lead.create({
+            data: {
+                id: lead.id,
+                name: lead.name,
+                email: lead.email,
+                customerId: lead.customerId,
+                status: lead.status ?? "NEW",
+                source: lead.source,
+            },
+        });
+    }
+}
+
+async function seedDeals(rows: NonNullable<TestSeedData["deals"]>): Promise<void> {
+    for (const deal of rows) {
+        await prisma!.deal.create({
+            data: {
+                id: deal.id,
+                name: deal.name,
+                customerId: deal.customerId,
+                leadId: deal.leadId,
+                stageId: deal.stageId,
+                value: deal.value,
+                status: deal.status ?? "OPEN",
+            },
+        });
+    }
+}
+
+async function seedInquiries(rows: NonNullable<TestSeedData["inquiries"]>): Promise<void> {
+    for (const inquiry of rows) {
+        await prisma!.inquiry.create({
+            data: {
+                id: inquiry.id,
+                customerId: inquiry.customerId,
+                subject: inquiry.subject,
+                content: inquiry.content,
+                category: (inquiry.category ?? "GENERAL") as InquiryCategory,
+                priority: inquiry.priority ?? "MEDIUM",
+                status: (inquiry.status ?? "OPEN") as InquiryStatus,
+            },
+        });
+    }
+}
+
 export async function seedTestData(data: TestSeedData): Promise<void> {
     if (!prisma) {
         throw new Error("Database not initialized. Call setupTestDb first.");
     }
-
-    if (data.posts) {
-        for (const post of data.posts) {
-            await prisma.post.create({
-                data: {
-                    id: post.id,
-                    title: post.title,
-                    slug: post.slug,
-                    content: post.content || "",
-                    description: post.description,
-                    imageTemp: post.imageTemp || "",
-                    sticky: post.sticky || false,
-                    date: post.date || new Date(),
-                },
-            });
-        }
-    }
-
-    if (data.portfolios) {
-        for (const portfolio of data.portfolios) {
-            await prisma.portfolio.create({
-                data: {
-                    id: portfolio.id,
-                    title: portfolio.title,
-                    slug: portfolio.slug,
-                    company: portfolio.company || "",
-                    description: portfolio.description,
-                    thumbnailTemp: portfolio.thumbnailTemp,
-                    date: portfolio.date || new Date(),
-                },
-            });
-        }
-    }
-
-    if (data.customers) {
-        for (const customer of data.customers) {
-            await prisma.customer.create({
-                data: {
-                    id: customer.id,
-                    name: customer.name,
-                    email: customer.email,
-                    phone: customer.phone,
-                    company: customer.company,
-                    status: customer.status || "PROSPECT",
-                },
-            });
-        }
-    }
-
-    if (data.pipelines) {
-        for (const pipeline of data.pipelines) {
-            await prisma.pipeline.create({
-                data: {
-                    id: pipeline.id,
-                    name: pipeline.name,
-                    description: pipeline.description,
-                    isDefault: pipeline.isDefault || false,
-                    stages: pipeline.stages
-                        ? {
-                              create: pipeline.stages.map((s) => ({
-                                  id: s.id,
-                                  name: s.name,
-                                  order: s.order,
-                                  probability: s.probability,
-                              })),
-                          }
-                        : undefined,
-                },
-            });
-        }
-    }
-
-    if (data.leads) {
-        for (const lead of data.leads) {
-            await prisma.lead.create({
-                data: {
-                    id: lead.id,
-                    name: lead.name,
-                    email: lead.email,
-                    customerId: lead.customerId,
-                    status: lead.status || "NEW",
-                    source: lead.source,
-                },
-            });
-        }
-    }
-
-    if (data.deals) {
-        for (const deal of data.deals) {
-            await prisma.deal.create({
-                data: {
-                    id: deal.id,
-                    name: deal.name,
-                    customerId: deal.customerId,
-                    leadId: deal.leadId,
-                    stageId: deal.stageId,
-                    value: deal.value,
-                    status: deal.status || "OPEN",
-                },
-            });
-        }
-    }
-
-    if (data.inquiries) {
-        for (const inquiry of data.inquiries) {
-            await prisma.inquiry.create({
-                data: {
-                    id: inquiry.id,
-                    customerId: inquiry.customerId,
-                    subject: inquiry.subject,
-                    content: inquiry.content,
-                    category: inquiry.category || "GENERAL",
-                    priority: inquiry.priority || "MEDIUM",
-                    status: inquiry.status || "OPEN",
-                },
-            });
-        }
-    }
+    if (data.posts) await seedPosts(data.posts);
+    if (data.portfolios) await seedPortfolios(data.portfolios);
+    if (data.customers) await seedCustomers(data.customers);
+    if (data.pipelines) await seedPipelines(data.pipelines);
+    if (data.leads) await seedLeads(data.leads);
+    if (data.deals) await seedDeals(data.deals);
+    if (data.inquiries) await seedInquiries(data.inquiries);
 }
 
 export function getPrismaClient(): PrismaClient {

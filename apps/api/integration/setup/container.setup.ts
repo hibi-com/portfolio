@@ -1,31 +1,9 @@
-/**
- * Medium Test用DIコンテナ セットアップ
- *
- * テスト用のDIコンテナを作成し、モックされた外部サービスを注入する
- */
-
-import { DIContainer } from "../../../src/di/container";
+import { DIContainer } from "~/di/container";
 import { getTestDatabaseUrlForContainer } from "./db.setup";
 
-/**
- * テスト用DIコンテナを作成
- *
- * @param options - コンテナオプション
- * @returns 設定済みのDIContainer
- */
 export interface TestContainerOptions {
-    /**
-     * Redis URLを使用するかどうか
-     * falseの場合、キャッシュなしで動作
-     */
     useCache?: boolean;
-    /**
-     * R2バケットのモック
-     */
     r2Bucket?: any;
-    /**
-     * R2パブリックURL
-     */
     r2PublicUrl?: string;
 }
 
@@ -38,9 +16,6 @@ export function createTestContainer(options: TestContainerOptions = {}): DIConta
     return new DIContainer(databaseUrl, redisUrl, r2Bucket, r2PublicUrl);
 }
 
-/**
- * テスト用のモックR2バケットを作成
- */
 export function createMockR2Bucket(): any {
     const storage = new Map<string, ArrayBuffer>();
 

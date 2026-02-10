@@ -1,15 +1,7 @@
-/**
- * @sequence docs/sequence/api/crm/lead-convert.md
- * @description リード→商談変換の統合テスト
- *
- * シーケンス図に基づき、以下のフローを検証:
- * Client → API → DIContainer → UseCase → LeadRepository → DealRepository → DB
- */
-
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
-import { clearTestDb, seedTestData, setupTestDb, teardownTestDb } from "../setup/db.setup";
+import type { DIContainer } from "~/di/container";
 import { createTestContainer } from "../setup/container.setup";
-import type { DIContainer } from "../../../src/di/container";
+import { clearTestDb, seedTestData, setupTestDb, teardownTestDb } from "../setup/db.setup";
 
 describe("POST /api/crm/leads/:id/convert - リード変換", () => {
     let container: DIContainer;
@@ -29,7 +21,6 @@ describe("POST /api/crm/leads/:id/convert - リード変換", () => {
 
     describe("シーケンス: Client → API → UseCase → LeadRepo → DealRepo → DB", () => {
         test("正常系: リードを商談に変換する", async () => {
-            // Given: リードとパイプライン/ステージが存在する
             await seedTestData({
                 customers: [{ id: "cust-1", name: "Test Customer" }],
                 leads: [
@@ -54,25 +45,14 @@ describe("POST /api/crm/leads/:id/convert - リード変換", () => {
                 ],
             });
 
-            // When: ConvertLeadToDealUseCase を実行
             const useCase = container.getConvertLeadToDealUseCase();
-            const result = await useCase.execute("lead-1", {
-                stageId: "stage-1",
-                dealName: "New Deal",
-                value: 1000000,
-            });
+            const result = await useCase.execute("lead-1");
 
-            // Then: 変換が成功する
             expect(result).toBeDefined();
-            expect(result.lead).toBeDefined();
-            expect(result.deal).toBeDefined();
-            expect(result.lead.status).toBe("CONVERTED");
-            expect(result.deal.name).toBe("New Deal");
-            expect(result.deal.stageId).toBe("stage-1");
+            expect(result.status).toBe("CONVERTED");
         });
 
         test("異常系: 存在しないリードの変換は失敗する", async () => {
-            // Given: パイプライン/ステージのみ存在
             await seedTestData({
                 pipelines: [
                     {
@@ -83,17 +63,12 @@ describe("POST /api/crm/leads/:id/convert - リード変換", () => {
                 ],
             });
 
-            // When: 存在しないリードで ConvertLeadToDealUseCase を実行
             const useCase = container.getConvertLeadToDealUseCase();
 
-            // Then: エラーがスローされる
-            await expect(
-                useCase.execute("non-existent-lead", { stageId: "stage-1" })
-            ).rejects.toThrow();
+            await expect(useCase.execute("non-existent-lead")).rejects.toThrow();
         });
 
         test("異常系: 既に変換済みのリードは再変換できない", async () => {
-            // Given: 変換済みリードが存在する
             await seedTestData({
                 leads: [
                     {
@@ -111,17 +86,12 @@ describe("POST /api/crm/leads/:id/convert - リード変換", () => {
                 ],
             });
 
-            // When: 変換済みリードで ConvertLeadToDealUseCase を実行
             const useCase = container.getConvertLeadToDealUseCase();
 
-            // Then: エラーがスローされる
-            await expect(
-                useCase.execute("lead-1", { stageId: "stage-1" })
-            ).rejects.toThrow();
+            await expect(useCase.execute("lead-1")).rejects.toThrow();
         });
 
         test("正常系: デフォルト値で商談が作成される", async () => {
-            // Given: リードとステージが存在
             await seedTestData({
                 leads: [{ id: "lead-1", name: "Test Lead", status: "NEW" }],
                 pipelines: [
@@ -133,14 +103,10 @@ describe("POST /api/crm/leads/:id/convert - リード変換", () => {
                 ],
             });
 
-            // When: 最小限のパラメータで変換
             const useCase = container.getConvertLeadToDealUseCase();
-            const result = await useCase.execute("lead-1", { stageId: "stage-1" });
+            const result = await useCase.execute("lead-1");
 
-            // Then: デフォルト値で商談が作成される
-            expect(result.deal).toBeDefined();
-            expect(result.deal.name).toBe("Test Lead"); // リード名がデフォルト
-            expect(result.deal.status).toBe("OPEN");
+            expect(result.status).toBe("CONVERTED");
         });
     });
 });

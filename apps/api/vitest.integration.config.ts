@@ -1,10 +1,3 @@
-/**
- * Integration Test専用Vitest設定
- *
- * シーケンス図に基づく統合テスト用の設定
- * テストDB接続を有効にし、外部サービスはモック化
- */
-
 import { resolve } from "node:path";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";

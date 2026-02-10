@@ -1,15 +1,7 @@
-/**
- * @sequence docs/sequence/api/posts-list.md
- * @description GET /api/posts - 投稿一覧取得の統合テスト
- *
- * シーケンス図に基づき、以下のフローを検証:
- * Client → API → DIContainer → UseCase → Repository → DB
- */
-
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
-import { clearTestDb, seedTestData, setupTestDb, teardownTestDb } from "../setup/db.setup";
+import type { DIContainer } from "~/di/container";
 import { createTestContainer } from "../setup/container.setup";
-import type { DIContainer } from "../../../src/di/container";
+import { clearTestDb, seedTestData, setupTestDb, teardownTestDb } from "../setup/db.setup";
 
 describe("GET /api/posts - 投稿一覧取得", () => {
     let container: DIContainer;
@@ -29,7 +21,6 @@ describe("GET /api/posts - 投稿一覧取得", () => {
 
     describe("シーケンス: Client → API → UseCase → Repository → DB", () => {
         test("正常系: 投稿一覧を取得する", async () => {
-            // Given: DBに投稿が存在する
             await seedTestData({
                 posts: [
                     { id: "post-1", title: "Test Post 1", slug: "test-post-1" },
@@ -38,11 +29,9 @@ describe("GET /api/posts - 投稿一覧取得", () => {
                 ],
             });
 
-            // When: GetPostsUseCase を実行
             const useCase = container.getGetPostsUseCase();
             const result = await useCase.execute();
 
-            // Then: 投稿一覧がレスポンスされる
             expect(result).toHaveLength(3);
             expect(result.map((p) => p.title)).toContain("Test Post 1");
             expect(result.map((p) => p.title)).toContain("Test Post 2");
@@ -50,18 +39,13 @@ describe("GET /api/posts - 投稿一覧取得", () => {
         });
 
         test("異常系: 投稿が0件の場合は空配列を返す", async () => {
-            // Given: DBに投稿が存在しない（clearTestDbで初期化済み）
-
-            // When: GetPostsUseCase を実行
             const useCase = container.getGetPostsUseCase();
             const result = await useCase.execute();
 
-            // Then: 空配列がレスポンスされる
             expect(result).toHaveLength(0);
         });
 
         test("正常系: stickyフラグが設定された投稿を取得する", async () => {
-            // Given: stickyな投稿が存在する
             await seedTestData({
                 posts: [
                     { id: "post-1", title: "Normal Post", slug: "normal", sticky: false },
@@ -69,11 +53,9 @@ describe("GET /api/posts - 投稿一覧取得", () => {
                 ],
             });
 
-            // When: GetPostsUseCase を実行
             const useCase = container.getGetPostsUseCase();
             const result = await useCase.execute();
 
-            // Then: stickyフラグが正しく取得される
             expect(result).toHaveLength(2);
             const stickyPost = result.find((p) => p.slug === "sticky");
             const normalPost = result.find((p) => p.slug === "normal");
