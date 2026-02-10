@@ -26,7 +26,7 @@
     "lint:fix": "biome lint --write .",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "with-env": "doppler run --"
+    "with-env": "env --"
   },
   "dependencies": {
     "ioredis": "5.4.1"
