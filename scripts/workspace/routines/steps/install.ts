@@ -1,5 +1,3 @@
-#!/usr/bin/env bun
-
 import { $ } from "bun";
 import { LoadingBar, logSection } from "../lib/env";
 import type { StepContext } from "../lib/types";

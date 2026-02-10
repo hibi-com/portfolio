@@ -1,5 +1,3 @@
-#!/usr/bin/env bun
-
 import { existsSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { $ } from "bun";

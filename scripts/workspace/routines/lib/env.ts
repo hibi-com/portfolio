@@ -1,5 +1,3 @@
-#!/usr/bin/env bun
-
 import pc from "picocolors";
 
 export function logSection(title: string): void {

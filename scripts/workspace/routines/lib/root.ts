@@ -1,5 +1,3 @@
-#!/usr/bin/env bun
-
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 

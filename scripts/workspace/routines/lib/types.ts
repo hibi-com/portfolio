@@ -1,5 +1,3 @@
-#!/usr/bin/env bun
-
 export type StepId = "install" | "docker";
 
 export interface SetupOptions {
