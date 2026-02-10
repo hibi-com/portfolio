@@ -1,13 +1,13 @@
 import {
     Counter,
+    type CounterConfiguration,
+    collectDefaultMetrics,
     Gauge,
+    type GaugeConfiguration,
     Histogram,
+    type HistogramConfiguration,
     Registry,
     Summary,
-    collectDefaultMetrics,
-    type CounterConfiguration,
-    type GaugeConfiguration,
-    type HistogramConfiguration,
     type SummaryConfiguration,
 } from "prom-client";
 

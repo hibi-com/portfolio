@@ -19,8 +19,12 @@ describe("Logger", () => {
         consoleInfoSpy = vi.spyOn(console, "info").mockImplementation(() => undefined);
         consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
         consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
-        sentryCaptureErrorSpy = vi.spyOn(sentryClient, "captureError").mockImplementation(() => undefined) as ReturnType<typeof vi.spyOn>;
-        sentryCaptureMessageSpy = vi.spyOn(sentryClient, "captureMessage").mockImplementation(() => undefined) as ReturnType<typeof vi.spyOn>;
+        sentryCaptureErrorSpy = vi
+            .spyOn(sentryClient, "captureError")
+            .mockImplementation(() => undefined) as ReturnType<typeof vi.spyOn>;
+        sentryCaptureMessageSpy = vi
+            .spyOn(sentryClient, "captureMessage")
+            .mockImplementation(() => undefined) as ReturnType<typeof vi.spyOn>;
     });
 
     describe("ログレベルのフィルタリング", () => {
@@ -171,10 +175,13 @@ describe("Logger", () => {
             });
             const error = new Error("test error");
             logger.error("error message", error);
-            expect(sentryCaptureErrorSpy).toHaveBeenCalledWith(error, expect.objectContaining({
-                level: LogLevel.ERROR,
-                message: "error message",
-            }));
+            expect(sentryCaptureErrorSpy).toHaveBeenCalledWith(
+                error,
+                expect.objectContaining({
+                    level: LogLevel.ERROR,
+                    message: "error message",
+                }),
+            );
         });
 
         it("AppErrorがSentryに送信される", () => {

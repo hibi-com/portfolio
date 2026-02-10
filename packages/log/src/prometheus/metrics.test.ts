@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { ErrorCodes } from "../errors/error-codes";
 import { PrometheusClient } from "./client";
 import { CommonMetrics } from "./metrics";
-import { ErrorCodes } from "../errors/error-codes";
 
 describe("CommonMetrics", () => {
     let client: PrometheusClient;
@@ -26,10 +26,7 @@ describe("CommonMetrics", () => {
         });
 
         it("HTTPリクエストの処理時間を記録できる", async () => {
-            metrics.httpRequestDuration.observe(
-                { method: "GET", route: "/api/users", status: "200" },
-                0.123,
-            );
+            metrics.httpRequestDuration.observe({ method: "GET", route: "/api/users", status: "200" }, 0.123);
             const result = await metrics.httpRequestDuration.get();
             expect(result.values.length).toBeGreaterThan(0);
         });

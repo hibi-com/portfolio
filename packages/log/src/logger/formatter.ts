@@ -43,11 +43,7 @@ export class JsonFormatter implements LogFormatter {
 
 export class PlainTextFormatter implements LogFormatter {
     format(entry: LogEntry): string {
-        const parts: string[] = [
-            `[${entry.timestamp}]`,
-            `[${entry.level.toUpperCase()}]`,
-            entry.message,
-        ];
+        const parts: string[] = [`[${entry.timestamp}]`, `[${entry.level.toUpperCase()}]`, entry.message];
 
         if (entry.context) {
             parts.push(`Context: ${JSON.stringify(entry.context)}`);

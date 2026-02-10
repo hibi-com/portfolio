@@ -108,9 +108,6 @@ describe("AppError", () => {
         });
 
         it("デフォルトメッセージが存在しないエラーコードの場合、フォールバックメッセージが使用される", () => {
-            // 存在しないエラーコードをシミュレート（実際には存在するが、テスト用に）
-            // 実際のコードではすべてのエラーコードにデフォルトメッセージがあるため、
-            // このテストは実装の堅牢性を確認するためのもの
             const error = AppError.fromCode(ErrorCodes.AUTH_INVALID_TOKEN);
             expect(error.message).toBeTruthy();
             expect(typeof error.message).toBe("string");

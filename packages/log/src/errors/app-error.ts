@@ -1,5 +1,4 @@
-import { ErrorCodes, getErrorCategory, getHttpStatusFromErrorCode } from "./error-codes";
-import { type ErrorCode } from "./error-codes";
+import { type ErrorCode, ErrorCodes, getErrorCategory, getHttpStatusFromErrorCode } from "./error-codes";
 
 export class AppError extends Error {
     public readonly code: ErrorCode;

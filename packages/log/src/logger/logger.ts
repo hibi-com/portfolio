@@ -1,7 +1,7 @@
 import { AppError } from "../errors/app-error";
 import { sentryClient } from "../sentry/client";
-import { compareLogLevel, LogLevel } from "./levels";
 import { defaultFormatter, type LogEntry, type LogFormatter } from "./formatter";
+import { compareLogLevel, LogLevel } from "./levels";
 
 export interface LoggerConfig {
     minLevel?: LogLevel;
@@ -26,7 +26,11 @@ export class Logger {
         this.defaultContext = config.defaultContext;
     }
 
-    private log(level: LogLevel, message: string, options?: { error?: Error; metadata?: Record<string, unknown> }): void {
+    private log(
+        level: LogLevel,
+        message: string,
+        options?: { error?: Error; metadata?: Record<string, unknown> },
+    ): void {
         if (compareLogLevel(level, this.minLevel) < 0) {
             return;
         }

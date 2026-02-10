@@ -9,43 +9,28 @@ import {
 
 describe("ErrorCodes", () => {
     it("すべてのエラーコードがPF形式で定義されている", () => {
-        // 認証エラー (PF1xxxxx)
         expect(ErrorCodes.AUTH_INVALID_TOKEN).toBe("PF100001");
         expect(ErrorCodes.AUTH_TOKEN_EXPIRED).toBe("PF100002");
         expect(ErrorCodes.AUTH_UNAUTHORIZED).toBe("PF100003");
         expect(ErrorCodes.AUTH_FORBIDDEN).toBe("PF100004");
         expect(ErrorCodes.AUTH_MISSING_CREDENTIALS).toBe("PF100005");
-
-        // バリデーションエラー (PF2xxxxx)
         expect(ErrorCodes.VALIDATION_MISSING_FIELD).toBe("PF200001");
         expect(ErrorCodes.VALIDATION_INVALID_FORMAT).toBe("PF200002");
         expect(ErrorCodes.VALIDATION_OUT_OF_RANGE).toBe("PF200003");
         expect(ErrorCodes.VALIDATION_INVALID_TYPE).toBe("PF200004");
-
-        // リソース未発見 (PF3xxxxx)
         expect(ErrorCodes.NOT_FOUND_RESOURCE).toBe("PF300001");
         expect(ErrorCodes.NOT_FOUND_USER).toBe("PF300002");
         expect(ErrorCodes.NOT_FOUND_PORTFOLIO).toBe("PF300003");
         expect(ErrorCodes.NOT_FOUND_POST).toBe("PF300004");
-
-        // 内部エラー (PF4xxxxx)
         expect(ErrorCodes.INTERNAL_SERVER_ERROR).toBe("PF400001");
         expect(ErrorCodes.INTERNAL_PROCESSING_ERROR).toBe("PF400002");
-
-        // 外部サービスエラー (PF5xxxxx)
         expect(ErrorCodes.EXTERNAL_API_ERROR).toBe("PF500001");
         expect(ErrorCodes.EXTERNAL_TIMEOUT).toBe("PF500002");
         expect(ErrorCodes.EXTERNAL_RATE_LIMIT).toBe("PF500003");
-
-        // レート制限 (PF6xxxxx)
         expect(ErrorCodes.RATE_LIMIT_EXCEEDED).toBe("PF600001");
-
-        // データベースエラー (PF7xxxxx)
         expect(ErrorCodes.DATABASE_CONNECTION_ERROR).toBe("PF700001");
         expect(ErrorCodes.DATABASE_QUERY_ERROR).toBe("PF700002");
         expect(ErrorCodes.DATABASE_TRANSACTION_ERROR).toBe("PF700003");
-
-        // キャッシュエラー (PF8xxxxx)
         expect(ErrorCodes.CACHE_CONNECTION_ERROR).toBe("PF800001");
         expect(ErrorCodes.CACHE_OPERATION_ERROR).toBe("PF800002");
     });

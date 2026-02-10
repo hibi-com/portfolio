@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { JsonFormatter, PlainTextFormatter, defaultFormatter, type LogEntry } from "./formatter";
+import { defaultFormatter, JsonFormatter, type LogEntry, PlainTextFormatter } from "./formatter";
 import { LogLevel } from "./levels";
 
 describe("JsonFormatter", () => {

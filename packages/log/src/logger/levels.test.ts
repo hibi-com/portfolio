@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LogLevel, LogLevelPriority, compareLogLevel } from "./levels";
+import { compareLogLevel, LogLevel, LogLevelPriority } from "./levels";
 
 describe("LogLevel", () => {
     it("すべてのログレベルが定義されている", () => {

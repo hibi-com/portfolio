@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { Counter, Registry } from "prom-client";
+import { describe, expect, it } from "vitest";
 import { createPrometheusRegistry } from "./config";
 
 describe("createPrometheusRegistry", () => {
@@ -18,14 +18,12 @@ describe("createPrometheusRegistry", () => {
         const registry = createPrometheusRegistry({
             defaultLabels: { service: "api", environment: "production" },
         });
-        // デフォルトラベルが設定されていることを確認するために、メトリクスを作成して確認
         const counter = new Counter({
             name: "test_counter",
             help: "Test counter",
             registers: [registry],
         });
         counter.inc();
-        // デフォルトラベルが適用されていることを確認（メトリクスに含まれる）
         expect(registry).toBeInstanceOf(Registry);
     });
 
@@ -41,7 +39,6 @@ describe("createPrometheusRegistry", () => {
             defaultLabels: { service: "api" },
         });
         expect(registry).toBe(customRegistry);
-        // デフォルトラベルが設定されていることを確認
         expect(registry).toBeInstanceOf(Registry);
     });
 });
