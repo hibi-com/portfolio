@@ -23,16 +23,30 @@ interface ResponseItemProps {
     response: InquiryResponse;
 }
 
-function ResponseItem({ response }: ResponseItemProps) {
+const BASE_CARD_CLASS = "max-w-[70%] rounded-lg p-4";
+const BORDER_INTERNAL = "border-2 border-dashed border-yellow-500";
+
+function getResponseCardClass(isStaff: boolean, isInternal: boolean): string {
+    if (isStaff && isInternal) {
+        return `${BASE_CARD_CLASS} ${BORDER_INTERNAL} bg-primary text-primary-foreground`;
+    }
+    if (isStaff) {
+        return `${BASE_CARD_CLASS} bg-primary text-primary-foreground`;
+    }
+    if (isInternal) {
+        return `${BASE_CARD_CLASS} ${BORDER_INTERNAL} bg-muted`;
+    }
+    return `${BASE_CARD_CLASS} bg-muted`;
+}
+
+function ResponseItem({ response }: Readonly<ResponseItemProps>) {
     const isStaff = response.senderType === "STAFF";
+    const wrapperClass = isStaff ? "flex justify-end" : "flex justify-start";
+    const cardClass = getResponseCardClass(isStaff, response.isInternal);
 
     return (
-        <div className={`flex ${isStaff ? "justify-end" : "justify-start"}`}>
-            <div
-                className={`max-w-[70%] rounded-lg p-4 ${
-                    isStaff ? "bg-primary text-primary-foreground" : "bg-muted"
-                } ${response.isInternal ? "border-2 border-dashed border-yellow-500" : ""}`}
-            >
+        <div className={wrapperClass}>
+            <div className={cardClass}>
                 <div className="mb-2 flex items-center gap-2">
                     <User className="h-4 w-4" />
                     <span className="font-medium text-sm">{isStaff ? "Staff" : "Customer"}</span>
@@ -57,7 +71,7 @@ interface InquiryDetailProps {
 }
 
 export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
-    const params = useParams({ strict: false }) as { id?: string };
+    const params = useParams({ strict: false });
     const inquiryId = propId || params.id || "";
     const { inquiry, loading, error, respond } = useInquiryDetail(inquiryId);
     const [message, setMessage] = useState("");
@@ -99,7 +113,7 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
         <div className="space-y-6">
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="icon" asChild>
-                    <Link to={"/support/inquiries" as string}>
+                    <Link to="/support/inquiries">
                         <ArrowLeft className="h-4 w-4" />
                     </Link>
                 </Button>
@@ -112,13 +126,15 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                         <Badge className={priorityColors[inquiry.priority]} variant="secondary">
                             {inquiry.priority}
                         </Badge>
-                        <span className="text-muted-foreground text-sm">{inquiry.type?.replace("_", " ") ?? inquiry.category ?? "-"}</span>
+                        <span className="text-muted-foreground text-sm">
+                            {inquiry.type?.replace("_", " ") ?? inquiry.category ?? "-"}
+                        </span>
                     </div>
                 </div>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-2 space-y-6">
+                <div className="space-y-6 lg:col-span-2">
                     {/* Original Description */}
                     <Card>
                         <CardHeader>
@@ -213,7 +229,7 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                                 <div>
                                     <p className="font-medium text-sm">Customer</p>
                                     <Link
-                                        to={`/crm/customers/${inquiry.customer.id}` as string}
+                                        to={`/crm/customers/${inquiry.customer.id}` as Parameters<typeof Link>[0]["to"]}
                                         className="text-primary text-sm hover:underline"
                                     >
                                         {inquiry.customer.name}

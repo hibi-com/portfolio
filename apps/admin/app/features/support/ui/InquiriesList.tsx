@@ -53,7 +53,7 @@ export function InquiriesList() {
     }
 
     const handleClose = async (id: string) => {
-        if (window.confirm("Are you sure you want to close this inquiry?")) {
+        if (globalThis.confirm("Are you sure you want to close this inquiry?")) {
             try {
                 await closeInquiry(id);
             } catch {
@@ -70,7 +70,7 @@ export function InquiriesList() {
                     <p className="text-muted-foreground">Manage customer support tickets</p>
                 </div>
                 <Button asChild>
-                    <Link to={"/support/inquiries/new" as string}>
+                    <Link to="/support/inquiries/new">
                         <Plus className="mr-2 h-4 w-4" />
                         New Inquiry
                     </Link>
@@ -106,10 +106,7 @@ export function InquiriesList() {
                                 {inquiries.map((inquiry) => (
                                     <TableRow key={inquiry.id}>
                                         <TableCell className="font-medium">
-                                            <Link
-                                                to={`/support/inquiries/${inquiry.id}` as string}
-                                                className="hover:underline"
-                                            >
+                                            <Link to={`/support/inquiries/${inquiry.id}`} className="hover:underline">
                                                 {inquiry.subject}
                                             </Link>
                                         </TableCell>
@@ -129,7 +126,7 @@ export function InquiriesList() {
                                         <TableCell className="text-right">
                                             <div className="flex items-center justify-end gap-1">
                                                 <Button variant="ghost" size="icon" asChild>
-                                                    <Link to={`/support/inquiries/${inquiry.id}` as string}>
+                                                    <Link to={`/support/inquiries/${inquiry.id}`}>
                                                         <Eye className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
