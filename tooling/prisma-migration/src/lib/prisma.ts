@@ -35,6 +35,9 @@ export function runPrismaDiff(
 ): PrismaDiffResult {
     const prismaBin = resolvePrismaBin(dbDir);
 
+    const env =
+        shadowDatabaseUrl === undefined ? process.env : { ...process.env, SHADOW_DATABASE_URL: shadowDatabaseUrl };
+
     const args: string[] = [
         prismaBin,
         "migrate",
@@ -43,12 +46,12 @@ export function runPrismaDiff(
         "--to-schema-datamodel",
         schemaPathRel,
         "--script",
-        ...(shadowDatabaseUrl ? ["--shadow-database-url", shadowDatabaseUrl] : []),
     ];
 
     const result = Bun.spawnSync(args, {
         cwd: dbDir,
         stdio: ["inherit", "pipe", "pipe"],
+        env,
     });
 
     return {
