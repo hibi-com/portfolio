@@ -34,10 +34,6 @@ color: blue
 ## テンプレート（簡易版）
 
 ```typescript
-/**
- * @sequence docs/sequence/api/{domain}/{operation}.md
- * @description {API説明}の統合テスト
- */
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { setupTestDb, teardownTestDb, seedTestData } from "../setup/db.setup";
 
