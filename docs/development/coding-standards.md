@@ -163,10 +163,6 @@ const dateString = created.toLocaleDateString("en-US", {
     year: "numeric",
 });
 
-/**
- * ブログ記事のプレビューを表示するコンポーネント
- * @param props - BlogPreviewProps
- */
 export const BlogPreview = (props: BlogPreviewProps) => {
     // ...
 };

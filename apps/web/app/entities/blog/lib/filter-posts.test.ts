@@ -78,7 +78,6 @@ describe("blog", () => {
 
         const result = filterBlogPosts(posts);
 
-        // Posts with DIY tag should go to diy category
         expect(result.diy.data).toHaveLength(1);
         expect(result.diy.featured).toHaveLength(1);
         expect(result.technical.data).toHaveLength(0);
@@ -90,7 +89,6 @@ describe("blog", () => {
 
         const result = filterBlogPosts(posts);
 
-        // Posts with no tags should go to technical category
         expect(result.technical.data).toHaveLength(1);
         expect(result.technical.featured).toHaveLength(1);
         expect(result.diy.data).toHaveLength(0);
@@ -105,7 +103,6 @@ describe("blog", () => {
 
         const result = filterBlogPosts(posts);
 
-        // Posts with other tags should go to technical category
         expect(result.technical.data).toHaveLength(1);
         expect(result.technical.featured).toHaveLength(1);
         expect(result.diy.data).toHaveLength(0);

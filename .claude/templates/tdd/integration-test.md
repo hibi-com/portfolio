@@ -26,10 +26,6 @@ apps/api/tests/medium/{domain}/{operation}.medium.test.ts
 ## テンプレート本体
 
 ```typescript
-/**
- * @sequence docs/sequence/api/{domain}/{operation}.md
- * @description {操作の説明}
- */
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { setupTestDb, teardownTestDb, cleanupTestData } from "../setup/db.setup";
 import { createTestContainer } from "../setup/container.setup";

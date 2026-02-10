@@ -114,7 +114,6 @@ describe("BlogPreview Component", () => {
         );
 
         const link = screen.getByText("Hello World").closest("a");
-        // モック化されたLinkではprefetchは転送されない場合がある
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute("href");
     });

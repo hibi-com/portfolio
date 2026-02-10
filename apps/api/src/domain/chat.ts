@@ -1,70 +1,26 @@
-export type ChatRoomStatus = "ACTIVE" | "ARCHIVED" | "CLOSED";
-export type ChatParticipantRole = "CUSTOMER" | "AGENT" | "OBSERVER";
-export type ChatMessageType = "TEXT" | "IMAGE" | "FILE" | "SYSTEM";
+export type {
+    AddParticipantInput,
+    ChatMessage,
+    ChatMessageType,
+    ChatParticipant,
+    ChatParticipantRole,
+    ChatRoom,
+    ChatRoomStatus,
+    ChatRoomWithParticipants,
+    CreateChatRoomInput,
+    SendMessageInput,
+} from "@portfolio/api/generated/zod";
 
-export interface ChatRoom {
-    id: string;
-    customerId?: string;
-    inquiryId?: string;
-    name?: string;
-    status: ChatRoomStatus;
-    metadata?: Record<string, unknown>;
-    closedAt?: Date;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface ChatParticipant {
-    id: string;
-    chatRoomId: string;
-    userId?: string;
-    name: string;
-    role: ChatParticipantRole;
-    isOnline: boolean;
-    lastSeenAt?: Date;
-    joinedAt: Date;
-    leftAt?: Date;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface ChatMessage {
-    id: string;
-    chatRoomId: string;
-    participantId: string;
-    type: ChatMessageType;
-    content: string;
-    metadata?: Record<string, unknown>;
-    readBy?: string[];
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface CreateChatRoomInput {
-    customerId?: string;
-    inquiryId?: string;
-    name?: string;
-    metadata?: Record<string, unknown>;
-}
-
-export interface AddParticipantInput {
-    chatRoomId: string;
-    userId?: string;
-    name: string;
-    role?: ChatParticipantRole;
-}
-
-export interface SendMessageInput {
-    chatRoomId: string;
-    participantId: string;
-    type?: ChatMessageType;
-    content: string;
-    metadata?: Record<string, unknown>;
-}
-
-export interface ChatRoomWithParticipants extends ChatRoom {
-    participants: ChatParticipant[];
-}
+import type {
+    AddParticipantInput,
+    ChatMessage,
+    ChatParticipant,
+    ChatRoom,
+    ChatRoomStatus,
+    ChatRoomWithParticipants,
+    CreateChatRoomInput,
+    SendMessageInput,
+} from "@portfolio/api/generated/zod";
 
 export interface ChatRoomWithMessages extends ChatRoom {
     messages: ChatMessage[];

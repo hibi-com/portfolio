@@ -127,7 +127,6 @@ describe("Error Component", () => {
             </MemoryRouter>,
         );
 
-        // コンテナ要素が存在することを確認
         const errorContainer = container.querySelector("section");
         expect(errorContainer).toBeInTheDocument();
     });

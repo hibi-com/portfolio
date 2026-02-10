@@ -26,7 +26,6 @@ describe("SectionEducation Component", () => {
     test("should render major", () => {
         render(<SectionEducation />);
 
-        // 複数要素がある場合はgetAllByTextを使用
         expect(screen.getAllByText(/Industrial Design/).length).toBeGreaterThan(0);
         expect(screen.getByText(/incomplete/)).toBeInTheDocument();
     });
@@ -35,7 +34,6 @@ describe("SectionEducation Component", () => {
         render(<SectionEducation />);
 
         expect(screen.getByText(/Mechanical Engineering/)).toBeInTheDocument();
-        // 複数要素がある場合はgetAllByTextを使用
         expect(screen.getAllByText(/Industrial Design/).length).toBeGreaterThan(0);
     });
 
@@ -43,7 +41,6 @@ describe("SectionEducation Component", () => {
         render(<SectionEducation />);
 
         expect(screen.getByText(/Industrial Designers Society of America/)).toBeInTheDocument();
-        // 複数要素がある場合はgetAllByTextを使用
         expect(screen.getAllByText(/Teaching Assistant/).length).toBeGreaterThan(0);
     });
 });

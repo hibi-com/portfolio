@@ -16,10 +16,6 @@ const sandboxItems: SandboxItem[] = [
     },
 ];
 
-/**
- * @name SandboxSidebar
- * @description Sidebar navigation for sandbox projects and experiments
- */
 export const SandboxSidebar = (props: SandboxSidebarProps) => {
     const { className } = props;
 

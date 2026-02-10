@@ -1,7 +1,3 @@
-/**
- * @story docs/user-stories/admin/manage-inquiries.md
- * @description 問い合わせ管理のE2Eテスト
- */
 import { expect, test } from "@playwright/test";
 
 test.describe("Inquiries Management - manage-inquiries.md", () => {

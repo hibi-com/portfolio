@@ -1,5 +1,5 @@
-import { getPosts } from "@portfolio/api/generated/posts/posts";
 import { getPortfolios } from "@portfolio/api/generated/portfolios/portfolios";
+import { getPosts } from "@portfolio/api/generated/posts/posts";
 
 const getBaseUrl = (apiUrl?: string) => {
     if (typeof globalThis !== "undefined" && "window" in globalThis) {

@@ -35,12 +35,6 @@ const SANITIZE_CONFIG = {
     ALLOW_DATA_ATTR: false,
 };
 
-/**
- * HTMLコンテンツをサニタイズする
- * サーバーサイドとクライアントサイドの両方でサニタイズを実行し、XSSを防止する
- * @param html - サニタイズするHTML文字列
- * @returns サニタイズされたHTML文字列
- */
 export const sanitizeHtml = (html: string): string => {
     return DOMPurify.sanitize(html, SANITIZE_CONFIG);
 };

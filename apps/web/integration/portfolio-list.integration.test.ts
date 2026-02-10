@@ -1,12 +1,4 @@
-/**
- * @sequence docs/sequence/web/portfolio-list.md
- * @description GET /portfolio - ポートフォリオ一覧ページの統合テスト
- *
- * シーケンス図に基づき、以下のフローを検証:
- * Browser → Remix → Loader → APIClient → API → UseCase → Repository → DB
- */
-
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 
@@ -21,7 +13,6 @@ describe("Portfolio List Integration - docs/sequence/web/portfolio-list.md", () 
 
     describe("シーケンス: Browser → Loader → APIClient → API", () => {
         test("正常系: ポートフォリオ一覧を取得する", async () => {
-            // Given: APIがポートフォリオ一覧を返す
             const mockPortfolios = [
                 {
                     id: "1",
@@ -47,11 +38,9 @@ describe("Portfolio List Integration - docs/sequence/web/portfolio-list.md", () 
                 }),
             );
 
-            // When: loaderが実行される
             const response = await fetch(`${API_URL}/api/portfolios`);
             const data = await response.json();
 
-            // Then: ポートフォリオ一覧が取得される
             expect(response.ok).toBe(true);
             expect(data).toHaveLength(2);
             expect(data[0].title).toBe("Project A");
@@ -86,9 +75,7 @@ describe("Portfolio List Integration - docs/sequence/web/portfolio-list.md", () 
 
     describe("データ変換検証", () => {
         test("技術スタックが正しく取得される", async () => {
-            const mockPortfolios = [
-                { id: "1", technologies: ["React", "TypeScript", "Tailwind"] },
-            ];
+            const mockPortfolios = [{ id: "1", technologies: ["React", "TypeScript", "Tailwind"] }];
 
             server.use(
                 http.get(`${API_URL}/api/portfolios`, () => {

@@ -135,7 +135,6 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
 
             <div className="grid gap-6 lg:grid-cols-3">
                 <div className="space-y-6 lg:col-span-2">
-                    {/* Original Description */}
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-lg">Description</CardTitle>
@@ -148,7 +147,6 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                         </CardContent>
                     </Card>
 
-                    {/* Responses */}
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg">
@@ -167,7 +165,6 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                         </CardContent>
                     </Card>
 
-                    {/* Reply Form */}
                     {inquiry.status !== "CLOSED" && (
                         <Card>
                             <CardHeader>
@@ -200,7 +197,6 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                     )}
                 </div>
 
-                {/* Sidebar */}
                 <div className="space-y-6">
                     <Card>
                         <CardHeader>

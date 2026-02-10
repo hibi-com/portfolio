@@ -42,7 +42,6 @@ describe("Post Component", () => {
             </MemoryRouter>,
         );
 
-        // タイトルはaria-labelで設定されている
         const heading = screen.getByRole("heading", { level: 1 });
         expect(heading).toHaveAttribute("aria-label", "Test Post");
         expect(screen.getByText("Post content")).toBeInTheDocument();
@@ -56,7 +55,6 @@ describe("Post Component", () => {
                 </Post>
             </MemoryRouter>,
         );
-        // 画像はrole="presentation"なのでimgタグで検索
         const images = container.querySelectorAll("img");
         expect(images.length).toBeGreaterThan(0);
     });
@@ -70,7 +68,6 @@ describe("Post Component", () => {
             </MemoryRouter>,
         );
         const link = screen.getByLabelText(/scroll/i);
-        // RouterLinkはMemoryRouter内で/#postContentになる
         expect(link).toHaveAttribute("href", "/#postContent");
     });
 

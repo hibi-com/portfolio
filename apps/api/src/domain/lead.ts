@@ -1,44 +1,6 @@
-export type LeadStatus = "NEW" | "CONTACTED" | "QUALIFIED" | "UNQUALIFIED" | "CONVERTED";
+export type { Lead, LeadStatus, CreateLeadInput, UpdateLeadInput } from "@portfolio/api/generated/zod";
 
-export interface Lead {
-    id: string;
-    customerId?: string;
-    name: string;
-    email?: string;
-    phone?: string;
-    company?: string;
-    source?: string;
-    status: LeadStatus;
-    score?: number;
-    notes?: string;
-    convertedAt?: Date;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface CreateLeadInput {
-    customerId?: string;
-    name: string;
-    email?: string;
-    phone?: string;
-    company?: string;
-    source?: string;
-    status?: LeadStatus;
-    score?: number;
-    notes?: string;
-}
-
-export interface UpdateLeadInput {
-    customerId?: string;
-    name?: string;
-    email?: string;
-    phone?: string;
-    company?: string;
-    source?: string;
-    status?: LeadStatus;
-    score?: number;
-    notes?: string;
-}
+import type { Lead, CreateLeadInput, UpdateLeadInput } from "@portfolio/api/generated/zod";
 
 export interface LeadRepository {
     findAll(): Promise<Lead[]>;

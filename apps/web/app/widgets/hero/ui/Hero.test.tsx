@@ -46,7 +46,6 @@ describe("Hero Component", () => {
     test("should apply custom className", () => {
         const { container } = render(<Hero className="custom-class" highlight="Test Highlight" tag="h2" />);
 
-        // classNameは最も外側のdivに適用される
         const heroDiv = container.firstChild as HTMLElement;
         expect(heroDiv).toHaveClass("custom-class");
     });

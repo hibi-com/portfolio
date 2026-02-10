@@ -67,7 +67,6 @@ export default function Resume() {
                         </div>
                     </section>
                     <SectionExperience />
-                    {/* <SectionProficiencies /> */}
                     <SectionEducation />
                 </div>
             </div>

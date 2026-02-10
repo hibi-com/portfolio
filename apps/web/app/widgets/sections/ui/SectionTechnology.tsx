@@ -3,10 +3,6 @@ import classnames from "classnames";
 import { useRef, useState } from "react";
 import { data } from "~/shared/data/details";
 
-/**
- * @name SectionTechnology
- * @description Section with pills that toggles a bit more information
- */
 export const SectionTechnology = () => {
     const refDescription = useRef<HTMLQuoteElement>(null);
     const [heading, setHeading] = useState<string>();

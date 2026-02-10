@@ -44,7 +44,6 @@ describe("ThemeToggle Component", () => {
         render(<ThemeToggle isMobile />);
 
         const button = screen.getByLabelText("Toggle theme");
-        // isMobileがtrueの場合、ボタンがレンダリングされることを確認
         expect(button).toBeInTheDocument();
     });
 

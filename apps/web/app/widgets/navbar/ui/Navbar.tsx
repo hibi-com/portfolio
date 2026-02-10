@@ -104,7 +104,6 @@ export const Navbar = () => {
                 <Monogram highlight />
             </RouterLink>
 
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex md:items-center md:gap-6">
                 {navLinks.map(({ label, pathname }: NavLink) => (
                     <RouterLink
@@ -125,7 +124,6 @@ export const Navbar = () => {
                 <ThemeToggle />
             </nav>
 
-            {/* Mobile Navigation */}
             <div className="flex items-center gap-2 md:hidden">
                 <ThemeToggle />
                 <Sheet open={menuOpen} onOpenChange={setMenuOpen}>

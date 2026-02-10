@@ -125,7 +125,6 @@ describe("Header Component", () => {
         const resumeLink = screen.getByText("Resume").closest("a");
         const usesLink = screen.getByText("Uses").closest("a");
 
-        // リンクが正しいhrefを持つことを確認
         expect(aboutLink).toHaveAttribute("href", "/");
         expect(blogLink).toHaveAttribute("href", "/blog");
         expect(portfolioLink).toHaveAttribute("href", "/portfolio");

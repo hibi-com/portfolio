@@ -7,13 +7,6 @@ export interface UseWebShareAPI {
     onShare: (url: string) => Promise<void>;
 }
 
-/**
- * @name useWebShareAPI
- * @external https://web.dev/web-share/ Share API
- * @external https://developers.google.com/analytics/devguides/collection/ga4/reference/events#share GA Event
- * @description Simple hook to take advantage of the Web Share API
- * where available.
- */
 export const useWebShareAPI = (): UseWebShareAPI => {
     const isAvailable = globalThis.window !== undefined && !!navigator.share;
     const logger = getLogger();

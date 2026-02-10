@@ -1,7 +1,3 @@
-/**
- * @name parseCookieHeader
- * @external https://www.30secondsofcode.org/js/s/parse-cookie
- */
 export const parseCookieHeader = (str: string) => {
     return str
         .split(";")

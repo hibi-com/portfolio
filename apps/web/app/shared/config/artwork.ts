@@ -8,11 +8,6 @@ import {
     SOCIAL_TWITTER,
 } from "~/shared/config/constants";
 
-/**
- * @external https://textart.io/art/tag/rocket/1
- * @description Adding a personal touch never hurt anyone right, and some
- * shameless self-promotion isn't all that bad either.
- */
 const artwork = String.raw`
 <!--
 

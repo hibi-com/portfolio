@@ -1,4 +1,4 @@
-import { initSentry, Logger, LogLevel, PrometheusClient, CommonMetrics } from "@portfolio/log";
+import { CommonMetrics, initSentry, Logger, LogLevel, PrometheusClient } from "@portfolio/log";
 
 let logger: Logger | null = null;
 let prometheus: PrometheusClient | null = null;

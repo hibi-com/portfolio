@@ -1,50 +1,20 @@
-export interface Pipeline {
-    id: string;
-    name: string;
-    description?: string;
-    isDefault: boolean;
-    stages: PipelineStage[];
-    createdAt: Date;
-    updatedAt: Date;
-}
+export type {
+    Pipeline,
+    PipelineStage,
+    CreatePipelineInput,
+    UpdatePipelineInput,
+    CreatePipelineStageInput,
+    UpdatePipelineStageInput,
+} from "@portfolio/api/generated/zod";
 
-export interface PipelineStage {
-    id: string;
-    pipelineId: string;
-    name: string;
-    order: number;
-    probability?: number;
-    color?: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface CreatePipelineInput {
-    name: string;
-    description?: string;
-    isDefault?: boolean;
-}
-
-export interface UpdatePipelineInput {
-    name?: string;
-    description?: string;
-    isDefault?: boolean;
-}
-
-export interface CreatePipelineStageInput {
-    pipelineId: string;
-    name: string;
-    order: number;
-    probability?: number;
-    color?: string;
-}
-
-export interface UpdatePipelineStageInput {
-    name?: string;
-    order?: number;
-    probability?: number;
-    color?: string;
-}
+import type {
+    Pipeline,
+    PipelineStage,
+    CreatePipelineInput,
+    UpdatePipelineInput,
+    CreatePipelineStageInput,
+    UpdatePipelineStageInput,
+} from "@portfolio/api/generated/zod";
 
 export interface PipelineRepository {
     findAll(): Promise<Pipeline[]>;

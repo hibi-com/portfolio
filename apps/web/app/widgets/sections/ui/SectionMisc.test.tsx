@@ -36,7 +36,6 @@ describe("SectionMisc Component", () => {
         render(<SectionMisc />);
 
         expect(screen.getByAltText(/Me, my son, and our dog at the beach/)).toBeInTheDocument();
-        // 複数の画像が同じaltテキストにマッチする場合があるのでgetAllを使用
         const thruxtonImages = screen.getAllByAltText(/Triumph Thruxton/);
         expect(thruxtonImages.length).toBeGreaterThan(0);
     });

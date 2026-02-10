@@ -307,10 +307,6 @@ apps/api/tests/
 Medium Tests はシーケンス図の各ステップを検証します。
 
 ```typescript
-/**
- * @sequence docs/sequence/api/post/posts-list.md
- * @description GET /api/posts - 投稿一覧取得の統合テスト
- */
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { setupTestDb, teardownTestDb, seedTestData } from "../setup/db.setup";
 import { createTestContainer } from "../setup/container.setup";
@@ -408,10 +404,6 @@ apps/admin/
 Integration Tests はMSWを使用してAPIをモックし、フロントエンドの統合フローを検証します。
 
 ```typescript
-/**
- * @sequence docs/sequence/web/blog-list.md
- * @description GET /blog - ブログ一覧ページの統合テスト
- */
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { describe, expect, test } from "vitest";
@@ -502,10 +494,6 @@ export class HomePage extends BasePage {
 Large Tests はユーザーストーリーのシナリオを検証します。
 
 ```typescript
-/**
- * @story docs/user-stories/visitor/browse-blog.md
- * @description 訪問者がブログを閲覧するシナリオ
- */
 import { expect, test } from "@playwright/test";
 import { HomePage } from "../pages/home.page";
 import { BlogPage } from "../pages/blog.page";
@@ -560,41 +548,6 @@ test("should return blog posts", async ({ request }) => {
 test("should return 404 for non-existent post", async ({ request }) => {
     const response = await request.get("/api/blog/non-existent");
     expect(response.status()).toBe(404);
-});
-```
-
-### アクセシビリティテスト
-
-Storybook上でコンポーネントのアクセシビリティを検証します。
-
-```typescript
-// e2e/accessibility/blog-preview.spec.ts
-import { expect, test } from "@playwright/test";
-
-test("BlogPreview should be accessible", async ({ page }) => {
-    await page.goto("/iframe.html?id=features-blogpreview--default");
-
-    const violations = await page.evaluate(() => {
-        // axe-coreによるアクセシビリティチェック
-        return window.axe?.run();
-    });
-
-    expect(violations).toBeUndefined();
-});
-```
-
-### ビジュアルリグレッションテスト
-
-Storybook上でスクリーンショット比較を行います。
-
-```typescript
-// e2e/storybook/visual/blog-preview.spec.ts
-import { expect, test } from "@playwright/test";
-
-test("BlogPreview visual regression", async ({ page }) => {
-    await page.goto("/iframe.html?id=features-blogpreview--default");
-
-    await expect(page).toHaveScreenshot("blog-preview.png");
 });
 ```
 

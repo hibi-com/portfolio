@@ -1,104 +1,35 @@
-export type SyncStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
-export type SyncDirection = "IMPORT" | "EXPORT" | "BIDIRECTIONAL";
+export type {
+    CreateCustomerMappingInput,
+    CreateDealMappingInput,
+    CreateFreeeIntegrationInput,
+    CreateSyncLogInput,
+    CustomerFreeeMapping,
+    DealFreeeMapping,
+    FreeeCompany,
+    FreeeIntegration,
+    FreeeOAuthTokens,
+    FreeePartner,
+    FreeeSyncLog,
+    SyncDirection,
+    SyncStatus,
+    UpdateFreeeTokensInput,
+    UpdateSyncLogInput,
+} from "@portfolio/api/generated/zod";
 
-export interface FreeeIntegration {
-    id: string;
-    userId: string;
-    companyId: number;
-    companyName?: string;
-    accessToken: string;
-    refreshToken: string;
-    tokenExpiresAt: Date;
-    scopes?: string[];
-    isActive: boolean;
-    lastSyncAt?: Date;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface FreeeSyncLog {
-    id: string;
-    integrationId: string;
-    direction: SyncDirection;
-    status: SyncStatus;
-    entityType: string;
-    totalRecords?: number;
-    successCount?: number;
-    errorCount?: number;
-    errorDetails?: Array<{ record: string; error: string }>;
-    startedAt?: Date;
-    completedAt?: Date;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface CustomerFreeeMapping {
-    id: string;
-    customerId: string;
-    freeePartnerId: number;
-    freeeCompanyId: number;
-    lastSyncAt: Date;
-    syncHash?: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface DealFreeeMapping {
-    id: string;
-    dealId: string;
-    freeeDealId: number;
-    freeeCompanyId: number;
-    lastSyncAt: Date;
-    syncHash?: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface CreateFreeeIntegrationInput {
-    userId: string;
-    companyId: number;
-    companyName?: string;
-    accessToken: string;
-    refreshToken: string;
-    tokenExpiresAt: Date;
-    scopes?: string[];
-}
-
-export interface UpdateFreeeTokensInput {
-    accessToken: string;
-    refreshToken: string;
-    tokenExpiresAt: Date;
-}
-
-export interface CreateSyncLogInput {
-    integrationId: string;
-    direction: SyncDirection;
-    entityType: string;
-}
-
-export interface UpdateSyncLogInput {
-    status?: SyncStatus;
-    totalRecords?: number;
-    successCount?: number;
-    errorCount?: number;
-    errorDetails?: Array<{ record: string; error: string }>;
-    startedAt?: Date;
-    completedAt?: Date;
-}
-
-export interface CreateCustomerMappingInput {
-    customerId: string;
-    freeePartnerId: number;
-    freeeCompanyId: number;
-    syncHash?: string;
-}
-
-export interface CreateDealMappingInput {
-    dealId: string;
-    freeeDealId: number;
-    freeeCompanyId: number;
-    syncHash?: string;
-}
+import type {
+    CreateCustomerMappingInput,
+    CreateDealMappingInput,
+    CreateFreeeIntegrationInput,
+    CreateSyncLogInput,
+    CustomerFreeeMapping,
+    DealFreeeMapping,
+    FreeeCompany,
+    FreeeIntegration,
+    FreeeOAuthTokens,
+    FreeeSyncLog,
+    UpdateFreeeTokensInput,
+    UpdateSyncLogInput,
+} from "@portfolio/api/generated/zod";
 
 export interface FreeeRepository {
     findIntegrationById(id: string): Promise<FreeeIntegration | null>;
@@ -127,37 +58,6 @@ export interface FreeeRepository {
     createDealMapping(input: CreateDealMappingInput): Promise<DealFreeeMapping>;
     updateDealMappingSyncHash(id: string, syncHash: string): Promise<DealFreeeMapping>;
     deleteDealMapping(id: string): Promise<void>;
-}
-
-export interface FreeePartner {
-    id: number;
-    name: string;
-    code?: string;
-    shortcut1?: string;
-    shortcut2?: string;
-    orgCode?: number;
-    countryCode?: string;
-    addressRegionCode?: string;
-    streetName1?: string;
-    streetName2?: string;
-    zipcode?: string;
-    phone?: string;
-    email?: string;
-}
-
-export interface FreeeOAuthTokens {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-    tokenType: string;
-    scope: string;
-    createdAt: number;
-}
-
-export interface FreeeCompany {
-    id: number;
-    displayName: string;
-    role: string;
 }
 
 export interface FreeeOAuthService {

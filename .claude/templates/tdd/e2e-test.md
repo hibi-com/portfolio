@@ -27,10 +27,6 @@ apps/admin/e2e/large/{feature}.large.spec.ts
 ## テンプレート本体
 
 ```typescript
-/**
- * @story docs/user-stories/{persona}/{story}.md
- * @description {ユーザーストーリーの概要}
- */
 import { test, expect, type Page } from "@playwright/test";
 
 test.describe("{ペルソナ}: {ストーリータイトル}", () => {

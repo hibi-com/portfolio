@@ -1,10 +1,5 @@
 import type { BlogData, Post } from "../model/types";
 
-/**
- * @name filterBlogPosts
- * @description We fetch all the results in one go and filter it as needed
- * on the client side
- */
 export const filterBlogPosts = (posts: Post[]) => {
     const diy: BlogData = { data: [], featured: [] };
     const technical: BlogData = { data: [], featured: [] };

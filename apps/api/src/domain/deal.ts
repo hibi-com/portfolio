@@ -1,46 +1,6 @@
-export type DealStatus = "OPEN" | "WON" | "LOST" | "STALLED";
+export type { Deal, DealStatus, CreateDealInput, UpdateDealInput } from "@portfolio/api/generated/zod";
 
-export interface Deal {
-    id: string;
-    customerId?: string;
-    leadId?: string;
-    stageId: string;
-    name: string;
-    value?: number;
-    currency: string;
-    expectedCloseDate?: Date;
-    actualCloseDate?: Date;
-    status: DealStatus;
-    notes?: string;
-    lostReason?: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface CreateDealInput {
-    customerId?: string;
-    leadId?: string;
-    stageId: string;
-    name: string;
-    value?: number;
-    currency?: string;
-    expectedCloseDate?: Date;
-    status?: DealStatus;
-    notes?: string;
-}
-
-export interface UpdateDealInput {
-    customerId?: string;
-    stageId?: string;
-    name?: string;
-    value?: number;
-    currency?: string;
-    expectedCloseDate?: Date;
-    actualCloseDate?: Date;
-    status?: DealStatus;
-    notes?: string;
-    lostReason?: string;
-}
+import type { Deal, CreateDealInput, UpdateDealInput } from "@portfolio/api/generated/zod";
 
 export interface DealRepository {
     findAll(): Promise<Deal[]>;

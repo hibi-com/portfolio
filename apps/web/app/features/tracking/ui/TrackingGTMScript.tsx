@@ -1,11 +1,5 @@
 import type { TrackingGTMScriptProps } from "../model/types";
 
-/**
- * @name TrackingGTMScript
- * @external https://tagmanager.google.com/
- * @description GTM requires a two part implementation, this script is
- * responsible for loading GTM which loads our Tags and Pixels
- */
 export const TrackingGTMScript = (props: TrackingGTMScriptProps) => {
     const { id } = props;
 

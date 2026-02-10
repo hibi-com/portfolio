@@ -1,7 +1,3 @@
-/**
- * @sequence docs/sequence/admin/inquiries/inquiries-list.md
- * @description 問い合わせ一覧取得の統合テスト
- */
 import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
@@ -28,8 +24,22 @@ describe("Inquiries List Integration - docs/sequence/admin/inquiries/inquiries-l
     describe("シーケンス: Component → Hook → APIClient → API", () => {
         test("正常系: 問い合わせ一覧を取得する", async () => {
             const mockInquiries: Inquiry[] = [
-                { id: "1", name: "John", email: "john@example.com", subject: "Hello", status: "open", createdAt: "2024-01-01" },
-                { id: "2", name: "Jane", email: "jane@example.com", subject: "Question", status: "closed", createdAt: "2024-01-02" },
+                {
+                    id: "1",
+                    name: "John",
+                    email: "john@example.com",
+                    subject: "Hello",
+                    status: "open",
+                    createdAt: "2024-01-01",
+                },
+                {
+                    id: "2",
+                    name: "Jane",
+                    email: "jane@example.com",
+                    subject: "Question",
+                    status: "closed",
+                    createdAt: "2024-01-02",
+                },
             ];
 
             server.use(

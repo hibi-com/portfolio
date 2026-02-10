@@ -1,11 +1,5 @@
 import type { TrackingGTMIFrameProps } from "../model/types";
 
-/**
- * @name TrackingGTMIFrame
- * @external https://tagmanager.google.com/
- * @description GTM requires a two part implementation, this noscript iframe
- * is responsible for loading GTM which loads our Tags and Pixels
- */
 export const TrackingGTMIFrame = (props: TrackingGTMIFrameProps) => {
     const { id } = props;
 

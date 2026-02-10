@@ -1,5 +1,5 @@
-import type { Context } from "hono";
 import { initAuth } from "@portfolio/auth";
+import type { Context } from "hono";
 
 export async function authenticate(ctx: Context): Promise<{ userId: string } | null> {
     const env = ctx.env;

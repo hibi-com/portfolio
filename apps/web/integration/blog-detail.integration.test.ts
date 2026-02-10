@@ -1,12 +1,4 @@
-/**
- * @sequence docs/sequence/web/blog-detail.md
- * @description GET /blog/:slug - ブログ詳細ページの統合テスト
- *
- * シーケンス図に基づき、以下のフローを検証:
- * Browser → Remix → Loader → Validation → APIClient → API → UseCase → Repository → DB
- */
-
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 

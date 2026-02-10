@@ -1,12 +1,4 @@
-/**
- * @sequence docs/sequence/web/portfolio-detail.md
- * @description GET /portfolio/:slug - ポートフォリオ詳細ページの統合テスト
- *
- * シーケンス図に基づき、以下のフローを検証:
- * Browser → Remix → Loader → Validation → APIClient → API → UseCase → Repository → DB
- */
-
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 
@@ -21,7 +13,6 @@ describe("Portfolio Detail Integration - docs/sequence/web/portfolio-detail.md",
 
     describe("シーケンス: Browser → Loader → Validation → APIClient → API", () => {
         test("正常系: 有効なslugでポートフォリオ詳細を取得する", async () => {
-            // Given: 有効なslugと対応するポートフォリオ
             const slug = "my-project";
             const mockPortfolio = {
                 id: "1",
@@ -43,11 +34,9 @@ describe("Portfolio Detail Integration - docs/sequence/web/portfolio-detail.md",
                 }),
             );
 
-            // When: 詳細ページのAPIを呼び出す
             const response = await fetch(`${API_URL}/api/portfolios/${slug}`);
             const data = await response.json();
 
-            // Then: ポートフォリオ詳細が取得される
             expect(response.ok).toBe(true);
             expect(data.title).toBe("My Project");
             expect(data.company).toBe("Tech Corp");

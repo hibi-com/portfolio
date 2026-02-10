@@ -23,7 +23,6 @@ describe("SectionSoftware Component", () => {
         expect(screen.getByText(/Visual Studio Code/)).toBeInTheDocument();
         expect(screen.getByText(/Iterm2/)).toBeInTheDocument();
         expect(screen.getByText(/Docker Desktop/)).toBeInTheDocument();
-        // 複数要素がある場合はgetAllByTextを使用
         expect(screen.getAllByText(/Figma/).length).toBeGreaterThan(0);
     });
 
@@ -49,7 +48,6 @@ describe("SectionSoftware Component", () => {
 
         expect(screen.getByText(/editor of choice/)).toBeInTheDocument();
         expect(screen.getByText(/terminal users/)).toBeInTheDocument();
-        // 複数要素がある場合はgetAllByTextを使用
         expect(screen.getAllByText(/Docker/).length).toBeGreaterThan(0);
     });
 });

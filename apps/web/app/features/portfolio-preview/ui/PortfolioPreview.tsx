@@ -1,11 +1,6 @@
 import { Link } from "@remix-run/react";
 import type { PortfolioPreviewProps } from "../model/types";
 
-/**
- * @name PortfolioPreview
- * @description Unfortunately I don't have a ton of great imagery to work with
- * for all of these past projects so I need to try and focus on the content 🤔
- */
 export const PortfolioPreview = (props: PortfolioPreviewProps) => {
     const { current = false, data } = props;
 

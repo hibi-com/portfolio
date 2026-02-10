@@ -1,18 +1,6 @@
-export interface Post {
-    id: string;
-    title: string;
-    slug: string;
-    date: Date;
-    description?: string;
-    content: string;
-    contentRaw?: unknown;
-    imageTemp: string;
-    sticky: boolean;
-    intro?: string;
-    tags: string[];
-    createdAt: Date;
-    updatedAt: Date;
-}
+export type { Post } from "@portfolio/api/generated/zod";
+
+import type { Post } from "@portfolio/api/generated/zod";
 
 export interface PostRepository {
     findAll(): Promise<Post[]>;

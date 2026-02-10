@@ -54,11 +54,6 @@ export const Header = () => {
                     <NavLink className="header-link" onClick={onClose} prefetch="intent" to="/resume">
                         Resume
                     </NavLink>
-                    {/*
-          <NavLink className="header-link" onClick={onClose} prefetch="intent" to="/sandbox">
-            Sandbox
-          </NavLink>
-          */}
                     <NavLink className="header-link" onClick={onClose} prefetch="intent" to="/uses">
                         Uses
                     </NavLink>

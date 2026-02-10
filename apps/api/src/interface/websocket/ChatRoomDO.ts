@@ -25,8 +25,8 @@ interface StoredMessage {
 }
 
 export class ChatRoomDO {
-    private state: DurableObjectState;
-    private sessions: Map<CFWebSocket, ChatSession>;
+    private readonly state: DurableObjectState;
+    private readonly sessions: Map<CFWebSocket, ChatSession>;
 
     constructor(state: DurableObjectState) {
         this.state = state;

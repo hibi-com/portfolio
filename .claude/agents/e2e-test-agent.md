@@ -50,10 +50,6 @@ apps/admin/e2e/large/
 ## テンプレート
 
 ```typescript
-/**
- * @story docs/user-stories/{persona}/{story}.md
- * @description {ユーザーストーリー}のE2Eテスト
- */
 import { test, expect } from "@playwright/test";
 
 test.describe("{Persona}: {Story Title}", () => {
