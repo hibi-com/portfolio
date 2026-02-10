@@ -28,12 +28,15 @@
     "with-env": "env"
   },
   "dependencies": {
+    "@hono/zod-openapi": "0.18.4",
     "@portfolio/api": "workspace:*",
     "@portfolio/auth": "workspace:*",
     "@portfolio/cache": "workspace:*",
     "@portfolio/db": "workspace:*",
     "@portfolio/log": "workspace:*",
-    "hono": "4.6.11"
+    "@portfolio/validation": "workspace:*",
+    "hono": "4.6.11",
+    "zod": "3.24.4 || 4.x"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.12.3",

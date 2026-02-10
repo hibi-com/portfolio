@@ -23,6 +23,10 @@
             "dependsOn": ["^build"],
             "outputs": []
         },
+        "@portfolio/api#build": {
+            "dependsOn": ["@portfolio/api#generate", "^build"],
+            "outputs": ["dist/**"]
+        },
         "build:ui": {
             "cache": true
         },

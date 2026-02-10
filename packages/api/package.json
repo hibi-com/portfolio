@@ -64,12 +64,17 @@
       "types": "./dist/generated/emails/emails.d.ts",
       "import": "./dist/generated/emails/emails.js",
       "require": "./dist/generated/emails/emails.js"
+    },
+    "./generated/zod": {
+      "types": "./dist/generated/zod/index.d.ts",
+      "import": "./dist/generated/zod/index.js",
+      "require": "./dist/generated/zod/index.js"
     }
   },
   "main": "./dist/src/index.js",
   "scripts": {
     "build": "bun run build:js && bun run build:types",
-    "build:js": "bun build ./src/index.ts ./generated/api.schemas.ts ./generated/mutator.ts ./generated/portfolios/portfolios.ts ./generated/posts/posts.ts ./generated/customers/customers.ts ./generated/leads/leads.ts ./generated/deals/deals.ts ./generated/pipelines/pipelines.ts ./generated/inquiries/inquiries.ts ./generated/chats/chats.ts ./generated/emails/emails.ts --outdir dist --target browser --format esm --external axios",
+    "build:js": "bun build ./src/index.ts ./generated/api.schemas.ts ./generated/mutator.ts ./generated/portfolios/portfolios.ts ./generated/posts/posts.ts ./generated/customers/customers.ts ./generated/leads/leads.ts ./generated/deals/deals.ts ./generated/pipelines/pipelines.ts ./generated/inquiries/inquiries.ts ./generated/chats/chats.ts ./generated/emails/emails.ts ./generated/zod/index.ts --outdir dist --target browser --format esm --external axios --external zod",
     "build:types": "git clean -xdf .cache/tsbuildinfo.json && tsc --emitDeclarationOnly --declaration --outDir dist",
     "build:ui": "redoc-cli bundle openapi.yaml --output ../../apps/wiki/reference/index.html",
     "clean:cache": "git clean -xdf .cache .turbo",
@@ -78,7 +83,8 @@
     "dev": "bun run build:js --watch",
     "fmt": "biome format --write .",
     "fmt:check": "biome format .",
-    "generate": "tsp compile schema/api.tsp && orval",
+    "generate": "tsp compile schema/api.tsp && orval && bun run generate:zod",
+    "generate:zod": "openapi-zod-client openapi.yaml -o generated/zod/schemas.ts && bun run scripts/export-schemas.ts",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "studio": "redoc-cli serve openapi.yaml --port 28080",
@@ -96,9 +102,13 @@
     "@typespec/compiler": "1.7.0",
     "@typespec/http": "1.7.0",
     "@typespec/openapi3": "1.7.0",
+    "openapi-zod-client": "1.18.2",
     "orval": "7.17.2",
     "redoc-cli": "0.13.21",
     "typescript": "5.9.3",
     "vitest": "3.2.4"
+  },
+  "peerDependencies": {
+    "zod": ">=3.0.0"
   }
 }
