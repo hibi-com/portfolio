@@ -1,5 +1,17 @@
 import { vi } from "vitest";
 
+const emptyRect: DOMRect = {
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+    toJSON: () => JSON.stringify({ x: 0, y: 0, width: 0, height: 0, top: 0, right: 0, bottom: 0, left: 0 }),
+};
+
 interface ClipboardAPI {
     writeText: (text: string) => Promise<void>;
     readText: () => Promise<string>;
@@ -7,44 +19,41 @@ interface ClipboardAPI {
 
 let clipboardStore = "";
 
-export const getClipboardStore = (): string => {
+export function getClipboardStore(): string {
     return clipboardStore;
-};
+}
 
-export const resetClipboardStore = (): void => {
+export function resetClipboardStore(): void {
     clipboardStore = "";
-};
+}
 
-try {
-    const navigatorWithClipboard = navigator as Navigator & {
-        clipboard?: ClipboardAPI;
-    };
-    if ("clipboard" in navigatorWithClipboard && navigatorWithClipboard.clipboard) {
-        vi.spyOn(navigatorWithClipboard.clipboard, "writeText").mockImplementation(async (text: string) => {
-            clipboardStore = text;
-        });
-        vi.spyOn(navigatorWithClipboard.clipboard, "readText").mockImplementation(async () => {
-            return clipboardStore;
-        });
-    } else {
-        Object.defineProperty(navigator, "clipboard", {
-            configurable: true,
-            writable: true,
-            value: {
-                writeText: vi.fn().mockImplementation(async (text: string) => {
-                    clipboardStore = text;
-                }),
-                readText: vi.fn().mockImplementation(async () => {
-                    return clipboardStore;
-                }),
-            },
-        });
+function setupClipboardMock(): void {
+    try {
+        const navigatorWithClipboard = navigator as Navigator & { clipboard?: ClipboardAPI };
+
+        if ("clipboard" in navigatorWithClipboard && navigatorWithClipboard.clipboard) {
+            vi.spyOn(navigatorWithClipboard.clipboard, "writeText").mockImplementation(async (text: string) => {
+                clipboardStore = text;
+            });
+            vi.spyOn(navigatorWithClipboard.clipboard, "readText").mockImplementation(async () => clipboardStore);
+        } else {
+            Object.defineProperty(navigator, "clipboard", {
+                configurable: true,
+                writable: true,
+                value: {
+                    writeText: vi.fn().mockImplementation(async (text: string) => {
+                        clipboardStore = text;
+                    }),
+                    readText: vi.fn().mockImplementation(async () => clipboardStore),
+                },
+            });
+        }
+    } catch (error) {
+        console.warn(
+            "[vitest-config] Failed to setup clipboard mock:",
+            error instanceof Error ? error.message : String(error),
+        );
     }
-} catch (error) {
-    console.warn(
-        "[vitest-config] Failed to setup clipboard mock:",
-        error instanceof Error ? error.message : String(error),
-    );
 }
 
 export class IntersectionObserverMock implements IntersectionObserver {
@@ -89,8 +98,6 @@ export class IntersectionObserverMock implements IntersectionObserver {
     }
 }
 
-globalThis.IntersectionObserver = IntersectionObserverMock as unknown as typeof IntersectionObserver;
-
 export class ResizeObserverMock implements ResizeObserver {
     private readonly observedElements = new Set<Element>();
 
@@ -109,9 +116,9 @@ export class ResizeObserverMock implements ResizeObserver {
     }
 
     triggerResize(entries: Partial<ResizeObserverEntry>[]): void {
-        const fullEntries = entries.map((e) => ({
-            ...e,
-            contentRect: e.contentRect ?? emptyRect,
+        const fullEntries = entries.map((entry) => ({
+            ...entry,
+            contentRect: entry.contentRect ?? emptyRect,
             borderBoxSize: [],
             contentBoxSize: [],
             devicePixelContentBoxSize: [],
@@ -121,11 +128,8 @@ export class ResizeObserverMock implements ResizeObserver {
     }
 }
 
-globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
-
-Object.defineProperty(globalThis, "matchMedia", {
-    writable: true,
-    value: vi.fn().mockImplementation((query) => ({
+function createMatchMediaMock() {
+    return vi.fn().mockImplementation((query: string) => ({
         matches: false,
         media: query,
         onchange: null,
@@ -134,33 +138,31 @@ Object.defineProperty(globalThis, "matchMedia", {
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
-    })),
+    }));
+}
+
+setupClipboardMock();
+
+globalThis.IntersectionObserver = IntersectionObserverMock as unknown as typeof IntersectionObserver;
+globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
+
+Object.defineProperty(globalThis, "matchMedia", {
+    writable: true,
+    value: createMatchMediaMock(),
 });
-
-const emptyRect = {
-    bottom: 0,
-    height: 0,
-    left: 0,
-    right: 0,
-    top: 0,
-    width: 0,
-    x: 0,
-    y: 0,
-    toJSON: vi.fn(),
-};
-
-Element.prototype.getBoundingClientRect = vi.fn(() => emptyRect);
-Element.prototype.scrollIntoView = vi.fn();
 
 Object.defineProperty(globalThis, "scrollTo", {
     writable: true,
     value: vi.fn(),
 });
 
-globalThis.requestAnimationFrame = vi.fn((cb) => setTimeout(cb, 0) as unknown as number);
-globalThis.cancelAnimationFrame = vi.fn((id) => clearTimeout(id));
-
 Object.defineProperty(navigator, "share", {
     writable: true,
     value: vi.fn().mockResolvedValue(undefined),
 });
+
+Element.prototype.getBoundingClientRect = vi.fn(() => emptyRect);
+Element.prototype.scrollIntoView = vi.fn();
+
+globalThis.requestAnimationFrame = vi.fn((cb) => setTimeout(cb, 0) as unknown as number);
+globalThis.cancelAnimationFrame = vi.fn((id) => clearTimeout(id));

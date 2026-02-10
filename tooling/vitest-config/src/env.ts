@@ -1,4 +1,9 @@
-function getEnvironmentFromBaseUrl(baseUrl: string): string {
+type Environment = "production" | "staging" | "development" | "test";
+
+const DEFAULT_PORT = "3000";
+const DEFAULT_BASE_URL = "http://localhost:3000";
+
+function getEnvironmentFromBaseUrl(baseUrl: string): Environment {
     if (baseUrl.includes("ageha734.jp") && !baseUrl.includes("stg.") && !baseUrl.includes("rc.")) {
         return "production";
     }
@@ -17,17 +22,22 @@ function getEnvironmentFromBaseUrl(baseUrl: string): string {
 function getPortFromBaseUrl(baseUrl: string): string {
     try {
         const url = new URL(baseUrl);
-        return url.port || "3000";
+        return url.port || DEFAULT_PORT;
     } catch {
-        return "3000";
+        return DEFAULT_PORT;
     }
 }
 
-const baseUrl = process.env.VITE_BASE_URL ?? process.env.BASE_URL ?? "http://localhost:3000";
-process.env.BASE_URL = baseUrl;
-process.env.PORT = getPortFromBaseUrl(baseUrl);
-process.env.ENVIRONMENT = getEnvironmentFromBaseUrl(baseUrl);
-process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
-process.env.GOOGLE_ANALYTICS = process.env.GOOGLE_ANALYTICS ?? "G-TEST123";
-process.env.GOOGLE_TAG_MANAGER = process.env.GOOGLE_TAG_MANAGER ?? "GTM-TEST123";
-process.env.TZ = "UTC";
+function setupTestEnvironment(): void {
+    const baseUrl = process.env.VITE_BASE_URL ?? process.env.BASE_URL ?? DEFAULT_BASE_URL;
+
+    process.env.BASE_URL = baseUrl;
+    process.env.PORT = getPortFromBaseUrl(baseUrl);
+    process.env.ENVIRONMENT = getEnvironmentFromBaseUrl(baseUrl);
+    process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
+    process.env.GOOGLE_ANALYTICS = process.env.GOOGLE_ANALYTICS ?? "G-TEST123";
+    process.env.GOOGLE_TAG_MANAGER = process.env.GOOGLE_TAG_MANAGER ?? "GTM-TEST123";
+    process.env.TZ = "UTC";
+}
+
+setupTestEnvironment();

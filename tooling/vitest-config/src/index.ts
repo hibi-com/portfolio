@@ -1,12 +1,19 @@
 import os from "node:os";
-import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
+import type { UserConfig } from "vite";
+import type { InlineConfig } from "vitest/node";
 
 const cpuCount = os.cpus().length;
-const totalMem = os.totalmem() / 1024 ** 3;
-
+const totalMemGB = os.totalmem() / 1024 ** 3;
 const isCI = !!process.env.CI;
-const safeConcurrency = isCI || totalMem <= 8 ? 2 : Math.max(1, Math.floor(cpuCount / 2));
+
+function calculateConcurrency(totalMem: number, cpus: number, ci: boolean): number {
+    if (ci || totalMem <= 8) return 2;
+    return Math.max(1, Math.floor(cpus / 2));
+}
+
+const safeConcurrency = calculateConcurrency(totalMemGB, cpuCount, isCI);
+
+type VitestEnvironment = "node" | "jsdom" | "happy-dom" | "edge-runtime" | "miniflare" | string;
 
 export interface VitestConfigOptions {
     root?: string;
@@ -16,11 +23,13 @@ export interface VitestConfigOptions {
     coverageDir?: string;
     additionalAliases?: Record<string, string>;
     projectName?: string;
-    test?: Record<string, any>;
+    test?: Partial<InlineConfig>;
     includeReact?: boolean;
 }
 
-export function createVitestConfig(options: VitestConfigOptions = {}) {
+type VitestConfig = UserConfig & { test: InlineConfig };
+
+export function createVitestConfig(options: VitestConfigOptions = {}): VitestConfig {
     const {
         root = process.cwd(),
         tsconfigPath,
@@ -32,31 +41,61 @@ export function createVitestConfig(options: VitestConfigOptions = {}) {
         includeReact: explicitIncludeReact,
     } = options;
 
-    const environment = testOverrides.environment ?? "jsdom";
-    const shouldIncludeReact = explicitIncludeReact ?? (environment !== "node" && environment !== "miniflare");
+    const environment: VitestEnvironment = (testOverrides?.environment as VitestEnvironment) ?? "jsdom";
+    const isNonBrowserEnv = environment === "node" || environment === "miniflare";
+    const shouldIncludeReact = explicitIncludeReact ?? !isNonBrowserEnv;
 
-    const plugins = [];
+    const plugins: UserConfig["plugins"] = [];
+
     if (shouldIncludeReact) {
-        plugins.push(react() as any);
+        const react = require("@vitejs/plugin-react").default;
+        plugins.push(react());
     }
+
+    const tsconfigPaths = require("vite-tsconfig-paths").default;
     plugins.push(
         tsconfigPaths({
             root,
             projects: tsconfigPath ? [tsconfigPath] : undefined,
-        }) as any,
+        }),
     );
+
+    const reporters: InlineConfig["reporters"] = options.projectName
+        ? [
+              "default",
+              [
+                  "@portfolio/vitest-reporter",
+                  { outputDir: "../apps/wiki/reports/test", projectName: options.projectName, coverageDir },
+              ],
+          ]
+        : ["default"];
 
     return {
         plugins,
         resolve: {
-            alias: {
-                ...additionalAliases,
-            },
+            alias: additionalAliases,
         },
         optimizeDeps: {
             disabled: true,
         },
         test: {
+            globals: true,
+            environment,
+            include: [`${testDir}/**/*.test.{ts,tsx}`],
+            setupFiles,
+            testTimeout: 10000,
+            passWithNoTests: true,
+            fileParallelism: true,
+            isolate: totalMemGB > 16,
+            pool: "threads",
+            poolOptions: {
+                threads: {
+                    singleThread: false,
+                    maxThreads: safeConcurrency,
+                    minThreads: 1,
+                },
+            },
+            reporters,
             coverage: {
                 exclude: [
                     ".cache/**",
@@ -75,46 +114,12 @@ export function createVitestConfig(options: VitestConfigOptions = {}) {
                     branches: 100,
                     statements: 90,
                 },
-                poolOptions: {
-                    threads: {
-                        maxThreads: safeConcurrency,
-                        minThreads: 1,
-                    },
-                },
-                isolate: totalMem > 16,
-            },
-            reporters: options.projectName
-                ? [
-                      "default",
-                      [
-                          "@portfolio/vitest-reporter",
-                          { outputDir: "../apps/wiki/reports/test", projectName: options.projectName, coverageDir },
-                      ],
-                  ]
-                : ["default"],
-            globals: true,
-            environment: "jsdom",
-            include: [`${testDir}/**/*.test.{ts,tsx}`],
-            setupFiles,
-            testTimeout: 10000,
-            passWithNoTests: true,
-            fileParallelism: true,
-            isolate: true,
-            pool: "threads",
-            poolOptions: {
-                threads: {
-                    singleThread: false,
-                },
             },
             deps: {
                 inline: ["@portfolio/**"],
                 optimizer: {
-                    web: {
-                        enabled: false,
-                    },
-                    ssr: {
-                        enabled: false,
-                    },
+                    web: { enabled: false },
+                    ssr: { enabled: false },
                 },
             },
             server: {
