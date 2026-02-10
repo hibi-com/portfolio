@@ -1,7 +1,31 @@
 import { describe, expect, test } from "vitest";
-import { assetSchema, enumValueSchema, tagSchema, typeInfoSchema, urlSchema } from "./shared";
+import { assetSchema, emailSchema, enumValueSchema, slugSchema, tagSchema, typeInfoSchema, urlSchema } from "./shared";
 
 describe("Shared Zod Schemas", () => {
+    describe("slugSchema", () => {
+        test.each(["hello-world", "test", "my-post-123", "a", "123"])("should accept valid slug: %s", (slug) => {
+            const result = slugSchema.safeParse(slug);
+            expect(result.success).toBe(true);
+        });
+
+        test.each([
+            "Hello-World",
+            "test_slug",
+            "my post",
+            "hello!",
+            "UPPERCASE",
+            "日本語",
+        ])("should reject invalid slug: %s", (slug) => {
+            const result = slugSchema.safeParse(slug);
+            expect(result.success).toBe(false);
+        });
+
+        test("should reject empty string", () => {
+            const result = slugSchema.safeParse("");
+            expect(result.success).toBe(false);
+        });
+    });
+
     describe("urlSchema", () => {
         test("should validate valid URL", () => {
             expect(urlSchema.safeParse("https://example.com").success).toBe(true);
@@ -9,6 +33,32 @@ describe("Shared Zod Schemas", () => {
 
         test("should reject invalid URL", () => {
             expect(urlSchema.safeParse("not-a-url").success).toBe(false);
+        });
+    });
+
+    describe("emailSchema", () => {
+        test.each([
+            "test@example.com",
+            "user.name@domain.co.jp",
+            "user+tag@example.org",
+            "a@b.co",
+            "user123@test-domain.com",
+        ])("should accept valid email: %s", (email) => {
+            const result = emailSchema.safeParse(email);
+            expect(result.success).toBe(true);
+        });
+
+        test.each([
+            "invalid-email",
+            "@example.com",
+            "user@",
+            "user@.com",
+            "user @example.com",
+            "user@ example.com",
+            "",
+        ])("should reject invalid email: %s", (email) => {
+            const result = emailSchema.safeParse(email);
+            expect(result.success).toBe(false);
         });
     });
 

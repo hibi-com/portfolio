@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const slugSchema = z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9-]+$/);
+
 export const urlSchema = z.string().refine(
     (val) => {
         try {
@@ -10,6 +15,14 @@ export const urlSchema = z.string().refine(
         }
     },
     { message: "Invalid URL" },
+);
+
+export const emailSchema = z.string().refine(
+    (val) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(val);
+    },
+    { message: "Invalid email" },
 );
 
 export const assetSchema = z.object({
