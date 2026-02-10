@@ -1,5 +1,5 @@
-import { getLogger } from "~/lib/logger";
 import { useNavigate } from "@remix-run/react";
+import { getLogger } from "~/lib/logger";
 import { BASE_URL } from "~/shared/config/settings";
 
 interface DocumentTransition {

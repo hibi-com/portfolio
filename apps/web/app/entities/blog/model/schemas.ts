@@ -1,5 +1,5 @@
+import { urlSchema } from "@portfolio/validation";
 import { z } from "zod";
-import { urlSchema } from "~/shared/validation";
 
 export const postSchema = z.object({
     content: z.object({

@@ -5,11 +5,6 @@ import { SITE_UPDATED } from "~/shared/config/constants";
 import { BASE_URL } from "~/shared/config/settings";
 import { createApiClient } from "~/shared/lib/api";
 
-/**
- * @method GET
- * @name /sitemap.xml
- * @description Generate a sitemap.xml for SEO purposes
- */
 export const loader: LoaderFunction = async (args) => {
     const apiUrl =
         args.context.cloudflare && typeof args.context.cloudflare === "object" && "env" in args.context.cloudflare

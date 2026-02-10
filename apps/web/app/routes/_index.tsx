@@ -24,7 +24,6 @@ export const meta: MetaFunction = (args) => {
 };
 
 export default function Index() {
-    // Hooks
     const [heading, setHeading] = React.useState("A Software Engineer");
 
     const onClick = () => {

@@ -1,8 +1,8 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { loader } from "./[sitemap.xml]";
 import type { Post } from "~/entities/blog";
 import type { Portfolio } from "~/entities/portfolio";
+import { loader } from "./[sitemap.xml]";
 
 vi.mock("~/shared/lib/api", () => ({
     createApiClient: vi.fn(),

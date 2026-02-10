@@ -1,6 +1,6 @@
+import { slugSchema } from "@portfolio/validation";
 import type { LoaderFunction } from "@remix-run/cloudflare";
 import { createApiClient } from "~/shared/lib/api";
-import { slugSchema } from "~/shared/validation";
 
 export interface Post {
     id: string;

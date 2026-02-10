@@ -70,7 +70,6 @@ export default function Blog_Slug() {
                         <div className="font-font-monospace text-sm">{date}</div>
                     </div>
 
-                    {/* Content */}
                     <Wysiwyg content={data.content.raw as string} />
                 </div>
             </section>

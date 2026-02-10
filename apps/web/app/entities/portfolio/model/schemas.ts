@@ -1,5 +1,5 @@
+import { urlSchema } from "@portfolio/validation";
 import { z } from "zod";
-import { urlSchema } from "~/shared/validation";
 
 export const portfolioSchema = z.object({
     company: z.string().min(1),

@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {
     SITE_AUTHOR,
     SITE_EMAIL_ADDRESS,
@@ -8,10 +7,6 @@ import {
     SOCIAL_TWITTER,
 } from "~/shared/config/constants";
 
-/**
- * @name useIntro
- * @description Simple hook to log the intro message to the console.
- */
 export const useIntro = () => {
     const styleContact = "color: default; font-size: 14px;";
     const styleMessage = "color: #f00; font-size: 18px;";
