@@ -14,7 +14,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "bun run build:js && bun run build:types",
-    "build:js": "bun build ./src/index.ts --outdir dist --target node --format esm && mkdir -p dist/cmd && bun build ./cmd/main.ts --outfile dist/cmd/main.js --target node --format esm && chmod +x dist/cmd/main.js",
+    "build:js": "bun build ./src/index.ts ./src/run.ts ./src/lib/*.ts --outdir dist --target bun --format esm --splitting && mkdir -p dist/cmd && bun build ./cmd/main.ts --outfile dist/cmd/main.js --target bun --format esm && chmod +x dist/cmd/main.js",
     "build:types": "git clean -xdf .cache/tsbuildinfo.json && tsc --emitDeclarationOnly --declaration --outDir dist",
     "clean:cache": "git clean -xdf .cache .turbo",
     "clean:pkg": "git clean -xdf node_modules dist",
@@ -31,7 +31,7 @@
   "devDependencies": {
     "@portfolio/biome-config": "workspace:*",
     "@portfolio/tsconfig": "workspace:*",
-    "@types/node": "25.0.3",
+    "@types/bun": "1.2.19",
     "typescript": "5.9.3"
   },
   "bin": {

@@ -1,10 +1,13 @@
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { parseArgs } from "./args.js";
-import { MIGRATION_DIR_NAME, SCHEMA_PATH_REL } from "./constants.js";
-import { hasExistingMigrations, writeMigration } from "./migration.js";
-import { getMigrationDirRel, getSchemaPathRel, runGenerate, runPrismaDiff } from "./prisma.js";
-import { getShadowUrlOrError } from "./shadow.js";
+import { parseArgs } from "./lib/args.js";
+import { MIGRATION_DIR_NAME, SCHEMA_PATH_REL } from "./lib/constants.js";
+import { hasExistingMigrations, writeMigration } from "./lib/migration.js";
+import { getMigrationDirRel, getSchemaPathRel, runGenerate, runPrismaDiff } from "./lib/prisma.js";
+import { getShadowUrl } from "./lib/shadow.js";
+
+const EXIT_SUCCESS = 0;
+const EXIT_FAILURE = 1;
 
 export function main(args: string[] = process.argv.slice(2)): number {
     const { dbDir, runGenerateFirst } = parseArgs(args);
@@ -13,26 +16,27 @@ export function main(args: string[] = process.argv.slice(2)): number {
 
     if (!existsSync(schemaPath)) {
         console.error(`prisma-migration: schema not found: ${schemaPath}`);
-        return 1;
+        return EXIT_FAILURE;
     }
 
     if (runGenerateFirst && !runGenerate(dbDir)) {
         console.error("prisma-migration: bun run generate failed");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     mkdirSync(migrationDir, { recursive: true });
+
     const fromEmpty = !hasExistingMigrations(migrationDir);
-    const shadowUrl = getShadowUrlOrError(fromEmpty);
+    const shadowUrl = getShadowUrl(fromEmpty);
 
     if (!fromEmpty && !shadowUrl) {
         console.error(
             "prisma-migration: 増分生成時は SHADOW_DATABASE_URL を設定するか、DATABASE_URL から派生できるようにしてください。",
         );
-        return 1;
+        return EXIT_FAILURE;
     }
 
-    const { stdout, stderr, status } = runPrismaDiff(
+    const { stdout, stderr, exitCode } = runPrismaDiff(
         dbDir,
         fromEmpty,
         getMigrationDirRel(),
@@ -40,17 +44,17 @@ export function main(args: string[] = process.argv.slice(2)): number {
         shadowUrl ?? undefined,
     );
 
-    if (status !== 0) {
+    if (exitCode !== 0) {
         if (stderr) console.error(stderr);
-        return status ?? 1;
+        return exitCode;
     }
 
     const sql = stdout.trim();
     if (!sql) {
         console.log("差分がありません。新規マイグレーションは作成しませんでした。");
-        return 0;
+        return EXIT_SUCCESS;
     }
 
     writeMigration(migrationDir, sql);
-    return 0;
+    return EXIT_SUCCESS;
 }

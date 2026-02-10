@@ -1,29 +1,29 @@
-import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { MIGRATION_DIR_NAME, SCHEMA_PATH_REL } from "./constants.js";
 
-export function resolvePrismaBin(dbDir: string): string {
-    const local = join(dbDir, "node_modules", ".bin", "prisma");
-    if (existsSync(local)) return local;
-    const root = join(dbDir, "..", "..", "node_modules", ".bin", "prisma");
-    if (existsSync(root)) return resolve(root);
+export interface PrismaDiffResult {
+    stdout: string;
+    stderr: string;
+    exitCode: number;
+}
+
+function resolvePrismaBin(dbDir: string): string {
+    const localBin = join(dbDir, "node_modules", ".bin", "prisma");
+    if (existsSync(localBin)) return localBin;
+
+    const rootBin = resolve(dbDir, "..", "..", "node_modules", ".bin", "prisma");
+    if (existsSync(rootBin)) return rootBin;
+
     return "prisma";
 }
 
 export function runGenerate(dbDir: string): boolean {
-    const r = spawnSync("bun", ["run", "generate"], {
+    const result = Bun.spawnSync(["bun", "run", "generate"], {
         cwd: dbDir,
-        stdio: "inherit",
-        shell: false,
+        stdio: ["inherit", "inherit", "inherit"],
     });
-    return r.status === 0;
-}
-
-export interface PrismaDiffResult {
-    stdout: string;
-    stderr: string;
-    status: number | null;
+    return result.exitCode === 0;
 }
 
 export function runPrismaDiff(
@@ -34,7 +34,9 @@ export function runPrismaDiff(
     shadowDatabaseUrl?: string,
 ): PrismaDiffResult {
     const prismaBin = resolvePrismaBin(dbDir);
+
     const args: string[] = [
+        prismaBin,
         "migrate",
         "diff",
         ...(fromEmpty ? ["--from-empty"] : ["--from-migrations", migrationDirRel]),
@@ -44,16 +46,15 @@ export function runPrismaDiff(
         ...(shadowDatabaseUrl ? ["--shadow-database-url", shadowDatabaseUrl] : []),
     ];
 
-    const r = spawnSync(prismaBin, args, {
+    const result = Bun.spawnSync(args, {
         cwd: dbDir,
-        encoding: "utf-8",
-        shell: false,
+        stdio: ["inherit", "pipe", "pipe"],
     });
 
     return {
-        stdout: (r.stdout ?? "").trim(),
-        stderr: (r.stderr ?? "").trim(),
-        status: r.status,
+        stdout: result.stdout.toString().trim(),
+        stderr: result.stderr.toString().trim(),
+        exitCode: result.exitCode,
     };
 }
 

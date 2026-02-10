@@ -5,21 +5,33 @@ export interface ParsedArgs {
     runGenerateFirst: boolean;
 }
 
+const FLAG_DB_DIR = "--db-dir";
+const FLAG_NO_GENERATE = "--no-generate";
+
 export function parseArgs(args: string[]): ParsedArgs {
     let dbDir = process.cwd();
     let runGenerateFirst = true;
+
     let i = 0;
     while (i < args.length) {
         const arg = args[i];
-        if (arg === "--db-dir" && args[i + 1] !== undefined) {
-            dbDir = resolve(args[i + 1]!);
-            i += 2;
+
+        if (arg === FLAG_DB_DIR) {
+            const nextArg = args[i + 1];
+            if (nextArg !== undefined) {
+                dbDir = resolve(nextArg);
+                i += 2;
+                continue;
+            }
+            i += 1;
             continue;
         }
-        if (arg === "--no-generate") {
+
+        if (arg === FLAG_NO_GENERATE) {
             runGenerateFirst = false;
         }
-        i++;
+        i += 1;
     }
+
     return { dbDir, runGenerateFirst };
 }

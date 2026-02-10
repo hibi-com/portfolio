@@ -4,7 +4,7 @@
         "baseUrl": ".",
         "rootDir": ".",
         "typeRoots": ["../../node_modules/@types"],
-        "types": ["node"]
+        "types": ["bun"]
     },
     "include": ["cmd/main.ts", "src/**/*.ts"]
 }
