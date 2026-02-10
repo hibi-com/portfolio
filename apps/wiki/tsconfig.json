@@ -10,6 +10,6 @@
         "skipLibCheck": true,
         "target": "ESNext"
     },
-    "exclude": ["node_modules", "dist", "astro.config.ts"],
+    "exclude": ["node_modules", "build", "dist", "astro.config.ts"],
     "include": ["src/**/*", ".astro/*.d.ts"]
 }
