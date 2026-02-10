@@ -5,137 +5,156 @@
  * OpenAPI spec version: 0.0.0
  */
 import type {
-  CreateInquiryInput,
-  CreateInquiryResponseInput,
-  InquiriesListInquiries200,
-  InquiriesListInquiriesParams,
-  Inquiry,
-  InquiryResponse,
-  UpdateInquiryInput
-} from '../api.schemas';
-
-import { customInstance } from '.././mutator';
-
+    CreateInquiryInput,
+    CreateInquiryResponseInput,
+    InquiriesListInquiries200,
+    InquiriesListInquiriesParams,
+    Inquiry,
+    InquiryResponse,
+    UpdateInquiryInput,
+} from "../api.schemas";
+import { customInstance } from ".././mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  export const getInquiries = () => {
-/**
- * @summary Get all inquiries
- */
-const inquiriesListInquiries = (
-    params?: InquiriesListInquiriesParams,
- options?: SecondParameter<typeof customInstance<InquiriesListInquiries200>>,) => {
-      return customInstance<InquiriesListInquiries200>(
-      {url: `/api/support/inquiries`, method: 'GET',
-        params
-    },
-      options);
-    }
-  /**
- * @summary Create a new inquiry
- */
-const inquiriesCreateInquiry = (
-    createInquiryInput: CreateInquiryInput,
- options?: SecondParameter<typeof customInstance<Inquiry>>,) => {
-      return customInstance<Inquiry>(
-      {url: `/api/support/inquiries`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createInquiryInput
-    },
-      options);
-    }
-  /**
- * @summary Get an inquiry by ID
- */
-const inquiriesGetInquiryById = (
-    id: string,
- options?: SecondParameter<typeof customInstance<Inquiry>>,) => {
-      return customInstance<Inquiry>(
-      {url: `/api/support/inquiries/${id}`, method: 'GET'
-    },
-      options);
-    }
-  /**
- * @summary Update an inquiry
- */
-const inquiriesUpdateInquiry = (
-    id: string,
-    updateInquiryInput: UpdateInquiryInput,
- options?: SecondParameter<typeof customInstance<Inquiry>>,) => {
-      return customInstance<Inquiry>(
-      {url: `/api/support/inquiries/${id}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateInquiryInput
-    },
-      options);
-    }
-  /**
- * @summary Delete an inquiry
- */
-const inquiriesDeleteInquiry = (
-    id: string,
- options?: SecondParameter<typeof customInstance<void>>,) => {
-      return customInstance<void>(
-      {url: `/api/support/inquiries/${id}`, method: 'DELETE'
-    },
-      options);
-    }
-  /**
- * @summary Close an inquiry
- */
-const inquiriesCloseInquiry = (
-    id: string,
- options?: SecondParameter<typeof customInstance<Inquiry>>,) => {
-      return customInstance<Inquiry>(
-      {url: `/api/support/inquiries/${id}/close`, method: 'POST'
-    },
-      options);
-    }
-  /**
- * @summary Resolve an inquiry
- */
-const inquiriesResolveInquiry = (
-    id: string,
- options?: SecondParameter<typeof customInstance<Inquiry>>,) => {
-      return customInstance<Inquiry>(
-      {url: `/api/support/inquiries/${id}/resolve`, method: 'POST'
-    },
-      options);
-    }
-  /**
- * @summary Get responses for an inquiry
- */
-const inquiriesGetInquiryResponses = (
-    id: string,
- options?: SecondParameter<typeof customInstance<InquiryResponse[]>>,) => {
-      return customInstance<InquiryResponse[]>(
-      {url: `/api/support/inquiries/${id}/responses`, method: 'GET'
-    },
-      options);
-    }
-  /**
- * @summary Add a response to an inquiry
- */
-const inquiriesAddInquiryResponse = (
-    id: string,
-    createInquiryResponseInput: CreateInquiryResponseInput,
- options?: SecondParameter<typeof customInstance<InquiryResponse>>,) => {
-      return customInstance<InquiryResponse>(
-      {url: `/api/support/inquiries/${id}/responses`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createInquiryResponseInput
-    },
-      options);
-    }
-  return {inquiriesListInquiries,inquiriesCreateInquiry,inquiriesGetInquiryById,inquiriesUpdateInquiry,inquiriesDeleteInquiry,inquiriesCloseInquiry,inquiriesResolveInquiry,inquiriesGetInquiryResponses,inquiriesAddInquiryResponse}};
-export type InquiriesListInquiriesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getInquiries>['inquiriesListInquiries']>>>
-export type InquiriesCreateInquiryResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getInquiries>['inquiriesCreateInquiry']>>>
-export type InquiriesGetInquiryByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getInquiries>['inquiriesGetInquiryById']>>>
-export type InquiriesUpdateInquiryResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getInquiries>['inquiriesUpdateInquiry']>>>
-export type InquiriesDeleteInquiryResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getInquiries>['inquiriesDeleteInquiry']>>>
-export type InquiriesCloseInquiryResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getInquiries>['inquiriesCloseInquiry']>>>
-export type InquiriesResolveInquiryResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getInquiries>['inquiriesResolveInquiry']>>>
-export type InquiriesGetInquiryResponsesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getInquiries>['inquiriesGetInquiryResponses']>>>
-export type InquiriesAddInquiryResponseResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getInquiries>['inquiriesAddInquiryResponse']>>>
+export const getInquiries = () => {
+    /**
+     * @summary Get all inquiries
+     */
+    const inquiriesListInquiries = (
+        params?: InquiriesListInquiriesParams,
+        options?: SecondParameter<typeof customInstance<InquiriesListInquiries200>>,
+    ) => {
+        return customInstance<InquiriesListInquiries200>(
+            { url: "/api/support/inquiries", method: "GET", params },
+            options,
+        );
+    };
+    /**
+     * @summary Create a new inquiry
+     */
+    const inquiriesCreateInquiry = (
+        createInquiryInput: CreateInquiryInput,
+        options?: SecondParameter<typeof customInstance<Inquiry>>,
+    ) => {
+        return customInstance<Inquiry>(
+            {
+                url: "/api/support/inquiries",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: createInquiryInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Get an inquiry by ID
+     */
+    const inquiriesGetInquiryById = (id: string, options?: SecondParameter<typeof customInstance<Inquiry>>) => {
+        return customInstance<Inquiry>({ url: `/api/support/inquiries/${id}`, method: "GET" }, options);
+    };
+    /**
+     * @summary Update an inquiry
+     */
+    const inquiriesUpdateInquiry = (
+        id: string,
+        updateInquiryInput: UpdateInquiryInput,
+        options?: SecondParameter<typeof customInstance<Inquiry>>,
+    ) => {
+        return customInstance<Inquiry>(
+            {
+                url: `/api/support/inquiries/${id}`,
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                data: updateInquiryInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Delete an inquiry
+     */
+    const inquiriesDeleteInquiry = (id: string, options?: SecondParameter<typeof customInstance<void>>) => {
+        return customInstance<void>({ url: `/api/support/inquiries/${id}`, method: "DELETE" }, options);
+    };
+    /**
+     * @summary Close an inquiry
+     */
+    const inquiriesCloseInquiry = (id: string, options?: SecondParameter<typeof customInstance<Inquiry>>) => {
+        return customInstance<Inquiry>({ url: `/api/support/inquiries/${id}/close`, method: "POST" }, options);
+    };
+    /**
+     * @summary Resolve an inquiry
+     */
+    const inquiriesResolveInquiry = (id: string, options?: SecondParameter<typeof customInstance<Inquiry>>) => {
+        return customInstance<Inquiry>({ url: `/api/support/inquiries/${id}/resolve`, method: "POST" }, options);
+    };
+    /**
+     * @summary Get responses for an inquiry
+     */
+    const inquiriesGetInquiryResponses = (
+        id: string,
+        options?: SecondParameter<typeof customInstance<InquiryResponse[]>>,
+    ) => {
+        return customInstance<InquiryResponse[]>(
+            { url: `/api/support/inquiries/${id}/responses`, method: "GET" },
+            options,
+        );
+    };
+    /**
+     * @summary Add a response to an inquiry
+     */
+    const inquiriesAddInquiryResponse = (
+        id: string,
+        createInquiryResponseInput: CreateInquiryResponseInput,
+        options?: SecondParameter<typeof customInstance<InquiryResponse>>,
+    ) => {
+        return customInstance<InquiryResponse>(
+            {
+                url: `/api/support/inquiries/${id}/responses`,
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: createInquiryResponseInput,
+            },
+            options,
+        );
+    };
+    return {
+        inquiriesListInquiries,
+        inquiriesCreateInquiry,
+        inquiriesGetInquiryById,
+        inquiriesUpdateInquiry,
+        inquiriesDeleteInquiry,
+        inquiriesCloseInquiry,
+        inquiriesResolveInquiry,
+        inquiriesGetInquiryResponses,
+        inquiriesAddInquiryResponse,
+    };
+};
+export type InquiriesListInquiriesResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getInquiries>["inquiriesListInquiries"]>>
+>;
+export type InquiriesCreateInquiryResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getInquiries>["inquiriesCreateInquiry"]>>
+>;
+export type InquiriesGetInquiryByIdResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getInquiries>["inquiriesGetInquiryById"]>>
+>;
+export type InquiriesUpdateInquiryResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getInquiries>["inquiriesUpdateInquiry"]>>
+>;
+export type InquiriesDeleteInquiryResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getInquiries>["inquiriesDeleteInquiry"]>>
+>;
+export type InquiriesCloseInquiryResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getInquiries>["inquiriesCloseInquiry"]>>
+>;
+export type InquiriesResolveInquiryResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getInquiries>["inquiriesResolveInquiry"]>>
+>;
+export type InquiriesGetInquiryResponsesResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getInquiries>["inquiriesGetInquiryResponses"]>>
+>;
+export type InquiriesAddInquiryResponseResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getInquiries>["inquiriesAddInquiryResponse"]>>
+>;

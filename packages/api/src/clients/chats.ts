@@ -1,17 +1,17 @@
-import { getChats } from "@generated/chats/chats";
 import type {
+    AddParticipantInput,
+    ChatMessage,
+    ChatParticipant,
     ChatRoom,
     ChatRoomWithParticipants,
-    ChatParticipant,
-    ChatMessage,
-    CreateChatRoomInput,
-    AddParticipantInput,
-    SendMessageInput,
-    ChatsListChatRoomsParams,
-    ChatsListChatRooms200,
     ChatsGetChatRoomMessagesParams,
+    ChatsListChatRooms200,
+    ChatsListChatRoomsParams,
     ChatsMarkMessagesAsReadBody,
+    CreateChatRoomInput,
+    SendMessageInput,
 } from "@generated/api.schemas";
+import { getChats } from "@generated/chats/chats";
 
 const chatsClient = getChats();
 

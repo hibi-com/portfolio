@@ -84,7 +84,7 @@
     "fmt": "biome format --write .",
     "fmt:check": "biome format .",
     "generate": "tsp compile schema/api.tsp && orval && bun run generate:zod",
-    "generate:zod": "openapi-zod-client openapi.yaml -o generated/zod/schemas.ts && bun run scripts/export-schemas.ts",
+    "generate:zod": "openapi-zod-client openapi.yaml -o generated/zod/schemas.ts && bun run scripts/export.ts",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "studio": "redoc-cli serve openapi.yaml --port 28080",

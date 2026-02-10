@@ -1,11 +1,11 @@
-import { getCustomers } from "@generated/customers/customers";
 import type {
-    Customer,
     CreateCustomerInput,
-    UpdateCustomerInput,
-    CustomersListCustomersParams,
+    Customer,
     CustomersListCustomers200,
+    CustomersListCustomersParams,
+    UpdateCustomerInput,
 } from "@generated/api.schemas";
+import { getCustomers } from "@generated/customers/customers";
 
 const customersClient = getCustomers();
 

@@ -1,13 +1,13 @@
-import { getInquiries } from "@generated/inquiries/inquiries";
 import type {
+    CreateInquiryInput,
+    CreateInquiryResponseInput,
+    InquiriesListInquiries200,
+    InquiriesListInquiriesParams,
     Inquiry,
     InquiryResponse,
-    CreateInquiryInput,
     UpdateInquiryInput,
-    CreateInquiryResponseInput,
-    InquiriesListInquiriesParams,
-    InquiriesListInquiries200,
 } from "@generated/api.schemas";
+import { getInquiries } from "@generated/inquiries/inquiries";
 
 const inquiriesClient = getInquiries();
 

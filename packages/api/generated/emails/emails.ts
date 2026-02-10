@@ -5,156 +5,179 @@
  * OpenAPI spec version: 0.0.0
  */
 import type {
-  CreateEmailTemplateInput,
-  EmailLog,
-  EmailTemplate,
-  EmailsListEmailLogs200,
-  EmailsListEmailLogsParams,
-  EmailsListEmailTemplatesParams,
-  EmailsSendEmailWithTemplateBody,
-  EmailsSendEmailWithTemplateParams,
-  SendEmailInput,
-  UpdateEmailTemplateInput
-} from '../api.schemas';
-
-import { customInstance } from '.././mutator';
-
+    CreateEmailTemplateInput,
+    EmailLog,
+    EmailsListEmailLogs200,
+    EmailsListEmailLogsParams,
+    EmailsListEmailTemplatesParams,
+    EmailsSendEmailWithTemplateBody,
+    EmailsSendEmailWithTemplateParams,
+    EmailTemplate,
+    SendEmailInput,
+    UpdateEmailTemplateInput,
+} from "../api.schemas";
+import { customInstance } from ".././mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  export const getEmails = () => {
-/**
- * @summary Get all email logs
- */
-const emailsListEmailLogs = (
-    params?: EmailsListEmailLogsParams,
- options?: SecondParameter<typeof customInstance<EmailsListEmailLogs200>>,) => {
-      return customInstance<EmailsListEmailLogs200>(
-      {url: `/api/email/logs`, method: 'GET',
-        params
-    },
-      options);
-    }
-  /**
- * @summary Get an email log by ID
- */
-const emailsGetEmailLogById = (
-    id: string,
- options?: SecondParameter<typeof customInstance<EmailLog>>,) => {
-      return customInstance<EmailLog>(
-      {url: `/api/email/logs/${id}`, method: 'GET'
-    },
-      options);
-    }
-  /**
- * @summary Send an email
- */
-const emailsSendEmail = (
-    sendEmailInput: SendEmailInput,
- options?: SecondParameter<typeof customInstance<EmailLog>>,) => {
-      return customInstance<EmailLog>(
-      {url: `/api/email/send`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: sendEmailInput
-    },
-      options);
-    }
-  /**
- * @summary Send an email using a template
- */
-const emailsSendEmailWithTemplate = (
-    params: EmailsSendEmailWithTemplateParams,
-    emailsSendEmailWithTemplateBody?: EmailsSendEmailWithTemplateBody,
- options?: SecondParameter<typeof customInstance<EmailLog>>,) => {
-      return customInstance<EmailLog>(
-      {url: `/api/email/send-with-template`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: emailsSendEmailWithTemplateBody,
-        params
-    },
-      options);
-    }
-  /**
- * @summary Get all email templates
- */
-const emailsListEmailTemplates = (
-    params?: EmailsListEmailTemplatesParams,
- options?: SecondParameter<typeof customInstance<EmailTemplate[]>>,) => {
-      return customInstance<EmailTemplate[]>(
-      {url: `/api/email/templates`, method: 'GET',
-        params
-    },
-      options);
-    }
-  /**
- * @summary Create a new email template
- */
-const emailsCreateEmailTemplate = (
-    createEmailTemplateInput: CreateEmailTemplateInput,
- options?: SecondParameter<typeof customInstance<EmailTemplate>>,) => {
-      return customInstance<EmailTemplate>(
-      {url: `/api/email/templates`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createEmailTemplateInput
-    },
-      options);
-    }
-  /**
- * @summary Get an email template by slug
- */
-const emailsGetEmailTemplateBySlug = (
-    slug: string,
- options?: SecondParameter<typeof customInstance<EmailTemplate>>,) => {
-      return customInstance<EmailTemplate>(
-      {url: `/api/email/templates/slug/${slug}`, method: 'GET'
-    },
-      options);
-    }
-  /**
- * @summary Get an email template by ID
- */
-const emailsGetEmailTemplateById = (
-    id: string,
- options?: SecondParameter<typeof customInstance<EmailTemplate>>,) => {
-      return customInstance<EmailTemplate>(
-      {url: `/api/email/templates/${id}`, method: 'GET'
-    },
-      options);
-    }
-  /**
- * @summary Update an email template
- */
-const emailsUpdateEmailTemplate = (
-    id: string,
-    updateEmailTemplateInput: UpdateEmailTemplateInput,
- options?: SecondParameter<typeof customInstance<EmailTemplate>>,) => {
-      return customInstance<EmailTemplate>(
-      {url: `/api/email/templates/${id}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateEmailTemplateInput
-    },
-      options);
-    }
-  /**
- * @summary Delete an email template
- */
-const emailsDeleteEmailTemplate = (
-    id: string,
- options?: SecondParameter<typeof customInstance<void>>,) => {
-      return customInstance<void>(
-      {url: `/api/email/templates/${id}`, method: 'DELETE'
-    },
-      options);
-    }
-  return {emailsListEmailLogs,emailsGetEmailLogById,emailsSendEmail,emailsSendEmailWithTemplate,emailsListEmailTemplates,emailsCreateEmailTemplate,emailsGetEmailTemplateBySlug,emailsGetEmailTemplateById,emailsUpdateEmailTemplate,emailsDeleteEmailTemplate}};
-export type EmailsListEmailLogsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsListEmailLogs']>>>
-export type EmailsGetEmailLogByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsGetEmailLogById']>>>
-export type EmailsSendEmailResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsSendEmail']>>>
-export type EmailsSendEmailWithTemplateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsSendEmailWithTemplate']>>>
-export type EmailsListEmailTemplatesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsListEmailTemplates']>>>
-export type EmailsCreateEmailTemplateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsCreateEmailTemplate']>>>
-export type EmailsGetEmailTemplateBySlugResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsGetEmailTemplateBySlug']>>>
-export type EmailsGetEmailTemplateByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsGetEmailTemplateById']>>>
-export type EmailsUpdateEmailTemplateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsUpdateEmailTemplate']>>>
-export type EmailsDeleteEmailTemplateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>['emailsDeleteEmailTemplate']>>>
+export const getEmails = () => {
+    /**
+     * @summary Get all email logs
+     */
+    const emailsListEmailLogs = (
+        params?: EmailsListEmailLogsParams,
+        options?: SecondParameter<typeof customInstance<EmailsListEmailLogs200>>,
+    ) => {
+        return customInstance<EmailsListEmailLogs200>({ url: "/api/email/logs", method: "GET", params }, options);
+    };
+    /**
+     * @summary Get an email log by ID
+     */
+    const emailsGetEmailLogById = (id: string, options?: SecondParameter<typeof customInstance<EmailLog>>) => {
+        return customInstance<EmailLog>({ url: `/api/email/logs/${id}`, method: "GET" }, options);
+    };
+    /**
+     * @summary Send an email
+     */
+    const emailsSendEmail = (
+        sendEmailInput: SendEmailInput,
+        options?: SecondParameter<typeof customInstance<EmailLog>>,
+    ) => {
+        return customInstance<EmailLog>(
+            {
+                url: "/api/email/send",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: sendEmailInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Send an email using a template
+     */
+    const emailsSendEmailWithTemplate = (
+        params: EmailsSendEmailWithTemplateParams,
+        emailsSendEmailWithTemplateBody?: EmailsSendEmailWithTemplateBody,
+        options?: SecondParameter<typeof customInstance<EmailLog>>,
+    ) => {
+        return customInstance<EmailLog>(
+            {
+                url: "/api/email/send-with-template",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: emailsSendEmailWithTemplateBody,
+                params,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Get all email templates
+     */
+    const emailsListEmailTemplates = (
+        params?: EmailsListEmailTemplatesParams,
+        options?: SecondParameter<typeof customInstance<EmailTemplate[]>>,
+    ) => {
+        return customInstance<EmailTemplate[]>({ url: "/api/email/templates", method: "GET", params }, options);
+    };
+    /**
+     * @summary Create a new email template
+     */
+    const emailsCreateEmailTemplate = (
+        createEmailTemplateInput: CreateEmailTemplateInput,
+        options?: SecondParameter<typeof customInstance<EmailTemplate>>,
+    ) => {
+        return customInstance<EmailTemplate>(
+            {
+                url: "/api/email/templates",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: createEmailTemplateInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Get an email template by slug
+     */
+    const emailsGetEmailTemplateBySlug = (
+        slug: string,
+        options?: SecondParameter<typeof customInstance<EmailTemplate>>,
+    ) => {
+        return customInstance<EmailTemplate>({ url: `/api/email/templates/slug/${slug}`, method: "GET" }, options);
+    };
+    /**
+     * @summary Get an email template by ID
+     */
+    const emailsGetEmailTemplateById = (
+        id: string,
+        options?: SecondParameter<typeof customInstance<EmailTemplate>>,
+    ) => {
+        return customInstance<EmailTemplate>({ url: `/api/email/templates/${id}`, method: "GET" }, options);
+    };
+    /**
+     * @summary Update an email template
+     */
+    const emailsUpdateEmailTemplate = (
+        id: string,
+        updateEmailTemplateInput: UpdateEmailTemplateInput,
+        options?: SecondParameter<typeof customInstance<EmailTemplate>>,
+    ) => {
+        return customInstance<EmailTemplate>(
+            {
+                url: `/api/email/templates/${id}`,
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                data: updateEmailTemplateInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Delete an email template
+     */
+    const emailsDeleteEmailTemplate = (id: string, options?: SecondParameter<typeof customInstance<void>>) => {
+        return customInstance<void>({ url: `/api/email/templates/${id}`, method: "DELETE" }, options);
+    };
+    return {
+        emailsListEmailLogs,
+        emailsGetEmailLogById,
+        emailsSendEmail,
+        emailsSendEmailWithTemplate,
+        emailsListEmailTemplates,
+        emailsCreateEmailTemplate,
+        emailsGetEmailTemplateBySlug,
+        emailsGetEmailTemplateById,
+        emailsUpdateEmailTemplate,
+        emailsDeleteEmailTemplate,
+    };
+};
+export type EmailsListEmailLogsResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getEmails>["emailsListEmailLogs"]>>
+>;
+export type EmailsGetEmailLogByIdResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getEmails>["emailsGetEmailLogById"]>>
+>;
+export type EmailsSendEmailResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEmails>["emailsSendEmail"]>>>;
+export type EmailsSendEmailWithTemplateResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getEmails>["emailsSendEmailWithTemplate"]>>
+>;
+export type EmailsListEmailTemplatesResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getEmails>["emailsListEmailTemplates"]>>
+>;
+export type EmailsCreateEmailTemplateResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getEmails>["emailsCreateEmailTemplate"]>>
+>;
+export type EmailsGetEmailTemplateBySlugResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getEmails>["emailsGetEmailTemplateBySlug"]>>
+>;
+export type EmailsGetEmailTemplateByIdResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getEmails>["emailsGetEmailTemplateById"]>>
+>;
+export type EmailsUpdateEmailTemplateResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getEmails>["emailsUpdateEmailTemplate"]>>
+>;
+export type EmailsDeleteEmailTemplateResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getEmails>["emailsDeleteEmailTemplate"]>>
+>;

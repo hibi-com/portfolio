@@ -1,15 +1,15 @@
-import { getEmails } from "@generated/emails/emails";
 import type {
-    EmailLog,
-    EmailTemplate,
-    SendEmailInput,
     CreateEmailTemplateInput,
-    UpdateEmailTemplateInput,
-    EmailsListEmailLogsParams,
+    EmailLog,
     EmailsListEmailLogs200,
+    EmailsListEmailLogsParams,
     EmailsListEmailTemplatesParams,
     EmailsSendEmailWithTemplateParams,
+    EmailTemplate,
+    SendEmailInput,
+    UpdateEmailTemplateInput,
 } from "@generated/api.schemas";
+import { getEmails } from "@generated/emails/emails";
 
 const emailsClient = getEmails();
 

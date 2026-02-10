@@ -5,127 +5,131 @@
  * OpenAPI spec version: 0.0.0
  */
 import type {
-  CreateDealInput,
-  Deal,
-  DealsListDeals200,
-  DealsListDealsParams,
-  DealsMarkDealAsLostParams,
-  DealsMoveDealToStageBody,
-  UpdateDealInput
-} from '../api.schemas';
-
-import { customInstance } from '.././mutator';
-
+    CreateDealInput,
+    Deal,
+    DealsListDeals200,
+    DealsListDealsParams,
+    DealsMarkDealAsLostParams,
+    DealsMoveDealToStageBody,
+    UpdateDealInput,
+} from "../api.schemas";
+import { customInstance } from ".././mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  export const getDeals = () => {
-/**
- * @summary Get all deals
- */
-const dealsListDeals = (
-    params?: DealsListDealsParams,
- options?: SecondParameter<typeof customInstance<DealsListDeals200>>,) => {
-      return customInstance<DealsListDeals200>(
-      {url: `/api/crm/deals`, method: 'GET',
-        params
-    },
-      options);
-    }
-  /**
- * @summary Create a new deal
- */
-const dealsCreateDeal = (
-    createDealInput: CreateDealInput,
- options?: SecondParameter<typeof customInstance<Deal>>,) => {
-      return customInstance<Deal>(
-      {url: `/api/crm/deals`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createDealInput
-    },
-      options);
-    }
-  /**
- * @summary Get a deal by ID
- */
-const dealsGetDealById = (
-    id: string,
- options?: SecondParameter<typeof customInstance<Deal>>,) => {
-      return customInstance<Deal>(
-      {url: `/api/crm/deals/${id}`, method: 'GET'
-    },
-      options);
-    }
-  /**
- * @summary Update a deal
- */
-const dealsUpdateDeal = (
-    id: string,
-    updateDealInput: UpdateDealInput,
- options?: SecondParameter<typeof customInstance<Deal>>,) => {
-      return customInstance<Deal>(
-      {url: `/api/crm/deals/${id}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateDealInput
-    },
-      options);
-    }
-  /**
- * @summary Delete a deal
- */
-const dealsDeleteDeal = (
-    id: string,
- options?: SecondParameter<typeof customInstance<void>>,) => {
-      return customInstance<void>(
-      {url: `/api/crm/deals/${id}`, method: 'DELETE'
-    },
-      options);
-    }
-  /**
- * @summary Mark a deal as lost
- */
-const dealsMarkDealAsLost = (
-    id: string,
-    params?: DealsMarkDealAsLostParams,
- options?: SecondParameter<typeof customInstance<Deal>>,) => {
-      return customInstance<Deal>(
-      {url: `/api/crm/deals/${id}/lost`, method: 'POST',
-        params
-    },
-      options);
-    }
-  /**
- * @summary Move a deal to a different stage
- */
-const dealsMoveDealToStage = (
-    id: string,
-    dealsMoveDealToStageBody: DealsMoveDealToStageBody,
- options?: SecondParameter<typeof customInstance<Deal>>,) => {
-      return customInstance<Deal>(
-      {url: `/api/crm/deals/${id}/stage`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: dealsMoveDealToStageBody
-    },
-      options);
-    }
-  /**
- * @summary Mark a deal as won
- */
-const dealsMarkDealAsWon = (
-    id: string,
- options?: SecondParameter<typeof customInstance<Deal>>,) => {
-      return customInstance<Deal>(
-      {url: `/api/crm/deals/${id}/won`, method: 'POST'
-    },
-      options);
-    }
-  return {dealsListDeals,dealsCreateDeal,dealsGetDealById,dealsUpdateDeal,dealsDeleteDeal,dealsMarkDealAsLost,dealsMoveDealToStage,dealsMarkDealAsWon}};
-export type DealsListDealsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>['dealsListDeals']>>>
-export type DealsCreateDealResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>['dealsCreateDeal']>>>
-export type DealsGetDealByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>['dealsGetDealById']>>>
-export type DealsUpdateDealResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>['dealsUpdateDeal']>>>
-export type DealsDeleteDealResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>['dealsDeleteDeal']>>>
-export type DealsMarkDealAsLostResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>['dealsMarkDealAsLost']>>>
-export type DealsMoveDealToStageResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>['dealsMoveDealToStage']>>>
-export type DealsMarkDealAsWonResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>['dealsMarkDealAsWon']>>>
+export const getDeals = () => {
+    /**
+     * @summary Get all deals
+     */
+    const dealsListDeals = (
+        params?: DealsListDealsParams,
+        options?: SecondParameter<typeof customInstance<DealsListDeals200>>,
+    ) => {
+        return customInstance<DealsListDeals200>({ url: "/api/crm/deals", method: "GET", params }, options);
+    };
+    /**
+     * @summary Create a new deal
+     */
+    const dealsCreateDeal = (
+        createDealInput: CreateDealInput,
+        options?: SecondParameter<typeof customInstance<Deal>>,
+    ) => {
+        return customInstance<Deal>(
+            {
+                url: "/api/crm/deals",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: createDealInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Get a deal by ID
+     */
+    const dealsGetDealById = (id: string, options?: SecondParameter<typeof customInstance<Deal>>) => {
+        return customInstance<Deal>({ url: `/api/crm/deals/${id}`, method: "GET" }, options);
+    };
+    /**
+     * @summary Update a deal
+     */
+    const dealsUpdateDeal = (
+        id: string,
+        updateDealInput: UpdateDealInput,
+        options?: SecondParameter<typeof customInstance<Deal>>,
+    ) => {
+        return customInstance<Deal>(
+            {
+                url: `/api/crm/deals/${id}`,
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                data: updateDealInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Delete a deal
+     */
+    const dealsDeleteDeal = (id: string, options?: SecondParameter<typeof customInstance<void>>) => {
+        return customInstance<void>({ url: `/api/crm/deals/${id}`, method: "DELETE" }, options);
+    };
+    /**
+     * @summary Mark a deal as lost
+     */
+    const dealsMarkDealAsLost = (
+        id: string,
+        params?: DealsMarkDealAsLostParams,
+        options?: SecondParameter<typeof customInstance<Deal>>,
+    ) => {
+        return customInstance<Deal>({ url: `/api/crm/deals/${id}/lost`, method: "POST", params }, options);
+    };
+    /**
+     * @summary Move a deal to a different stage
+     */
+    const dealsMoveDealToStage = (
+        id: string,
+        dealsMoveDealToStageBody: DealsMoveDealToStageBody,
+        options?: SecondParameter<typeof customInstance<Deal>>,
+    ) => {
+        return customInstance<Deal>(
+            {
+                url: `/api/crm/deals/${id}/stage`,
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                data: dealsMoveDealToStageBody,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Mark a deal as won
+     */
+    const dealsMarkDealAsWon = (id: string, options?: SecondParameter<typeof customInstance<Deal>>) => {
+        return customInstance<Deal>({ url: `/api/crm/deals/${id}/won`, method: "POST" }, options);
+    };
+    return {
+        dealsListDeals,
+        dealsCreateDeal,
+        dealsGetDealById,
+        dealsUpdateDeal,
+        dealsDeleteDeal,
+        dealsMarkDealAsLost,
+        dealsMoveDealToStage,
+        dealsMarkDealAsWon,
+    };
+};
+export type DealsListDealsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>["dealsListDeals"]>>>;
+export type DealsCreateDealResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>["dealsCreateDeal"]>>>;
+export type DealsGetDealByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>["dealsGetDealById"]>>>;
+export type DealsUpdateDealResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>["dealsUpdateDeal"]>>>;
+export type DealsDeleteDealResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getDeals>["dealsDeleteDeal"]>>>;
+export type DealsMarkDealAsLostResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getDeals>["dealsMarkDealAsLost"]>>
+>;
+export type DealsMoveDealToStageResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getDeals>["dealsMoveDealToStage"]>>
+>;
+export type DealsMarkDealAsWonResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getDeals>["dealsMarkDealAsWon"]>>
+>;

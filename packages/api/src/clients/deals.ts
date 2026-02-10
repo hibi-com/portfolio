@@ -1,11 +1,11 @@
-import { getDeals } from "@generated/deals/deals";
 import type {
-    Deal,
     CreateDealInput,
-    UpdateDealInput,
-    DealsListDealsParams,
+    Deal,
     DealsListDeals200,
+    DealsListDealsParams,
+    UpdateDealInput,
 } from "@generated/api.schemas";
+import { getDeals } from "@generated/deals/deals";
 
 const dealsClient = getDeals();
 

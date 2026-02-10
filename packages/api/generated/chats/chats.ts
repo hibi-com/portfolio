@@ -5,162 +5,193 @@
  * OpenAPI spec version: 0.0.0
  */
 import type {
-  AddParticipantInput,
-  ChatMessage,
-  ChatParticipant,
-  ChatRoom,
-  ChatRoomWithParticipants,
-  ChatsGetChatRoomMessagesParams,
-  ChatsListChatRooms200,
-  ChatsListChatRoomsParams,
-  ChatsMarkMessagesAsReadBody,
-  ChatsMarkMessagesAsReadParams,
-  CreateChatRoomInput,
-  SendMessageInput
-} from '../api.schemas';
-
-import { customInstance } from '.././mutator';
-
+    AddParticipantInput,
+    ChatMessage,
+    ChatParticipant,
+    ChatRoom,
+    ChatRoomWithParticipants,
+    ChatsGetChatRoomMessagesParams,
+    ChatsListChatRooms200,
+    ChatsListChatRoomsParams,
+    ChatsMarkMessagesAsReadBody,
+    ChatsMarkMessagesAsReadParams,
+    CreateChatRoomInput,
+    SendMessageInput,
+} from "../api.schemas";
+import { customInstance } from ".././mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  export const getChats = () => {
-/**
- * @summary Get all chat rooms
- */
-const chatsListChatRooms = (
-    params?: ChatsListChatRoomsParams,
- options?: SecondParameter<typeof customInstance<ChatsListChatRooms200>>,) => {
-      return customInstance<ChatsListChatRooms200>(
-      {url: `/api/chat/rooms`, method: 'GET',
-        params
-    },
-      options);
-    }
-  /**
- * @summary Create a new chat room
- */
-const chatsCreateChatRoom = (
-    createChatRoomInput: CreateChatRoomInput,
- options?: SecondParameter<typeof customInstance<ChatRoom>>,) => {
-      return customInstance<ChatRoom>(
-      {url: `/api/chat/rooms`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createChatRoomInput
-    },
-      options);
-    }
-  /**
- * @summary Get a chat room by ID
- */
-const chatsGetChatRoomById = (
-    id: string,
- options?: SecondParameter<typeof customInstance<ChatRoomWithParticipants>>,) => {
-      return customInstance<ChatRoomWithParticipants>(
-      {url: `/api/chat/rooms/${id}`, method: 'GET'
-    },
-      options);
-    }
-  /**
- * @summary Close a chat room
- */
-const chatsCloseChatRoom = (
-    id: string,
- options?: SecondParameter<typeof customInstance<ChatRoom>>,) => {
-      return customInstance<ChatRoom>(
-      {url: `/api/chat/rooms/${id}/close`, method: 'POST'
-    },
-      options);
-    }
-  /**
- * @summary Get messages in a chat room
- */
-const chatsGetChatRoomMessages = (
-    id: string,
-    params?: ChatsGetChatRoomMessagesParams,
- options?: SecondParameter<typeof customInstance<ChatMessage[]>>,) => {
-      return customInstance<ChatMessage[]>(
-      {url: `/api/chat/rooms/${id}/messages`, method: 'GET',
-        params
-    },
-      options);
-    }
-  /**
- * @summary Send a message in a chat room
- */
-const chatsSendChatMessage = (
-    id: string,
-    sendMessageInput: SendMessageInput,
- options?: SecondParameter<typeof customInstance<ChatMessage>>,) => {
-      return customInstance<ChatMessage>(
-      {url: `/api/chat/rooms/${id}/messages`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: sendMessageInput
-    },
-      options);
-    }
-  /**
- * @summary Get participants in a chat room
- */
-const chatsGetChatRoomParticipants = (
-    id: string,
- options?: SecondParameter<typeof customInstance<ChatParticipant[]>>,) => {
-      return customInstance<ChatParticipant[]>(
-      {url: `/api/chat/rooms/${id}/participants`, method: 'GET'
-    },
-      options);
-    }
-  /**
- * @summary Add a participant to a chat room
- */
-const chatsAddChatParticipant = (
-    id: string,
-    addParticipantInput: AddParticipantInput,
- options?: SecondParameter<typeof customInstance<ChatParticipant>>,) => {
-      return customInstance<ChatParticipant>(
-      {url: `/api/chat/rooms/${id}/participants`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: addParticipantInput
-    },
-      options);
-    }
-  /**
- * @summary Mark messages as read
- */
-const chatsMarkMessagesAsRead = (
-    roomId: string,
-    chatsMarkMessagesAsReadBody: ChatsMarkMessagesAsReadBody,
-    params: ChatsMarkMessagesAsReadParams,
- options?: SecondParameter<typeof customInstance<void>>,) => {
-      return customInstance<void>(
-      {url: `/api/chat/rooms/${roomId}/messages/read`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: chatsMarkMessagesAsReadBody,
-        params
-    },
-      options);
-    }
-  /**
- * @summary Remove a participant from a chat room
- */
-const chatsRemoveChatParticipant = (
-    roomId: string,
-    participantId: string,
- options?: SecondParameter<typeof customInstance<void>>,) => {
-      return customInstance<void>(
-      {url: `/api/chat/rooms/${roomId}/participants/${participantId}`, method: 'DELETE'
-    },
-      options);
-    }
-  return {chatsListChatRooms,chatsCreateChatRoom,chatsGetChatRoomById,chatsCloseChatRoom,chatsGetChatRoomMessages,chatsSendChatMessage,chatsGetChatRoomParticipants,chatsAddChatParticipant,chatsMarkMessagesAsRead,chatsRemoveChatParticipant}};
-export type ChatsListChatRoomsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsListChatRooms']>>>
-export type ChatsCreateChatRoomResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsCreateChatRoom']>>>
-export type ChatsGetChatRoomByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsGetChatRoomById']>>>
-export type ChatsCloseChatRoomResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsCloseChatRoom']>>>
-export type ChatsGetChatRoomMessagesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsGetChatRoomMessages']>>>
-export type ChatsSendChatMessageResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsSendChatMessage']>>>
-export type ChatsGetChatRoomParticipantsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsGetChatRoomParticipants']>>>
-export type ChatsAddChatParticipantResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsAddChatParticipant']>>>
-export type ChatsMarkMessagesAsReadResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsMarkMessagesAsRead']>>>
-export type ChatsRemoveChatParticipantResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getChats>['chatsRemoveChatParticipant']>>>
+export const getChats = () => {
+    /**
+     * @summary Get all chat rooms
+     */
+    const chatsListChatRooms = (
+        params?: ChatsListChatRoomsParams,
+        options?: SecondParameter<typeof customInstance<ChatsListChatRooms200>>,
+    ) => {
+        return customInstance<ChatsListChatRooms200>({ url: "/api/chat/rooms", method: "GET", params }, options);
+    };
+    /**
+     * @summary Create a new chat room
+     */
+    const chatsCreateChatRoom = (
+        createChatRoomInput: CreateChatRoomInput,
+        options?: SecondParameter<typeof customInstance<ChatRoom>>,
+    ) => {
+        return customInstance<ChatRoom>(
+            {
+                url: "/api/chat/rooms",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: createChatRoomInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Get a chat room by ID
+     */
+    const chatsGetChatRoomById = (
+        id: string,
+        options?: SecondParameter<typeof customInstance<ChatRoomWithParticipants>>,
+    ) => {
+        return customInstance<ChatRoomWithParticipants>({ url: `/api/chat/rooms/${id}`, method: "GET" }, options);
+    };
+    /**
+     * @summary Close a chat room
+     */
+    const chatsCloseChatRoom = (id: string, options?: SecondParameter<typeof customInstance<ChatRoom>>) => {
+        return customInstance<ChatRoom>({ url: `/api/chat/rooms/${id}/close`, method: "POST" }, options);
+    };
+    /**
+     * @summary Get messages in a chat room
+     */
+    const chatsGetChatRoomMessages = (
+        id: string,
+        params?: ChatsGetChatRoomMessagesParams,
+        options?: SecondParameter<typeof customInstance<ChatMessage[]>>,
+    ) => {
+        return customInstance<ChatMessage[]>({ url: `/api/chat/rooms/${id}/messages`, method: "GET", params }, options);
+    };
+    /**
+     * @summary Send a message in a chat room
+     */
+    const chatsSendChatMessage = (
+        id: string,
+        sendMessageInput: SendMessageInput,
+        options?: SecondParameter<typeof customInstance<ChatMessage>>,
+    ) => {
+        return customInstance<ChatMessage>(
+            {
+                url: `/api/chat/rooms/${id}/messages`,
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: sendMessageInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Get participants in a chat room
+     */
+    const chatsGetChatRoomParticipants = (
+        id: string,
+        options?: SecondParameter<typeof customInstance<ChatParticipant[]>>,
+    ) => {
+        return customInstance<ChatParticipant[]>({ url: `/api/chat/rooms/${id}/participants`, method: "GET" }, options);
+    };
+    /**
+     * @summary Add a participant to a chat room
+     */
+    const chatsAddChatParticipant = (
+        id: string,
+        addParticipantInput: AddParticipantInput,
+        options?: SecondParameter<typeof customInstance<ChatParticipant>>,
+    ) => {
+        return customInstance<ChatParticipant>(
+            {
+                url: `/api/chat/rooms/${id}/participants`,
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: addParticipantInput,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Mark messages as read
+     */
+    const chatsMarkMessagesAsRead = (
+        roomId: string,
+        chatsMarkMessagesAsReadBody: ChatsMarkMessagesAsReadBody,
+        params: ChatsMarkMessagesAsReadParams,
+        options?: SecondParameter<typeof customInstance<void>>,
+    ) => {
+        return customInstance<void>(
+            {
+                url: `/api/chat/rooms/${roomId}/messages/read`,
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                data: chatsMarkMessagesAsReadBody,
+                params,
+            },
+            options,
+        );
+    };
+    /**
+     * @summary Remove a participant from a chat room
+     */
+    const chatsRemoveChatParticipant = (
+        roomId: string,
+        participantId: string,
+        options?: SecondParameter<typeof customInstance<void>>,
+    ) => {
+        return customInstance<void>(
+            { url: `/api/chat/rooms/${roomId}/participants/${participantId}`, method: "DELETE" },
+            options,
+        );
+    };
+    return {
+        chatsListChatRooms,
+        chatsCreateChatRoom,
+        chatsGetChatRoomById,
+        chatsCloseChatRoom,
+        chatsGetChatRoomMessages,
+        chatsSendChatMessage,
+        chatsGetChatRoomParticipants,
+        chatsAddChatParticipant,
+        chatsMarkMessagesAsRead,
+        chatsRemoveChatParticipant,
+    };
+};
+export type ChatsListChatRoomsResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsListChatRooms"]>>
+>;
+export type ChatsCreateChatRoomResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsCreateChatRoom"]>>
+>;
+export type ChatsGetChatRoomByIdResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsGetChatRoomById"]>>
+>;
+export type ChatsCloseChatRoomResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsCloseChatRoom"]>>
+>;
+export type ChatsGetChatRoomMessagesResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsGetChatRoomMessages"]>>
+>;
+export type ChatsSendChatMessageResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsSendChatMessage"]>>
+>;
+export type ChatsGetChatRoomParticipantsResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsGetChatRoomParticipants"]>>
+>;
+export type ChatsAddChatParticipantResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsAddChatParticipant"]>>
+>;
+export type ChatsMarkMessagesAsReadResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsMarkMessagesAsRead"]>>
+>;
+export type ChatsRemoveChatParticipantResult = NonNullable<
+    Awaited<ReturnType<ReturnType<typeof getChats>["chatsRemoveChatParticipant"]>>
+>;

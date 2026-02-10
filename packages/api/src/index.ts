@@ -1,94 +1,77 @@
-// Portfolio & Posts
-export { posts, listPosts, getPostBySlug } from "./clients/posts";
-export { portfolios, listPortfolios, getPortfolioBySlug } from "./clients/portfolios";
-
-// CRM
-export { customers } from "./clients/customers";
-export { leads } from "./clients/leads";
-export { deals } from "./clients/deals";
-export { pipelines } from "./clients/pipelines";
-
-// Communication
-export { inquiries } from "./clients/inquiries";
-export { chats } from "./clients/chats";
-export { emails } from "./clients/emails";
-
-// Custom instance
-export { customInstance } from "@generated/mutator";
-
-// Types - Portfolio & Posts
 export type {
+    AddParticipantInput,
     Asset,
-    ErrorResponse,
-    PaginationMeta,
-    Portfolio,
-    PortfolioContent,
-    Post,
-    PostContent,
-    PostsListPostsParams,
-    PostsListPosts200,
-    PortfoliosListPortfoliosParams,
-    PortfoliosListPortfolios200,
-} from "@generated/api.schemas";
-
-// Types - CRM
-export type {
+    ChatMessage,
+    ChatParticipant,
+    ChatRoom,
+    ChatRoomStatus,
+    ChatRoomWithParticipants,
+    ChatsGetChatRoomMessagesParams,
+    ChatsListChatRooms200,
+    ChatsListChatRoomsParams,
+    CreateChatRoomInput,
+    CreateCustomerInput,
+    CreateDealInput,
+    CreateEmailTemplateInput,
+    CreateInquiryInput,
+    CreateInquiryResponseInput,
+    CreateLeadInput,
+    CreatePipelineInput,
+    CreatePipelineStageInput,
     Customer,
     CustomerStatus,
-    CreateCustomerInput,
-    UpdateCustomerInput,
-    CustomersListCustomersParams,
     CustomersListCustomers200,
-    Lead,
-    LeadStatus,
-    CreateLeadInput,
-    UpdateLeadInput,
-    LeadsListLeadsParams,
-    LeadsListLeads200,
+    CustomersListCustomersParams,
     Deal,
     DealStatus,
-    CreateDealInput,
-    UpdateDealInput,
-    DealsListDealsParams,
     DealsListDeals200,
-    Pipeline,
-    PipelineStage,
-    CreatePipelineInput,
-    UpdatePipelineInput,
-    CreatePipelineStageInput,
-    UpdatePipelineStageInput,
-} from "@generated/api.schemas";
-
-// Types - Communication
-export type {
-    Inquiry,
-    InquiryStatus,
-    InquiryResponse,
-    CreateInquiryInput,
-    UpdateInquiryInput,
-    CreateInquiryResponseInput,
-    InquiriesListInquiriesParams,
-    InquiriesListInquiries200,
-    ChatRoom,
-    ChatRoomWithParticipants,
-    ChatParticipant,
-    ChatMessage,
-    ChatRoomStatus,
-    CreateChatRoomInput,
-    AddParticipantInput,
-    SendMessageInput,
-    ChatsListChatRoomsParams,
-    ChatsListChatRooms200,
-    ChatsGetChatRoomMessagesParams,
+    DealsListDealsParams,
     EmailLog,
-    EmailTemplate,
     EmailStatus,
-    EmailTemplateCategory,
-    SendEmailInput,
-    CreateEmailTemplateInput,
-    UpdateEmailTemplateInput,
-    EmailsListEmailLogsParams,
     EmailsListEmailLogs200,
+    EmailsListEmailLogsParams,
     EmailsListEmailTemplatesParams,
     EmailsSendEmailWithTemplateParams,
+    EmailTemplate,
+    EmailTemplateCategory,
+    ErrorResponse,
+    InquiriesListInquiries200,
+    InquiriesListInquiriesParams,
+    Inquiry,
+    InquiryResponse,
+    InquiryStatus,
+    Lead,
+    LeadStatus,
+    LeadsListLeads200,
+    LeadsListLeadsParams,
+    PaginationMeta,
+    Pipeline,
+    PipelineStage,
+    Portfolio,
+    PortfolioContent,
+    PortfoliosListPortfolios200,
+    PortfoliosListPortfoliosParams,
+    Post,
+    PostContent,
+    PostsListPosts200,
+    PostsListPostsParams,
+    SendEmailInput,
+    SendMessageInput,
+    UpdateCustomerInput,
+    UpdateDealInput,
+    UpdateEmailTemplateInput,
+    UpdateInquiryInput,
+    UpdateLeadInput,
+    UpdatePipelineInput,
+    UpdatePipelineStageInput,
 } from "@generated/api.schemas";
+export { customInstance } from "@generated/mutator";
+export { chats } from "./clients/chats";
+export { customers } from "./clients/customers";
+export { deals } from "./clients/deals";
+export { emails } from "./clients/emails";
+export { inquiries } from "./clients/inquiries";
+export { leads } from "./clients/leads";
+export { pipelines } from "./clients/pipelines";
+export { getPortfolioBySlug, listPortfolios, portfolios } from "./clients/portfolios";
+export { getPostBySlug, listPosts, posts } from "./clients/posts";

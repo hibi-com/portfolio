@@ -1,11 +1,11 @@
-import { getLeads } from "@generated/leads/leads";
 import type {
-    Lead,
     CreateLeadInput,
-    UpdateLeadInput,
-    LeadsListLeadsParams,
+    Lead,
     LeadsListLeads200,
+    LeadsListLeadsParams,
+    UpdateLeadInput,
 } from "@generated/api.schemas";
+import { getLeads } from "@generated/leads/leads";
 
 const leadsClient = getLeads();
 

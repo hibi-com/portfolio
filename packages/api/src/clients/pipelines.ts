@@ -1,12 +1,12 @@
-import { getPipelines } from "@generated/pipelines/pipelines";
 import type {
+    CreatePipelineInput,
+    CreatePipelineStageInput,
     Pipeline,
     PipelineStage,
-    CreatePipelineInput,
     UpdatePipelineInput,
-    CreatePipelineStageInput,
     UpdatePipelineStageInput,
 } from "@generated/api.schemas";
+import { getPipelines } from "@generated/pipelines/pipelines";
 
 const pipelinesClient = getPipelines();
 
