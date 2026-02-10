@@ -46,7 +46,8 @@
             "quoteProperties": "asNeeded",
             "semicolons": "always",
             "trailingCommas": "all"
-        }
+        },
+        "globals": ["$", "Bun"]
     },
     "json": {
         "formatter": {
@@ -145,7 +146,7 @@
         {
             "includes": ["**/*.test.*"],
             "javascript": {
-                "globals": ["expect", "test", "describe", "beforeEach", "afterEach", "vi", "it"]
+                "globals": ["expect", "test", "describe", "beforeEach", "afterEach", "vi", "it", "$", "Bun"]
             },
             "linter": {
                 "rules": {

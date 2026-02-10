@@ -3,8 +3,5 @@
     "extends": ["@portfolio/biome-config/base"],
     "files": {
         "includes": ["!!.cache", "!!.turbo", "!!dist"]
-    },
-    "javascript": {
-        "globals": ["$", "Bun"]
     }
 }
