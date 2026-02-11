@@ -14,8 +14,7 @@ export const Info = () => (
         <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
             <h3 className="mb-2 font-bold text-sm">使用例:</h3>
             <pre className="overflow-x-auto whitespace-pre-wrap text-xs">
-                {`// root.tsxまたはルートレイアウト内で使用
-<Navbar />`}
+                <code>&lt;Navbar /&gt;</code>
             </pre>
         </div>
         <div className="mt-4 rounded-lg bg-yellow-100 p-4 dark:bg-yellow-900">

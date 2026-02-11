@@ -124,7 +124,7 @@ export const Post = ({ children, title, date, banner, timecode }: PostProps) => 
                         <div className="flex items-center justify-between gap-4">
                             <RouterLink
                                 to="#postContent"
-                                className="fade-in relative left-[-1rem] animate-in p-4 opacity-0 delay-1000 duration-600"
+                                className="fade-in relative -left-4 animate-in p-4 opacity-0 delay-1000 duration-600"
                                 aria-label="Scroll to post content"
                                 onClick={handleScrollIndicatorClick}
                             >

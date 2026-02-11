@@ -210,7 +210,6 @@ async function main(): Promise<void> {
     console.log("🚀 Portfolio Verdaccio Publisher");
     console.log("================================\n");
 
-    // Check Docker availability
     if (!isDockerAvailable()) {
         console.error("❌ Docker is not installed.");
         console.error("   Please install Docker Desktop from https://www.docker.com/products/docker-desktop/");

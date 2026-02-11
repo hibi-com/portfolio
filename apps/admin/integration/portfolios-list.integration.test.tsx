@@ -3,8 +3,6 @@ import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import "@testing-library/jest-dom/vitest";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as React from "react";
 
 interface MockPortfolio {
     id: string;

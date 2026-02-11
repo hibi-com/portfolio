@@ -30,8 +30,7 @@ export const GAImplementation = () => (
             <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
                 <h3 className="mb-2 font-bold text-sm">1. root.tsxでの使用:</h3>
                 <pre className="overflow-x-auto whitespace-pre-wrap text-xs">
-                    {`// head内
-<TrackingGA id={GOOGLE_ANALYTICS_ID} />`}
+                    <code>&lt;TrackingGA id="G-XXXXXXXXXX" /&gt;</code>
                 </pre>
             </div>
             <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">

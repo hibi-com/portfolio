@@ -27,7 +27,6 @@ test.describe("Inquiries Management - manage-inquiries.md", () => {
 
     test.describe("AC3: 問い合わせへの返信", () => {
         test.skip("返信フォームが表示される", async ({ page }) => {
-            // TODO: 実装後に有効化
             await page.goto("/support/inquiries/1");
             await expect(page.getByRole("textbox", { name: /返信|Reply/i })).toBeVisible();
         });
@@ -35,7 +34,6 @@ test.describe("Inquiries Management - manage-inquiries.md", () => {
 
     test.describe("AC4: ステータスの変更", () => {
         test.skip("ステータスを変更できる", async ({ page }) => {
-            // TODO: 実装後に有効化
             await page.goto("/support/inquiries/1");
             await expect(page.getByRole("combobox", { name: /ステータス|Status/i })).toBeVisible();
         });

@@ -17,7 +17,6 @@ export const loader: LoaderFunction = async (args) => {
     const response = await api.posts.listPosts();
     const posts = Array.isArray(response.data) ? response.data : response.data.data;
 
-    // タグを抽出してソート
     const tagSet = new Set<string>();
     posts.forEach((post) => {
         post.tags.forEach((tag) => tagSet.add(tag));

@@ -84,10 +84,6 @@ export function createPreviewDeploymentAccess(
                 return d;
             });
         } else if (service.key === "api") {
-            // Workersのプレビューデプロイメント（*.workers.dev）はCloudflareのゾーンに属していないため、
-            // Access Applicationのドメインとして使用できません。
-            // Workersのカスタムドメインが使用されている場合でも、プレビューデプロイメントは*.workers.devになるため、
-            // APIサービスについてはプレビューデプロイメント用のAccess Applicationを作成しません。
             continue;
         } else {
             continue;

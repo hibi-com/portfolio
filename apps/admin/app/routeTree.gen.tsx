@@ -12,6 +12,7 @@ import { Route as PostsNewRouteImport } from "./routes/posts.new";
 import { Route as SupportRouteImport } from "./routes/support";
 import { Route as SupportInquiriesRouteImport } from "./routes/support.inquiries";
 import { Route as SupportInquiriesIdRouteImport } from "./routes/support.inquiries.$id";
+import { Route as SupportInquiriesNewRouteImport } from "./routes/support.inquiries.new";
 
 const SupportRoute = SupportRouteImport.update({
     id: "/support",
@@ -73,6 +74,11 @@ const SupportInquiriesIdRoute = SupportInquiriesIdRouteImport.update({
     path: "/$id",
     getParentRoute: () => SupportInquiriesRoute,
 } as any);
+const SupportInquiriesNewRoute = SupportInquiriesNewRouteImport.update({
+    id: "/new",
+    path: "/new",
+    getParentRoute: () => SupportInquiriesRoute,
+} as any);
 const CrmCustomersNewRoute = CrmCustomersNewRouteImport.update({
     id: "/new",
     path: "/new",
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
     "/support/inquiries": typeof SupportInquiriesRouteWithChildren;
     "/crm/customers/new": typeof CrmCustomersNewRoute;
     "/support/inquiries/$id": typeof SupportInquiriesIdRoute;
+    "/support/inquiries/new": typeof SupportInquiriesNewRoute;
 }
 export interface FileRoutesByTo {
     "/": typeof IndexRoute;
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
     "/support/inquiries": typeof SupportInquiriesRouteWithChildren;
     "/crm/customers/new": typeof CrmCustomersNewRoute;
     "/support/inquiries/$id": typeof SupportInquiriesIdRoute;
+    "/support/inquiries/new": typeof SupportInquiriesNewRoute;
 }
 export interface FileRoutesById {
     __root__: typeof rootRouteImport;
@@ -124,6 +132,7 @@ export interface FileRoutesById {
     "/support/inquiries": typeof SupportInquiriesRouteWithChildren;
     "/crm/customers/new": typeof CrmCustomersNewRoute;
     "/support/inquiries/$id": typeof SupportInquiriesIdRoute;
+    "/support/inquiries/new": typeof SupportInquiriesNewRoute;
 }
 export interface FileRouteTypes {
     fileRoutesByFullPath: FileRoutesByFullPath;
@@ -140,7 +149,8 @@ export interface FileRouteTypes {
         | "/posts/new"
         | "/support/inquiries"
         | "/crm/customers/new"
-        | "/support/inquiries/$id";
+        | "/support/inquiries/$id"
+        | "/support/inquiries/new";
     fileRoutesByTo: FileRoutesByTo;
     to:
         | "/"
@@ -155,7 +165,8 @@ export interface FileRouteTypes {
         | "/posts/new"
         | "/support/inquiries"
         | "/crm/customers/new"
-        | "/support/inquiries/$id";
+        | "/support/inquiries/$id"
+        | "/support/inquiries/new";
     id:
         | "__root__"
         | "/"
@@ -170,7 +181,8 @@ export interface FileRouteTypes {
         | "/posts/new"
         | "/support/inquiries"
         | "/crm/customers/new"
-        | "/support/inquiries/$id";
+        | "/support/inquiries/$id"
+        | "/support/inquiries/new";
     fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -267,6 +279,13 @@ declare module "@tanstack/react-router" {
             preLoaderRoute: typeof SupportInquiriesIdRouteImport;
             parentRoute: typeof SupportInquiriesRoute;
         };
+        "/support/inquiries/new": {
+            id: "/support/inquiries/new";
+            path: "/new";
+            fullPath: "/support/inquiries/new";
+            preLoaderRoute: typeof SupportInquiriesNewRouteImport;
+            parentRoute: typeof SupportInquiriesRoute;
+        };
         "/crm/customers/new": {
             id: "/crm/customers/new";
             path: "/new";
@@ -323,10 +342,12 @@ const PostsRouteWithChildren = PostsRoute._addFileChildren(PostsRouteChildren);
 
 interface SupportInquiriesRouteChildren {
     SupportInquiriesIdRoute: typeof SupportInquiriesIdRoute;
+    SupportInquiriesNewRoute: typeof SupportInquiriesNewRoute;
 }
 
 const SupportInquiriesRouteChildren: SupportInquiriesRouteChildren = {
     SupportInquiriesIdRoute: SupportInquiriesIdRoute,
+    SupportInquiriesNewRoute: SupportInquiriesNewRoute,
 };
 
 const SupportInquiriesRouteWithChildren = SupportInquiriesRoute._addFileChildren(SupportInquiriesRouteChildren);

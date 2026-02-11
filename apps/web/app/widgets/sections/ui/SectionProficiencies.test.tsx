@@ -27,7 +27,6 @@ describe("SectionProficiencies Component", () => {
         render(<SectionProficiencies />);
 
         expect(screen.getByText("DevOps")).toBeInTheDocument();
-        // 複数要素がある場合はgetAllByTextを使用
         expect(screen.getAllByText("Testing").length).toBeGreaterThan(0);
         expect(screen.getByText("Design")).toBeInTheDocument();
     });
@@ -37,7 +36,6 @@ describe("SectionProficiencies Component", () => {
 
         expect(screen.getByText(/React/)).toBeInTheDocument();
         expect(screen.getByText(/TypeScript/)).toBeInTheDocument();
-        // 複数要素がある場合はgetAllByTextを使用
         expect(screen.getAllByText(/Docker/).length).toBeGreaterThan(0);
     });
 });

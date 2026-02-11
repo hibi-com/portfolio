@@ -43,7 +43,6 @@ grep -r "{error-keyword}" apps/
 **使用テンプレート**: `.claude/templates/tdd/unit-test.md`
 
 ```typescript
-// バグ再現テストの例
 test("バグ: {description}", () => {
     // Given: バグが発生する条件
     const input = /* バグを引き起こす入力 */;
@@ -66,7 +65,6 @@ test("バグ: {description}", () => {
 4. デバッグログを削除
 
 ```typescript
-// デバッグログ例
 console.log(`[DEBUG_TRACE] >>> ENTRY: functionName(arg=${arg})`);
 console.log(`[DEBUG_TRACE] >>> STATE: status=${status}`);
 ```

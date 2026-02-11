@@ -17,7 +17,7 @@ describe("useWebShareAPI", () => {
                 configurable: true,
             });
         } catch {
-            // 無視
+            // Ignore
         }
     });
 

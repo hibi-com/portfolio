@@ -1,18 +1,17 @@
-import { customers, leads, deals, pipelines } from "@portfolio/api";
 import type {
-    Customer,
-    Lead,
-    Deal,
-    Pipeline,
     CreateCustomerInput,
-    UpdateCustomerInput,
-    CreateLeadInput,
-    UpdateLeadInput,
     CreateDealInput,
+    CreateLeadInput,
+    Customer,
+    Deal,
+    Lead,
+    Pipeline,
+    UpdateCustomerInput,
     UpdateDealInput,
+    UpdateLeadInput,
 } from "@portfolio/api";
+import { customers, deals, leads, pipelines } from "@portfolio/api";
 
-// Helper to extract array from paginated response
 const asArray = <T>(data: T[] | { data: T[] }): T[] => {
     return Array.isArray(data) ? data : data.data;
 };
@@ -47,8 +46,13 @@ export const crmApi = {
     },
 };
 
-// Re-export types for backward compatibility
-export type { Customer, Lead, Deal, Pipeline, PipelineStage } from "@portfolio/api";
-export type { CreateCustomerInput as CustomerFormData } from "@portfolio/api";
-export type { CreateLeadInput as LeadFormData } from "@portfolio/api";
-export type { CreateDealInput as DealFormData } from "@portfolio/api";
+export type {
+    CreateCustomerInput as CustomerFormData,
+    CreateDealInput as DealFormData,
+    CreateLeadInput as LeadFormData,
+    Customer,
+    Deal,
+    Lead,
+    Pipeline,
+    PipelineStage,
+} from "@portfolio/api";

@@ -199,7 +199,7 @@ export function ErrorPage({ error }: Readonly<ErrorProps>) {
     const { summary, message } = getErrorMessage(error);
 
     return (
-        <section className="grid h-screen grid-cols-1 pl-[140px] md:h-auto md:min-h-screen md:grid-cols-2 md:pt-20 md:pb-20 md:pl-0 md:pl-20">
+        <section className="grid h-screen grid-cols-1 pl-[140px] md:h-auto md:min-h-screen md:grid-cols-2 md:pt-20 md:pb-20 md:pl-20">
             {flatlined && <FlatlineThemeStyles />}
             <div className="flex h-full items-center justify-center p-0 md:row-start-2 md:p-8">
                 <div className="flex w-full max-w-[480px] flex-col">
@@ -215,7 +215,7 @@ export function ErrorPage({ error }: Readonly<ErrorProps>) {
 
             <div
                 className={cn(
-                    "relative h-full w-full overflow-hidden border-48 md:row-start-1 md:min-h-[240px] md:border-4 md:border-[64px] md:border-t-0",
+                    "relative h-full w-full overflow-hidden border-48 md:row-start-1 md:min-h-[240px] md:border-64 md:border-t-0",
                     visible ? "opacity-100" : "opacity-0",
                 )}
             >

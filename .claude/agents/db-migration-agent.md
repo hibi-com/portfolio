@@ -82,7 +82,6 @@ model Example {
 
 ```prisma
 model Post {
-    // 検索頻度の高いフィールドにインデックス
     @@index([slug])
     @@index([publishedAt])
     @@index([authorId, publishedAt])

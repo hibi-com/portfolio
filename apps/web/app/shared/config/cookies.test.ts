@@ -29,7 +29,6 @@ describe("cookies", () => {
     test("should handle empty string", () => {
         const result = parseCookieHeader("");
 
-        // 空文字列の場合の実装の動作に合わせる
         expect(result).toHaveProperty("");
     });
 

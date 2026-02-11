@@ -74,7 +74,6 @@ describe("clipboard", () => {
         test("should log warning when navigator.clipboard is not available", () => {
             const text = "test fallback";
 
-            // clipboardを一時的に無効化
             const originalClipboard = navigator.clipboard;
             Object.defineProperty(navigator, "clipboard", {
                 value: undefined,

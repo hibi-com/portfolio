@@ -50,11 +50,9 @@ export const GTMImplementation = () => (
             <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
                 <h3 className="mb-2 font-bold text-sm">1. root.tsxでの使用:</h3>
                 <pre className="overflow-x-auto whitespace-pre-wrap text-xs">
-                    {`// head内
-<TrackingGTMScript id={GOOGLE_TAG_MANAGER} />
-
-// body直後
-<TrackingGTMIFrame id={GOOGLE_TAG_MANAGER} />`}
+                    <code>
+                        &lt;TrackingGTMScript id="GTM-XXXXXXX" /&gt; &lt;TrackingGTMIFrame id="GTM-XXXXXXX" /&gt;
+                    </code>
                 </pre>
             </div>
             <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">

@@ -106,7 +106,7 @@ export function InquiriesList() {
                                 {inquiries.map((inquiry) => (
                                     <TableRow key={inquiry.id}>
                                         <TableCell className="font-medium">
-                                            <Link to={`/support/inquiries/${inquiry.id}`} className="hover:underline">
+                                            <Link to="/support/inquiries/$id" params={{ id: inquiry.id }} className="hover:underline">
                                                 {inquiry.subject}
                                             </Link>
                                         </TableCell>
@@ -126,7 +126,7 @@ export function InquiriesList() {
                                         <TableCell className="text-right">
                                             <div className="flex items-center justify-end gap-1">
                                                 <Button variant="ghost" size="icon" asChild>
-                                                    <Link to={`/support/inquiries/${inquiry.id}`}>
+                                                    <Link to="/support/inquiries/$id" params={{ id: inquiry.id }}>
                                                         <Eye className="h-4 w-4" />
                                                     </Link>
                                                 </Button>

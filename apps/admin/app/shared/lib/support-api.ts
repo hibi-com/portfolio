@@ -1,13 +1,12 @@
-import { inquiries } from "@portfolio/api";
 import type {
+    CreateInquiryInput,
+    CreateInquiryResponseInput,
     Inquiry,
     InquiryResponse,
-    CreateInquiryInput,
     UpdateInquiryInput,
-    CreateInquiryResponseInput,
 } from "@portfolio/api";
+import { inquiries } from "@portfolio/api";
 
-// Helper to extract array from paginated response
 const asArray = <T>(data: T[] | { data: T[] }): T[] => {
     return Array.isArray(data) ? data : data.data;
 };
@@ -23,33 +22,30 @@ export const supportApi = {
     },
 };
 
-// Re-export types for backward compatibility
-export type { Inquiry, InquiryResponse } from "@portfolio/api";
-export type { CreateInquiryInput as InquiryFormData } from "@portfolio/api";
-export type { CreateInquiryResponseInput as InquiryResponseFormData } from "@portfolio/api";
+export type {
+    CreateInquiryInput as InquiryFormData,
+    CreateInquiryResponseInput as InquiryResponseFormData,
+    Inquiry,
+    InquiryResponse,
+} from "@portfolio/api";
 
-// Legacy types for existing code compatibility
 export type InquiryStatus = "OPEN" | "PENDING" | "RESOLVED" | "CLOSED";
 export type InquiryPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 export type InquiryType = "GENERAL" | "SUPPORT" | "SALES" | "FEEDBACK" | "BUG_REPORT";
 
-// Extended type with responses and legacy field aliases
 export interface InquiryDetail {
     id: string;
     customerId?: string;
     assigneeId?: string;
     subject: string;
     content: string;
-    // Alias for content for backward compatibility
     description?: string;
     status: InquiryStatus;
     priority: InquiryPriority;
-    // category maps to type for backward compatibility
     category?: string;
     type?: InquiryType;
     tags?: string[];
     source?: string;
-    // Legacy fields from old API
     name?: string;
     email?: string;
     phone?: string;
