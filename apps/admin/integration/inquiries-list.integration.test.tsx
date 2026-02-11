@@ -18,7 +18,10 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-describe("Inquiries List Integration - docs/sequence/admin/inquiries/inquiries-list.md", () => {
+/**
+ * @sequence docs/sequence/admin/inquiries/inquiries-list.md
+ */
+describe("Inquiries List Integration", () => {
     const API_URL = "http://localhost:8787";
 
     describe("シーケンス: Component → Hook → APIClient → API", () => {

@@ -1,6 +1,10 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
+/**
+ * @story docs/user-stories/visitor/submit-inquiry.md
+ */
+
 async function skipIfNotFound(page: Page) {
     const pageTitle = await page.title();
     if (pageTitle.includes("404") || pageTitle.includes("Not Found")) {

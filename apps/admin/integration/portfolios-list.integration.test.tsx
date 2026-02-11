@@ -17,6 +17,10 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
+/**
+ * @sequence docs/sequence/admin/portfolios/portfolios-list.md
+ */
+
 const MockPortfoliosList = ({ portfolios }: { portfolios: Array<{ id: string; title: string; company: string }> }) => (
     <div data-testid="portfolios-list">
         {portfolios.map((portfolio) => (
@@ -28,7 +32,7 @@ const MockPortfoliosList = ({ portfolios }: { portfolios: Array<{ id: string; ti
     </div>
 );
 
-describe("Portfolios List Integration - docs/sequence/admin/portfolios/portfolios-list.md", () => {
+describe("Portfolios List Integration", () => {
     const API_URL = "http://localhost:8787";
 
     describe("シーケンス: Component → Hook → APIClient → API", () => {

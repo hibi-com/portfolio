@@ -9,7 +9,10 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-describe("Dashboard Load Integration - docs/sequence/admin/dashboard/dashboard-load.md", () => {
+/**
+ * @sequence docs/sequence/admin/dashboard/dashboard-load.md
+ */
+describe("Dashboard Load Integration", () => {
     const API_URL = "http://localhost:8787";
 
     describe("シーケンス: Component → Hook → APIClient → API（並列呼び出し）", () => {

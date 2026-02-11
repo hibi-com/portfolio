@@ -27,6 +27,10 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
+/**
+ * @sequence docs/sequence/admin/crm/customers-list.md
+ */
+
 const MockCustomersList = ({
     customers,
 }: {
@@ -43,7 +47,7 @@ const MockCustomersList = ({
     </div>
 );
 
-describe("Customers List Integration - docs/sequence/admin/crm/customers-list.md", () => {
+describe("Customers List Integration", () => {
     const API_URL = "http://localhost:8787";
 
     describe("シーケンス: Component → Hook → APIClient → API", () => {

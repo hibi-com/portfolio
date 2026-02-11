@@ -10,6 +10,10 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
+/**
+ * @sequence docs/sequence/admin/posts/posts-list.md
+ */
+
 const MockPostsList = ({ posts }: { posts: Array<{ id: string; title: string; slug: string }> }) => (
     <div data-testid="posts-list">
         {posts.map((post) => (
@@ -21,7 +25,7 @@ const MockPostsList = ({ posts }: { posts: Array<{ id: string; title: string; sl
     </div>
 );
 
-describe("Posts List Integration - docs/sequence/admin/posts/posts-list.md", () => {
+describe("Posts List Integration", () => {
     const API_URL = "http://localhost:8787";
 
     describe("シーケンス: Component → Hook → APIClient → API", () => {
