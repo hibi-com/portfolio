@@ -10,8 +10,8 @@ describe("GetCustomersUseCase", () => {
         phone: "123-456-7890",
         company: "Test Company",
         status: "ACTIVE",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const createMockRepository = (overrides: Partial<CustomerRepository> = {}): CustomerRepository => ({
@@ -25,10 +25,7 @@ describe("GetCustomersUseCase", () => {
     });
 
     test("should return all customers", async () => {
-        const customers: Customer[] = [
-            mockCustomer,
-            { ...mockCustomer, id: "customer-2", name: "Customer 2" },
-        ];
+        const customers: Customer[] = [mockCustomer, { ...mockCustomer, id: "customer-2", name: "Customer 2" }];
         const mockRepository = createMockRepository({
             findAll: vi.fn().mockResolvedValue(customers),
         });

@@ -3,18 +3,18 @@ import type { CreateEmailTemplateInput, EmailRepository, EmailTemplate } from "~
 import { CreateEmailTemplateUseCase } from "./createEmailTemplate";
 
 describe("CreateEmailTemplateUseCase", () => {
+    const now = "2024-01-01T00:00:00.000Z";
     const mockTemplate: EmailTemplate = {
         id: "template-1",
         name: "Welcome Email",
         slug: "welcome-email",
         subject: "Welcome to our service",
-        htmlBody: "<h1>Welcome!</h1>",
-        textBody: "Welcome!",
+        htmlContent: "<h1>Welcome!</h1>",
         category: "MARKETING",
         variables: ["name", "email"],
         isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
     };
 
     const createMockRepository = (overrides: Partial<EmailRepository> = {}): EmailRepository => ({
@@ -35,13 +35,11 @@ describe("CreateEmailTemplateUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("メールテンプレートを作成できる", async () => {
-                // Given: テンプレート作成入力
                 const input: CreateEmailTemplateInput = {
                     name: "Welcome Email",
                     slug: "welcome-email",
                     subject: "Welcome to our service",
-                    htmlBody: "<h1>Welcome!</h1>",
-                    textBody: "Welcome!",
+                    htmlContent: "<h1>Welcome!</h1>",
                     category: "MARKETING",
                     variables: ["name", "email"],
                 };
@@ -52,10 +50,8 @@ describe("CreateEmailTemplateUseCase", () => {
 
                 const useCase = new CreateEmailTemplateUseCase(mockRepository);
 
-                // When: テンプレートを作成
                 const result = await useCase.execute(input);
 
-                // Then: テンプレートが作成される
                 expect(result).toEqual(mockTemplate);
                 expect(result.name).toBe("Welcome Email");
                 expect(result.slug).toBe("welcome-email");
@@ -65,12 +61,11 @@ describe("CreateEmailTemplateUseCase", () => {
             });
 
             test("変数なしでテンプレートを作成できる", async () => {
-                // Given: 変数なしのテンプレート
                 const input: CreateEmailTemplateInput = {
                     name: "Simple Email",
                     slug: "simple-email",
                     subject: "Simple subject",
-                    htmlBody: "<p>Simple content</p>",
+                    htmlContent: "<p>Simple content</p>",
                     category: "TRANSACTIONAL",
                 };
 
@@ -88,10 +83,8 @@ describe("CreateEmailTemplateUseCase", () => {
 
                 const useCase = new CreateEmailTemplateUseCase(mockRepository);
 
-                // When: テンプレートを作成
                 const result = await useCase.execute(input);
 
-                // Then: 変数なしでテンプレートが作成される
                 expect(result.variables).toEqual([]);
                 expect(result.category).toBe("TRANSACTIONAL");
             });

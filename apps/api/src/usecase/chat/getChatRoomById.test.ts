@@ -3,23 +3,24 @@ import type { ChatRepository, ChatRoomWithParticipants } from "~/domain/chat";
 import { GetChatRoomByIdUseCase } from "./getChatRoomById";
 
 describe("GetChatRoomByIdUseCase", () => {
+    const now = "2024-01-01T00:00:00.000Z";
     const mockChatRoom: ChatRoomWithParticipants = {
         id: "room-1",
         customerId: "customer-1",
         inquiryId: "inquiry-1",
         status: "ACTIVE",
-        closedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
         participants: [
             {
                 id: "participant-1",
                 chatRoomId: "room-1",
-                customerId: "customer-1",
-                userId: null,
+                name: "Customer One",
                 role: "CUSTOMER",
-                joinedAt: new Date(),
+                joinedAt: now,
                 isOnline: true,
+                createdAt: now,
+                updatedAt: now,
             },
         ],
     };
@@ -47,7 +48,6 @@ describe("GetChatRoomByIdUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("IDでチャットルームを取得できる", async () => {
-                // Given: チャットルームID
                 const roomId = "room-1";
 
                 const mockRepository = createMockRepository({
@@ -56,10 +56,8 @@ describe("GetChatRoomByIdUseCase", () => {
 
                 const useCase = new GetChatRoomByIdUseCase(mockRepository);
 
-                // When: チャットルームを取得
                 const result = await useCase.execute(roomId);
 
-                // Then: チャットルームが参加者情報付きで返される
                 expect(result).toEqual(mockChatRoom);
                 expect(result?.participants).toBeDefined();
                 expect(result?.participants).toHaveLength(1);
@@ -70,7 +68,6 @@ describe("GetChatRoomByIdUseCase", () => {
 
         describe("異常系", () => {
             test("存在しないIDの場合はnullを返す", async () => {
-                // Given: 存在しないチャットルームID
                 const roomId = "non-existent";
 
                 const mockRepository = createMockRepository({
@@ -79,10 +76,8 @@ describe("GetChatRoomByIdUseCase", () => {
 
                 const useCase = new GetChatRoomByIdUseCase(mockRepository);
 
-                // When: チャットルームを取得
                 const result = await useCase.execute(roomId);
 
-                // Then: nullが返される
                 expect(result).toBeNull();
                 expect(mockRepository.findRoomById).toHaveBeenCalledWith(roomId);
             });

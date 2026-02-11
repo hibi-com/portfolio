@@ -10,8 +10,8 @@ describe("CloseInquiryUseCase", () => {
         status: "OPEN",
         priority: "MEDIUM",
         category: "GENERAL",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const mockResponse: InquiryResponse = {
@@ -19,8 +19,8 @@ describe("CloseInquiryUseCase", () => {
         inquiryId: "inquiry-1",
         content: "Test response",
         isInternal: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const createMockRepository = (overrides: Partial<InquiryRepository> = {}): InquiryRepository => ({
@@ -43,7 +43,7 @@ describe("CloseInquiryUseCase", () => {
         const closedInquiry: Inquiry = {
             ...mockInquiry,
             status: "CLOSED",
-            closedAt: new Date(),
+            closedAt: "2024-01-01T00:00:00.000Z",
         };
 
         const mockRepository = createMockRepository({

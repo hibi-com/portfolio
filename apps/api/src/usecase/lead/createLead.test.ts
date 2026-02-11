@@ -11,8 +11,8 @@ describe("CreateLeadUseCase", () => {
         source: "Website",
         status: "NEW",
         score: 50,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const createMockRepository = (overrides: Partial<LeadRepository> = {}): LeadRepository => ({

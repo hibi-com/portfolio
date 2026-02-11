@@ -8,13 +8,12 @@ describe("UpdateEmailTemplateUseCase", () => {
         name: "Updated Email",
         slug: "welcome-email",
         subject: "Updated subject",
-        htmlBody: "<h1>Updated!</h1>",
-        textBody: "Updated!",
+        htmlContent: "<h1>Updated!</h1>",
         category: "MARKETING",
         variables: ["name", "email"],
         isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const createMockRepository = (overrides: Partial<EmailRepository> = {}): EmailRepository => ({
@@ -35,7 +34,6 @@ describe("UpdateEmailTemplateUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("メールテンプレートを更新できる", async () => {
-                // Given: テンプレートIDと更新データ
                 const templateId = "template-1";
                 const input: UpdateEmailTemplateInput = {
                     name: "Updated Email",
@@ -49,10 +47,8 @@ describe("UpdateEmailTemplateUseCase", () => {
 
                 const useCase = new UpdateEmailTemplateUseCase(mockRepository);
 
-                // When: テンプレートを更新
                 const result = await useCase.execute(templateId, input);
 
-                // Then: テンプレートが更新される
                 expect(result).toEqual(mockTemplate);
                 expect(result.name).toBe("Updated Email");
                 expect(result.subject).toBe("Updated subject");
@@ -61,7 +57,6 @@ describe("UpdateEmailTemplateUseCase", () => {
             });
 
             test("一部のフィールドのみ更新できる", async () => {
-                // Given: 一部のフィールドのみの更新データ
                 const templateId = "template-1";
                 const input: UpdateEmailTemplateInput = {
                     subject: "New subject only",
@@ -78,16 +73,13 @@ describe("UpdateEmailTemplateUseCase", () => {
 
                 const useCase = new UpdateEmailTemplateUseCase(mockRepository);
 
-                // When: 一部のフィールドを更新
                 const result = await useCase.execute(templateId, input);
 
-                // Then: 指定したフィールドのみが更新される
                 expect(result.subject).toBe("New subject only");
                 expect(result.name).toBe(mockTemplate.name);
             });
 
             test("テンプレートを非アクティブにできる", async () => {
-                // Given: 非アクティブ化の更新データ
                 const templateId = "template-1";
                 const input: UpdateEmailTemplateInput = {
                     isActive: false,
@@ -104,10 +96,8 @@ describe("UpdateEmailTemplateUseCase", () => {
 
                 const useCase = new UpdateEmailTemplateUseCase(mockRepository);
 
-                // When: テンプレートを非アクティブ化
                 const result = await useCase.execute(templateId, input);
 
-                // Then: テンプレートが非アクティブになる
                 expect(result.isActive).toBe(false);
             });
         });

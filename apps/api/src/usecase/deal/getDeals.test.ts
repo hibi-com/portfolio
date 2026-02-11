@@ -10,8 +10,8 @@ describe("GetDealsUseCase", () => {
         value: 10000,
         currency: "USD",
         status: "OPEN",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const createMockRepository = (overrides: Partial<DealRepository> = {}): DealRepository => ({
@@ -29,10 +29,7 @@ describe("GetDealsUseCase", () => {
     });
 
     test("should return all deals", async () => {
-        const deals: Deal[] = [
-            mockDeal,
-            { ...mockDeal, id: "deal-2", name: "Deal 2", value: 20000 },
-        ];
+        const deals: Deal[] = [mockDeal, { ...mockDeal, id: "deal-2", name: "Deal 2", value: 20000 }];
         const mockRepository = createMockRepository({
             findAll: vi.fn().mockResolvedValue(deals),
         });

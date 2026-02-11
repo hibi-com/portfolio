@@ -3,14 +3,16 @@ import type { AddParticipantInput, ChatParticipant, ChatRepository } from "~/dom
 import { AddChatParticipantUseCase } from "./addChatParticipant";
 
 describe("AddChatParticipantUseCase", () => {
+    const now = "2024-01-01T00:00:00.000Z";
     const mockParticipant: ChatParticipant = {
         id: "participant-1",
         chatRoomId: "room-1",
-        customerId: "customer-1",
-        userId: null,
+        name: "Customer One",
         role: "CUSTOMER",
-        joinedAt: new Date(),
+        joinedAt: now,
         isOnline: true,
+        createdAt: now,
+        updatedAt: now,
     };
 
     const createMockRepository = (overrides: Partial<ChatRepository> = {}): ChatRepository => ({
@@ -36,10 +38,9 @@ describe("AddChatParticipantUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("顧客をチャットルームに追加できる", async () => {
-                // Given: 顧客参加者の入力データ
                 const input: AddParticipantInput = {
                     chatRoomId: "room-1",
-                    customerId: "customer-1",
+                    name: "Customer One",
                     role: "CUSTOMER",
                 };
 
@@ -49,31 +50,31 @@ describe("AddChatParticipantUseCase", () => {
 
                 const useCase = new AddChatParticipantUseCase(mockRepository);
 
-                // When: 参加者を追加
                 const result = await useCase.execute(input);
 
-                // Then: 参加者が追加される
                 expect(result).toEqual(mockParticipant);
                 expect(mockRepository.addParticipant).toHaveBeenCalledWith(input);
                 expect(mockRepository.addParticipant).toHaveBeenCalledTimes(1);
             });
 
             test("管理者をチャットルームに追加できる", async () => {
-                // Given: 管理者参加者の入力データ
                 const input: AddParticipantInput = {
                     chatRoomId: "room-1",
+                    name: "Agent One",
                     userId: "user-1",
-                    role: "ADMIN",
+                    role: "AGENT",
                 };
 
                 const adminParticipant: ChatParticipant = {
                     id: "participant-2",
                     chatRoomId: "room-1",
-                    customerId: null,
+                    name: "Agent One",
                     userId: "user-1",
-                    role: "ADMIN",
-                    joinedAt: new Date(),
+                    role: "AGENT",
+                    joinedAt: now,
                     isOnline: true,
+                    createdAt: now,
+                    updatedAt: now,
                 };
 
                 const mockRepository = createMockRepository({
@@ -82,13 +83,11 @@ describe("AddChatParticipantUseCase", () => {
 
                 const useCase = new AddChatParticipantUseCase(mockRepository);
 
-                // When: 参加者を追加
                 const result = await useCase.execute(input);
 
-                // Then: 管理者が追加される
                 expect(result).toEqual(adminParticipant);
                 expect(result.userId).toBe("user-1");
-                expect(result.role).toBe("ADMIN");
+                expect(result.role).toBe("AGENT");
             });
         });
     });

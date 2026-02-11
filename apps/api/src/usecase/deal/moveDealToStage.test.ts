@@ -10,8 +10,8 @@ describe("MoveDealToStageUseCase", () => {
         value: 10000,
         currency: "USD",
         status: "OPEN",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const createMockRepository = (overrides: Partial<DealRepository> = {}): DealRepository => ({

@@ -10,8 +10,8 @@ describe("DeleteCustomerUseCase", () => {
         phone: "123-456-7890",
         company: "Test Company",
         status: "ACTIVE",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const createMockRepository = (overrides: Partial<CustomerRepository> = {}): CustomerRepository => ({

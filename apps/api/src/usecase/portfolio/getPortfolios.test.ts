@@ -10,10 +10,10 @@ describe("GetPortfoliosUseCase", () => {
                 title: "Test Portfolio",
                 slug: "test-portfolio",
                 company: "Test Company",
-                date: new Date(),
+                date: "2024-01-01",
                 current: true,
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                createdAt: "2024-01-01T00:00:00.000Z",
+                updatedAt: "2024-01-01T00:00:00.000Z",
             },
         ];
 

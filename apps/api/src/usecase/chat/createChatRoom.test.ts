@@ -3,14 +3,14 @@ import type { ChatRepository, ChatRoom, CreateChatRoomInput } from "~/domain/cha
 import { CreateChatRoomUseCase } from "./createChatRoom";
 
 describe("CreateChatRoomUseCase", () => {
+    const now = "2024-01-01T00:00:00.000Z";
     const mockChatRoom: ChatRoom = {
         id: "room-1",
         customerId: "customer-1",
         inquiryId: "inquiry-1",
         status: "ACTIVE",
-        closedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
     };
 
     const createMockRepository = (overrides: Partial<ChatRepository> = {}): ChatRepository => ({
@@ -36,7 +36,6 @@ describe("CreateChatRoomUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("問い合わせに紐づくチャットルームを作成できる", async () => {
-                // Given: チャットルーム作成入力
                 const input: CreateChatRoomInput = {
                     customerId: "customer-1",
                     inquiryId: "inquiry-1",
@@ -48,10 +47,8 @@ describe("CreateChatRoomUseCase", () => {
 
                 const useCase = new CreateChatRoomUseCase(mockRepository);
 
-                // When: チャットルームを作成
                 const result = await useCase.execute(input);
 
-                // Then: チャットルームが作成される
                 expect(result).toEqual(mockChatRoom);
                 expect(result.customerId).toBe("customer-1");
                 expect(result.inquiryId).toBe("inquiry-1");
@@ -61,14 +58,13 @@ describe("CreateChatRoomUseCase", () => {
             });
 
             test("問い合わせIDなしでチャットルームを作成できる", async () => {
-                // Given: 問い合わせIDなしの入力
                 const input: CreateChatRoomInput = {
                     customerId: "customer-1",
                 };
 
                 const roomWithoutInquiry: ChatRoom = {
                     ...mockChatRoom,
-                    inquiryId: null,
+                    inquiryId: undefined,
                 };
 
                 const mockRepository = createMockRepository({
@@ -77,11 +73,9 @@ describe("CreateChatRoomUseCase", () => {
 
                 const useCase = new CreateChatRoomUseCase(mockRepository);
 
-                // When: チャットルームを作成
                 const result = await useCase.execute(input);
 
-                // Then: 問い合わせIDなしでチャットルームが作成される
-                expect(result.inquiryId).toBeNull();
+                expect(result.inquiryId).toBeUndefined();
                 expect(result.customerId).toBe("customer-1");
             });
         });

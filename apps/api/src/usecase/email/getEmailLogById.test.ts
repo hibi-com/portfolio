@@ -3,20 +3,17 @@ import type { EmailLog, EmailRepository } from "~/domain/email";
 import { GetEmailLogByIdUseCase } from "./getEmailLogById";
 
 describe("GetEmailLogByIdUseCase", () => {
+    const now = "2024-01-01T00:00:00.000Z";
     const mockEmailLog: EmailLog = {
         id: "log-1",
-        templateId: "template-1",
-        customerId: "customer-1",
+        fromEmail: "from@example.com",
         toEmail: "test@example.com",
         subject: "Test Email",
-        htmlBody: "<p>Test</p>",
-        textBody: "Test",
         status: "SENT",
         resendId: "resend-123",
-        errorMessage: null,
-        sentAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        sentAt: now,
+        createdAt: now,
+        updatedAt: now,
     };
 
     const createMockRepository = (overrides: Partial<EmailRepository> = {}): EmailRepository => ({
@@ -37,7 +34,6 @@ describe("GetEmailLogByIdUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("IDでメールログを取得できる", async () => {
-                // Given: メールログID
                 const logId = "log-1";
 
                 const mockRepository = createMockRepository({
@@ -46,10 +42,8 @@ describe("GetEmailLogByIdUseCase", () => {
 
                 const useCase = new GetEmailLogByIdUseCase(mockRepository);
 
-                // When: メールログを取得
                 const result = await useCase.execute(logId);
 
-                // Then: メールログが返される
                 expect(result).toEqual(mockEmailLog);
                 expect(result?.status).toBe("SENT");
                 expect(result?.toEmail).toBe("test@example.com");
@@ -60,7 +54,6 @@ describe("GetEmailLogByIdUseCase", () => {
 
         describe("異常系", () => {
             test("存在しないIDの場合はnullを返す", async () => {
-                // Given: 存在しないメールログID
                 const logId = "non-existent";
 
                 const mockRepository = createMockRepository({
@@ -69,10 +62,8 @@ describe("GetEmailLogByIdUseCase", () => {
 
                 const useCase = new GetEmailLogByIdUseCase(mockRepository);
 
-                // When: メールログを取得
                 const result = await useCase.execute(logId);
 
-                // Then: nullが返される
                 expect(result).toBeNull();
                 expect(mockRepository.findLogById).toHaveBeenCalledWith(logId);
             });

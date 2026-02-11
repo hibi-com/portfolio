@@ -149,7 +149,6 @@ describe("chatsRouter", () => {
     describe("POST /rooms", () => {
         describe("正常系", () => {
             test("新しいチャットルームを201で作成する", async () => {
-                // Given: 有効なルームデータ
                 const req = new Request("http://localhost/rooms", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -158,10 +157,8 @@ describe("chatsRouter", () => {
                     }),
                 });
 
-                // When: リクエスト実行
                 const res = await chatsRouter.request(req, undefined, mockEnv);
 
-                // Then: レスポンス検証
                 expect(res.status).toBe(201);
             });
         });
@@ -186,7 +183,6 @@ describe("chatsRouter", () => {
     describe("POST /rooms/:id/participants", () => {
         describe("正常系", () => {
             test("参加者を201で追加する", async () => {
-                // Given: 有効な参加者データ
                 const req = new Request("http://localhost/rooms/123e4567-e89b-12d3-a456-426614174000/participants", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -196,10 +192,8 @@ describe("chatsRouter", () => {
                     }),
                 });
 
-                // When: リクエスト実行
                 const res = await chatsRouter.request(req, undefined, mockEnv);
 
-                // Then: レスポンス検証
                 expect(res.status).toBe(201);
             });
         });
@@ -208,15 +202,12 @@ describe("chatsRouter", () => {
     describe("GET /rooms/:id/messages", () => {
         describe("正常系", () => {
             test("メッセージ一覧を200で返す", async () => {
-                // Given: 有効なUUID
                 const req = new Request("http://localhost/rooms/123e4567-e89b-12d3-a456-426614174000/messages", {
                     method: "GET",
                 });
 
-                // When: リクエスト実行
                 const res = await chatsRouter.request(req, undefined, mockEnv);
 
-                // Then: レスポンス検証
                 expect(res.status).toBe(200);
                 const json = await res.json();
                 expect(Array.isArray(json)).toBe(true);
@@ -227,7 +218,6 @@ describe("chatsRouter", () => {
     describe("POST /rooms/:id/messages", () => {
         describe("正常系", () => {
             test("メッセージを201で送信する", async () => {
-                // Given: 有効なメッセージデータ
                 const req = new Request("http://localhost/rooms/123e4567-e89b-12d3-a456-426614174000/messages", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -237,10 +227,8 @@ describe("chatsRouter", () => {
                     }),
                 });
 
-                // When: リクエスト実行
                 const res = await chatsRouter.request(req, undefined, mockEnv);
 
-                // Then: レスポンス検証
                 expect(res.status).toBe(201);
             });
         });

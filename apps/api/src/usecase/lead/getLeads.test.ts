@@ -11,8 +11,8 @@ describe("GetLeadsUseCase", () => {
         source: "Website",
         status: "NEW",
         score: 50,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const createMockRepository = (overrides: Partial<LeadRepository> = {}): LeadRepository => ({
@@ -27,10 +27,7 @@ describe("GetLeadsUseCase", () => {
     });
 
     test("should return all leads", async () => {
-        const leads: Lead[] = [
-            mockLead,
-            { ...mockLead, id: "lead-2", name: "Lead 2", status: "CONTACTED" },
-        ];
+        const leads: Lead[] = [mockLead, { ...mockLead, id: "lead-2", name: "Lead 2", status: "CONTACTED" }];
         const mockRepository = createMockRepository({
             findAll: vi.fn().mockResolvedValue(leads),
         });

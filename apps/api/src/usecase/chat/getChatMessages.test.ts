@@ -3,26 +3,25 @@ import type { ChatMessage, ChatRepository } from "~/domain/chat";
 import { GetChatMessagesUseCase } from "./getChatMessages";
 
 describe("GetChatMessagesUseCase", () => {
+    const now = "2024-01-01T00:00:00.000Z";
     const mockMessages: ChatMessage[] = [
         {
             id: "message-1",
             chatRoomId: "room-1",
-            chatParticipantId: "participant-1",
+            participantId: "participant-1",
             type: "TEXT",
             content: "Hello",
-            isRead: true,
-            readAt: new Date(),
-            createdAt: new Date(),
+            createdAt: now,
+            updatedAt: now,
         },
         {
             id: "message-2",
             chatRoomId: "room-1",
-            chatParticipantId: "participant-2",
+            participantId: "participant-2",
             type: "TEXT",
             content: "Hi there",
-            isRead: false,
-            readAt: null,
-            createdAt: new Date(),
+            createdAt: now,
+            updatedAt: now,
         },
     ];
 
@@ -49,7 +48,6 @@ describe("GetChatMessagesUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("チャットルームのメッセージ一覧を取得できる", async () => {
-                // Given: チャットルームID
                 const chatRoomId = "room-1";
 
                 const mockRepository = createMockRepository({
@@ -58,22 +56,15 @@ describe("GetChatMessagesUseCase", () => {
 
                 const useCase = new GetChatMessagesUseCase(mockRepository);
 
-                // When: メッセージを取得
                 const result = await useCase.execute(chatRoomId);
 
-                // Then: メッセージ一覧が返される
                 expect(result).toEqual(mockMessages);
                 expect(result).toHaveLength(2);
-                expect(mockRepository.findMessagesByRoomId).toHaveBeenCalledWith(
-                    chatRoomId,
-                    undefined,
-                    undefined,
-                );
+                expect(mockRepository.findMessagesByRoomId).toHaveBeenCalledWith(chatRoomId, undefined, undefined);
                 expect(mockRepository.findMessagesByRoomId).toHaveBeenCalledTimes(1);
             });
 
             test("制限数を指定してメッセージを取得できる", async () => {
-                // Given: チャットルームIDと制限数
                 const chatRoomId = "room-1";
                 const limit = 10;
 
@@ -83,20 +74,13 @@ describe("GetChatMessagesUseCase", () => {
 
                 const useCase = new GetChatMessagesUseCase(mockRepository);
 
-                // When: 制限数を指定してメッセージを取得
                 const result = await useCase.execute(chatRoomId, limit);
 
-                // Then: 指定数のメッセージが返される
                 expect(result).toHaveLength(1);
-                expect(mockRepository.findMessagesByRoomId).toHaveBeenCalledWith(
-                    chatRoomId,
-                    limit,
-                    undefined,
-                );
+                expect(mockRepository.findMessagesByRoomId).toHaveBeenCalledWith(chatRoomId, limit, undefined);
             });
 
             test("日時を指定して過去のメッセージを取得できる", async () => {
-                // Given: チャットルームIDと基準日時
                 const chatRoomId = "room-1";
                 const before = new Date();
 
@@ -106,22 +90,15 @@ describe("GetChatMessagesUseCase", () => {
 
                 const useCase = new GetChatMessagesUseCase(mockRepository);
 
-                // When: 基準日時より前のメッセージを取得
                 const result = await useCase.execute(chatRoomId, undefined, before);
 
-                // Then: メッセージが返される
                 expect(result).toEqual(mockMessages);
-                expect(mockRepository.findMessagesByRoomId).toHaveBeenCalledWith(
-                    chatRoomId,
-                    undefined,
-                    before,
-                );
+                expect(mockRepository.findMessagesByRoomId).toHaveBeenCalledWith(chatRoomId, undefined, before);
             });
         });
 
         describe("エッジケース", () => {
             test("メッセージが存在しない場合は空配列を返す", async () => {
-                // Given: メッセージのないチャットルーム
                 const chatRoomId = "room-empty";
 
                 const mockRepository = createMockRepository({
@@ -130,10 +107,8 @@ describe("GetChatMessagesUseCase", () => {
 
                 const useCase = new GetChatMessagesUseCase(mockRepository);
 
-                // When: メッセージを取得
                 const result = await useCase.execute(chatRoomId);
 
-                // Then: 空配列が返される
                 expect(result).toEqual([]);
                 expect(result).toHaveLength(0);
             });

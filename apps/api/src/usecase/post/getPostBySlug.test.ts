@@ -8,13 +8,13 @@ describe("GetPostBySlugUseCase", () => {
             id: "1",
             title: "Test Post",
             slug: "test-post",
-            date: new Date(),
-            content: "Test content",
+            date: "2024-01-01",
+            content: { html: "Test content" },
             imageTemp: "test.jpg",
             sticky: false,
             tags: ["test"],
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: "2024-01-01T00:00:00.000Z",
+            updatedAt: "2024-01-01T00:00:00.000Z",
         };
 
         const mockRepository: PostRepository = {

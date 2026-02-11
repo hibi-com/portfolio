@@ -3,15 +3,15 @@ import type { ChatMessage, ChatRepository, SendMessageInput } from "~/domain/cha
 import { SendChatMessageUseCase } from "./sendChatMessage";
 
 describe("SendChatMessageUseCase", () => {
+    const now = "2024-01-01T00:00:00.000Z";
     const mockMessage: ChatMessage = {
         id: "message-1",
         chatRoomId: "room-1",
-        chatParticipantId: "participant-1",
+        participantId: "participant-1",
         type: "TEXT",
         content: "Hello, this is a test message",
-        isRead: false,
-        readAt: null,
-        createdAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
     };
 
     const createMockRepository = (overrides: Partial<ChatRepository> = {}): ChatRepository => ({
@@ -37,10 +37,9 @@ describe("SendChatMessageUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("テキストメッセージを送信できる", async () => {
-                // Given: テキストメッセージの入力データ
                 const input: SendMessageInput = {
                     chatRoomId: "room-1",
-                    chatParticipantId: "participant-1",
+                    participantId: "participant-1",
                     type: "TEXT",
                     content: "Hello, this is a test message",
                 };
@@ -51,23 +50,19 @@ describe("SendChatMessageUseCase", () => {
 
                 const useCase = new SendChatMessageUseCase(mockRepository);
 
-                // When: メッセージを送信
                 const result = await useCase.execute(input);
 
-                // Then: メッセージが作成される
                 expect(result).toEqual(mockMessage);
                 expect(result.content).toBe("Hello, this is a test message");
                 expect(result.type).toBe("TEXT");
-                expect(result.isRead).toBe(false);
                 expect(mockRepository.createMessage).toHaveBeenCalledWith(input);
                 expect(mockRepository.createMessage).toHaveBeenCalledTimes(1);
             });
 
             test("ファイルメッセージを送信できる", async () => {
-                // Given: ファイルメッセージの入力データ
                 const input: SendMessageInput = {
                     chatRoomId: "room-1",
-                    chatParticipantId: "participant-1",
+                    participantId: "participant-1",
                     type: "FILE",
                     content: "https://example.com/file.pdf",
                 };
@@ -84,19 +79,16 @@ describe("SendChatMessageUseCase", () => {
 
                 const useCase = new SendChatMessageUseCase(mockRepository);
 
-                // When: ファイルメッセージを送信
                 const result = await useCase.execute(input);
 
-                // Then: ファイルメッセージが作成される
                 expect(result.type).toBe("FILE");
                 expect(result.content).toBe("https://example.com/file.pdf");
             });
 
             test("システムメッセージを送信できる", async () => {
-                // Given: システムメッセージの入力データ
                 const input: SendMessageInput = {
                     chatRoomId: "room-1",
-                    chatParticipantId: "participant-1",
+                    participantId: "participant-1",
                     type: "SYSTEM",
                     content: "User has joined the chat",
                 };
@@ -113,10 +105,8 @@ describe("SendChatMessageUseCase", () => {
 
                 const useCase = new SendChatMessageUseCase(mockRepository);
 
-                // When: システムメッセージを送信
                 const result = await useCase.execute(input);
 
-                // Then: システムメッセージが作成される
                 expect(result.type).toBe("SYSTEM");
                 expect(result.content).toBe("User has joined the chat");
             });

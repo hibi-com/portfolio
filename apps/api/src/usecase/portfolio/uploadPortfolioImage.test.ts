@@ -25,7 +25,7 @@ describe("UploadPortfolioImageUseCase", () => {
                 etag: "test-etag",
                 httpEtag: "test-etag",
                 checksums: {},
-                uploaded: new Date(),
+                uploaded: "2024-01-01T00:00:00.000Z",
                 storageClass: "STANDARD",
             }),
         } as unknown as R2Bucket;
@@ -45,10 +45,10 @@ describe("UploadPortfolioImageUseCase", () => {
             title: "Test Portfolio",
             slug: "test-portfolio",
             company: "Test Company",
-            date: new Date(),
+            date: "2024-01-01",
             current: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: "2024-01-01T00:00:00.000Z",
+            updatedAt: "2024-01-01T00:00:00.000Z",
         };
 
         const imageFile = createMockImageFile("test.jpg", "image/jpeg", 1024 * 1024);
@@ -88,10 +88,10 @@ describe("UploadPortfolioImageUseCase", () => {
             title: "Test Portfolio",
             slug: "test-portfolio",
             company: "Test Company",
-            date: new Date(),
+            date: "2024-01-01",
             current: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: "2024-01-01T00:00:00.000Z",
+            updatedAt: "2024-01-01T00:00:00.000Z",
         };
 
         const textFile = createMockImageFile("test.txt", "text/plain", 1024);
@@ -115,10 +115,10 @@ describe("UploadPortfolioImageUseCase", () => {
             title: "Test Portfolio",
             slug: "test-portfolio",
             company: "Test Company",
-            date: new Date(),
+            date: "2024-01-01",
             current: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: "2024-01-01T00:00:00.000Z",
+            updatedAt: "2024-01-01T00:00:00.000Z",
         };
 
         const largeImageFile = createMockImageFile("large.jpg", "image/jpeg", 11 * 1024 * 1024);
@@ -142,10 +142,10 @@ describe("UploadPortfolioImageUseCase", () => {
             title: "Test Portfolio",
             slug: "test-portfolio",
             company: "Test Company",
-            date: new Date(),
+            date: "2024-01-01",
             current: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: "2024-01-01T00:00:00.000Z",
+            updatedAt: "2024-01-01T00:00:00.000Z",
         };
 
         const imageFile = createMockImageFile("test.png", "image/png", 1024);
@@ -155,7 +155,7 @@ describe("UploadPortfolioImageUseCase", () => {
         const useCase = new UploadPortfolioImageUseCase(mockRepository, mockR2Bucket, r2PublicUrl);
         await useCase.execute(portfolioId, imageFile);
 
-        const putCall = vi.mocked(mockR2Bucket.put).mock.calls[0];
+        const putCall = (mockR2Bucket.put as unknown as { mock: { calls: [string, ArrayBuffer, object][] } }).mock.calls[0];
         const key = putCall?.[0];
 
         expect(key).toContain(`portfolios/${portfolioId}/`);
@@ -175,10 +175,10 @@ describe("UploadPortfolioImageUseCase", () => {
             title: "Test Portfolio",
             slug: "test-portfolio",
             company: "Test Company",
-            date: new Date(),
+            date: "2024-01-01",
             current: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: "2024-01-01T00:00:00.000Z",
+            updatedAt: "2024-01-01T00:00:00.000Z",
         };
 
         const imageFile = createMockImageFile("test", "image/jpeg", 1024);
@@ -188,7 +188,7 @@ describe("UploadPortfolioImageUseCase", () => {
         const useCase = new UploadPortfolioImageUseCase(mockRepository, mockR2Bucket, r2PublicUrl);
         await useCase.execute(portfolioId, imageFile);
 
-        const putCall = vi.mocked(mockR2Bucket.put).mock.calls[0];
+        const putCall = (mockR2Bucket.put as unknown as { mock: { calls: [string, ArrayBuffer, object][] } }).mock.calls[0];
         const key = putCall?.[0];
 
         expect(key).toMatch(/\.jpg$/);
@@ -201,10 +201,10 @@ describe("UploadPortfolioImageUseCase", () => {
             title: "Test Portfolio",
             slug: "test-portfolio",
             company: "Test Company",
-            date: new Date(),
+            date: "2024-01-01",
             current: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: "2024-01-01T00:00:00.000Z",
+            updatedAt: "2024-01-01T00:00:00.000Z",
         };
 
         const imageFile = createMockImageFile("test.jpg", "image/jpeg", 1024);

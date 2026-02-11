@@ -3,18 +3,18 @@ import type { EmailRepository, EmailTemplate } from "~/domain/email";
 import { GetEmailTemplateByIdUseCase } from "./getEmailTemplateById";
 
 describe("GetEmailTemplateByIdUseCase", () => {
+    const now = "2024-01-01T00:00:00.000Z";
     const mockTemplate: EmailTemplate = {
         id: "template-1",
         name: "Welcome Email",
         slug: "welcome-email",
         subject: "Welcome to our service",
-        htmlBody: "<h1>Welcome!</h1>",
-        textBody: "Welcome!",
+        htmlContent: "<h1>Welcome!</h1>",
         category: "MARKETING",
         variables: ["name", "email"],
         isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
     };
 
     const createMockRepository = (overrides: Partial<EmailRepository> = {}): EmailRepository => ({
@@ -35,7 +35,6 @@ describe("GetEmailTemplateByIdUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("IDでメールテンプレートを取得できる", async () => {
-                // Given: テンプレートID
                 const templateId = "template-1";
 
                 const mockRepository = createMockRepository({
@@ -44,10 +43,8 @@ describe("GetEmailTemplateByIdUseCase", () => {
 
                 const useCase = new GetEmailTemplateByIdUseCase(mockRepository);
 
-                // When: テンプレートを取得
                 const result = await useCase.execute(templateId);
 
-                // Then: テンプレートが返される
                 expect(result).toEqual(mockTemplate);
                 expect(result?.name).toBe("Welcome Email");
                 expect(result?.slug).toBe("welcome-email");
@@ -59,7 +56,6 @@ describe("GetEmailTemplateByIdUseCase", () => {
 
         describe("異常系", () => {
             test("存在しないIDの場合はnullを返す", async () => {
-                // Given: 存在しないテンプレートID
                 const templateId = "non-existent";
 
                 const mockRepository = createMockRepository({
@@ -68,10 +64,8 @@ describe("GetEmailTemplateByIdUseCase", () => {
 
                 const useCase = new GetEmailTemplateByIdUseCase(mockRepository);
 
-                // When: テンプレートを取得
                 const result = await useCase.execute(templateId);
 
-                // Then: nullが返される
                 expect(result).toBeNull();
                 expect(mockRepository.findTemplateById).toHaveBeenCalledWith(templateId);
             });

@@ -64,7 +64,7 @@ export async function clearTestDb(): Promise<void> {
         try {
             await prisma.$executeRawUnsafe(`DELETE FROM ${tableName}`);
         } catch {
-            // テーブルが存在しない場合は無視
+            // Table does not exist, ignore
         }
     }
 }

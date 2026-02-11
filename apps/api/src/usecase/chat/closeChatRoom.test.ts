@@ -3,14 +3,15 @@ import type { ChatRepository, ChatRoom } from "~/domain/chat";
 import { CloseChatRoomUseCase } from "./closeChatRoom";
 
 describe("CloseChatRoomUseCase", () => {
+    const now = "2024-01-01T00:00:00.000Z";
     const mockChatRoom: ChatRoom = {
         id: "room-1",
         customerId: "customer-1",
         inquiryId: "inquiry-1",
         status: "CLOSED",
-        closedAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        closedAt: now,
+        createdAt: now,
+        updatedAt: now,
     };
 
     const createMockRepository = (overrides: Partial<ChatRepository> = {}): ChatRepository => ({
@@ -36,7 +37,6 @@ describe("CloseChatRoomUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("チャットルームをクローズできる", async () => {
-                // Given: チャットルームID
                 const roomId = "room-1";
 
                 const mockRepository = createMockRepository({
@@ -45,10 +45,8 @@ describe("CloseChatRoomUseCase", () => {
 
                 const useCase = new CloseChatRoomUseCase(mockRepository);
 
-                // When: チャットルームをクローズ
                 const result = await useCase.execute(roomId);
 
-                // Then: チャットルームがクローズされる
                 expect(result).toEqual(mockChatRoom);
                 expect(result.status).toBe("CLOSED");
                 expect(result.closedAt).toBeDefined();

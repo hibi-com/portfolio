@@ -26,7 +26,6 @@ export function createMockR2Bucket(): any {
             } else if (value instanceof ArrayBuffer) {
                 storage.set(key, value);
             } else {
-                // ReadableStream
                 const reader = value.getReader();
                 const chunks: Uint8Array[] = [];
                 let done = false;
@@ -44,7 +43,7 @@ export function createMockR2Bucket(): any {
                     combined.set(chunk, offset);
                     offset += chunk.length;
                 }
-                storage.set(key, combined.buffer as ArrayBuffer);
+                storage.set(key, combined.buffer);
             }
         },
         get: async (key: string): Promise<{ arrayBuffer: () => Promise<ArrayBuffer> } | null> => {

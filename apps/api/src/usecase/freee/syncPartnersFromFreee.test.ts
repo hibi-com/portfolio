@@ -67,7 +67,7 @@ describe("SyncPartnersFromFreeeUseCase", () => {
                 expect(result.status).toBe("COMPLETED");
                 expect(result.totalRecords).toBe(5);
                 expect(result.successCount).toBe(5);
-                expect(result.recordsFailed).toBe(0);
+                expect(result.errorCount).toBe(0);
             });
         });
 

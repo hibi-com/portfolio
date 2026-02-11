@@ -9,8 +9,8 @@ describe("CreatePipelineUseCase", () => {
         description: "Main sales pipeline",
         isDefault: true,
         stages: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
     };
 
     const createMockRepository = (overrides: Partial<PipelineRepository> = {}): PipelineRepository => ({
@@ -30,7 +30,6 @@ describe("CreatePipelineUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("パイプラインを作成できる", async () => {
-                // Given: パイプライン作成データが与えられる
                 const input: CreatePipelineInput = {
                     name: "Sales Pipeline",
                     description: "Main sales pipeline",
@@ -40,18 +39,15 @@ describe("CreatePipelineUseCase", () => {
                     create: vi.fn().mockResolvedValue(mockPipeline),
                 });
 
-                // When: パイプラインを作成する
                 const useCase = new CreatePipelineUseCase(mockRepository);
                 const result = await useCase.execute(input);
 
-                // Then: パイプラインが返される
                 expect(result).toEqual(mockPipeline);
                 expect(mockRepository.create).toHaveBeenCalledWith(input);
                 expect(mockRepository.create).toHaveBeenCalledTimes(1);
             });
 
             test("最小限の情報でパイプラインを作成できる", async () => {
-                // Given: 名前のみのパイプライン作成データ
                 const input: CreatePipelineInput = {
                     name: "Minimal Pipeline",
                 };
@@ -65,17 +61,14 @@ describe("CreatePipelineUseCase", () => {
                     create: vi.fn().mockResolvedValue(minimalPipeline),
                 });
 
-                // When: パイプラインを作成する
                 const useCase = new CreatePipelineUseCase(mockRepository);
                 const result = await useCase.execute(input);
 
-                // Then: パイプラインが返される
                 expect(result.name).toBe("Minimal Pipeline");
                 expect(result.isDefault).toBe(false);
             });
 
             test("説明付きのパイプラインを作成できる", async () => {
-                // Given: 説明付きのパイプライン作成データ
                 const input: CreatePipelineInput = {
                     name: "Marketing Pipeline",
                     description: "Pipeline for marketing campaigns",
@@ -91,18 +84,15 @@ describe("CreatePipelineUseCase", () => {
                     create: vi.fn().mockResolvedValue(pipelineWithDescription),
                 });
 
-                // When: パイプラインを作成する
                 const useCase = new CreatePipelineUseCase(mockRepository);
                 const result = await useCase.execute(input);
 
-                // Then: 説明付きパイプラインが返される
                 expect(result.description).toBe("Pipeline for marketing campaigns");
             });
         });
 
         describe("異常系", () => {
             test("リポジトリでエラーが発生した場合、エラーがスローされる", async () => {
-                // Given: リポジトリがエラーをスローする
                 const input: CreatePipelineInput = {
                     name: "Test Pipeline",
                 };
@@ -110,7 +100,6 @@ describe("CreatePipelineUseCase", () => {
                     create: vi.fn().mockRejectedValue(new Error("Database error")),
                 });
 
-                // When & Then: エラーがスローされる
                 const useCase = new CreatePipelineUseCase(mockRepository);
                 await expect(useCase.execute(input)).rejects.toThrow("Database error");
             });
@@ -118,7 +107,6 @@ describe("CreatePipelineUseCase", () => {
 
         describe("エッジケース", () => {
             test("空文字の名前でパイプラインを作成しようとするとリポジトリでエラーになる", async () => {
-                // Given: 空文字の名前
                 const input: CreatePipelineInput = {
                     name: "",
                 };
@@ -126,13 +114,11 @@ describe("CreatePipelineUseCase", () => {
                     create: vi.fn().mockRejectedValue(new Error("Name is required")),
                 });
 
-                // When & Then: エラーがスローされる
                 const useCase = new CreatePipelineUseCase(mockRepository);
                 await expect(useCase.execute(input)).rejects.toThrow("Name is required");
             });
 
             test("長い説明文でパイプラインを作成できる", async () => {
-                // Given: 長い説明文
                 const longDescription = "a".repeat(1000);
                 const input: CreatePipelineInput = {
                     name: "Test Pipeline",
@@ -146,11 +132,9 @@ describe("CreatePipelineUseCase", () => {
                     create: vi.fn().mockResolvedValue(pipelineWithLongDesc),
                 });
 
-                // When: パイプラインを作成する
                 const useCase = new CreatePipelineUseCase(mockRepository);
                 const result = await useCase.execute(input);
 
-                // Then: 長い説明文のパイプラインが返される
                 expect(result.description).toBe(longDescription);
             });
         });
