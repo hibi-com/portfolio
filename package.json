@@ -48,6 +48,8 @@
     "studio": "turbo run studio",
     "test": "turbo run test --concurrency=50%",
     "typecheck": "turbo run typecheck",
+    "typedoc": "typedoc",
+    "typedoc:check": "typedoc --emit none",
     "version": "changeset version && bun run .changeset/changelog.ts"
   },
   "devDependencies": {

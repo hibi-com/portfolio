@@ -27,8 +27,8 @@ for (const name of schemaNames) {
 
 const typeExports = schemaNames.map((name) => `export type ${name} = z.infer<typeof ${name}Schema>;`).join("\n");
 
-content = content.replaceAll(/const endpoints = makeApi\(\[[\s\S]*?\]\);[\s\S]*$/, "");
-content = content.replaceAll(/^export const schemas = \{[\s\S]*?\};$/gm, "");
+content = content.replace(/const endpoints = makeApi\(\[[\s\S]*?\]\);[\s\S]*$/, "");
+content = content.replace(/^export const schemas = \{[\s\S]*?\};$/m, "");
 
 const schemasObject = schemaNames.map((name) => `    ${name}: ${name}Schema,`).join("\n");
 
