@@ -1,7 +1,7 @@
 import { AppError, ErrorCodes } from "@portfolio/log";
-import { getLogger } from "~/lib/logger";
 import { useEffect, useState } from "react";
 import { api } from "~/shared/lib/api";
+import { getLogger } from "~/shared/lib/logger";
 import type { DashboardStats } from "../model/types";
 
 export function useDashboardStats() {
@@ -38,11 +38,12 @@ export function useDashboardStats() {
                     users: 0,
                 });
             } catch (err) {
-                const appError = err instanceof AppError
-                    ? err
-                    : AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to fetch stats", {
-                          originalError: err instanceof Error ? err : new Error(String(err)),
-                      });
+                const appError =
+                    err instanceof AppError
+                        ? err
+                        : AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to fetch stats", {
+                              originalError: err instanceof Error ? err : new Error(String(err)),
+                          });
                 setError(appError);
                 logger.logError(appError, { endpoint: "/api/dashboard/stats" });
             } finally {

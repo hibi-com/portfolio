@@ -1,6 +1,6 @@
 import { AppError, ErrorCodes } from "@portfolio/log";
-import { getLogger } from "~/lib/logger";
 import { SITE_DESCRIPTION, SITE_TITLE } from "~/shared/config/constants";
+import { getLogger } from "~/shared/lib/logger";
 
 export interface UseWebShareAPI {
     isAvailable: boolean;

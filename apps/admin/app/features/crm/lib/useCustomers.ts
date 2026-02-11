@@ -1,8 +1,8 @@
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useCallback, useEffect, useState } from "react";
 import type { Customer, CustomerFormData } from "~/entities/customer";
-import { getLogger } from "~/lib/logger";
 import { crmApi } from "~/shared/lib/crm-api";
+import { getLogger } from "~/shared/lib/logger";
 
 export function useCustomers() {
     const [customers, setCustomers] = useState<Customer[]>([]);

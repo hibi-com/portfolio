@@ -1,5 +1,5 @@
 import { AppError, ErrorCodes } from "@portfolio/log";
-import { getLogger } from "~/lib/logger";
+import { getLogger } from "~/shared/lib/logger";
 
 export const copyTextToClipboard = (text: string) => {
     const logger = getLogger();

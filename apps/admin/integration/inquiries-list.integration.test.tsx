@@ -49,7 +49,7 @@ describe("Inquiries List Integration - docs/sequence/admin/inquiries/inquiries-l
             );
 
             const response = await fetch(`${API_URL}/api/inquiries`);
-            const data = (await response.json()) as Inquiry[];
+            const data: Inquiry[] = await response.json();
 
             expect(response.ok).toBe(true);
             expect(data).toHaveLength(2);
@@ -69,7 +69,7 @@ describe("Inquiries List Integration - docs/sequence/admin/inquiries/inquiries-l
             );
 
             const response = await fetch(`${API_URL}/api/inquiries?status=open`);
-            const data = (await response.json()) as Inquiry[];
+            const data: Inquiry[] = await response.json();
 
             expect(data).toHaveLength(1);
         });

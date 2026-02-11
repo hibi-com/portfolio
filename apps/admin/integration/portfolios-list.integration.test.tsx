@@ -45,11 +45,11 @@ describe("Portfolios List Integration - docs/sequence/admin/portfolios/portfolio
             );
 
             const response = await fetch(`${API_URL}/api/portfolios`);
-            const data = (await response.json()) as MockPortfolio[];
+            const data: MockPortfolio[] = await response.json();
 
             expect(response.ok).toBe(true);
             expect(data).toHaveLength(2);
-            expect(data[0].company).toBe("Company X");
+            expect(data[0]?.company).toBe("Company X");
         });
 
         test("正常系: コンポーネントレンダリング検証", () => {

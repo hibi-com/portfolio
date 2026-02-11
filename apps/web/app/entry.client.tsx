@@ -2,8 +2,8 @@ import { AppError, ErrorCodes } from "@portfolio/log";
 import { RemixBrowser } from "@remix-run/react";
 import { StrictMode, startTransition } from "react";
 import { hydrateRoot } from "react-dom/client";
-import { getLogger, initLogger } from "~/lib/logger";
 import { SENTRY_DSN, SENTRY_ENVIRONMENT, XSTATE_INSPECTOR_ENABLED } from "~/shared/config/settings";
+import { getLogger, initLogger } from "~/shared/lib/logger";
 
 if (SENTRY_DSN !== "__undefined__") {
     initLogger({

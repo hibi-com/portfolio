@@ -1,4 +1,3 @@
-import { render, screen } from "@testing-library/react";
 import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
@@ -29,11 +28,11 @@ describe("Dashboard Load Integration - docs/sequence/admin/dashboard/dashboard-l
             );
 
             const response = await fetch(`${API_URL}/api/dashboard/stats`);
-            const data = (await response.json()) as typeof mockStats;
+            const data = await response.json();
 
             expect(response.ok).toBe(true);
-            expect(data.postsCount).toBe(10);
-            expect(data.portfoliosCount).toBe(5);
+            expect((data as typeof mockStats).postsCount).toBe(10);
+            expect((data as typeof mockStats).portfoliosCount).toBe(5);
         });
 
         test("異常系: API 500エラー", async () => {

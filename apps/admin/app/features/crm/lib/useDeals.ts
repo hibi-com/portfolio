@@ -1,7 +1,7 @@
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useCallback, useEffect, useState } from "react";
-import { getLogger } from "~/lib/logger";
 import { crmApi, type Deal, type DealFormData, type Pipeline } from "~/shared/lib/crm-api";
+import { getLogger } from "~/shared/lib/logger";
 
 export function useDeals() {
     const [deals, setDeals] = useState<Deal[]>([]);

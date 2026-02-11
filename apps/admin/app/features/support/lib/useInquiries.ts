@@ -1,6 +1,6 @@
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useCallback, useEffect, useState } from "react";
-import { getLogger } from "~/lib/logger";
+import { getLogger } from "~/shared/lib/logger";
 import {
     type Inquiry,
     type InquiryDetail,

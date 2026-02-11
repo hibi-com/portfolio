@@ -3,7 +3,6 @@ import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import "@testing-library/jest-dom/vitest";
-import React from "react";
 
 const server = setupServer();
 
@@ -39,11 +38,11 @@ describe("Posts List Integration - docs/sequence/admin/posts/posts-list.md", () 
             );
 
             const response = await fetch(`${API_URL}/api/posts`);
-            const data = await response.json();
+            const data: Array<{ id: string; title: string; slug: string }> = await response.json();
 
             expect(response.ok).toBe(true);
             expect(data).toHaveLength(2);
-            expect(data[0].title).toBe("Test Post 1");
+            expect(data[0]?.title).toBe("Test Post 1");
         });
 
         test("正常系: コンポーネントレンダリング検証", () => {
@@ -90,8 +89,7 @@ describe("Posts List Integration - docs/sequence/admin/posts/posts-list.md", () 
 
             const response = await fetch(`${API_URL}/api/posts`);
             const data = await response.json();
-
-            expect(data).toHaveLength(0);
+            expect(Array.isArray(data) && data.length === 0).toBe(true);
         });
     });
 });

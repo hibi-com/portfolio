@@ -24,11 +24,9 @@ export function initLogger(env: { SENTRY_DSN?: string; NODE_ENV?: string; APP_VE
 }
 
 export function getLogger(): Logger {
-    if (!logger) {
-        logger = new Logger({
-            minLevel: globalThis.window?.location.hostname === "localhost" ? LogLevel.DEBUG : LogLevel.INFO,
-            defaultContext: { service: "admin" },
-        });
-    }
+    logger ??= new Logger({
+        minLevel: globalThis.window?.location.hostname === "localhost" ? LogLevel.DEBUG : LogLevel.INFO,
+        defaultContext: { service: "admin" },
+    });
     return logger;
 }

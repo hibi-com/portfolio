@@ -1,5 +1,5 @@
 import { sanitizeHtml } from "@portfolio/ui";
-import { getLogger } from "~/lib/logger";
+import { getLogger } from "~/shared/lib/logger";
 import { getTimeWorked } from "../lib/date-time";
 import type { SectionExperienceDetailProps } from "../model/types";
 

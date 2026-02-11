@@ -1,8 +1,8 @@
-import { AppError, ErrorCodes } from "@portfolio/log";
-import { getLogger } from "~/lib/logger";
 import type { Post } from "@portfolio/api";
+import { AppError, ErrorCodes } from "@portfolio/log";
 import { useEffect, useState } from "react";
 import { api } from "~/shared/lib/api";
+import { getLogger } from "~/shared/lib/logger";
 
 export function usePosts() {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -19,11 +19,12 @@ export function usePosts() {
                 const data = Array.isArray(response) ? response : response.data || [];
                 setPosts(data);
             } catch (err) {
-                const appError = err instanceof AppError
-                    ? err
-                    : AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to fetch posts", {
-                          originalError: err instanceof Error ? err : new Error(String(err)),
-                      });
+                const appError =
+                    err instanceof AppError
+                        ? err
+                        : AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to fetch posts", {
+                              originalError: err instanceof Error ? err : new Error(String(err)),
+                          });
                 setError(appError);
                 logger.logError(appError, { endpoint: "/api/posts" });
             } finally {

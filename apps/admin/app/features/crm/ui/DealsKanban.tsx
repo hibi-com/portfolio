@@ -16,9 +16,9 @@ interface DealCardProps {
     onDelete: (id: string) => void;
 }
 
-function DealCard({ deal, onDelete }: DealCardProps) {
+function DealCard({ deal, onDelete }: Readonly<DealCardProps>) {
     const handleDelete = () => {
-        if (window.confirm("Are you sure you want to delete this deal?")) {
+        if (globalThis.confirm("Are you sure you want to delete this deal?")) {
             onDelete(deal.id);
         }
     };
@@ -61,7 +61,7 @@ interface StageColumnProps {
     onDeleteDeal: (id: string) => void;
 }
 
-function StageColumn({ stage, deals, onDeleteDeal }: StageColumnProps) {
+function StageColumn({ stage, deals, onDeleteDeal }: Readonly<StageColumnProps>) {
     const totalValue = deals.reduce((sum, deal) => sum + (deal.value || 0), 0);
 
     return (
@@ -146,8 +146,8 @@ export function DealsKanban() {
                     <p className="text-muted-foreground">Manage your sales pipeline - {activePipeline.name}</p>
                 </div>
                 <Button asChild>
-                    <Link to={"/crm/deals/new" as string}>
-                        <Plus className="mr-2 h-4 w-4" />
+<Link to={"/crm/deals/new" as string}>
+                    <Plus className="mr-2 h-4 w-4" />
                         New Deal
                     </Link>
                 </Button>

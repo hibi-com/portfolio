@@ -10,5 +10,5 @@
         }
     },
     "exclude": ["node_modules", "build", ".tanstack", "../../packages/api/dist/generated"],
-    "include": ["app/**/*", ".storybook", "vite.config.ts", "env.d.ts", "functions/**/*", "integration/**/*"]
+    "include": ["app/**/*", "integration/**/*", ".storybook", "vite.config.ts", "env.d.ts", "functions/**/*"]
 }

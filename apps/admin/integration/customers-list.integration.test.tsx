@@ -60,7 +60,7 @@ describe("Customers List Integration - docs/sequence/admin/crm/customers-list.md
             );
 
             const response = await fetch(`${API_URL}/api/crm/customers`);
-            const data = (await response.json()) as Customer[];
+            const data: Customer[] = await response.json();
 
             expect(response.ok).toBe(true);
             expect(data).toHaveLength(2);
@@ -98,7 +98,7 @@ describe("Customers List Integration - docs/sequence/admin/crm/customers-list.md
             );
 
             const response = await fetch(`${API_URL}/api/crm/customers?status=active`);
-            const data = (await response.json()) as Customer[];
+            const data: Customer[] = await response.json();
 
             expect(data).toHaveLength(1);
             expect(data[0]!.status).toBe("active");
@@ -125,7 +125,7 @@ describe("Customers List Integration - docs/sequence/admin/crm/customers-list.md
             );
 
             const response = await fetch(`${API_URL}/api/crm/customers?page=2&limit=20`);
-            const data = (await response.json()) as PaginatedResponse;
+            const data: PaginatedResponse = await response.json();
 
             expect(data.pagination.page).toBe(2);
             expect(data.pagination.limit).toBe(20);

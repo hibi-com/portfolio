@@ -3,8 +3,8 @@ import type { EntryContext } from "@remix-run/cloudflare";
 import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
 import { renderToReadableStream } from "react-dom/server";
-import { getLogger, initLogger } from "~/lib/logger";
 import { SENTRY_DSN, SENTRY_ENVIRONMENT } from "~/shared/config/settings";
+import { getLogger, initLogger } from "~/shared/lib/logger";
 
 if (SENTRY_DSN !== "__undefined__") {
     initLogger({

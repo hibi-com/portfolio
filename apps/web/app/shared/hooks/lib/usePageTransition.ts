@@ -1,6 +1,6 @@
 import { useNavigate } from "@remix-run/react";
-import { getLogger } from "~/lib/logger";
 import { BASE_URL } from "~/shared/config/settings";
+import { getLogger } from "~/shared/lib/logger";
 
 interface DocumentTransition {
     start(callback: () => void | Promise<void>): Promise<void>;
