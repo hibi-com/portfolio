@@ -1,13 +1,14 @@
+import type { InquiryPriority, InquiryResponse, InquiryStatus } from "@portfolio/api";
 import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Textarea } from "@portfolio/ui";
 import { Link, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Clock, MessageCircle, Send, User } from "lucide-react";
 import { useState } from "react";
-import type { InquiryPriority, InquiryResponse, InquiryStatus } from "~/shared/lib/support-api";
 import { useInquiryDetail } from "../lib/useInquiries";
 
 const statusColors: Record<InquiryStatus, string> = {
     OPEN: "bg-blue-100 text-blue-800",
-    PENDING: "bg-yellow-100 text-yellow-800",
+    IN_PROGRESS: "bg-yellow-100 text-yellow-800",
+    WAITING_CUSTOMER: "bg-orange-100 text-orange-800",
     RESOLVED: "bg-green-100 text-green-800",
     CLOSED: "bg-gray-100 text-gray-800",
 };
@@ -40,7 +41,7 @@ function getResponseCardClass(isStaff: boolean, isInternal: boolean): string {
 }
 
 function ResponseItem({ response }: Readonly<ResponseItemProps>) {
-    const isStaff = response.senderType === "STAFF";
+    const isStaff = Boolean(response.userId);
     const wrapperClass = isStaff ? "flex justify-end" : "flex justify-start";
     const cardClass = getResponseCardClass(isStaff, response.isInternal);
 
@@ -56,7 +57,7 @@ function ResponseItem({ response }: Readonly<ResponseItemProps>) {
                         </Badge>
                     )}
                 </div>
-                <p className="text-sm">{response.message}</p>
+                <p className="text-sm">{response.content}</p>
                 <p className="mt-2 flex items-center gap-1 text-xs opacity-70">
                     <Clock className="h-3 w-3" />
                     {new Date(response.createdAt).toLocaleString()}
@@ -127,7 +128,7 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                             {inquiry.priority}
                         </Badge>
                         <span className="text-muted-foreground text-sm">
-                            {inquiry.type?.replace("_", " ") ?? inquiry.category ?? "-"}
+                            {inquiry.category?.replace("_", " ") ?? "-"}
                         </span>
                     </div>
                 </div>
@@ -143,7 +144,7 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="whitespace-pre-wrap">{inquiry.description}</p>
+                            <p className="whitespace-pre-wrap">{inquiry.content}</p>
                         </CardContent>
                     </Card>
 
@@ -158,7 +159,7 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                             {inquiry.responses.length === 0 ? (
                                 <p className="text-center text-muted-foreground">No responses yet</p>
                             ) : (
-                                inquiry.responses.map((response) => (
+                                inquiry.responses.map((response: InquiryResponse) => (
                                     <ResponseItem key={response.id} response={response} />
                                 ))
                             )}
@@ -200,36 +201,26 @@ export function InquiryDetail({ id: propId }: InquiryDetailProps = {}) {
                 <div className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">Contact Info</CardTitle>
+                            <CardTitle className="text-lg">Customer</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                            {inquiry.name && (
+                            {inquiry.customerId ? (
                                 <div>
-                                    <p className="font-medium text-sm">Name</p>
-                                    <p className="text-muted-foreground text-sm">{inquiry.name}</p>
-                                </div>
-                            )}
-                            {inquiry.email && (
-                                <div>
-                                    <p className="font-medium text-sm">Email</p>
-                                    <p className="text-muted-foreground text-sm">{inquiry.email}</p>
-                                </div>
-                            )}
-                            {inquiry.phone && (
-                                <div>
-                                    <p className="font-medium text-sm">Phone</p>
-                                    <p className="text-muted-foreground text-sm">{inquiry.phone}</p>
-                                </div>
-                            )}
-                            {inquiry.customer && (
-                                <div>
-                                    <p className="font-medium text-sm">Customer</p>
+                                    <p className="font-medium text-sm">Customer ID</p>
                                     <Link
-                                        to={`/crm/customers/${inquiry.customer.id}` as Parameters<typeof Link>[0]["to"]}
+                                        to={`/crm/customers/${inquiry.customerId}` as Parameters<typeof Link>[0]["to"]}
                                         className="text-primary text-sm hover:underline"
                                     >
-                                        {inquiry.customer.name}
+                                        View Customer
                                     </Link>
+                                </div>
+                            ) : (
+                                <p className="text-muted-foreground text-sm">No customer linked</p>
+                            )}
+                            {inquiry.source && (
+                                <div>
+                                    <p className="font-medium text-sm">Source</p>
+                                    <p className="text-muted-foreground text-sm">{inquiry.source}</p>
                                 </div>
                             )}
                         </CardContent>

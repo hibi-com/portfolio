@@ -1,7 +1,7 @@
+import { type Customer, customers as customersApi } from "@portfolio/api";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useCallback, useEffect, useState } from "react";
-import type { Customer, CustomerFormData } from "~/entities/customer";
-import { crmApi } from "~/shared/lib/crm-api";
+import type { CustomerFormData } from "~/entities/customer";
 import { getLogger } from "~/shared/lib/logger";
 
 export function useCustomers() {
@@ -14,7 +14,8 @@ export function useCustomers() {
         setLoading(true);
         setError(null);
         try {
-            const data = await crmApi.customers.list();
+            const response = await customersApi.list();
+            const data = Array.isArray(response) ? response : response.data || [];
             setCustomers(data);
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to fetch customers", {
@@ -33,7 +34,7 @@ export function useCustomers() {
 
     const createCustomer = async (data: CustomerFormData): Promise<Customer | null> => {
         try {
-            const customer = await crmApi.customers.create(data);
+            const customer = await customersApi.create(data);
             setCustomers((prev) => [customer, ...prev]);
             return customer;
         } catch (err) {
@@ -47,7 +48,7 @@ export function useCustomers() {
 
     const updateCustomer = async (id: string, data: Partial<CustomerFormData>): Promise<Customer | null> => {
         try {
-            const customer = await crmApi.customers.update(id, data);
+            const customer = await customersApi.update(id, data);
             setCustomers((prev) => prev.map((c) => (c.id === id ? customer : c)));
             return customer;
         } catch (err) {
@@ -61,7 +62,7 @@ export function useCustomers() {
 
     const deleteCustomer = async (id: string): Promise<void> => {
         try {
-            await crmApi.customers.delete(id);
+            await customersApi.delete(id);
             setCustomers((prev) => prev.filter((c) => c.id !== id));
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to delete customer", {

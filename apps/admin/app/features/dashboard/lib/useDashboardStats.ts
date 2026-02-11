@@ -1,6 +1,6 @@
+import { portfolios as portfoliosApi, posts as postsApi } from "@portfolio/api";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useEffect, useState } from "react";
-import { api } from "~/shared/lib/api";
 import { getLogger } from "~/shared/lib/logger";
 import type { DashboardStats } from "../model/types";
 
@@ -22,8 +22,8 @@ export function useDashboardStats() {
                 setError(null);
 
                 const [postsResponse, portfoliosResponse] = await Promise.all([
-                    api.posts.listPosts(),
-                    api.portfolios.listPortfolios(),
+                    postsApi.list(),
+                    portfoliosApi.list(),
                 ]);
 
                 const postsData = Array.isArray(postsResponse) ? postsResponse : postsResponse.data || [];

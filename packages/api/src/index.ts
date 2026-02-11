@@ -38,6 +38,8 @@ export type {
     InquiriesListInquiries200,
     InquiriesListInquiriesParams,
     Inquiry,
+    InquiryCategory,
+    InquiryPriority,
     InquiryResponse,
     InquiryStatus,
     Lead,

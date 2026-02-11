@@ -1,14 +1,21 @@
+import {
+    type CreateInquiryInput,
+    type CreateInquiryResponseInput,
+    type Inquiry,
+    type InquiryResponse,
+    type UpdateInquiryInput,
+    inquiries as inquiriesApi,
+} from "@portfolio/api";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useCallback, useEffect, useState } from "react";
 import { getLogger } from "~/shared/lib/logger";
-import {
-    type Inquiry,
-    type InquiryDetail,
-    type InquiryFormData,
-    type InquiryResponse,
-    type InquiryResponseFormData,
-    supportApi,
-} from "~/shared/lib/support-api";
+
+export type InquiryFormData = CreateInquiryInput;
+export type InquiryResponseFormData = CreateInquiryResponseInput;
+
+export type InquiryDetail = Inquiry & {
+    responses: InquiryResponse[];
+};
 
 export function useInquiries() {
     const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -20,7 +27,8 @@ export function useInquiries() {
         setLoading(true);
         setError(null);
         try {
-            const data = await supportApi.inquiries.list();
+            const response = await inquiriesApi.list();
+            const data = Array.isArray(response) ? response : response.data || [];
             setInquiries(data);
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to fetch inquiries", {
@@ -39,7 +47,7 @@ export function useInquiries() {
 
     const createInquiry = async (data: InquiryFormData): Promise<Inquiry | null> => {
         try {
-            const inquiry = await supportApi.inquiries.create(data);
+            const inquiry = await inquiriesApi.create(data);
             setInquiries((prev) => [inquiry, ...prev]);
             return inquiry;
         } catch (err) {
@@ -51,9 +59,9 @@ export function useInquiries() {
         }
     };
 
-    const updateInquiry = async (id: string, data: Partial<InquiryFormData>): Promise<Inquiry | null> => {
+    const updateInquiry = async (id: string, data: Partial<UpdateInquiryInput>): Promise<Inquiry | null> => {
         try {
-            const inquiry = await supportApi.inquiries.update(id, data);
+            const inquiry = await inquiriesApi.update(id, data);
             setInquiries((prev) => prev.map((i) => (i.id === id ? inquiry : i)));
             return inquiry;
         } catch (err) {
@@ -67,7 +75,7 @@ export function useInquiries() {
 
     const closeInquiry = async (id: string): Promise<void> => {
         try {
-            const inquiry = await supportApi.inquiries.close(id);
+            const inquiry = await inquiriesApi.close(id);
             setInquiries((prev) => prev.map((i) => (i.id === id ? inquiry : i)));
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to close inquiry", {
@@ -99,8 +107,11 @@ export function useInquiryDetail(id: string) {
         setLoading(true);
         setError(null);
         try {
-            const data = await supportApi.inquiries.getById(id);
-            setInquiry(data);
+            const [inquiryData, responsesData] = await Promise.all([
+                inquiriesApi.getById(id),
+                inquiriesApi.getResponses(id),
+            ]);
+            setInquiry({ ...inquiryData, responses: responsesData });
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to fetch inquiry", {
                 originalError: err instanceof Error ? err : new Error(String(err)),
@@ -118,8 +129,10 @@ export function useInquiryDetail(id: string) {
 
     const respond = async (data: InquiryResponseFormData): Promise<InquiryResponse | null> => {
         try {
-            const response = await supportApi.inquiries.respond(id, data);
-            setInquiry((prev) => (prev ? { ...prev, responses: [...prev.responses, response] } : prev));
+            const response = await inquiriesApi.addResponse(id, data);
+            setInquiry((prev: InquiryDetail | null) =>
+                prev ? { ...prev, responses: [...prev.responses, response] } : prev,
+            );
             return response;
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to respond to inquiry", {

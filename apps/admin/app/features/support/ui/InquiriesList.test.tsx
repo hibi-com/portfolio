@@ -1,8 +1,8 @@
+import type { Inquiry } from "@portfolio/api";
 import "@testing-library/jest-dom/vitest";
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import type { Inquiry } from "~/shared/lib/support-api";
 import * as useInquiriesModule from "../lib/useInquiries";
 import { InquiriesList } from "./InquiriesList";
 
@@ -133,12 +133,10 @@ describe("InquiriesList", () => {
             {
                 id: "1",
                 subject: "Test Inquiry",
-                description: "Test description",
-                type: "SUPPORT",
+                content: "Test content",
+                category: "SUPPORT",
                 status: "OPEN",
                 priority: "HIGH",
-                email: "test@example.com",
-                name: "Test User",
                 createdAt: "2024-01-01",
                 updatedAt: "2024-01-01",
             },

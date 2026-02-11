@@ -1,13 +1,11 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { api } from "~/shared/lib/api";
+import { portfolios as portfoliosApi } from "@portfolio/api";
 import { usePortfolios } from "./usePortfolios";
 
-vi.mock("~/shared/lib/api", () => ({
-    api: {
-        portfolios: {
-            listPortfolios: vi.fn(),
-        },
+vi.mock("@portfolio/api", () => ({
+    portfolios: {
+        list: vi.fn(),
     },
 }));
 
@@ -17,7 +15,7 @@ describe("usePortfolios", () => {
     });
 
     test("should initialize with empty portfolios and loading true", () => {
-        vi.mocked(api.portfolios.listPortfolios).mockResolvedValue({ data: [] } as never);
+        vi.mocked(portfoliosApi.list).mockResolvedValue({ data: [] } as never);
 
         const { result } = renderHook(() => usePortfolios());
 
@@ -38,7 +36,7 @@ describe("usePortfolios", () => {
             },
         ];
 
-        vi.mocked(api.portfolios.listPortfolios).mockResolvedValue({ data: mockPortfolios } as never);
+        vi.mocked(portfoliosApi.list).mockResolvedValue({ data: mockPortfolios } as never);
 
         const { result } = renderHook(() => usePortfolios());
 
@@ -47,11 +45,11 @@ describe("usePortfolios", () => {
         });
 
         expect(result.current.portfolios).toEqual(mockPortfolios);
-        expect(api.portfolios.listPortfolios).toHaveBeenCalled();
+        expect(portfoliosApi.list).toHaveBeenCalled();
     });
 
     test("should handle empty data", async () => {
-        vi.mocked(api.portfolios.listPortfolios).mockResolvedValue({ data: null } as never);
+        vi.mocked(portfoliosApi.list).mockResolvedValue({ data: null } as never);
 
         const { result } = renderHook(() => usePortfolios());
 
@@ -64,7 +62,7 @@ describe("usePortfolios", () => {
 
     test("should handle errors", async () => {
         const error = new Error("Failed to fetch");
-        vi.mocked(api.portfolios.listPortfolios).mockRejectedValue(error);
+        vi.mocked(portfoliosApi.list).mockRejectedValue(error);
 
         const { result } = renderHook(() => usePortfolios());
 

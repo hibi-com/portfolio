@@ -1,7 +1,6 @@
-import type { Portfolio } from "@portfolio/api";
+import { type Portfolio, portfolios as portfoliosApi } from "@portfolio/api";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useEffect, useState } from "react";
-import { api } from "~/shared/lib/api";
 import { getLogger } from "~/shared/lib/logger";
 
 export function usePortfolios() {
@@ -15,7 +14,7 @@ export function usePortfolios() {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await api.portfolios.listPortfolios();
+                const response = await portfoliosApi.list();
                 const data = Array.isArray(response) ? response : response.data || [];
                 setPortfolios(data);
             } catch (err) {

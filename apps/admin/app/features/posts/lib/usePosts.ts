@@ -1,7 +1,6 @@
-import type { Post } from "@portfolio/api";
+import { type Post, posts as postsApi } from "@portfolio/api";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useEffect, useState } from "react";
-import { api } from "~/shared/lib/api";
 import { getLogger } from "~/shared/lib/logger";
 
 export function usePosts() {
@@ -15,7 +14,7 @@ export function usePosts() {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await api.posts.listPosts();
+                const response = await postsApi.list();
                 const data = Array.isArray(response) ? response : response.data || [];
                 setPosts(data);
             } catch (err) {

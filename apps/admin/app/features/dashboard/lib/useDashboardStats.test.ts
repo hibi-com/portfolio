@@ -1,16 +1,14 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { api } from "~/shared/lib/api";
+import { portfolios as portfoliosApi, posts as postsApi } from "@portfolio/api";
 import { useDashboardStats } from "./useDashboardStats";
 
-vi.mock("~/shared/lib/api", () => ({
-    api: {
-        posts: {
-            listPosts: vi.fn(),
-        },
-        portfolios: {
-            listPortfolios: vi.fn(),
-        },
+vi.mock("@portfolio/api", () => ({
+    posts: {
+        list: vi.fn(),
+    },
+    portfolios: {
+        list: vi.fn(),
     },
 }));
 
@@ -20,8 +18,8 @@ describe("useDashboardStats", () => {
     });
 
     test("should initialize with default stats", () => {
-        vi.mocked(api.posts.listPosts).mockResolvedValue({ data: [] } as never);
-        vi.mocked(api.portfolios.listPortfolios).mockResolvedValue({ data: [] } as never);
+        vi.mocked(postsApi.list).mockResolvedValue({ data: [] } as never);
+        vi.mocked(portfoliosApi.list).mockResolvedValue({ data: [] } as never);
 
         const { result } = renderHook(() => useDashboardStats());
 
@@ -35,13 +33,13 @@ describe("useDashboardStats", () => {
     });
 
     test("should fetch and update stats", async () => {
-        vi.mocked(api.posts.listPosts).mockResolvedValue({
+        vi.mocked(postsApi.list).mockResolvedValue({
             data: [
                 { id: "1", title: "Test Post" },
                 { id: "2", title: "Test Post 2" },
             ],
         } as never);
-        vi.mocked(api.portfolios.listPortfolios).mockResolvedValue({
+        vi.mocked(portfoliosApi.list).mockResolvedValue({
             data: [{ id: "1", title: "Test Portfolio" }],
         } as never);
 
@@ -57,13 +55,13 @@ describe("useDashboardStats", () => {
             totalViews: 0,
             users: 0,
         });
-        expect(api.posts.listPosts).toHaveBeenCalled();
-        expect(api.portfolios.listPortfolios).toHaveBeenCalled();
+        expect(postsApi.list).toHaveBeenCalled();
+        expect(portfoliosApi.list).toHaveBeenCalled();
     });
 
     test("should handle empty data", async () => {
-        vi.mocked(api.posts.listPosts).mockResolvedValue({ data: null } as never);
-        vi.mocked(api.portfolios.listPortfolios).mockResolvedValue({ data: null } as never);
+        vi.mocked(postsApi.list).mockResolvedValue({ data: null } as never);
+        vi.mocked(portfoliosApi.list).mockResolvedValue({ data: null } as never);
 
         const { result } = renderHook(() => useDashboardStats());
 
@@ -81,8 +79,8 @@ describe("useDashboardStats", () => {
 
     test("should handle errors", async () => {
         const error = new Error("Failed to fetch");
-        vi.mocked(api.posts.listPosts).mockRejectedValue(error);
-        vi.mocked(api.portfolios.listPortfolios).mockResolvedValue({ data: [] } as never);
+        vi.mocked(postsApi.list).mockRejectedValue(error);
+        vi.mocked(portfoliosApi.list).mockResolvedValue({ data: [] } as never);
 
         const { result } = renderHook(() => useDashboardStats());
 

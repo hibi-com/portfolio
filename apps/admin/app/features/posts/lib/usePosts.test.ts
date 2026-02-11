@@ -1,13 +1,11 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { api } from "~/shared/lib/api";
+import { posts as postsApi } from "@portfolio/api";
 import { usePosts } from "./usePosts";
 
-vi.mock("~/shared/lib/api", () => ({
-    api: {
-        posts: {
-            listPosts: vi.fn(),
-        },
+vi.mock("@portfolio/api", () => ({
+    posts: {
+        list: vi.fn(),
     },
 }));
 
@@ -17,7 +15,7 @@ describe("usePosts", () => {
     });
 
     test("should initialize with empty posts and loading true", () => {
-        vi.mocked(api.posts.listPosts).mockResolvedValue({ data: [] } as never);
+        vi.mocked(postsApi.list).mockResolvedValue({ data: [] } as never);
 
         const { result } = renderHook(() => usePosts());
 
@@ -40,7 +38,7 @@ describe("usePosts", () => {
             },
         ];
 
-        vi.mocked(api.posts.listPosts).mockResolvedValue({ data: mockPosts } as never);
+        vi.mocked(postsApi.list).mockResolvedValue({ data: mockPosts } as never);
 
         const { result } = renderHook(() => usePosts());
 
@@ -49,11 +47,11 @@ describe("usePosts", () => {
         });
 
         expect(result.current.posts).toEqual(mockPosts);
-        expect(api.posts.listPosts).toHaveBeenCalled();
+        expect(postsApi.list).toHaveBeenCalled();
     });
 
     test("should handle empty data", async () => {
-        vi.mocked(api.posts.listPosts).mockResolvedValue({ data: null } as never);
+        vi.mocked(postsApi.list).mockResolvedValue({ data: null } as never);
 
         const { result } = renderHook(() => usePosts());
 
@@ -66,7 +64,7 @@ describe("usePosts", () => {
 
     test("should handle errors", async () => {
         const error = new Error("Failed to fetch");
-        vi.mocked(api.posts.listPosts).mockRejectedValue(error);
+        vi.mocked(postsApi.list).mockRejectedValue(error);
 
         const { result } = renderHook(() => usePosts());
 

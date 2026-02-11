@@ -1,3 +1,4 @@
+import type { CustomerStatus } from "@portfolio/api";
 import {
     Badge,
     Button,
@@ -15,7 +16,6 @@ import {
 } from "@portfolio/ui";
 import { Link } from "@tanstack/react-router";
 import { Edit, Eye, Plus, Trash2, Users } from "lucide-react";
-import type { CustomerStatus } from "~/entities/customer";
 import { useCustomers } from "../lib/useCustomers";
 
 const statusColors: Record<CustomerStatus, string> = {

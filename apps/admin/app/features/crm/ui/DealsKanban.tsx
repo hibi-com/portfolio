@@ -1,7 +1,7 @@
+import type { Deal, PipelineStage } from "@portfolio/api";
 import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@portfolio/ui";
 import { Link } from "@tanstack/react-router";
 import { DollarSign, Edit, MoreVertical, Plus, Trash2, TrendingUp } from "lucide-react";
-import type { Deal, PipelineStage } from "~/shared/lib/crm-api";
 import { useDeals } from "../lib/useDeals";
 
 const statusColors: Record<Deal["status"], string> = {

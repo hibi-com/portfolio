@@ -1,7 +1,9 @@
+import { type CreateLeadInput, type Lead, type UpdateLeadInput, leads as leadsApi } from "@portfolio/api";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useCallback, useEffect, useState } from "react";
-import { crmApi, type Lead, type LeadFormData } from "~/shared/lib/crm-api";
 import { getLogger } from "~/shared/lib/logger";
+
+export type LeadFormData = CreateLeadInput;
 
 export function useLeads() {
     const [leads, setLeads] = useState<Lead[]>([]);
@@ -13,7 +15,8 @@ export function useLeads() {
         setLoading(true);
         setError(null);
         try {
-            const data = await crmApi.leads.list();
+            const response = await leadsApi.list();
+            const data = Array.isArray(response) ? response : response.data || [];
             setLeads(data);
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to fetch leads", {
@@ -32,7 +35,7 @@ export function useLeads() {
 
     const createLead = async (data: LeadFormData): Promise<Lead | null> => {
         try {
-            const lead = await crmApi.leads.create(data);
+            const lead = await leadsApi.create(data);
             setLeads((prev) => [lead, ...prev]);
             return lead;
         } catch (err) {
@@ -44,9 +47,9 @@ export function useLeads() {
         }
     };
 
-    const updateLead = async (id: string, data: Partial<LeadFormData>): Promise<Lead | null> => {
+    const updateLead = async (id: string, data: Partial<UpdateLeadInput>): Promise<Lead | null> => {
         try {
-            const lead = await crmApi.leads.update(id, data);
+            const lead = await leadsApi.update(id, data);
             setLeads((prev) => prev.map((l) => (l.id === id ? lead : l)));
             return lead;
         } catch (err) {
@@ -60,7 +63,7 @@ export function useLeads() {
 
     const deleteLead = async (id: string): Promise<void> => {
         try {
-            await crmApi.leads.delete(id);
+            await leadsApi.delete(id);
             setLeads((prev) => prev.filter((l) => l.id !== id));
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to delete lead", {
@@ -73,7 +76,7 @@ export function useLeads() {
 
     const convertLead = async (id: string): Promise<void> => {
         try {
-            await crmApi.leads.convert(id);
+            await leadsApi.convert(id);
             setLeads((prev) => prev.filter((l) => l.id !== id));
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to convert lead", {

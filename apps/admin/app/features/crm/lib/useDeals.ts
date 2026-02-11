@@ -1,7 +1,16 @@
+import {
+    type CreateDealInput,
+    type Deal,
+    type Pipeline,
+    type UpdateDealInput,
+    deals as dealsApi,
+    pipelines as pipelinesApi,
+} from "@portfolio/api";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useCallback, useEffect, useState } from "react";
-import { crmApi, type Deal, type DealFormData, type Pipeline } from "~/shared/lib/crm-api";
 import { getLogger } from "~/shared/lib/logger";
+
+export type DealFormData = CreateDealInput;
 
 export function useDeals() {
     const [deals, setDeals] = useState<Deal[]>([]);
@@ -14,7 +23,8 @@ export function useDeals() {
         setLoading(true);
         setError(null);
         try {
-            const [dealsData, pipelinesData] = await Promise.all([crmApi.deals.list(), crmApi.pipelines.list()]);
+            const [dealsResponse, pipelinesData] = await Promise.all([dealsApi.list(), pipelinesApi.list()]);
+            const dealsData = Array.isArray(dealsResponse) ? dealsResponse : dealsResponse.data || [];
             setDeals(dealsData);
             setPipelines(pipelinesData);
         } catch (err) {
@@ -34,7 +44,7 @@ export function useDeals() {
 
     const createDeal = async (data: DealFormData): Promise<Deal | null> => {
         try {
-            const deal = await crmApi.deals.create(data);
+            const deal = await dealsApi.create(data);
             setDeals((prev) => [deal, ...prev]);
             return deal;
         } catch (err) {
@@ -46,9 +56,9 @@ export function useDeals() {
         }
     };
 
-    const updateDeal = async (id: string, data: Partial<DealFormData>): Promise<Deal | null> => {
+    const updateDeal = async (id: string, data: Partial<UpdateDealInput>): Promise<Deal | null> => {
         try {
-            const deal = await crmApi.deals.update(id, data);
+            const deal = await dealsApi.update(id, data);
             setDeals((prev) => prev.map((d) => (d.id === id ? deal : d)));
             return deal;
         } catch (err) {
@@ -62,7 +72,7 @@ export function useDeals() {
 
     const deleteDeal = async (id: string): Promise<void> => {
         try {
-            await crmApi.deals.delete(id);
+            await dealsApi.delete(id);
             setDeals((prev) => prev.filter((d) => d.id !== id));
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to delete deal", {
@@ -75,7 +85,7 @@ export function useDeals() {
 
     const moveToStage = async (id: string, stageId: string): Promise<void> => {
         try {
-            const deal = await crmApi.deals.moveToStage(id, stageId);
+            const deal = await dealsApi.moveToStage(id, stageId);
             setDeals((prev) => prev.map((d) => (d.id === id ? deal : d)));
         } catch (err) {
             const appError = AppError.fromCode(ErrorCodes.EXTERNAL_API_ERROR, "Failed to move deal", {

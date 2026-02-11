@@ -1,3 +1,4 @@
+import type { Lead } from "@portfolio/api";
 import {
     Badge,
     Button,
@@ -15,7 +16,6 @@ import {
 } from "@portfolio/ui";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Edit, Plus, Trash2, UserPlus } from "lucide-react";
-import type { Lead } from "~/shared/lib/crm-api";
 import { useLeads } from "../lib/useLeads";
 
 const statusColors: Record<Lead["status"], string> = {
