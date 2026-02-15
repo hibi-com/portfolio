@@ -1,0 +1,1 @@
+../../../.claude/skills/gen-mock/SKILL.md
