@@ -1,0 +1,8 @@
+{
+  "start": "🔗 AI設定シンボリックリンクの統一構築を開始...",
+  "targetStart": "{icon} [{name}] 設定を構築中...",
+  "taskStart": "  {icon} {description}を構築中...",
+  "summaryTitle": "📊 [{name}] 作成されたリンク：",
+  "summaryItem": "   {description} ({count}ファイル)",
+  "complete": "✅ 完了！"
+}

@@ -1,0 +1,101 @@
+{
+    "paths": {
+        "projectRoot": "../../..",
+        "claude": ".claude",
+        "github": ".github",
+        "codex": ".codex"
+    },
+    "targets": [
+        {
+            "name": "copilot",
+            "displayName": "Copilot",
+            "icon": "📦",
+            "tasks": [
+                {
+                    "type": "symlink",
+                    "name": "copilot-instructions.md",
+                    "description": "copilot-instructions.md",
+                    "icon": "📝",
+                    "target": "../CLAUDE.md",
+                    "location": "github"
+                },
+                {
+                    "type": "fileLinks",
+                    "name": "instructions",
+                    "description": "instructions/",
+                    "icon": "📂",
+                    "source": "claude/rules",
+                    "target": "github/instructions",
+                    "suffix": ".instructions"
+                },
+                {
+                    "type": "fileLinks",
+                    "name": "agents",
+                    "description": "agents/",
+                    "icon": "🤖",
+                    "source": "claude/agents",
+                    "target": "github/agents",
+                    "suffix": ".agent"
+                },
+                {
+                    "type": "skillLinks",
+                    "name": "skills",
+                    "description": "skills/",
+                    "icon": "⚡",
+                    "source": "claude/skills",
+                    "target": "github/skills"
+                }
+            ]
+        },
+        {
+            "name": "codex",
+            "displayName": "Codex",
+            "icon": "📦",
+            "tasks": [
+                {
+                    "type": "fileLinks",
+                    "name": "commands",
+                    "description": "commands/",
+                    "icon": "📂",
+                    "source": "claude/commands",
+                    "target": "codex/commands",
+                    "suffix": ""
+                },
+                {
+                    "type": "fileLinks",
+                    "name": "rules",
+                    "description": "rules/",
+                    "icon": "📋",
+                    "source": "claude/rules",
+                    "target": "codex/rules",
+                    "suffix": ""
+                },
+                {
+                    "type": "fileLinks",
+                    "name": "agents",
+                    "description": "agents/",
+                    "icon": "🤖",
+                    "source": "claude/agents",
+                    "target": "codex/agents",
+                    "suffix": ""
+                },
+                {
+                    "type": "skillLinks",
+                    "name": "skills",
+                    "description": "skills/",
+                    "icon": "⚡",
+                    "source": "claude/skills",
+                    "target": "codex/skills"
+                }
+            ]
+        }
+    ],
+    "messageKeys": {
+        "start": "start",
+        "targetStart": "targetStart",
+        "taskStart": "taskStart",
+        "summaryTitle": "summaryTitle",
+        "summaryItem": "summaryItem",
+        "complete": "complete"
+    }
+}
