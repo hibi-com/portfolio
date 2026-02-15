@@ -1,15 +1,9 @@
-import {
-    blogDataSchema,
-    postContentSchema,
-    postSchema as basePostSchema,
-} from "@portfolio/validation";
+import { postSchema as basePostSchema, blogDataSchema, postContentSchema } from "@portfolio/validation";
 import { z } from "zod";
 
-// @portfolio/validation から再利用
 export { blogDataSchema, postContentSchema };
 export const postSchema = basePostSchema;
 
-// Admin固有: フォーム入力用
 export const postFormDataSchema = z.object({
     title: z.string().min(1),
     slug: z.string().min(1),
@@ -25,7 +19,6 @@ export const postFormDataSchema = z.object({
     intro: z.string().optional(),
 });
 
-// Admin固有: リスト表示用
 export const postListItemSchema = z.object({
     id: z.string().min(1),
     title: z.string().min(1),
@@ -36,7 +29,6 @@ export const postListItemSchema = z.object({
     sticky: z.boolean(),
 });
 
-// 型推論
 export type PostSchema = z.infer<typeof postSchema>;
 export type PostContentSchema = z.infer<typeof postContentSchema>;
 export type BlogDataSchema = z.infer<typeof blogDataSchema>;

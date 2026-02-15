@@ -1,14 +1,9 @@
-import {
-    portfolioContentSchema,
-    portfolioSchema as basePortfolioSchema,
-} from "@portfolio/validation";
+import { portfolioSchema as basePortfolioSchema, portfolioContentSchema } from "@portfolio/validation";
 import { z } from "zod";
 
-// @portfolio/validation から再利用
 export { portfolioContentSchema };
 export const portfolioSchema = basePortfolioSchema;
 
-// Admin固有: フォーム入力用
 export const portfolioFormDataSchema = z.object({
     title: z.string().min(1),
     slug: z.string().min(1),
@@ -22,7 +17,6 @@ export const portfolioFormDataSchema = z.object({
     intro: z.string().optional(),
 });
 
-// Admin固有: リスト表示用
 export const portfolioListItemSchema = z.object({
     id: z.string().optional(),
     title: z.string().min(1),
@@ -33,7 +27,6 @@ export const portfolioListItemSchema = z.object({
     overview: z.string().optional(),
 });
 
-// 型推論
 export type PortfolioSchema = z.infer<typeof portfolioSchema>;
 export type PortfolioContentSchema = z.infer<typeof portfolioContentSchema>;
 export type PortfolioFormDataSchema = z.infer<typeof portfolioFormDataSchema>;

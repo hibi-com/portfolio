@@ -1,16 +1,4 @@
-// 型（interface）
-export type { Post, PostFormData, PostListItem } from "./model/types";
-
-// スキーマ
-export {
-    blogDataSchema,
-    postContentSchema,
-    postFormDataSchema,
-    postListItemSchema,
-    postSchema,
-} from "./model/schemas";
-
-// スキーマ型
+export { mapApiPostToPost, postToListItem } from "./lib/mappers";
 export type {
     BlogDataSchema,
     PostContentSchema,
@@ -18,6 +6,11 @@ export type {
     PostListItemSchema,
     PostSchema,
 } from "./model/schemas";
-
-// マッパー
-export { mapApiPostToPost, postToListItem } from "./lib/mappers";
+export {
+    blogDataSchema,
+    postContentSchema,
+    postFormDataSchema,
+    postListItemSchema,
+    postSchema,
+} from "./model/schemas";
+export type { Post, PostFormData, PostListItem } from "./model/types";
