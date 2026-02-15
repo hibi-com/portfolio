@@ -1,0 +1,1 @@
+../../../.claude/skills/integration-test/SKILL.md
