@@ -1,1 +1,0 @@
-../../../.claude/skills/sync-docs/SKILL.md

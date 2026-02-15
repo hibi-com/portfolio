@@ -1,1 +1,0 @@
-../../../.claude/skills/format/SKILL.md

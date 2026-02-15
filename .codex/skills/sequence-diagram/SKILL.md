@@ -1,1 +1,0 @@
-../../../.claude/skills/sequence-diagram/SKILL.md
