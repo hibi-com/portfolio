@@ -1,5 +1,5 @@
 ---
-alwaysApply: false
+files: ["docs/sequence/**/*.md", "apps/api/src/interface/rest/**/*", "apps/api/src/application/usecases/**/*"]
 ---
 
 # シーケンス図作成ルール
