@@ -27,7 +27,7 @@ export async function createFileLinks(sourceDir: string, targetDir: string, suff
     }
 }
 
-export async function createSkillLinks(sourceSkills: string, targetSkills: string): Promise<void> {
+export async function createSkillLinks(sourceSkills: string, targetSkills: string, filename: string): Promise<void> {
     if (fs.existsSync(targetSkills) && fs.lstatSync(targetSkills).isSymbolicLink()) {
         fs.unlinkSync(targetSkills);
     }
@@ -48,13 +48,13 @@ export async function createSkillLinks(sourceSkills: string, targetSkills: strin
     const skillDirs = fs.readdirSync(sourceSkills).filter((f) => fs.statSync(path.join(sourceSkills, f)).isDirectory());
 
     for (const skillName of skillDirs) {
-        const skillFile = path.join(sourceSkills, skillName, "SKILL.md");
+        const skillFile = path.join(sourceSkills, skillName, filename);
         if (fs.existsSync(skillFile)) {
             const targetSkillDir = path.join(targetSkills, skillName);
             fs.mkdirSync(targetSkillDir, { recursive: true });
 
             const relativePath = path.relative(targetSkillDir, skillFile);
-            const targetFile = path.join(targetSkillDir, "SKILL.md");
+            const targetFile = path.join(targetSkillDir, filename);
 
             fs.symlinkSync(relativePath, targetFile);
         }
@@ -73,9 +73,7 @@ export function countFiles(dir: string, pattern: string): number {
 
             if (stat.isDirectory()) {
                 walk(itemPath);
-            } else if (
-                pattern === "SKILL.md" ? item === "SKILL.md" : item.match(new RegExp(pattern.replace(/\*/g, ".*")))
-            ) {
+            } else if (item.match(new RegExp(pattern.replaceAll("*", ".*")))) {
                 count++;
             }
         }

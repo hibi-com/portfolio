@@ -43,7 +43,8 @@
                     "description": "skills/",
                     "icon": "⚡",
                     "source": "claude/skills",
-                    "target": "github/skills"
+                    "target": "github/skills",
+                    "filename": "SKILL.md"
                 }
             ]
         },
@@ -85,17 +86,10 @@
                     "description": "skills/",
                     "icon": "⚡",
                     "source": "claude/skills",
-                    "target": "codex/skills"
+                    "target": "codex/skills",
+                    "filename": "SKILL.md"
                 }
             ]
         }
-    ],
-    "messageKeys": {
-        "start": "start",
-        "targetStart": "targetStart",
-        "taskStart": "taskStart",
-        "summaryTitle": "summaryTitle",
-        "summaryItem": "summaryItem",
-        "complete": "complete"
-    }
+    ]
 }

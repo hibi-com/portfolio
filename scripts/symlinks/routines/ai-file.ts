@@ -28,7 +28,8 @@ async function executeTask(task: Task, targetName: string, resolvedPaths: Record
         case "skillLinks": {
             const sourcePath = resolvePath(task.source!, resolvedPaths);
             const targetPath = resolvePath(task.target, resolvedPaths);
-            await createSkillLinks(sourcePath, targetPath);
+            const filename = task.filename || "SKILL.md";
+            await createSkillLinks(sourcePath, targetPath, filename);
             break;
         }
     }
@@ -41,7 +42,7 @@ function printTaskSummary(task: Task, resolvedPaths: Record<string, string>, sum
 
     let pattern: string;
     if (task.type === "skillLinks") {
-        pattern = "SKILL.md";
+        pattern = task.filename || "SKILL.md";
     } else if (task.suffix) {
         pattern = `*${task.suffix}.md`;
     } else {
