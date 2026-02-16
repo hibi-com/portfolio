@@ -73,7 +73,7 @@ export function countFiles(dir: string, pattern: string): number {
 
             if (stat.isDirectory()) {
                 walk(itemPath);
-            } else if (item.match(new RegExp(pattern.replaceAll("*", ".*")))) {
+            } else if (new RegExp(pattern.replaceAll("*", ".*")).exec(item)) {
                 count++;
             }
         }

@@ -1,9 +1,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import pc from "picocolors";
-import type { Target, Task } from "../lib/config-loader";
-import { formatMessage, loadConfig, resolvePath } from "../lib/config-loader";
-import { countFiles, createFileLinks, createSkillLinks } from "../lib/file-links";
+import { countFiles, createFileLinks, createSkillLinks } from "./links";
+import type { Target, Task } from "./loader";
+import { formatMessage, loadConfig, resolvePath } from "./loader";
 
 async function executeTask(task: Task, targetName: string, resolvedPaths: Record<string, string>): Promise<void> {
     switch (task.type) {

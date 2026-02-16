@@ -2,7 +2,7 @@
 
 import { cac } from "cac";
 import pc from "picocolors";
-import { createAIFileLinks } from "../routines/ai-file";
+import { createAIFileLinks } from "../routines/file";
 
 const cli = cac("symlinks");
 
