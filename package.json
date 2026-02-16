@@ -46,7 +46,7 @@
     "stop": "docker compose down",
     "logs": "docker compose logs -f",
     "studio": "turbo run studio",
-    "symlinks": "bun run symlinks",
+    "symlinks": "symlinks",
     "test": "turbo run test --concurrency=50%",
     "typecheck": "turbo run typecheck",
     "typedoc": "typedoc",
