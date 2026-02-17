@@ -100,7 +100,13 @@
                 "useYield": "error"
             },
             "nursery": {
-                "useSortedClasses": "warn"
+                "useSortedClasses": {
+                    "fix": "safe",
+                    "level": "error",
+                    "options": {
+                        "functions": ["twMerge", "twJoin", "cn"]
+                    }
+                }
             },
             "recommended": false,
             "style": {
