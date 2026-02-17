@@ -124,20 +124,20 @@ export default function TestRunner() {
 
     return (
         <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">E2E Test Runner</h1>
+            <h1 className="mb-6 font-bold text-3xl">E2E Test Runner</h1>
 
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl font-semibold mb-4">新規テスト実行</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="mb-6 p-6 rounded-lg bg-white shadow">
+                <h2 className="mb-4 font-semibold text-xl">新規テスト実行</h2>
+                <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div>
-                        <label htmlFor="project" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="project" className="block mb-2 font-medium text-gray-700 text-sm">
                             プロジェクト
                         </label>
                         <select
                             id="project"
                             value={selectedProject}
                             onChange={(e) => setSelectedProject(e.target.value as TestProject)}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                            className="rounded-md border border-gray-300 w-full px-3 py-2"
                             disabled={isRunning}
                         >
                             <option value="web">Web</option>
@@ -147,14 +147,14 @@ export default function TestRunner() {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="environment" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="environment" className="block mb-2 font-medium text-gray-700 text-sm">
                             環境
                         </label>
                         <select
                             id="environment"
                             value={selectedEnvironment}
                             onChange={(e) => setSelectedEnvironment(e.target.value as "local" | "rc" | "stg" | "prd")}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                            className="rounded-md border border-gray-300 w-full px-3 py-2"
                             disabled={isRunning}
                         >
                             <option value="local">Local</option>
@@ -168,7 +168,7 @@ export default function TestRunner() {
                             type="button"
                             onClick={handleRunTest}
                             disabled={isRunning}
-                            className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            className="rounded-md bg-blue-600 w-full px-4 py-2 text-white hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                         >
                             {isRunning ? "実行中..." : "テスト実行"}
                         </button>
@@ -176,9 +176,9 @@ export default function TestRunner() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-4 border-b">
-                    <h2 className="text-xl font-semibold">実行履歴</h2>
+            <div className="rounded-lg bg-white shadow">
+                <div className="border-b py-4 px-6">
+                    <h2 className="font-semibold text-xl">実行履歴</h2>
                 </div>
                 <div className="divide-y">
                     {jobs.length === 0 ? (
@@ -188,9 +188,9 @@ export default function TestRunner() {
                             <div key={job.id} className="px-6 py-4 hover:bg-gray-50">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-3">
-                                        <span className="text-lg font-semibold">{job.project}</span>
+                                        <span className="font-semibold text-lg">{job.project}</span>
                                         <span
-                                            className={`px-3 py-1 rounded-full text-white text-sm ${getStatusBadge(job.status)}`}
+                                            className={`rounded-full px-3 py-1 text-sm text-white ${getStatusBadge(job.status)}`}
                                         >
                                             {getStatusText(job.status)}
                                         </span>
@@ -200,12 +200,12 @@ export default function TestRunner() {
                                     </div>
                                 </div>
                                 {job.completedAt && (
-                                    <div className="text-sm text-gray-600 mb-2">
+                                    <div className="mb-2 text-sm text-gray-600">
                                         完了時刻: {new Date(job.completedAt).toLocaleString("ja-JP")}
                                     </div>
                                 )}
                                 {job.error && (
-                                    <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                                    <div className="mt-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
                                         <strong>エラー:</strong> {job.error}
                                     </div>
                                 )}
@@ -213,7 +213,7 @@ export default function TestRunner() {
                                     <div className="mt-2">
                                         <a
                                             href={job.reportPath}
-                                            className="text-blue-600 hover:underline text-sm"
+                                            className="text-sm text-blue-600 hover:underline"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
