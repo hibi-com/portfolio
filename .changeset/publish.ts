@@ -172,18 +172,40 @@ function restorePackageJson(pkgPath: string): void {
     }
 }
 
-async function publishPackage(pkgPath: string, config: PublishConfig): Promise<boolean> {
+type PublishResult = "published" | "already_published" | "failed";
+
+function isAlreadyPublishedError(stderr: string): boolean {
+    const lower = stderr.toLowerCase();
+    const patterns = [
+        "cannot publish over",
+        "previously published",
+        "you cannot publish over",
+        "403",
+        "version already exists",
+    ];
+    return patterns.some((p) => lower.includes(p));
+}
+
+function getErrorMessage(err: unknown): string {
+    if (err instanceof Error && "stderr" in err) {
+        const raw = (err as { stderr?: Buffer | string }).stderr;
+        if (raw != null) return typeof raw === "string" ? raw : raw.toString();
+    }
+    return err instanceof Error ? err.message : String(err);
+}
+
+async function publishPackage(pkgPath: string, config: PublishConfig): Promise<PublishResult> {
     const fullPath = resolve(ROOT_DIR, pkgPath);
 
     if (!existsSync(fullPath)) {
         console.log(`  ⚠️ Package not found: ${pkgPath}`);
-        return false;
+        return "failed";
     }
 
     const pkgJsonPath = resolve(fullPath, "package.json");
     if (!existsSync(pkgJsonPath)) {
         console.log(`  ⚠️ No package.json found: ${pkgPath}`);
-        return false;
+        return "failed";
     }
 
     try {
@@ -195,10 +217,18 @@ async function publishPackage(pkgPath: string, config: PublishConfig): Promise<b
         });
 
         console.log("  ✅ Published successfully");
-        return true;
-    } catch {
-        console.log("  ⚠️ Already published or failed");
-        return false;
+        return "published";
+    } catch (err) {
+        const errText = getErrorMessage(err);
+        const fullText = err instanceof Error ? `${errText}\n${err.message}` : errText;
+        if (isAlreadyPublishedError(fullText)) {
+            console.log("  ✅ Already published (up to date)");
+            return "already_published";
+        }
+        console.log("  ⚠️ Failed");
+        const firstLine = errText.trim().split("\n")[0];
+        if (firstLine) console.log(`     ${firstLine}`);
+        return "failed";
     } finally {
         restorePackageJson(fullPath);
     }
@@ -233,21 +263,21 @@ async function main(): Promise<void> {
     buildPackages();
 
     let publishedCount = 0;
+    let alreadyPublishedCount = 0;
     let failedCount = 0;
 
     for (const pkg of config.packages) {
         console.log(`📤 Publishing ${pkg}...`);
-        const success = await publishPackage(pkg, config);
-        if (success) {
-            publishedCount++;
-        } else {
-            failedCount++;
-        }
+        const result = await publishPackage(pkg, config);
+        if (result === "published") publishedCount++;
+        else if (result === "already_published") alreadyPublishedCount++;
+        else failedCount++;
     }
 
     console.log("\n📊 Summary:");
     console.log(`  ✅ Published: ${publishedCount}`);
-    console.log(`  ⚠️ Skipped/Failed: ${failedCount}`);
+    console.log(`  ✅ Already up to date: ${alreadyPublishedCount}`);
+    if (failedCount > 0) console.log(`  ⚠️ Failed: ${failedCount}`);
     console.log("");
 
     if (startedByScript) {
@@ -255,7 +285,11 @@ async function main(): Promise<void> {
         console.log("   To stop it: docker compose down verdaccio");
     }
 
-    console.log("✅ All packages published to Verdaccio");
+    if (failedCount > 0) {
+        console.error("❌ Some packages failed to publish.");
+        process.exit(1);
+    }
+    console.log("✅ Verdaccio is ready (all packages published or up to date).");
 }
 
 try {
