@@ -61,7 +61,7 @@ export const ChatRoomWithParticipantsSchema = z
     closedAt: z.string().optional(),
     createdAt: z.string(),
     updatedAt: z.string(),
-    participants: z.array(ChatParticipant),
+    participants: z.array(ChatParticipantSchema),
   })
   .passthrough();
 export const ChatMessageTypeSchema = z.enum(["TEXT", "IMAGE", "FILE", "SYSTEM"]);
@@ -261,7 +261,7 @@ export const PipelineSchema = z
     name: z.string(),
     description: z.string().optional(),
     isDefault: z.boolean(),
-    stages: z.array(PipelineStage),
+    stages: z.array(PipelineStageSchema),
     createdAt: z.string(),
     updatedAt: z.string(),
   })
@@ -409,7 +409,7 @@ export const PortfolioSchema = z
     description: z.string().optional(),
     content: PortfolioContentSchema.optional(),
     thumbnailTemp: z.string().optional(),
-    images: z.array(Asset).optional(),
+    images: z.array(AssetSchema).optional(),
     intro: z.string().optional(),
   })
   .passthrough();
@@ -430,7 +430,7 @@ export const PostSchema = z
     intro: z.string().optional(),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional(),
-    images: z.array(Asset).optional(),
+    images: z.array(AssetSchema).optional(),
   })
   .passthrough();
 export const InquiryStatusSchema = z.enum([
@@ -625,7 +625,7 @@ export const FreeeSyncLogSchema = z
     totalRecords: z.number().int().optional(),
     successCount: z.number().int().optional(),
     errorCount: z.number().int().optional(),
-    errorDetails: z.array(SyncErrorDetail).optional(),
+    errorDetails: z.array(SyncErrorDetailSchema).optional(),
     startedAt: z.string().optional(),
     completedAt: z.string().optional(),
     createdAt: z.string(),
@@ -645,7 +645,7 @@ export const UpdateSyncLogInputSchema = z
     totalRecords: z.number().int(),
     successCount: z.number().int(),
     errorCount: z.number().int(),
-    errorDetails: z.array(SyncErrorDetail),
+    errorDetails: z.array(SyncErrorDetailSchema),
     startedAt: z.string(),
     completedAt: z.string(),
   })

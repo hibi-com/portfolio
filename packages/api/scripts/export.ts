@@ -18,7 +18,7 @@ while (match !== null) {
 
 for (const name of schemaNames) {
     const exportConstRegex = new RegExp(String.raw`^const ${name} = z`, "gm");
-    const arrayRefRegex = new RegExp(String.raw`z\.array(${name})`, "g");
+    const arrayRefRegex = new RegExp(String.raw`z\.array\(${name}\)`, "g");
     const refInContextRegex = new RegExp(String.raw`([:\s,])${name}([,.)\s])`, "g");
     content = content.replaceAll(exportConstRegex, `export const ${name}Schema = z`);
     content = content.replaceAll(arrayRefRegex, `z.array(${name}Schema)`);
