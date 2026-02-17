@@ -48,17 +48,14 @@ describe("DisconnectFreeeUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("連携を無効化できる", async () => {
-                // Given: 有効な連携IDが与えられる
                 const integrationId = "integration-1";
                 const mockRepository = createMockRepository({
                     deactivateIntegration: vi.fn().mockResolvedValue(mockIntegration),
                 });
 
-                // When: 連携を無効化する
                 const useCase = new DisconnectFreeeUseCase(mockRepository);
                 await useCase.execute(integrationId);
 
-                // Then: リポジトリのdeactivateIntegrationが呼ばれる
                 expect(mockRepository.deactivateIntegration).toHaveBeenCalledWith(integrationId);
                 expect(mockRepository.deactivateIntegration).toHaveBeenCalledTimes(1);
             });
@@ -66,13 +63,11 @@ describe("DisconnectFreeeUseCase", () => {
 
         describe("異常系", () => {
             test("存在しない連携IDの場合、リポジトリからエラーがスローされる", async () => {
-                // Given: 存在しない連携ID
                 const integrationId = "non-existent";
                 const mockRepository = createMockRepository({
                     deactivateIntegration: vi.fn().mockRejectedValue(new Error("Integration not found")),
                 });
 
-                // When & Then: エラーがスローされる
                 const useCase = new DisconnectFreeeUseCase(mockRepository);
                 await expect(useCase.execute(integrationId)).rejects.toThrow("Integration not found");
             });

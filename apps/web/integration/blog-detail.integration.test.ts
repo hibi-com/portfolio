@@ -13,7 +13,6 @@ describe("Blog Detail Integration - docs/sequence/web/blog-detail.md", () => {
 
     describe("シーケンス: Browser → Loader → Validation → APIClient → API", () => {
         test("正常系: 有効なslugで投稿詳細を取得する", async () => {
-            // Given: 有効なslugと対応する投稿
             const slug = "test-post-slug";
             const mockPost = {
                 id: "1",
@@ -33,11 +32,9 @@ describe("Blog Detail Integration - docs/sequence/web/blog-detail.md", () => {
                 }),
             );
 
-            // When: 詳細ページのAPIを呼び出す
             const response = await fetch(`${API_URL}/api/posts/${slug}`);
             const data = await response.json();
 
-            // Then: 投稿詳細が取得される
             expect(response.ok).toBe(true);
             expect(data.title).toBe("Test Post");
             expect(data.slug).toBe(slug);
@@ -45,7 +42,6 @@ describe("Blog Detail Integration - docs/sequence/web/blog-detail.md", () => {
         });
 
         test("異常系: 存在しないslugで404を返す", async () => {
-            // Given: 存在しないslug
             const slug = "non-existent-post";
 
             server.use(
@@ -54,31 +50,24 @@ describe("Blog Detail Integration - docs/sequence/web/blog-detail.md", () => {
                 }),
             );
 
-            // When: 存在しないslugでアクセス
             const response = await fetch(`${API_URL}/api/posts/${slug}`);
 
-            // Then: 404エラー
             expect(response.status).toBe(404);
         });
     });
 
     describe("シーケンス分岐: slugが無効な場合", () => {
         test("空のslugは無効として処理される", async () => {
-            // Given: 空のslug
             const slug = "";
 
-            // When: バリデーション
             const isValidSlug = slug.length > 0 && /^[a-z0-9-]+$/.test(slug);
 
-            // Then: 無効と判定
             expect(isValidSlug).toBe(false);
         });
 
         test("特殊文字を含むslugは無効として処理される", async () => {
-            // Given: 特殊文字を含むslug
             const invalidSlugs = ["test<script>", "test post", "test/post", "TEST-POST"];
 
-            // When/Then: すべて無効と判定
             for (const slug of invalidSlugs) {
                 const isValidSlug = /^[a-z0-9-]+$/.test(slug);
                 expect(isValidSlug).toBe(false);
@@ -86,10 +75,8 @@ describe("Blog Detail Integration - docs/sequence/web/blog-detail.md", () => {
         });
 
         test("有効なslug形式のバリデーション", async () => {
-            // Given: 有効なslug
             const validSlugs = ["test-post", "my-first-blog", "2024-01-review"];
 
-            // When/Then: すべて有効と判定
             for (const slug of validSlugs) {
                 const isValidSlug = /^[a-z0-9-]+$/.test(slug);
                 expect(isValidSlug).toBe(true);

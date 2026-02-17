@@ -1,5 +1,11 @@
 import { describe, expect, test, vi } from "vitest";
-import type { FreeeCompany, FreeeIntegration, FreeeOAuthService, FreeeOAuthTokens, FreeeRepository } from "~/domain/freee";
+import type {
+    FreeeCompany,
+    FreeeIntegration,
+    FreeeOAuthService,
+    FreeeOAuthTokens,
+    FreeeRepository,
+} from "~/domain/freee";
 import { HandleFreeeCallbackUseCase } from "./handleFreeeCallback";
 
 describe("HandleFreeeCallbackUseCase", () => {
@@ -73,7 +79,6 @@ describe("HandleFreeeCallbackUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("新規連携を作成できる", async () => {
-                // Given: 認証コード、リダイレクトURI、ユーザーIDが与えられる
                 const code = "auth-code-123";
                 const redirectUri = "https://example.com/callback";
                 const userId = "user-1";
@@ -84,11 +89,9 @@ describe("HandleFreeeCallbackUseCase", () => {
                 });
                 const mockOAuthService = createMockOAuthService();
 
-                // When: コールバックを処理する
                 const useCase = new HandleFreeeCallbackUseCase(mockRepository, mockOAuthService);
                 const result = await useCase.execute(code, redirectUri, userId);
 
-                // Then: 新規連携が作成される
                 expect(result).toEqual(mockIntegration);
                 expect(mockOAuthService.exchangeCodeForTokens).toHaveBeenCalledWith(code, redirectUri);
                 expect(mockOAuthService.getCompanies).toHaveBeenCalledWith(mockTokens.accessToken);
@@ -104,7 +107,6 @@ describe("HandleFreeeCallbackUseCase", () => {
             });
 
             test("既存連携のトークンを更新できる", async () => {
-                // Given: 既存の連携が存在する
                 const code = "auth-code-123";
                 const redirectUri = "https://example.com/callback";
                 const userId = "user-1";
@@ -119,11 +121,9 @@ describe("HandleFreeeCallbackUseCase", () => {
                 });
                 const mockOAuthService = createMockOAuthService();
 
-                // When: コールバックを処理する
                 const useCase = new HandleFreeeCallbackUseCase(mockRepository, mockOAuthService);
                 const result = await useCase.execute(code, redirectUri, userId);
 
-                // Then: トークンが更新される
                 expect(result).toEqual(mockIntegration);
                 expect(mockRepository.updateTokens).toHaveBeenCalledWith(existingIntegration.id, {
                     accessToken: mockTokens.accessToken,
@@ -136,7 +136,6 @@ describe("HandleFreeeCallbackUseCase", () => {
 
         describe("異常系", () => {
             test("会社情報が取得できない場合、エラーがスローされる", async () => {
-                // Given: 会社情報が空の配列
                 const code = "auth-code-123";
                 const redirectUri = "https://example.com/callback";
                 const userId = "user-1";
@@ -146,7 +145,6 @@ describe("HandleFreeeCallbackUseCase", () => {
                     getCompanies: vi.fn().mockResolvedValue([]),
                 });
 
-                // When & Then: エラーがスローされる
                 const useCase = new HandleFreeeCallbackUseCase(mockRepository, mockOAuthService);
                 await expect(useCase.execute(code, redirectUri, userId)).rejects.toThrow(
                     "No companies found for this freee account",
@@ -154,7 +152,6 @@ describe("HandleFreeeCallbackUseCase", () => {
             });
 
             test("トークン交換に失敗した場合、エラーがスローされる", async () => {
-                // Given: トークン交換がエラーをスローする
                 const code = "invalid-code";
                 const redirectUri = "https://example.com/callback";
                 const userId = "user-1";
@@ -164,7 +161,6 @@ describe("HandleFreeeCallbackUseCase", () => {
                     exchangeCodeForTokens: vi.fn().mockRejectedValue(new Error("Invalid authorization code")),
                 });
 
-                // When & Then: エラーがスローされる
                 const useCase = new HandleFreeeCallbackUseCase(mockRepository, mockOAuthService);
                 await expect(useCase.execute(code, redirectUri, userId)).rejects.toThrow("Invalid authorization code");
             });
@@ -172,7 +168,6 @@ describe("HandleFreeeCallbackUseCase", () => {
 
         describe("エッジケース", () => {
             test("複数の会社が存在する場合、最初の会社を使用する", async () => {
-                // Given: 複数の会社情報
                 const code = "auth-code-123";
                 const redirectUri = "https://example.com/callback";
                 const userId = "user-1";
@@ -189,11 +184,9 @@ describe("HandleFreeeCallbackUseCase", () => {
                     getCompanies: vi.fn().mockResolvedValue(multipleCompanies),
                 });
 
-                // When: コールバックを処理する
                 const useCase = new HandleFreeeCallbackUseCase(mockRepository, mockOAuthService);
                 await useCase.execute(code, redirectUri, userId);
 
-                // Then: 最初の会社で連携が作成される
                 expect(mockRepository.createIntegration).toHaveBeenCalledWith(
                     expect.objectContaining({
                         companyId: multipleCompanies[0]!.id,

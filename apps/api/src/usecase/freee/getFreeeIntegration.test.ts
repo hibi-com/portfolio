@@ -48,34 +48,28 @@ describe("GetFreeeIntegrationUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("ユーザーIDから連携情報を取得できる", async () => {
-                // Given: 有効なユーザーIDが与えられる
                 const userId = "user-1";
                 const mockRepository = createMockRepository({
                     findIntegrationByUserId: vi.fn().mockResolvedValue(mockIntegration),
                 });
 
-                // When: 連携情報を取得する
                 const useCase = new GetFreeeIntegrationUseCase(mockRepository);
                 const result = await useCase.execute(userId);
 
-                // Then: 連携情報が返される
                 expect(result).toEqual(mockIntegration);
                 expect(mockRepository.findIntegrationByUserId).toHaveBeenCalledWith(userId);
                 expect(mockRepository.findIntegrationByUserId).toHaveBeenCalledTimes(1);
             });
 
             test("連携が存在しない場合nullを返す", async () => {
-                // Given: 連携が存在しないユーザーID
                 const userId = "user-without-integration";
                 const mockRepository = createMockRepository({
                     findIntegrationByUserId: vi.fn().mockResolvedValue(null),
                 });
 
-                // When: 連携情報を取得する
                 const useCase = new GetFreeeIntegrationUseCase(mockRepository);
                 const result = await useCase.execute(userId);
 
-                // Then: nullが返される
                 expect(result).toBeNull();
                 expect(mockRepository.findIntegrationByUserId).toHaveBeenCalledWith(userId);
             });
@@ -83,13 +77,11 @@ describe("GetFreeeIntegrationUseCase", () => {
 
         describe("異常系", () => {
             test("リポジトリでエラーが発生した場合、エラーがスローされる", async () => {
-                // Given: リポジトリがエラーをスローする
                 const userId = "user-1";
                 const mockRepository = createMockRepository({
                     findIntegrationByUserId: vi.fn().mockRejectedValue(new Error("Database error")),
                 });
 
-                // When & Then: エラーがスローされる
                 const useCase = new GetFreeeIntegrationUseCase(mockRepository);
                 await expect(useCase.execute(userId)).rejects.toThrow("Database error");
             });
@@ -97,17 +89,14 @@ describe("GetFreeeIntegrationUseCase", () => {
 
         describe("エッジケース", () => {
             test("空文字のユーザーIDでも処理できる", async () => {
-                // Given: 空文字のユーザーID
                 const userId = "";
                 const mockRepository = createMockRepository({
                     findIntegrationByUserId: vi.fn().mockResolvedValue(null),
                 });
 
-                // When: 連携情報を取得する
                 const useCase = new GetFreeeIntegrationUseCase(mockRepository);
                 const result = await useCase.execute(userId);
 
-                // Then: nullが返される
                 expect(result).toBeNull();
                 expect(mockRepository.findIntegrationByUserId).toHaveBeenCalledWith(userId);
             });

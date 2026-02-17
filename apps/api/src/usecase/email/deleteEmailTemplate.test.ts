@@ -21,7 +21,6 @@ describe("DeleteEmailTemplateUseCase", () => {
     describe("execute", () => {
         describe("正常系", () => {
             test("メールテンプレートを削除できる", async () => {
-                // Given: テンプレートID
                 const templateId = "template-1";
 
                 const mockRepository = createMockRepository({
@@ -30,10 +29,8 @@ describe("DeleteEmailTemplateUseCase", () => {
 
                 const useCase = new DeleteEmailTemplateUseCase(mockRepository);
 
-                // When: テンプレートを削除
                 await useCase.execute(templateId);
 
-                // Then: 削除が実行される
                 expect(mockRepository.deleteTemplate).toHaveBeenCalledWith(templateId);
                 expect(mockRepository.deleteTemplate).toHaveBeenCalledTimes(1);
             });
