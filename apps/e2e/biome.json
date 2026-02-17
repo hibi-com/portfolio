@@ -2,6 +2,6 @@
     "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
     "extends": ["@portfolio/biome-config/base"],
     "files": {
-        "includes": ["!!.cache", "!!.turbo", "!!dist"]
+        "includes": ["!!.cache", "!!.turbo", "!!dist", "!!build", "!!worker-configuration.d.ts"]
     }
 }
