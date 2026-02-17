@@ -8,10 +8,8 @@ vi.mock("prismjs", () => ({
     },
 }));
 
-vi.mock("isomorphic-dompurify", () => ({
-    default: {
-        sanitize: (html: string) => html,
-    },
+vi.mock("../libs/sanitize.js", () => ({
+    sanitizeHtml: vi.fn((html: string) => html),
 }));
 
 describe("Wysiwyg Component", () => {
