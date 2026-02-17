@@ -30,6 +30,12 @@ export interface EnvYamlStructure {
             subscriptionId?: string;
             databaseId?: string;
         };
+        backblaze?: {
+            applicationKeyId?: string;
+            applicationKey?: string;
+            bucketName?: string;
+            endpoint?: string;
+        };
     };
     secrets?: {
         database?: {
@@ -334,6 +340,34 @@ export function getApiEnvVars(): {
                 envYaml,
             ),
         },
+    };
+}
+
+export function getBackblazeConfig(): {
+    applicationKeyId: string;
+    applicationKey: pulumi.Output<string>;
+    bucketName: string;
+    endpoint: string;
+} {
+    const envYaml = parseEnvironmentYaml();
+
+    return {
+        applicationKeyId: getValueFromEnvOrYaml(
+            "BACKBLAZE_APPLICATION_KEY_ID",
+            ["infra", "backblaze", "applicationKeyId"],
+            envYaml,
+        ),
+        applicationKey: getSecretValue(
+            "BACKBLAZE_APPLICATION_KEY",
+            ["infra", "backblaze", "applicationKey"],
+            envYaml,
+        ),
+        bucketName:
+            getValueFromEnvOrYaml("BACKBLAZE_BUCKET_NAME", ["infra", "backblaze", "bucketName"], envYaml) ||
+            "portfolio-test-reports",
+        endpoint:
+            getValueFromEnvOrYaml("BACKBLAZE_ENDPOINT", ["infra", "backblaze", "endpoint"], envYaml) ||
+            "s3.us-west-002.backblazeb2.com",
     };
 }
 

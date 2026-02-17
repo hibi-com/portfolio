@@ -20,6 +20,7 @@ import { createPortfolioDnsRecords } from "./resources/dns.js";
 import { createObservability } from "./resources/observability.js";
 import { createPortfolioPagesProjects } from "./resources/pages.js";
 import { getCloudflareEnvVars } from "./resources/secrets.js";
+import { createBackblazeBucket, getBackblazeEnvVars } from "./resources/storage.js";
 import { createPortfolioApiWorker } from "./resources/workers.js";
 
 const secrets = getSecretsFromEnv();
@@ -178,6 +179,16 @@ export const workerDomainNames = pulumi
     .apply((domains) => Object.fromEntries(Object.entries(domains).map(([key, domain]) => [key, domain.hostname])));
 
 const observability = createObservability(config, grafanaProvider, sentryProvider);
+
+const backblazeStorage = createBackblazeBucket(config);
+
+export const backblazeInfo = {
+    bucketName: backblazeStorage.bucketName,
+    endpoint: backblazeStorage.endpoint,
+    region: backblazeStorage.region,
+};
+
+export const backblazeEnvVars = getBackblazeEnvVars();
 
 export const grafanaFolderUids = pulumi
     .output(observability.grafana.folders)
