@@ -11,7 +11,7 @@ description: BDD形式のユーザーストーリー管理
 
 ```text
 docs/user-stories/
-├── overview.md           # このファイル
+├── overview.md
 ├── visitor/              # 一般訪問者のストーリー
 │   ├── browse-blog.md
 │   ├── browse-portfolio.md

@@ -62,8 +62,6 @@ docs/user-stories/
 **When** {ユーザーのアクション}
 **Then** {エラー時の期待される結果}
 
----
-
 ## シナリオ
 
 ### 正常系シナリオ
@@ -80,8 +78,6 @@ docs/user-stories/
 ### 異常系シナリオ
 
 1. {エラーフローの手順}
-
----
 
 ## UI/UX要件
 
@@ -111,8 +107,6 @@ docs/user-stories/
 | ---------- | ---- |
 | {action} | {result} |
 
----
-
 ## 非機能要件
 
 ### パフォーマンス
@@ -127,8 +121,6 @@ docs/user-stories/
 - キーボード操作対応
 - スクリーンリーダー対応
 - カラーコントラスト基準準拠
-
----
 
 ## テスト
 
@@ -145,16 +137,12 @@ docs/user-stories/
 | {scenario2} | AC2 | Yes |
 | {error-scenario} | AC3 | Yes |
 
----
-
 ## 関連
 
 - シーケンス図: `docs/sequence/{layer}/{feature}/`
 - API仕様: `docs/specs/api/{domain}.md`
 - 画面: `apps/{app}/app/routes/{path}.tsx`
 ```
-
----
 
 ## 作成手順チェックリスト
 

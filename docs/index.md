@@ -28,13 +28,7 @@ cd portfolio
 # 2. 依存関係をインストール
 bun install
 
-# 3. 環境変数を設定
-cp .env.example .env
-
-# 4. データベースを初期化
-bun run db:push
-
-# 5. 開発サーバーを起動
+# 3. 開発サーバーを起動
 bun run dev
 ```
 
@@ -46,10 +40,9 @@ bun run dev
 | `bun run test` | ユニットテスト実行 |
 | `bun run lint` | リント実行 |
 | `bun run typecheck` | 型チェック実行 |
+| `bun run integration` | E2Eテスト実行 |
 | `bun run e2e` | E2Eテスト実行 |
 | `bun run build` | プロダクションビルド |
-
----
 
 ## Tech Stack
 
@@ -80,12 +73,9 @@ bun run dev
 | -------- | ---- |
 | Cloudflare Pages | Webホスティング |
 | Cloudflare Workers | APIサーバー |
-| Cloudflare D1 | SQLiteデータベース |
-| Cloudflare R2 | オブジェクトストレージ |
-| TiDB Cloud | 本番データベース |
-| Upstash Redis | キャッシュ |
-
----
+| Backblaze | オブジェクトストレージ |
+| TiDB Cloud | データベース |
+| Redis Cloud | キャッシュ |
 
 ## Documentation Map
 
@@ -117,36 +107,6 @@ bun run dev
 | [エラーコード](./specs/error-codes.md) | エラー定義一覧 | `docs/specs/error-codes.md` |
 | [QAシート](./testing/qa-sheet.md) | テストカバレッジ | `docs/testing/qa-sheet.md` |
 
----
-
-## Architecture Overview
-
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│                        Cloudflare Edge                          │
-├─────────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
-│  │  apps/web   │  │ apps/admin  │  │       apps/api          │  │
-│  │   (Remix)   │  │ (TanStack)  │  │        (Hono)           │  │
-│  │     FSD     │  │     FSD     │  │         DDD             │  │
-│  └──────┬──────┘  └──────┬──────┘  └───────────┬─────────────┘  │
-│         │                │                      │                │
-│         └────────────────┴──────────────────────┘                │
-│                          │                                       │
-│  ┌───────────────────────┴───────────────────────────────────┐  │
-│  │                    packages/*                              │  │
-│  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌──────────┐ │  │
-│  │  │   db   │ │  api   │ │  auth  │ │   ui   │ │validation│ │  │
-│  │  └────────┘ └────────┘ └────────┘ └────────┘ └──────────┘ │  │
-│  └───────────────────────────────────────────────────────────┘  │
-├─────────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
-│  │     D1      │  │     R2      │  │    Durable Objects      │  │
-│  │  (SQLite)   │  │  (Storage)  │  │       (Chat)            │  │
-│  └─────────────┘  └─────────────┘  └─────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
 ### レイヤー構造
 
 #### Frontend (FSD - Feature-Sliced Design)
@@ -174,8 +134,6 @@ src/
 └── infrastructure/  # インフラ層
     └── repositories/ # リポジトリ
 ```
-
----
 
 ## Development Workflow
 
@@ -219,8 +177,6 @@ bun run lint:fix
 bun run fmt
 ```
 
----
-
 ## Testing Strategy
 
 ### Google Test Sizes
@@ -228,8 +184,8 @@ bun run fmt
 | サイズ | 説明 | 実行時間 | 命名規則 |
 | ------ | ---- | -------- | -------- |
 | **Small** | ユニットテスト（モック使用） | < 100ms | `*.test.ts` |
-| **Medium** | 統合テスト（DB使用） | < 1s | `*.medium.test.ts` |
-| **Large** | E2Eテスト（ブラウザ使用） | < 10s | `*.large.spec.ts` |
+| **Medium** | 統合テスト（DB使用） | < 1s | `*.integration.test.ts` |
+| **Large** | E2Eテスト（ブラウザ使用） | < 10s | `*.spec.ts` |
 
 ### テストとドキュメントの対応
 
@@ -247,8 +203,6 @@ bun run fmt
 | Functions | 90% |
 | Statements | 90% |
 | Branches | 100% |
-
----
 
 ## Project Structure
 
@@ -287,8 +241,6 @@ portfolio/
     └── e2e/                 # E2Eテスト用
 ```
 
----
-
 ## Important Rules
 
 ### 禁止事項
@@ -312,19 +264,17 @@ portfolio/
 
 ### コミットメッセージ
 
+Types: feat, fix, docs, style, refactor, test, chore
+Scope: admin, api, e2e, web, wiki
+
 ```text
 {type}({scope}): {subject}
-
-Types: feat, fix, docs, style, refactor, test, chore
 ```
-
----
 
 ## Support
 
 ### 質問・フィードバック
 
-- GitHub Issues: [github.com/ageha734/portfolio/issues](https://github.com/ageha734/portfolio/issues)
 - Claude Code: `/help` コマンドで使い方を確認
 
 ### 参考資料
