@@ -1,4 +1,4 @@
-import { json, type MetaFunction } from "@remix-run/cloudflare";
+import type { MetaFunction } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { TestRunnerService } from "~/lib/test-runner/service.server";
@@ -10,13 +10,38 @@ import type {
     TestStatusResponse,
 } from "~/lib/test-runner/types";
 
+async function fetchJobUpdates(runningJobs: TestJob[]): Promise<TestJob[]> {
+    return Promise.all(
+        runningJobs.map(async (job) => {
+            try {
+                const response = await fetch(`/api/test/status/${job.id}`);
+                const data: TestStatusResponse = await response.json();
+                return data.job;
+            } catch {
+                return job;
+            }
+        }),
+    );
+}
+
+function mergeJobUpdates(prevJobs: TestJob[], updates: TestJob[]): TestJob[] {
+    const updatedJobs = [...prevJobs];
+    for (const update of updates) {
+        const index = updatedJobs.findIndex((j) => j.id === update.id);
+        if (index !== -1) {
+            updatedJobs[index] = update;
+        }
+    }
+    return updatedJobs;
+}
+
 export const meta: MetaFunction = () => {
     return [{ title: "Test Runner - Test Portal" }];
 };
 
 export async function loader() {
     const jobs = TestRunnerService.getAllJobs();
-    return json({ jobs });
+    return { jobs };
 }
 
 export default function TestRunner() {
@@ -32,28 +57,8 @@ export default function TestRunner() {
         if (runningJobs.length === 0) return;
 
         const interval = setInterval(async () => {
-            const updates = await Promise.all(
-                runningJobs.map(async (job) => {
-                    try {
-                        const response = await fetch(`/api/test/status/${job.id}`);
-                        const data = (await response.json()) as TestStatusResponse;
-                        return data.job;
-                    } catch {
-                        return job;
-                    }
-                }),
-            );
-
-            setJobs((prevJobs) => {
-                const updatedJobs = [...prevJobs];
-                for (const update of updates) {
-                    const index = updatedJobs.findIndex((j) => j.id === update.id);
-                    if (index !== -1) {
-                        updatedJobs[index] = update;
-                    }
-                }
-                return updatedJobs;
-            });
+            const updates = await fetchJobUpdates(runningJobs);
+            setJobs((prevJobs) => mergeJobUpdates(prevJobs, updates));
         }, 2000);
 
         return () => clearInterval(interval);
@@ -79,7 +84,7 @@ export default function TestRunner() {
                 throw new Error("Failed to start test");
             }
 
-            const data = (await response.json()) as TestRunResponse;
+            const data: TestRunResponse = await response.json();
 
             const newJob: TestJob = {
                 id: data.jobId,
