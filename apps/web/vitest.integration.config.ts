@@ -46,7 +46,7 @@ export default defineConfig({
                 },
             ],
         ],
-        setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup.ts")],
+        setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup-no-msw.ts")],
         coverage: {
             enabled: false,
         },
