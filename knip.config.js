@@ -15,7 +15,7 @@ const config = {
         "tooling/**/*.{ts,tsx}",
         "testing/**/*.{ts,tsx}",
         "generators/**/*.{ts,tsx}",
-        "scripts/**/*.{ts,tsx}"
+        "scripts/**/*.{ts,tsx}",
     ],
     project: [
         "apps/**/*.{ts,tsx}",
@@ -38,25 +38,9 @@ const config = {
         "results/**",
         "report/**",
     ],
-    ignoreDependencies: [
-        "@types/bun",
-        "@types/node",
-        "@types/prismjs",
-        "@types/react",
-        "@types/react-dom",
-    ],
+    ignoreDependencies: ["@types/bun", "@types/node", "@types/prismjs", "@types/react", "@types/react-dom"],
     ignoreBinaries: ["wrangler", "playwright", "storybook", "tsp", "orval", "check", "env", "setup"],
     workspaces: {
-        "apps/web": {
-            remix: {
-                entry: ["app/entry.client.tsx", "app/entry.server.tsx"],
-            },
-        },
-        "apps/wiki": {
-            astro: {
-                config: "astro.config.ts",
-            },
-        },
         "packages/ui": {
             storybook: {
                 config: ".storybook/main.ts",
@@ -65,6 +49,26 @@ const config = {
         "apps/admin": {
             storybook: {
                 config: ".storybook/main.ts",
+            },
+        },
+        "apps/api": {
+            hono: {
+                config: "hono.config.ts",
+            },
+        },
+        "apps/e2e": {
+            remix: {
+                entry: ["e2e/entry.client.tsx", "e2e/entry.server.tsx"],
+            },
+        },
+        "apps/web": {
+            remix: {
+                entry: ["app/entry.client.tsx", "app/entry.server.tsx"],
+            },
+        },
+        "apps/wiki": {
+            astro: {
+                config: "astro.config.ts",
             },
         },
     },
