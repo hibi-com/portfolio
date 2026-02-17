@@ -11,5 +11,5 @@
         "types": ["vitest/globals"]
     },
     "exclude": ["node_modules", "build", "dist", ".tanstack", "functions", "../../packages/api/dist/generated"],
-    "include": ["app/**/*", "env.d.ts", "vite.config.ts", "vitest.d.ts"]
+    "include": ["app/**/*", "integration/**/*", "env.d.ts", "vite.config.ts", "vitest.d.ts"]
 }
