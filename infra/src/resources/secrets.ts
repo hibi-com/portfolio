@@ -391,7 +391,7 @@ export function parseEnvFile(envFilePath?: string): Record<string, string> {
         if (equalIndex === -1) continue;
         const key = trimmedLine.slice(0, equalIndex).trim();
         const value = trimmedLine.slice(equalIndex + 1).trim();
-        envVars[key] = value.replace(/^["']|["']$/g, "");
+        envVars[key] = value.replaceAll(/(^["'])|(["']$)/g, "");
     }
     return envVars;
 }
