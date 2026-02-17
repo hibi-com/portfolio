@@ -1,13 +1,11 @@
-import { json, type LoaderFunctionArgs, redirect } from "@remix-run/cloudflare";
+import { type LoaderFunctionArgs, redirect } from "@remix-run/cloudflare";
 import { Form, Outlet, useLoaderData } from "@remix-run/react";
 import { requireAuth } from "~/lib/auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         const session = await requireAuth(request);
-        return json({
-            user: session.user,
-        });
+        return { user: session.user };
     } catch (error) {
         if (error instanceof Response && error.status === 401) {
             return redirect("/login");
@@ -36,6 +34,15 @@ export default function PortalLayout() {
                     <nav style={{ display: "flex", gap: "1rem" }}>
                         <a href="/" style={{ color: "#60a5fa", textDecoration: "none" }}>
                             Dashboard
+                        </a>
+                        <a href="/test" style={{ color: "#60a5fa", textDecoration: "none" }}>
+                            E2E実行
+                        </a>
+                        <a href="/e2e" style={{ color: "#60a5fa", textDecoration: "none" }}>
+                            E2Eレポート
+                        </a>
+                        <a href="/coverage" style={{ color: "#60a5fa", textDecoration: "none" }}>
+                            カバレッジ
                         </a>
                     </nav>
                 </div>

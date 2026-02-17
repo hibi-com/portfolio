@@ -1,4 +1,4 @@
-import { json, type MetaFunction } from "@remix-run/cloudflare";
+import type { MetaFunction } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getAllProjects, getProjectReports } from "~/lib/reports/parser";
 
@@ -13,7 +13,7 @@ export async function loader() {
         reports: getProjectReports(project, "e2e"),
     }));
 
-    return json({ reports });
+    return { reports };
 }
 
 export default function E2EReports() {
