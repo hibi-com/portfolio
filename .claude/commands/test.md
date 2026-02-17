@@ -34,20 +34,10 @@ cat .claude/templates/tdd/unit-test.md
 ### Small の実行
 
 ```bash
-# 全テスト
 bun run test
 
 # 特定パッケージ
-turbo run test --filter=@portfolio/{package}
-
-# 特定ファイル
-bun vitest run {file-pattern}
-
-# ウォッチモード
-bun vitest
-
-# カバレッジ
-bun run coverage
+bun run test --filter={package}
 ```
 
 ### Small の配置
@@ -74,11 +64,10 @@ cat .claude/templates/tdd/integration-test.md
 ### Medium の実行
 
 ```bash
-# API Medium Tests
-bun vitest run -c apps/api/tests/vitest.medium.config.ts
+bun run integration
 
 # 特定ドメイン
-bun vitest run -c apps/api/tests/vitest.medium.config.ts --filter={domain}
+bun run integration --filter={domain}
 ```
 
 ### Medium の配置

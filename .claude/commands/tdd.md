@@ -57,8 +57,8 @@
 # テンプレート読み込み
 cat .claude/templates/tdd/unit-test.md
 
-# テスト実行（失敗確認）
-bun vitest run {test-file}
+# テスト実行（失敗確認。ファイルは -- で渡す）
+bun run test -- {test-file}
 ```
 
 ### テスト作成ガイドライン
@@ -96,7 +96,7 @@ describe("機能名", () => {
 
 ```bash
 # テスト実行（成功確認）
-bun vitest run {test-file}
+bun run test -- {test-file}
 ```
 
 ### 実装ガイドライン
@@ -125,7 +125,7 @@ bun run fmt
 bun run typecheck
 
 # テスト（回帰確認）
-bun vitest run {test-file}
+bun run test -- {test-file}
 ```
 
 ### リファクタリング対象

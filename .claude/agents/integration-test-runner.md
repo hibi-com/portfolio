@@ -18,17 +18,10 @@ color: blue
 ## 実行コマンド
 
 ```bash
-# API Medium Tests
-bun vitest run -c apps/api/tests/vitest.medium.config.ts
+bun run integration
 
 # 特定ドメイン
-bun vitest run -c apps/api/tests/vitest.medium.config.ts --filter={domain}
-
-# Web Integration Tests
-bun vitest run -c apps/web/vitest.integration.config.ts
-
-# Admin Integration Tests
-bun vitest run -c apps/admin/vitest.integration.config.ts
+bun run integration --filter={domain}
 ```
 
 ## 出力フォーマット

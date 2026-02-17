@@ -180,11 +180,11 @@ bunx prisma migrate dev --name migration_name
 # テストファイルのパスを確認
 # vitest.config.ts の testDir 設定を確認
 
-# 特定のテストファイルを実行
-bun vitest run path/to/test.test.ts
+# 特定のテストファイルを実行（ルートの script、ファイルは -- で渡す）
+bun run test -- path/to/test.test.ts
 
 # ウォッチモードで実行
-bun vitest
+bun run test -- --watch
 ```
 
 ### テストが失敗する
@@ -194,11 +194,11 @@ bun vitest
 **解決方法**:
 
 ```bash
-# 詳細なログを出力
-bun vitest run --reporter=verbose
+# 詳細なログを出力（-- で引数を渡す）
+bun run test -- --reporter=verbose
 
 # 特定のテストのみ実行
-bun vitest run -t "test name"
+bun run test -- -t "test name"
 
 # カバレッジレポートを確認
 bun run coverage

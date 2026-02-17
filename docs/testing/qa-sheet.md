@@ -306,36 +306,6 @@ description: テストで担保している品質保証項目一覧
 | A03 | XSS | 自動 | - |
 | A07 | 認証フローテスト | 手動 | - |
 
-## テスト実行コマンド
-
-```bash
-# Small Tests（ユニットテスト）
-bun run test
-
-# Integration Tests（API）
-cd apps/api && bun run test:integration
-
-# Integration Tests（Admin）
-cd apps/admin && bun vitest run -c vitest.integration.config.ts
-
-# Integration Tests（Web）
-cd apps/web && bun vitest run -c vitest.integration.config.ts
-
-# E2E Tests（Web）
-cd apps/web && bun run e2e
-
-# E2E Tests（Admin）
-cd apps/admin && bun run e2e
-
-# E2E Tests（独立）
-cd apps/e2e && BASE_URL=https://example.com bun run accessibility
-cd apps/e2e && BASE_URL=https://example.com bun run monkey
-cd apps/e2e && BASE_URL=https://example.com bun run e2e:web
-
-# カバレッジレポート
-bun run coverage
-```
-
 ## CI/CDパイプライン
 
 | ステージ | テストタイプ | トリガー |

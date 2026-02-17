@@ -74,7 +74,7 @@ turbo run typecheck --filter=@portfolio/{package}
        │ depends on
        ▼
 ┌─────────────┐
-│   apps/*    │  (api, web, admin)
+│   apps/*    │  (api, web, admin, e2e, wiki)
 └─────────────┘
 ```
 
@@ -137,6 +137,8 @@ Cloudflareへのデプロイ前チェック：
 - apps/api: {size}
 - apps/web: {size}
 - apps/admin: {size}
+- apps/e2e: {size}
+- apps/wiki: {size}
 
 ### 次のステップ
 - {suggestion}

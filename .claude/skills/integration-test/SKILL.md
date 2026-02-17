@@ -20,11 +20,10 @@ allowed-tools: Bash, Read, Glob, Grep
 ## 実行コマンド
 
 ```bash
-# API Medium Tests
-bun vitest run -c apps/api/tests/vitest.medium.config.ts
+bun run integration
 
 # 特定ドメイン
-bun vitest run -c apps/api/tests/vitest.medium.config.ts --filter={domain}
+bun run integration --filter={domain}
 ```
 
 ## 参考ドキュメント

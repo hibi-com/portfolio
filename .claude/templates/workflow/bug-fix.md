@@ -138,8 +138,8 @@ describe("{機能名}", () => {
 ## Step 4: テスト失敗の確認
 
 ```bash
-# テスト実行（失敗することを確認）
-bun vitest run {test-file}
+# テスト実行（失敗することを確認。ファイルは -- で渡す）
+bun run test -- {test-file}
 ```
 
 ### 確認事項
@@ -178,10 +178,10 @@ bun vitest run {test-file}
 
 ```bash
 # 作成したテストが通過することを確認
-bun vitest run {test-file}
+bun run test -- {test-file}
 
 # 関連テストが通過することを確認
-bun vitest run {related-tests}
+bun run test -- {related-tests}
 
 # 全テスト実行
 bun run test

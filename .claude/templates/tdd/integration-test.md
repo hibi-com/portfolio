@@ -246,14 +246,10 @@ export async function seedCustomerWithDeals(prisma: PrismaClient) {
 ## 実行コマンド
 
 ```bash
-# Medium Test実行
-bun vitest run -c apps/api/tests/vitest.medium.config.ts
+bun run integration
 
-# 特定ドメインのみ
-bun vitest run -c apps/api/tests/vitest.medium.config.ts {domain}
-
-# ウォッチモード
-bun vitest -c apps/api/tests/vitest.medium.config.ts
+# 特定ドメイン
+bun run integration --filter={domain}
 ```
 
 ## 出力フォーマット（テスト作成後）

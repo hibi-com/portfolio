@@ -77,9 +77,10 @@ console.log(`[DEBUG_TRACE] >>> STATE: status=${status}`);
 2. 他のテストが壊れていないことを確認
 
 ```bash
-# テスト実行
-bun vitest run {test-file}
 bun run test
+
+# 特定パッケージ
+bun run test --filter={package}
 ```
 
 ### Step 5: レビュー

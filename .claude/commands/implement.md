@@ -45,8 +45,8 @@ ls docs/specs/api/
 **使用スキル**: `/unit-test`
 
 ```bash
-# テスト実行（失敗確認）
-bun vitest run {test-file}
+# テスト実行（失敗確認。ファイルは -- で渡す）
+bun run test -- {test-file}
 ```
 
 ### Step 3: 実装（TDD Green）
@@ -62,7 +62,7 @@ bun vitest run {test-file}
 
 ```bash
 # テスト実行（成功確認）
-bun vitest run {test-file}
+bun run test -- {test-file}
 ```
 
 ### Step 4: リファクタリング

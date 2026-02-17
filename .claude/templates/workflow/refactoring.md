@@ -43,11 +43,11 @@ ls -la {target-dir}/*.test.ts
 ### Step 2: 既存テストの実行
 
 ```bash
-# 関連テストを実行
-bun vitest run {target-file}
+# 関連テストを実行（ルートの script を利用、ファイルは -- で渡す）
+bun run test -- {target-file}
 
 # カバレッジ確認
-bun vitest run --coverage {target-file}
+bun run coverage -- {target-file}
 ```
 
 #### テスト結果
@@ -169,7 +169,7 @@ class DiscountCalculator {
 
 ```bash
 # 各ステップ後にテスト実行
-bun vitest run {target-file}
+bun run test -- {target-file}
 
 # 全テスト実行
 bun run test

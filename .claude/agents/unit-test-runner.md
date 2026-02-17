@@ -18,17 +18,10 @@ color: green
 ## 実行コマンド
 
 ```bash
-# 全体テスト
 bun run test
 
 # 特定パッケージ
-turbo run test --filter=@portfolio/{package}
-
-# 特定ファイル
-bun vitest run {file-pattern}
-
-# ウォッチモード
-bun vitest {file-pattern}
+bun run test --filter={package}
 
 # カバレッジ
 bun run coverage

@@ -360,11 +360,10 @@ describe("Posts List Integration", () => {
 ### Medium Tests実行コマンド
 
 ```bash
-# API Medium Testsのみ実行
-bun vitest run -c apps/api/tests/vitest.medium.config.ts
+bun run integration
 
-# 特定ドメインのMedium Tests
-bun vitest run -c apps/api/tests/vitest.medium.config.ts --filter=post
+# 特定ドメイン
+bun run integration --filter={domain}
 ```
 
 ## Integration Tests（Web/Admin）
@@ -427,11 +426,10 @@ describe("Blog List Integration", () => {
 ### Integration Tests実行コマンド
 
 ```bash
-# Web Integration Tests
-bun vitest run -c apps/web/vitest.integration.config.ts
+bun run integration
 
-# Admin Integration Tests
-bun vitest run -c apps/admin/vitest.integration.config.ts
+# 特定ドメイン
+bun run integration --filter={domain}
 ```
 
 ## E2Eテスト
@@ -558,16 +556,16 @@ test("should return 404 for non-existent post", async ({ request }) => {
 bun run test
 
 # 特定のパッケージのSmall Tests
-turbo run test --filter=@portfolio/web
+bun run test --filter=@portfolio/web
 
-# ウォッチモード
-bun vitest
+# ウォッチモード（-- で引数を渡す）
+bun run test -- --watch
 
 # カバレッジレポート生成
 bun run coverage
 
 # Medium Tests（統合テスト）
-bun vitest run -c apps/api/tests/vitest.medium.config.ts
+bun run integration
 
 # Large Tests（E2Eテスト）
 bun run e2e
@@ -826,7 +824,7 @@ open apps/e2e/public/reports/coverage/web/{日時}/index.html
 open apps/e2e/public/reports/coverage/admin/{日時}/index.html
 
 # 特定ファイルのブランチカバレッジ詳細
-bun vitest run --coverage --reporter=verbose
+bun run coverage --filter={package}
 ```
 
 ### カバレッジ除外

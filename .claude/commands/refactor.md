@@ -54,8 +54,8 @@ ls {target-file}.test.ts
 3. テストが失敗したら即座に修正
 
 ```bash
-# 変更後のテスト実行（毎回）
-bun vitest run {related-tests}
+# 変更後のテスト実行（毎回。対象は -- で渡す）
+bun run test -- {related-tests}
 ```
 
 ### Step 4: 全テスト確認

@@ -195,14 +195,14 @@ describe("{TargetClass/Function}", () => {
 ## 実行コマンド
 
 ```bash
-# 単一ファイル実行
-bun vitest run {path/to/file.test.ts}
+# 単一ファイル実行（ルートの script、ファイルは -- で渡す）
+bun run test -- {path/to/file.test.ts}
 
-# ウォッチモード
-bun vitest {path/to/file.test.ts}
+# ウォッチモード（-- の後にオプション・ファイルを渡す）
+bun run test -- --watch {path/to/file.test.ts}
 
 # カバレッジ付き
-bun vitest run --coverage {path/to/file.test.ts}
+bun run coverage -- {path/to/file.test.ts}
 ```
 
 ## カバレッジ基準

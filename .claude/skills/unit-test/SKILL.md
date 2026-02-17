@@ -21,20 +21,10 @@ allowed-tools: Bash, Read, Glob, Grep
 ## 実行コマンド
 
 ```bash
-# 全テスト
 bun run test
 
 # 特定パッケージ
-turbo run test --filter=@portfolio/{package-name}
-
-# 特定ファイル
-bun vitest run {file-pattern}
-
-# ウォッチモード
-bun vitest
-
-# カバレッジ
-bun run coverage
+bun run test --filter={package}
 ```
 
 ## 参考ドキュメント
