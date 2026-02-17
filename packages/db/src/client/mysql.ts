@@ -8,13 +8,13 @@ export interface CreatePrismaClientOptions {
 let prismaInstance: PrismaClient | null = null;
 
 export function createPrismaClient(options: CreatePrismaClientOptions = {}): PrismaClient {
+    if (prismaInstance) {
+        return prismaInstance;
+    }
+
     const url = options.databaseUrl ?? process.env.DATABASE_URL;
     if (!url) {
         throw new Error("DATABASE_URL or databaseUrl option is required");
-    }
-
-    if (prismaInstance) {
-        return prismaInstance;
     }
 
     const adapter = new PrismaMariaDb(url);

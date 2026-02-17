@@ -29,10 +29,12 @@ describe("Post Zod Schemas", () => {
                 title: "Test Post",
                 slug: "test-post",
                 date: "2024-01-01",
-                content: { html: "<p>Test</p>" },
+                content: "<p>Test</p>",
                 imageTemp: "test.jpg",
                 tags: ["test"],
                 sticky: false,
+                createdAt: "2024-01-01",
+                updatedAt: "2024-01-01",
             });
             expect(result.success).toBe(true);
         });
