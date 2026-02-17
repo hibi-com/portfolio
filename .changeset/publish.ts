@@ -114,8 +114,8 @@ function setupNpmrc(config: PublishConfig): void {
 }
 
 function buildPackages(): void {
-    console.log("🔨 Building packages...");
-    execSync("bun run build", {
+    console.log("🔨 Building publishable packages (tooling + packages)...");
+    execSync("bun run build --filter=./tooling/* --filter=./packages/*", {
         cwd: ROOT_DIR,
         stdio: "inherit",
     });
