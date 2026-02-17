@@ -32,13 +32,13 @@
     "with-env": "env --"
   },
   "dependencies": {
-    "@prisma/client": "7.3.0",
-    "@prisma/adapter-mariadb": "7.3.0"
+    "@prisma/adapter-mariadb": "7.3.0",
+    "@prisma/client": "7.3.0"
   },
   "devDependencies": {
     "@portfolio/biome-config": "workspace:*",
-    "@portfolio/prisma-migration": "workspace:*",
     "@portfolio/prisma-markdown": "workspace:*",
+    "@portfolio/prisma-migration": "workspace:*",
     "@portfolio/tsconfig": "workspace:*",
     "@portfolio/vitest-config": "workspace:*",
     "prisma": "7.3.0",
