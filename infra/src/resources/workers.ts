@@ -5,6 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as random from "@pulumi/random";
 import type { InfraConfig } from "../config.js";
 import { getProjectName } from "../config.js";
+import { getApiEnvVars } from "./secrets.js";
 
 export interface WorkerConfig {
     name: string;
@@ -274,7 +275,7 @@ export function createWorkers(
 
 export function createPortfolioApiWorker(
     config: InfraConfig,
-    secrets: {
+    _secrets: {
         databaseUrl: pulumi.Output<string>;
         redisUrl?: pulumi.Output<string>;
     },
@@ -289,29 +290,19 @@ export function createPortfolioApiWorker(
         .all([projectName, apiRandomSuffix.result])
         .apply(([name, suffix]) => `${name}-api-${suffix}`);
 
-    const staticBindings: WorkerBinding[] = [
-        {
-            name: "NODE_ENV",
-            text: "production",
-            type: "plain_text",
-        },
-    ];
+    const apiConfig = getApiEnvVars();
 
-    const secretBindings: WorkerBinding[] = [
-        {
-            name: "DATABASE_URL",
-            text: secrets.databaseUrl,
-            type: "secret_text",
-        },
-    ];
+    const staticBindings: WorkerBinding[] = Object.entries(apiConfig.vars).map(([name, text]) => ({
+        name,
+        text,
+        type: "plain_text" as const,
+    }));
 
-    if (secrets.redisUrl) {
-        secretBindings.push({
-            name: "CACHE_URL",
-            text: secrets.redisUrl,
-            type: "secret_text",
-        });
-    }
+    const secretBindings: WorkerBinding[] = Object.entries(apiConfig.secrets).map(([name, text]) => ({
+        name,
+        text,
+        type: "secret_text" as const,
+    }));
 
     const allBindings = [...staticBindings, ...secretBindings];
 

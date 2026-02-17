@@ -4,6 +4,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as random from "@pulumi/random";
 import type { InfraConfig } from "../config.js";
 import { getProjectName } from "../config.js";
+import { getAdminEnvVars, getE2eEnvVars, getWebEnvVars, getWikiEnvVars } from "./secrets.js";
 
 type EnvVarConfig = cloudflare.types.input.PagesProjectDeploymentConfigsProductionEnvVars;
 
@@ -21,7 +22,7 @@ export interface PagesProjectConfig {
     buildCommand?: string;
     destinationDir?: string;
     rootDir?: string;
-    environmentVariables?: Record<string, string>;
+    environmentVariables?: Record<string, pulumi.Input<string>>;
     secrets?: Record<string, pulumi.Output<string>>;
     compatibilityDate?: string;
     customDomain?: string;
@@ -46,7 +47,7 @@ function generateRandomSuffix(resourceName: string): random.RandomString {
 }
 
 function buildEnvVars(
-    environmentVariables?: Record<string, string>,
+    environmentVariables?: Record<string, pulumi.Input<string>>,
     secrets?: Record<string, pulumi.Output<string>>,
 ): Record<string, pulumi.Input<EnvVarConfig>> | undefined {
     const envVars: Record<string, pulumi.Input<EnvVarConfig>> = {};
@@ -54,14 +55,14 @@ function buildEnvVars(
 
     if (environmentVariables) {
         for (const [key, value] of Object.entries(environmentVariables)) {
-            envVars[key] = { type: "plain_text", value };
+            envVars[key] = pulumi.output(value).apply((v) => ({ type: "plain_text" as const, value: v }));
             hasEnvVars = true;
         }
     }
 
     if (secrets) {
         for (const [key, value] of Object.entries(secrets)) {
-            envVars[key] = { type: "secret_text", value };
+            envVars[key] = value.apply((v) => ({ type: "secret_text" as const, value: v }));
             hasEnvVars = true;
         }
     }
@@ -222,6 +223,12 @@ export function createPortfolioPagesProjects(
     const webRandomSuffix = generateRandomSuffix(`${projectName}-web-random`);
     const adminRandomSuffix = generateRandomSuffix(`${projectName}-admin-random`);
     const wikiRandomSuffix = generateRandomSuffix(`${projectName}-wiki-random`);
+    const e2eRandomSuffix = generateRandomSuffix(`${projectName}-e2e-random`);
+
+    const webConfig = getWebEnvVars();
+    const adminConfig = getAdminEnvVars();
+    const wikiConfig = getWikiEnvVars();
+    const e2eConfig = getE2eEnvVars();
 
     if (!apiWorkerScriptName) {
         throw new Error(
@@ -254,12 +261,11 @@ export function createPortfolioPagesProjects(
             name: pulumi.all([projectName, webRandomSuffix.result]).apply(([name, suffix]) => `${name}-web-${suffix}`),
             productionBranch: "master",
             buildCommand: "bun run build",
-            destinationDir: "dist",
+            destinationDir: "build/client",
             rootDir: "apps/web",
             customDomain: "www",
-            environmentVariables: {
-                NODE_ENV: "production",
-            },
+            environmentVariables: webConfig.envVars,
+            secrets: webConfig.secrets,
             serviceBinding: webServiceBinding,
         },
         {
@@ -268,13 +274,22 @@ export function createPortfolioPagesProjects(
                 .apply(([name, suffix]) => `${name}-admin-${suffix}`),
             productionBranch: "master",
             buildCommand: "bun run build",
-            destinationDir: "dist",
+            destinationDir: "build",
             rootDir: "apps/admin",
             customDomain: "admin",
-            environmentVariables: {
-                NODE_ENV: "production",
-            },
+            environmentVariables: adminConfig.envVars,
+            secrets: adminConfig.secrets,
             serviceBinding: adminServiceBinding,
+        },
+        {
+            name: pulumi.all([projectName, e2eRandomSuffix.result]).apply(([name, suffix]) => `${name}-e2e-${suffix}`),
+            productionBranch: "master",
+            buildCommand: "bun run build",
+            destinationDir: "build/client",
+            rootDir: "apps/e2e",
+            customDomain: "portal",
+            environmentVariables: e2eConfig.envVars,
+            secrets: e2eConfig.secrets,
         },
         {
             name: pulumi
@@ -282,12 +297,10 @@ export function createPortfolioPagesProjects(
                 .apply(([name, suffix]) => `${name}-wiki-${suffix}`),
             productionBranch: "master",
             buildCommand: "bun run build",
-            destinationDir: "dist",
+            destinationDir: "build",
             rootDir: "apps/wiki",
             customDomain: "wiki",
-            environmentVariables: {
-                NODE_ENV: "production",
-            },
+            environmentVariables: wikiConfig.envVars,
         },
     ];
 
