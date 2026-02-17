@@ -11,16 +11,17 @@ function getPortFromBaseUrl(baseUrl: string): string {
     }
 }
 
-const baseUrl = process.env.VITE_BASE_URL ?? "http://localhost:3000";
+const isRemoteEnv = !!process.env.BASE_URL;
+const baseUrl = process.env.BASE_URL ?? process.env.VITE_BASE_URL ?? "http://localhost:3000";
 const PORT = getPortFromBaseUrl(baseUrl);
 
 export default createPlaywrightConfig({
     testDir: "./e2e",
     outputDir: "./.results/playwright",
-    baseURL: `http://localhost:${PORT}/`,
+    baseURL: isRemoteEnv ? baseUrl : `http://localhost:${PORT}/`,
     port: PORT,
-    webServerCommand: process.env.CI ? "bun run start" : "bun run dev",
-    reportOutputDir: "../wiki/reports/e2e/admin",
+    webServerCommand: isRemoteEnv ? undefined : process.env.CI ? "bun run start" : "bun run dev",
+    reportOutputDir: "../e2e/public/reports/e2e/admin",
     projectName: "admin",
     projects: [
         {

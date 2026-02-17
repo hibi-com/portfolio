@@ -14,6 +14,7 @@ title: "Architecture Overview"
   - `web/`: Remix + Cloudflare Pages（ポートフォリオサイト）
   - `api/`: Hono + Cloudflare Workers + D1（CMS API）
   - `admin/`: React + Vite + Tanstack Router（管理ダッシュボード）
+  - `e2e/`: Remix + Cloudflare Pages（Test Portal - 認証付きテストレポートサイト）
   - `wiki/`: Astro + Starlight（ドキュメントサイト）
 - **`packages/`**: 共通パッケージ層
   - `ui/`: Design System

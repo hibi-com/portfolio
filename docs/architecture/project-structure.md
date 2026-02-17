@@ -12,6 +12,7 @@ title: "Project Structure"
 │   ├── web/                      # Remix + Cloudflare Pages
 │   ├── api/                      # Hono + Cloudflare Workers + D1
 │   ├── admin/                    # React + Vite + Tanstack Router
+│   ├── e2e/                      # Remix + Cloudflare Pages (Test Portal)
 │   └── wiki/                     # Astro + Starlight
 ├── packages/                     # 共通パッケージ層
 │   ├── ui/                       # Design System
@@ -95,9 +96,26 @@ CMS APIです。Domain-Driven Design (DDD) を採用しています。
 
 詳細は [`feature-sliced.md`](./feature-sliced.md) を参照してください。
 
+### apps/e2e (Remix + Cloudflare Pages)
+
+認証付きTest Portalサイトです。E2Eテストレポートとカバレッジレポートを可視化します。
+
+**構造:**
+
+- `app/`: Remixアプリケーション
+  - `routes/`: ファイルベースルーティング（認証、ダッシュボード、レポート表示）
+  - `lib/`: ユーティリティ（auth.server.ts, reports/）
+- `e2e/`: Playwright E2Eテスト
+  - `large/`: Large Tests (E2E)
+- `public/`: 静的ファイル
+  - `reports/`: テストレポート出力先（E2E、カバレッジ）
+- `playwright.config.ts`: Playwright設定
+- `vite.config.ts`: Vite + Remix設定
+- `wrangler.toml`: Cloudflare Pages設定
+
 ### apps/wiki (Astro + Starlight)
 
-Wiki & Reportsサイトです。
+Wikiドキュメントサイトです。
 
 **構造:**
 
@@ -107,7 +125,6 @@ Wiki & Reportsサイトです。
   - `styles/`: カスタムスタイル
 - `design/`: デザインアセット（Storybookビルド成果物など）
 - `reference/`: APIリファレンス
-- `reports/`: CI生成のE2E/Coverage HTMLレポート
 
 ## パッケージ層 (`packages/`)
 

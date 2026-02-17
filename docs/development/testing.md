@@ -267,15 +267,18 @@ afterEach(() => {
 カバレッジレポートは次の設定で生成されます：
 
 - **レポート形式**: HTML, LCOV
-- **閾値**: 80%（lines, functions, branches, statements）
+- **閾値**: 90%（lines, functions, statements）、100%（branches）
 - **除外**: `.cache/`, `node_modules/`, `**/*.test.{ts,tsx}`, `**/*.config.{ts,js}`
+- **出力先**: `apps/e2e/public/reports/coverage/{project}/`（Test Portalで表示）
 
 ```bash
 # カバレッジレポートを生成
 bun run coverage
 
 # 特定のパッケージのカバレッジ
+turbo run coverage --filter=@portfolio/api
 turbo run coverage --filter=@portfolio/web
+turbo run coverage --filter=@portfolio/admin
 ```
 
 ## 統合テスト
@@ -816,12 +819,18 @@ describe("canAccess MC/DC", () => {
 
 ### カバレッジレポートの確認
 
-```bash
-# HTMLレポートを開く
-open docs/vitest/coverage/index.html
+カバレッジレポートは `apps/e2e/public/reports/coverage/` に出力されます。
+Test Portal（http://localhost:24000）でブラウザから確認できます。
 
-# LCOVレポート（CI用）
-cat docs/vitest/coverage/lcov.info
+```bash
+# Test Portalを起動してカバレッジレポートを表示
+cd apps/e2e && bun run dev
+# http://localhost:24000/coverage でアクセス
+
+# HTMLレポートを直接開く（ローカル）
+open apps/e2e/public/reports/coverage/api/{日時}/index.html
+open apps/e2e/public/reports/coverage/web/{日時}/index.html
+open apps/e2e/public/reports/coverage/admin/{日時}/index.html
 
 # 特定ファイルのブランチカバレッジ詳細
 bun vitest run --coverage --reporter=verbose

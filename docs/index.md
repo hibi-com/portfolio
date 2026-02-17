@@ -60,6 +60,8 @@ bun run dev
 | **apps/web** | Remix + Cloudflare Pages | ポートフォリオサイト（FSD） |
 | **apps/admin** | TanStack Router + Vite | 管理ダッシュボード（FSD） |
 | **apps/api** | Hono + Cloudflare Workers | バックエンドAPI（DDD） |
+| **apps/e2e** | Remix + Cloudflare Pages | Test Portal - 認証付きテストレポート |
+| **apps/wiki** | Astro + Starlight | ドキュメントサイト |
 
 ### 共有パッケージ
 
@@ -255,7 +257,9 @@ portfolio/
 ├── apps/
 │   ├── web/                 # ポートフォリオサイト (Remix)
 │   ├── admin/               # 管理画面 (TanStack Router)
-│   └── api/                 # バックエンドAPI (Hono)
+│   ├── api/                 # バックエンドAPI (Hono)
+│   ├── e2e/                 # Test Portal - 認証付きテストレポート (Remix)
+│   └── wiki/                # ドキュメントサイト (Astro)
 ├── packages/
 │   ├── db/                  # データベース (Prisma)
 │   ├── api/                 # APIクライアント (Orval)

@@ -5,7 +5,7 @@ export default createVitestConfig({
     root: __dirname,
     tsconfigPath: "./tsconfig.json",
     testDir: "./app",
-    coverageDir: "../wiki/reports/test/admin",
+    coverageDir: "../e2e/public/reports/coverage/admin",
     projectName: "admin",
     additionalAliases: {
         "~": resolve(__dirname, "./app"),

@@ -217,19 +217,6 @@ export default defineConfig({
                         },
                     ],
                 },
-                {
-                    label: "Reports",
-                    items: [
-                        {
-                            label: "E2E Test Reports",
-                            link: "/reports/",
-                        },
-                        {
-                            label: "Coverage Reports",
-                            link: "/reports/coverage/",
-                        },
-                    ],
-                },
             ],
             customCss: ["./src/styles/custom.css"],
         }),
