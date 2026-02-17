@@ -1,6 +1,5 @@
 import { renderHook } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { usePageTracking } from "./usePageTracking";
 
 let mockPathname = "/";

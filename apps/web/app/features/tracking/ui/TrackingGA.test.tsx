@@ -1,5 +1,4 @@
 import { render } from "@testing-library/react";
-import { beforeEach, describe, expect, test } from "vitest";
 import type { TrackingGAProps } from "../model/types";
 import { TrackingGA } from "./TrackingGA";
 

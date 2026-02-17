@@ -10,6 +10,6 @@
         },
         "types": ["@cloudflare/workers-types", "vitest/globals"]
     },
-    "exclude": ["node_modules", "build", "dist", ".wrangler", "functions"],
+    "exclude": ["node_modules", "build", "dist", ".wrangler", "functions", "../../packages/api/dist/generated"],
     "include": ["app/**/*", "env.d.ts", "vite.config.ts", "vitest.d.ts"]
 }

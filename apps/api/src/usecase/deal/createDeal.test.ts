@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { CreateDealInput, Deal, DealRepository } from "~/domain/deal";
 import { CreateDealUseCase } from "./createDeal";
 

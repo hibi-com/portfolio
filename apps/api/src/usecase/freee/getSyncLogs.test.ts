@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { FreeeRepository, FreeeSyncLog } from "~/domain/freee";
 import { GetSyncLogsUseCase } from "./getSyncLogs";
 

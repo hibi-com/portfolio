@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { FreeeOAuthService } from "~/domain/freee";
 import { GetFreeeAuthUrlUseCase } from "./getFreeeAuthUrl";
 

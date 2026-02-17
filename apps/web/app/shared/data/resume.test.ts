@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import type { Experience, Social } from "~/entities/user";
 import { experience, social } from "./resume";
 

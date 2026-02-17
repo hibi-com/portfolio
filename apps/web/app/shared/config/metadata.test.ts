@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import type { MetaDataOptions } from "./metadata";
 import { getMetaData, getMetaDataBase } from "./metadata";
 

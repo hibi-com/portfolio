@@ -10,8 +10,8 @@
         },
         "rootDir": "./src",
         "typeRoots": ["../../node_modules/@types"],
-        "types": ["node", "vitest/globals"]
+        "types": ["node"]
     },
     "exclude": ["node_modules", "dist"],
-    "include": ["src/**/*.ts", "src/**/*.tsx", "vitest.d.ts"]
+    "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

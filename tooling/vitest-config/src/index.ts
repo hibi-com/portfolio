@@ -65,7 +65,11 @@ export function createVitestConfig(options: VitestConfigOptions = {}): VitestCon
               "default",
               [
                   "@portfolio/vitest-reporter",
-                  { outputDir: "../apps/wiki/reports/test", projectName: options.projectName, coverageDir },
+                  {
+                      outputDir: "../e2e/public/reports/test",
+                      projectName: options.projectName,
+                      coverageDir,
+                  },
               ],
           ]
         : ["default"];

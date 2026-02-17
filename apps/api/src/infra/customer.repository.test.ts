@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CustomerStatus } from "~/domain/customer";
 import { CustomerRepositoryImpl } from "./customer.repository";
 

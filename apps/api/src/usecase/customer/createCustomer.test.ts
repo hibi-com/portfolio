@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { CreateCustomerInput, Customer, CustomerRepository } from "~/domain/customer";
 import { CreateCustomerUseCase } from "./createCustomer";
 

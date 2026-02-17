@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import { type Data, data } from "./companies";
 
 describe("companies data", () => {

@@ -4,9 +4,10 @@ import { createVitestConfig } from "@portfolio/vitest-config";
 export default createVitestConfig({
     root: __dirname,
     tsconfigPath: "./tsconfig.json",
-    testDir: "./src",
+    testDir: "./app",
     coverageDir: "../e2e/public/reports/coverage/api",
     projectName: "api",
+    setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup.ts")],
     additionalAliases: {
         "~": resolve(__dirname, "./src"),
     },
@@ -19,12 +20,7 @@ export default createVitestConfig({
         },
         coverage: {
             include: ["src/**/*.ts"],
-            exclude: [
-                "dist/**",
-                "src/index.ts",
-                "**/*.test.ts",
-                "**/*.d.ts",
-            ],
+            exclude: ["dist/**", "build/**", "**/*.test.ts", "**/*.d.ts"],
         },
     },
 });

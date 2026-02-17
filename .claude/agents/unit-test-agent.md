@@ -40,8 +40,6 @@ Red（テスト作成・失敗確認） → Green（最小限実装） → Refac
 ## テンプレート（簡易版）
 
 ```typescript
-import { describe, expect, test } from "vitest";
-
 describe("機能名", () => {
     test("正常系: 期待される動作", () => {
         // Given: 前提条件

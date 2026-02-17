@@ -4,12 +4,10 @@ compatibility_flags = ["nodejs_compat"]
 main = "src/index.ts"
 
 [vars]
-NODE_ENV = "development"
+NODE_ENV = "production"
 
 [durable_objects]
-bindings = [
-    { name = "CHAT_ROOMS", class_name = "ChatRoomDO" }
-]
+bindings = [{ name = "CHAT_ROOMS", class_name = "ChatRoomDO" }]
 
 [[migrations]]
 tag = "v1"

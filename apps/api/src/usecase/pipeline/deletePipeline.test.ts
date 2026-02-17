@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { PipelineRepository } from "~/domain/pipeline";
 import { DeletePipelineUseCase } from "./deletePipeline";
 

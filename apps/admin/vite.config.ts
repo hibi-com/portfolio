@@ -1,6 +1,8 @@
+/// <reference path="./env.d.ts" />
+/// <reference types="./env.d.ts" />
 import { resolve } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -8,7 +10,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
     plugins: [
         react(),
-        TanStackRouterVite({
+        tanstackRouter({
             routesDirectory: "./app/routes",
             generatedRouteTree: "./app/routeTree.gen.tsx",
             routeFileIgnorePattern: ".test.",

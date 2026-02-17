@@ -1,20 +1,54 @@
+import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-    plugins: [react(), tsconfigPaths()],
+    plugins: [
+        react(),
+        tsconfigPaths({
+            root: resolve(__dirname),
+            projects: ["./tsconfig.json"],
+        }) as any,
+    ],
+    resolve: {
+        alias: {
+            "~": resolve(__dirname, "./app"),
+        },
+    },
     test: {
         name: "integration",
+        root: resolve(__dirname),
         include: ["integration/**/*.integration.test.{ts,tsx}"],
-        environment: "jsdom",
+        exclude: ["**/node_modules/**", "**/dist/**", "**/build/**", "**/functions/**", "**/public/**"],
         globals: true,
+        environment: "jsdom",
         testTimeout: 30000,
-        setupFiles: ["./testing/vitest/setup.ts"],
+        hookTimeout: 30000,
+        teardownTimeout: 10000,
+        pool: "forks",
+        poolOptions: {
+            forks: {
+                singleFork: true,
+            },
+        },
+        sequence: {
+            shuffle: false,
+        },
+        reporters: [
+            "default",
+            [
+                "@portfolio/vitest-reporter",
+                {
+                    outputDir: "../e2e/public/reports/integration",
+                    projectName: "admin",
+                    coverageDir: "../e2e/public/reports/coverage/admin-integration",
+                },
+            ],
+        ],
+        setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup.ts")],
         coverage: {
-            exclude: ["node_modules/**", "integration/**", "e2e/**", "**/*.config.{ts,js}"],
-            reporter: ["lcov", "json-summary"],
-            reportsDirectory: "./coverage/integration",
+            enabled: false,
         },
     },
 });

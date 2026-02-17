@@ -1,4 +1,3 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { trackSocial } from "./track-social";
 
 describe("tracking", () => {

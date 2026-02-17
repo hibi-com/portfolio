@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import { FreeeOAuthServiceImpl } from "./freee-oauth.service";
 
 globalThis.fetch = vi.fn();

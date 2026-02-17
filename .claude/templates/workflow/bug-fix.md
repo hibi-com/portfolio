@@ -109,8 +109,6 @@ git log --oneline -p {related-file}
 
 ```typescript
 // {path}.test.ts
-import { describe, expect, test } from "vitest";
-
 describe("{機能名}", () => {
     describe("バグ #{issue-number} の再現", () => {
         test("{バグの症状を説明するテスト名}", () => {

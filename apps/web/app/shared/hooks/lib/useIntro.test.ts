@@ -1,5 +1,4 @@
 import { renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { useIntro } from "./useIntro";
 
 describe("useIntro", () => {
@@ -11,10 +10,10 @@ describe("useIntro", () => {
 
     beforeEach(() => {
         logs = [];
-        consoleGroupSpy = vi.spyOn(console, "group").mockImplementation((label) => {
+        consoleGroupSpy = vi.spyOn(console, "group").mockImplementation((label: string) => {
             logs.push(`group: ${label}`);
         });
-        consoleLogSpy = vi.spyOn(console, "log").mockImplementation((...args) => {
+        consoleLogSpy = vi.spyOn(console, "log").mockImplementation((...args: unknown[]) => {
             logs.push(`log: ${args.join(" ")}`);
         });
         consoleGroupEndSpy = vi.spyOn(console, "groupEnd").mockImplementation(() => {

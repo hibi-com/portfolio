@@ -1,9 +1,6 @@
 import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { createVitestConfig } from "@portfolio/vitest-config";
 import { defineConfig, mergeConfig } from "vitest/config";
-
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig(
     mergeConfig(
@@ -26,7 +23,7 @@ export default defineConfig(
         {
             resolve: {
                 alias: {
-                    "@portfolio/ui": `${__dirname}src`,
+                    "@portfolio/ui": resolve(__dirname, "src"),
                 },
             },
         },

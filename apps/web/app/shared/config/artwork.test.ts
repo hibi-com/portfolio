@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import { artwork } from "./artwork";
 import {
     MESSAGE_HIRE_CONOSLE,

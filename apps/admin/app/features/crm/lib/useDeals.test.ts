@@ -1,7 +1,6 @@
 import type { Deal, Pipeline } from "@portfolio/api";
 import { deals as dealsApi, pipelines as pipelinesApi } from "@portfolio/api";
 import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import { useDeals } from "./useDeals";
 
 vi.mock("@portfolio/api", () => ({

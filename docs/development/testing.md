@@ -164,7 +164,6 @@ app/
 
 ```typescript
 // app/shared/lib/formatDate.test.ts
-import { describe, expect, it } from "vitest";
 import { formatDate } from "./formatDate";
 
 describe("formatDate", () => {
@@ -186,7 +185,6 @@ describe("formatDate", () => {
 ```typescript
 // app/features/blog-preview/ui/BlogPreview.test.tsx
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
 import { BlogPreview } from "./BlogPreview";
 
 describe("BlogPreview", () => {
@@ -221,7 +219,6 @@ describe("BlogPreview", () => {
 
 ```typescript
 // app/routes/blog.$slug.test.ts
-import { describe, expect, it, vi } from "vitest";
 import { loader } from "./blog.$slug";
 
 describe("loader", () => {
@@ -255,7 +252,6 @@ describe("loader", () => {
 // testing/vitest/setup.ts で設定される共通のセットアップ
 import "@testing-library/jest-dom";
 import { cleanup } from "@testing-library/react";
-import { afterEach } from "vitest";
 
 afterEach(() => {
     cleanup();
@@ -409,7 +405,6 @@ Integration Tests はMSWを使用してAPIをモックし、フロントエン�
 ```typescript
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { describe, expect, test } from "vitest";
 
 const server = setupServer();
 
@@ -656,8 +651,6 @@ it("should format date correctly", () => {
 外部依存関係は適切にモックします。
 
 ```typescript
-import { vi } from "vitest";
-
 it("should fetch data from API", async () => {
     // API呼び出しをモック
     const mockFetch = vi.fn().mockResolvedValue({

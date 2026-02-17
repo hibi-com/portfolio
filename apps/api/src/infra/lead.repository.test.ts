@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { LeadStatus } from "~/domain/lead";
 import { LeadRepositoryImpl } from "./lead.repository";
 

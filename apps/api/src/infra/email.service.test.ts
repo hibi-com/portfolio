@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { EmailLog, EmailRepository, EmailTemplate } from "~/domain/email";
 import { ResendEmailService } from "./email.service";
 

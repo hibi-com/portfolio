@@ -1,5 +1,4 @@
 import type { WebSocket as CFWebSocket, DurableObjectState } from "@cloudflare/workers-types";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 
 class MockWebSocket {
     accept = vi.fn();

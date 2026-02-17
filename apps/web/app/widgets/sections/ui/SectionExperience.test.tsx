@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
 import { SectionExperience } from "./SectionExperience";
 
 describe("SectionExperience Component", () => {

@@ -4,11 +4,7 @@ export default createVitestConfig({
     test: {
         coverage: {
             include: ["src/**/*.ts"],
-            exclude: [
-                "dist/**",
-                "**/*.test.ts",
-                "**/*.d.ts",
-            ],
+            exclude: ["dist/**", "src/index.ts", "**/*.test.ts", "**/*.d.ts"],
         },
     },
 });

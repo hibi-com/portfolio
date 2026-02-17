@@ -1,7 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { MemoryRouter, Link as RouterLink } from "react-router";
-import { describe, expect, test, vi } from "vitest";
 import { PostMarkdown } from "./PostMarkdown";
 
 vi.mock("@remix-run/react", async () => {

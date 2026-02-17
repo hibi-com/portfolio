@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import i18n from "./i18n";
 
 describe("i18n config", () => {

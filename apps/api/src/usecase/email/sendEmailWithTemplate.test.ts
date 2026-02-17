@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { EmailLog, EmailService } from "~/domain/email";
 import { SendEmailWithTemplateUseCase } from "./sendEmailWithTemplate";
 

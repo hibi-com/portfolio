@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import {
     COOKIE_THEME,
     MESSAGE_HIRE_ARTWORK,

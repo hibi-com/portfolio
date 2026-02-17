@@ -1,5 +1,4 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { describe, expect, test } from "vitest";
 import { loader } from "./[robots.txt]";
 
 describe("[robots.txt] loader", () => {

@@ -1,6 +1,5 @@
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { InquiryDetail as InquiryDetailType } from "../lib/useInquiries";
 import * as useInquiriesModule from "../lib/useInquiries";
 import { InquiryDetail } from "./InquiryDetail";

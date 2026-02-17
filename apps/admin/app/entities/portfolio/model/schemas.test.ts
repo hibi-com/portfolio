@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import { portfolioContentSchema, portfolioFormDataSchema, portfolioListItemSchema, portfolioSchema } from "./schemas";
 
 describe("Portfolio Entity Schemas", () => {

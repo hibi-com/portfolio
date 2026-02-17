@@ -64,8 +64,6 @@ bun vitest run {test-file}
 ### テスト作成ガイドライン
 
 ```typescript
-import { describe, expect, test } from "vitest";
-
 describe("機能名", () => {
     // 正常系
     test("should {expected-behavior} when {condition}", () => {

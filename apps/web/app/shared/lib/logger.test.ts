@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import type { LoggerConfig } from "@portfolio/log";
 
 vi.mock("@portfolio/log", () => ({
     initSentry: vi.fn(),
-    Logger: vi.fn().mockImplementation((config) => ({
+    Logger: vi.fn().mockImplementation((config: LoggerConfig) => ({
         config,
         debug: vi.fn(),
         info: vi.fn(),

@@ -1,7 +1,7 @@
 name = "portfolio-admin-o1dhv1"
 compatibility_date = "2025-11-17"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "./dist"
+pages_build_output_dir = "build"
 
 [vars]
-NODE_ENV = "development"
+NODE_ENV = "production"

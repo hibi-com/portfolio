@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { Customer, CustomerRepository } from "~/domain/customer";
 import { DeleteCustomerUseCase } from "./deleteCustomer";
 

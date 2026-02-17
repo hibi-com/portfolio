@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { EmailRepository, EmailTemplate, UpdateEmailTemplateInput } from "~/domain/email";
 import { UpdateEmailTemplateUseCase } from "./updateEmailTemplate";
 

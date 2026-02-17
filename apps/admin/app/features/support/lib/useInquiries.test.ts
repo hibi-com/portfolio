@@ -1,7 +1,6 @@
 import type { Inquiry, InquiryResponse } from "@portfolio/api";
 import { inquiries as inquiriesApi } from "@portfolio/api";
 import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import { useInquiries, useInquiryDetail } from "./useInquiries";
 
 vi.mock("@portfolio/api", () => ({

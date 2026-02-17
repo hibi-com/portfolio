@@ -18,7 +18,7 @@ export default defineConfig({
         name: "integration",
         root: resolve(__dirname),
         include: ["integration/**/*.integration.test.ts"],
-        exclude: ["**/node_modules/**", "**/dist/**"],
+        exclude: ["**/node_modules/**", "**/dist/**", "**/build/**"],
         globals: true,
         environment: "node",
         testTimeout: 30000,
@@ -38,12 +38,13 @@ export default defineConfig({
             [
                 "@portfolio/vitest-reporter",
                 {
-                    outputDir: "../wiki/reports/test",
-                    projectName: "api-integration",
-                    coverageDir: "../wiki/reports/test/api-integration",
+                    outputDir: "../e2e/public/reports/integration",
+                    projectName: "api",
+                    coverageDir: "../e2e/public/reports/coverage/api-integration",
                 },
             ],
         ],
+        setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup.ts")],
         coverage: {
             enabled: false,
         },

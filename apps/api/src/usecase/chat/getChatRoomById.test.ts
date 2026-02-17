@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { ChatRepository, ChatRoomWithParticipants } from "~/domain/chat";
 import { GetChatRoomByIdUseCase } from "./getChatRoomById";
 

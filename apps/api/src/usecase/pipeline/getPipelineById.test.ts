@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { Pipeline, PipelineRepository } from "~/domain/pipeline";
 import { GetPipelineByIdUseCase } from "./getPipelineById";
 

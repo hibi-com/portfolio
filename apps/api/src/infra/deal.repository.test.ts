@@ -1,5 +1,4 @@
 import { Prisma } from "@portfolio/db";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { DealStatus } from "~/domain/deal";
 import { DealRepositoryImpl } from "./deal.repository";
 

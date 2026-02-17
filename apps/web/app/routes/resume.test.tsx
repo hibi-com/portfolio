@@ -1,6 +1,5 @@
 import { createRouterWrapper } from "@portfolio/testing-vitest";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
 import Resume, { meta } from "./resume";
 
 describe("resume route", () => {

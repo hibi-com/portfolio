@@ -10,6 +10,6 @@
         },
         "types": ["vitest/globals"]
     },
-    "exclude": ["node_modules", "build", ".tanstack", "../../packages/api/dist/generated"],
-    "include": ["app/**/*", "integration/**/*", ".storybook", "vite.config.ts", "vitest.d.ts", "env.d.ts", "functions/**/*"]
+    "exclude": ["node_modules", "build", "dist", ".tanstack", "functions", "../../packages/api/dist/generated"],
+    "include": ["app/**/*", "env.d.ts", "vite.config.ts", "vitest.d.ts"]
 }

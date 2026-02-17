@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import { customerFormDataSchema, customerListItemSchema, customerSchema, customerStatusSchema } from "./schemas";
 
 describe("Customer Entity Schemas", () => {

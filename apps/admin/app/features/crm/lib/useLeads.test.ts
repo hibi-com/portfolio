@@ -1,7 +1,6 @@
 import type { Lead } from "@portfolio/api";
 import { leads as leadsApi } from "@portfolio/api";
 import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import { useLeads } from "./useLeads";
 
 vi.mock("@portfolio/api", () => ({

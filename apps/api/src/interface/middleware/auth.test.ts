@@ -1,5 +1,4 @@
 import type { Context } from "hono";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import { authenticate } from "./auth";
 
 const mockGetSession = vi.fn();

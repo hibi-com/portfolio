@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createRateLimiter, type RateLimitConfig, resetRateLimitStore } from "./rateLimit";
 
 describe("Rate Limiter Middleware", () => {

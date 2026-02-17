@@ -1,6 +1,5 @@
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
 import { SidebarContent } from "./SidebarContent";
 
 const createTestRouter = (pathname: string, onNavigate?: () => void) => {

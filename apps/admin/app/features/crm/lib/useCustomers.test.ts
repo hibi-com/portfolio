@@ -1,7 +1,6 @@
 import type { Customer } from "@portfolio/api";
 import { customers as customersApi } from "@portfolio/api";
 import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import { useCustomers } from "./useCustomers";
 
 vi.mock("@portfolio/api", () => ({

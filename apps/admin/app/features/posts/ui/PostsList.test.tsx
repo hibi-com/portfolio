@@ -1,7 +1,6 @@
 import type { Post } from "@portfolio/api";
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import * as usePostsModule from "../lib/usePosts";
 import { PostsList } from "./PostsList";
 

@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { AddParticipantInput, ChatParticipant, ChatRepository } from "~/domain/chat";
 import { AddChatParticipantUseCase } from "./addChatParticipant";
 

@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
 import { SectionSoftware } from "./SectionSoftware";
 
 describe("SectionSoftware Component", () => {

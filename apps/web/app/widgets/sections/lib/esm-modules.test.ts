@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import { fireworks } from "./esm-modules";
 
 vi.mock("@fireworks-js/react", () => ({

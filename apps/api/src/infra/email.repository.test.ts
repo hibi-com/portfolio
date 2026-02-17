@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { EmailStatus, EmailTemplateCategory } from "~/domain/email";
 import { EmailRepositoryImpl } from "./email.repository";
 

@@ -1,6 +1,5 @@
 import { posts as postsApi } from "@portfolio/api";
 import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import { usePosts } from "./usePosts";
 
 vi.mock("@portfolio/api", () => ({

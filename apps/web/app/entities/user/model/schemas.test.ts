@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import { experienceSchema, socialSchema } from "./schemas";
 
 describe("User Entity Schemas", () => {

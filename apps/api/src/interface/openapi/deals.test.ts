@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import { dealsRouter } from "./deals";
 
 vi.mock("~/di/container", () => ({

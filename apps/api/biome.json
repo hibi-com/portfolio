@@ -2,6 +2,6 @@
     "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
     "extends": ["@portfolio/biome-config/base"],
     "files": {
-        "includes": ["!!.wrangler", "!!worker-configuration.d.ts"]
+        "includes": ["!!.wrangler", "!!dist", "!!build", "!!worker-configuration.d.ts"]
     }
 }

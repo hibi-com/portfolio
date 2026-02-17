@@ -5,8 +5,9 @@
         "baseUrl": ".",
         "paths": {
             "~/*": ["./src/*"]
-        }
+        },
+        "types": ["vitest/globals"]
     },
-    "exclude": ["node_modules", "build", "dist"],
-    "include": ["src/**/*", "integration/**/*", "vite.config.ts", "env.d.ts"]
+    "exclude": ["node_modules", "build", "dist", ".wrangler", "../../packages/api/dist/generated"],
+    "include": ["src/**/*", "env.d.ts", "integration/**/*", "vite.config.ts", "env.d.ts"]
 }

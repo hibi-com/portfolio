@@ -1,5 +1,4 @@
 import { initSentry, Logger, LogLevel } from "@portfolio/log";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import { getLogger, initLogger, resetLoggerForTesting } from "./logger";
 
 vi.mock("@portfolio/log", () => ({

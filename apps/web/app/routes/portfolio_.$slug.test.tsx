@@ -1,7 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { MemoryRouter, Link as RouterLink } from "react-router";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import PortfolioSlug, { meta } from "./portfolio_.$slug";
 
 vi.mock("~/routes/api.portfolio.$slug", () => ({

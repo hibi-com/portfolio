@@ -1,6 +1,5 @@
 import type { R2Bucket } from "@cloudflare/workers-types";
 import { AppError } from "@portfolio/log";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { Portfolio, PortfolioRepository } from "~/domain/portfolio";
 import { UploadPortfolioImageUseCase } from "./uploadPortfolioImage";
 
@@ -155,7 +154,8 @@ describe("UploadPortfolioImageUseCase", () => {
         const useCase = new UploadPortfolioImageUseCase(mockRepository, mockR2Bucket, r2PublicUrl);
         await useCase.execute(portfolioId, imageFile);
 
-        const putCall = (mockR2Bucket.put as unknown as { mock: { calls: [string, ArrayBuffer, object][] } }).mock.calls[0];
+        const putCall = (mockR2Bucket.put as unknown as { mock: { calls: [string, ArrayBuffer, object][] } }).mock
+            .calls[0];
         const key = putCall?.[0];
 
         expect(key).toContain(`portfolios/${portfolioId}/`);
@@ -188,7 +188,8 @@ describe("UploadPortfolioImageUseCase", () => {
         const useCase = new UploadPortfolioImageUseCase(mockRepository, mockR2Bucket, r2PublicUrl);
         await useCase.execute(portfolioId, imageFile);
 
-        const putCall = (mockR2Bucket.put as unknown as { mock: { calls: [string, ArrayBuffer, object][] } }).mock.calls[0];
+        const putCall = (mockR2Bucket.put as unknown as { mock: { calls: [string, ArrayBuffer, object][] } }).mock
+            .calls[0];
         const key = putCall?.[0];
 
         expect(key).toMatch(/\.jpg$/);

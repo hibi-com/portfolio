@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { CreateLeadInput, Lead, LeadRepository } from "~/domain/lead";
 import { CreateLeadUseCase } from "./createLead";
 

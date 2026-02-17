@@ -1,5 +1,3 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
 const mockPostsClient = {
     postsListPosts: vi.fn(),
     postsGetPostBySlug: vi.fn(),

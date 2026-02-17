@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import { blogDataSchema, enumValueSchema, postSchema } from "./schemas";
 
 describe("Blog Entity Schemas", () => {

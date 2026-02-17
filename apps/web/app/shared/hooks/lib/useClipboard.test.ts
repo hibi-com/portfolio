@@ -1,5 +1,4 @@
 import { act, renderHook } from "@testing-library/react";
-import { beforeEach, expect, test, vi } from "vitest";
 import { useClipboard } from "./useClipboard";
 
 vi.mock("~/shared/lib/clipboard", () => ({

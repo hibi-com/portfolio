@@ -1,4 +1,3 @@
-import { describe, expect, test, vi } from "vitest";
 import type { Post, PostRepository } from "~/domain/post";
 import { GetPostsUseCase } from "./getPosts";
 

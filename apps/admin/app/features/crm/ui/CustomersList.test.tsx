@@ -1,6 +1,5 @@
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { Customer } from "~/entities/customer";
 import * as useCustomersModule from "../lib/useCustomers";
 import { CustomersList } from "./CustomersList";

@@ -1,7 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, expect, test, vi } from "vitest";
 import { usePageTransition } from "./usePageTransition";
 
 interface DocumentTransition {

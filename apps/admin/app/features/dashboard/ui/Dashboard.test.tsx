@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
 import * as useDashboardStatsModule from "../lib/useDashboardStats";
+import type { DashboardStats } from "../model/types";
 import { Dashboard } from "./Dashboard";
 
 vi.mock("../lib/useDashboardStats");
 vi.mock("../lib/createStatCards", () => ({
-    createStatCards: vi.fn((stats) => [
+    createStatCards: vi.fn((stats: DashboardStats) => [
         {
             title: "Total Posts",
             value: stats.posts,

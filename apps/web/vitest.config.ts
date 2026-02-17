@@ -14,13 +14,7 @@ export default createVitestConfig({
     test: {
         coverage: {
             include: ["app/**/*.ts", "app/**/*.tsx"],
-            exclude: [
-                "dist/**",
-                "**/*.test.ts",
-                "**/*.test.tsx",
-                "**/*.d.ts",
-                "**/*.stories.tsx",
-            ],
+            exclude: ["dist/**", "build/**", "**/*.test.ts", "**/*.test.tsx", "**/*.d.ts", "**/*.stories.tsx"],
         },
     },
 });
