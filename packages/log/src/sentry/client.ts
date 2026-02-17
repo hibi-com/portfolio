@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { AppError } from "../errors/app-error";
-import { type ErrorCode } from "../errors/error-codes";
+import { ErrorCategory, type ErrorCode, getErrorCategory } from "../errors/error-codes";
 
 export class SentryClient {
     captureError(error: Error | AppError, context?: Record<string, unknown>): string | undefined {
@@ -52,11 +52,13 @@ export class SentryClient {
     }
 
     private getSeverityLevel(code: ErrorCode): Sentry.SeverityLevel {
-        if (code.startsWith("AUTH_") || code.startsWith("VALIDATION_")) {
+        const category = getErrorCategory(code);
+
+        if (category === ErrorCategory.AUTHENTICATION || category === ErrorCategory.VALIDATION) {
             return "warning";
         }
 
-        if (code.startsWith("NOT_FOUND_")) {
+        if (category === ErrorCategory.NOT_FOUND) {
             return "info";
         }
 
