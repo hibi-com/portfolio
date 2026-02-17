@@ -120,10 +120,10 @@ export function createVitestConfig(options: VitestConfigOptions = {}): VitestCon
                 },
             },
             deps: {
+                inline: ["@portfolio/**"],
                 optimizer: {
                     web: { enabled: false },
                     ssr: { enabled: false },
-                    client: { include: ["@portfolio/**"] },
                 },
             },
             server: {
