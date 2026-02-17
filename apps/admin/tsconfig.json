@@ -7,8 +7,9 @@
         "lib": ["DOM", "DOM.Iterable", "ES2022"],
         "paths": {
             "~/*": ["./app/*"]
-        }
+        },
+        "types": ["vitest/globals"]
     },
     "exclude": ["node_modules", "build", ".tanstack", "../../packages/api/dist/generated"],
-    "include": ["app/**/*", "integration/**/*", ".storybook", "vite.config.ts", "env.d.ts", "functions/**/*"]
+    "include": ["app/**/*", "integration/**/*", ".storybook", "vite.config.ts", "vitest.d.ts", "env.d.ts", "functions/**/*"]
 }
