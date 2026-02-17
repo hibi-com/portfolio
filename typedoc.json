@@ -1,5 +1,6 @@
 {
     "$schema": "https://typedoc.org/schema.json",
+    "name": "Portfolio API Reference",
     "entryPoints": [
         "packages/api/src/index.ts",
         "packages/validation/src/index.ts",
