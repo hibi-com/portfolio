@@ -31,7 +31,6 @@ export function getProjectReports(projectName: string, reportType: "e2e" | "cove
         .reverse();
 
     return reportDirs.map((reportId) => {
-        const reportPath = join(projectDir, reportId);
         const metadata = getReportMetadata(projectName, reportId, reportType);
 
         return {

@@ -1,5 +1,13 @@
 import { initAuth } from "@portfolio/auth";
 
+if (!process.env.BASE_URL) {
+    throw new Error("BASE_URL environment variable is required");
+}
+
+if (!process.env.PRODUCTION_URL) {
+    throw new Error("PRODUCTION_URL environment variable is required");
+}
+
 if (!process.env.AUTH_SECRET) {
     throw new Error("AUTH_SECRET environment variable is required");
 }

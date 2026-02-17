@@ -1,4 +1,4 @@
-import { json, type LoaderFunctionArgs, type MetaFunction } from "@remix-run/cloudflare";
+import { json, type MetaFunction } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getAllProjects, getProjectReports } from "~/lib/reports/parser";
 
@@ -6,7 +6,7 @@ export const meta: MetaFunction = () => {
     return [{ title: "Coverage Reports - Test Portal" }];
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
     const projects = getAllProjects("coverage");
     const reports = projects.map((project) => ({
         project,
