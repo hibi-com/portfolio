@@ -5,7 +5,7 @@
     "tasks": {
         "build": {
             "dependsOn": ["^build"],
-            "outputs": ["dist/**"],
+            "outputs": ["dist/**", "bin/**", "build/**", ".wrangler/**"],
             "inputs": ["src/**", "cmd/**", "generated/**", "generators/**", "tsconfig.json", "package.json"],
             "env": ["NODE_OPTIONS"]
         },
@@ -21,7 +21,7 @@
         },
         "@portfolio/cms#build": {
             "dependsOn": ["^build"],
-            "outputs": []
+            "outputs": [".wrangler/**"]
         },
         "@portfolio/api#build": {
             "dependsOn": ["@portfolio/api#generate", "^build"],
@@ -63,6 +63,10 @@
         },
         "generate": {
             "dependsOn": ["^build"],
+            "cache": false
+        },
+        "@portfolio/db#generate": {
+            "dependsOn": ["@portfolio/prisma-markdown#build", "^build"],
             "cache": false
         },
         "@portfolio/infra#generate": {
