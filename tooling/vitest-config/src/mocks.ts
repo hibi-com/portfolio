@@ -143,26 +143,30 @@ function createMatchMediaMock() {
 
 setupClipboardMock();
 
-globalThis.IntersectionObserver = IntersectionObserverMock as unknown as typeof IntersectionObserver;
-globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
+if (typeof navigator !== "undefined") {
+    Object.defineProperty(navigator, "share", {
+        writable: true,
+        value: vi.fn().mockResolvedValue(undefined),
+    });
+}
 
-Object.defineProperty(globalThis, "matchMedia", {
-    writable: true,
-    value: createMatchMediaMock(),
-});
+if (typeof Element !== "undefined") {
+    globalThis.IntersectionObserver = IntersectionObserverMock as unknown as typeof IntersectionObserver;
+    globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
 
-Object.defineProperty(globalThis, "scrollTo", {
-    writable: true,
-    value: vi.fn(),
-});
+    Object.defineProperty(globalThis, "matchMedia", {
+        writable: true,
+        value: createMatchMediaMock(),
+    });
 
-Object.defineProperty(navigator, "share", {
-    writable: true,
-    value: vi.fn().mockResolvedValue(undefined),
-});
+    Object.defineProperty(globalThis, "scrollTo", {
+        writable: true,
+        value: vi.fn(),
+    });
 
-Element.prototype.getBoundingClientRect = vi.fn(() => emptyRect);
-Element.prototype.scrollIntoView = vi.fn();
+    Element.prototype.getBoundingClientRect = vi.fn(() => emptyRect);
+    Element.prototype.scrollIntoView = vi.fn();
+}
 
 globalThis.requestAnimationFrame = vi.fn((cb) => setTimeout(cb, 0) as unknown as number);
 globalThis.cancelAnimationFrame = vi.fn((id) => clearTimeout(id));

@@ -44,7 +44,7 @@ export default defineConfig({
                 },
             ],
         ],
-        setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup.ts")],
+        setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup-api.ts")],
         coverage: {
             enabled: false,
         },
