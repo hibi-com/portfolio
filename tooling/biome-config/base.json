@@ -20,7 +20,8 @@
             "enabled": false
         },
         "parser": {
-            "cssModules": true
+            "cssModules": true,
+            "tailwindDirectives": true
         }
     },
     "files": {
