@@ -1,63 +1,63 @@
 {
-    "author": "Matthew Scholta",
-    "background_color": "#ff0000",
+    "author": "HIBI.com",
+    "background_color": "#ffffff",
     "default_locale": "en",
-    "display": "standalone",
+    "description": "HIBI.com",
     "dir": "ltr",
-    "description": "2023 Portfolio of Matthew Scholta, a software Engineer",
-    "id": "/",
+    "display": "standalone",
     "icons": [
         {
             "purpose": "any",
             "sizes": "48x48",
-            "src": "/icons/48.png",
+            "src": "/hibi-com-icov.png",
             "type": "image/png"
         },
         {
             "purpose": "any",
             "sizes": "96x96",
-            "src": "/icons/96.png",
+            "src": "/hibi-com-icov.png",
             "type": "image/png"
         },
         {
             "purpose": "any",
             "sizes": "144x144",
-            "src": "/icons/144.png",
+            "src": "/hibi-com-icov.png",
             "type": "image/png"
         },
         {
             "purpose": "any",
             "sizes": "192x192",
-            "src": "/icons/192.png",
+            "src": "/hibi-com-icov.png",
             "type": "image/png"
         },
         {
             "purpose": "any",
             "sizes": "256x256",
-            "src": "/icons/256.png",
+            "src": "/hibi-com-icov.png",
             "type": "image/png"
         },
         {
             "purpose": "any",
             "sizes": "384x384",
-            "src": "/icons/384.png",
+            "src": "/hibi-com-icov.png",
             "type": "image/png"
         },
         {
             "purpose": "any",
             "sizes": "512x512",
-            "src": "/icons/512.png",
+            "src": "/hibi-com-icov.png",
             "type": "image/png"
         }
     ],
+    "id": "/",
     "lang": "en-US",
     "manifest_version": 2,
-    "name": "2023 Portfolio",
+    "name": "HIBI.com",
     "orientation": "portrait",
     "scope": "/",
+    "short_name": "HIBI.com",
     "shortcuts": [],
-    "short_name": "Portfolio",
     "start_url": "/",
-    "theme_color": "#ff0000",
+    "theme_color": "#ffffff",
     "version": "1.0"
 }
