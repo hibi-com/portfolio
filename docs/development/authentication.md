@@ -317,8 +317,8 @@ wrangler d1 execute portfolio-db --command "SELECT * FROM sessions"
 # Prismaスキーマを確認
 cat packages/db/prisma/schema.prisma
 
-# マイグレーションを適用
-bunx prisma migrate deploy
+# マイグレーションを適用（db パッケージで実行）
+bun --cwd packages/db x prisma migrate deploy
 ```
 
 ## 参考資料

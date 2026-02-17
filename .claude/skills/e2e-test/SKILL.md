@@ -21,28 +21,24 @@ E2Eテスト（Large Tests）をPlaywrightで実行します。
 
 ## 実行コマンド
 
+ルートの package.json の script を利用し、オプション・ファイルは `--` で渡す。
+
 ```bash
 # 全テスト
 bun run e2e
 
-# 特定アプリ
-bun --cwd apps/web playwright test
-bun --cwd apps/admin playwright test
+# 特定アプリ（--filter でパッケージ指定）
+bun run e2e --filter=@portfolio/web
+bun run e2e --filter=@portfolio/admin
 
-# 特定ファイル
-bun --cwd apps/web playwright test e2e/large/visitor/browse-blog.large.spec.ts
+# 特定ファイル・オプション（-- の後に渡す）
+bun run e2e --filter=@portfolio/web -- e2e/large/visitor/browse-blog.large.spec.ts
+bun run e2e --filter=@portfolio/web -- --ui
+bun run e2e --filter=@portfolio/web -- --headed
+bun run e2e --filter=@portfolio/web -- --update-snapshots
 
-# UIモード（デバッグ用）
-bun --cwd apps/web playwright test --ui
-
-# ヘッドフルモード（ブラウザ表示）
-bun --cwd apps/web playwright test --headed
-
-# スナップショット更新
-bun --cwd apps/web playwright test --update-snapshots
-
-# レポート表示
-bun --cwd apps/web playwright show-report
+# レポート表示（show-report は各アプリの e2e 実行後、パッケージ内で実行）
+bun run e2e --filter=@portfolio/web -- --show-report
 ```
 
 ## 前提条件

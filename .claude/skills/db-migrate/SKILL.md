@@ -20,24 +20,26 @@ Prismaマイグレーションを実行します。
 
 ## 実行コマンド
 
-```bash
-# ステータス確認
-cd packages/db && bun prisma migrate status
+ルートの package.json の script を優先する。マイグレーションは @portfolio/db のコンテキストで実行する。
 
-# 開発用マイグレーション
-cd packages/db && bun prisma migrate dev --name {migration-name}
+```bash
+# 型生成のみ（ルートの generate で @portfolio/db を指定）
+bun run generate --filter=@portfolio/db
+
+# ステータス確認（db パッケージで prisma を実行）
+bun --cwd packages/db x prisma migrate status
+
+# 開発用マイグレーション（新規作成・適用。-- で引数を渡す場合は migrate dev の前に指定）
+bun --cwd packages/db x prisma migrate dev --name {migration-name}
 
 # 本番適用
-cd packages/db && bun prisma migrate deploy
+bun --cwd packages/db x prisma migrate deploy
 
 # DBリセット（開発用）
-cd packages/db && bun prisma migrate reset
-
-# 型生成のみ
-bun run db:generate
+bun --cwd packages/db x prisma migrate reset
 
 # バリデーション
-cd packages/db && bun prisma validate
+bun --cwd packages/db x prisma validate
 ```
 
 ## Prismaスキーマ構成

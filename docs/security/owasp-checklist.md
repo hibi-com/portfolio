@@ -123,8 +123,8 @@ bun audit
 # 更新可能なパッケージ
 bun outdated
 
-# 未使用パッケージ
-npx depcheck
+# 未使用パッケージ（package.json に depcheck script が無い場合は bunx で実行）
+bunx depcheck
 ```
 
 ## A07:2021 - 識別と認証の失敗

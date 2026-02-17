@@ -141,14 +141,14 @@ cat apps/api/wrangler.toml
 **解決方法**:
 
 ```bash
-# マイグレーション状態を確認
-bunx prisma migrate status
+# マイグレーション状態を確認（db パッケージで実行）
+bun --cwd packages/db x prisma migrate status
 
 # データベースをリセット（開発環境のみ）
-bunx prisma migrate reset
+bun --cwd packages/db x prisma migrate reset
 
 # マイグレーションを再適用
-bunx prisma migrate deploy
+bun --cwd packages/db x prisma migrate deploy
 ```
 
 ### スキーマの変更が反映されない
@@ -158,14 +158,11 @@ bunx prisma migrate deploy
 **解決方法**:
 
 ```bash
-# Prisma Clientを再生成
-bun run generate
+# Prisma Clientを再生成（ルートの generate）
+bun run generate --filter=@portfolio/db
 
-# データベースにスキーマをプッシュ（開発環境）
-bun run push
-
-# マイグレーションを作成
-bunx prisma migrate dev --name migration_name
+# マイグレーションを作成・適用（開発環境、db パッケージで実行）
+bun --cwd packages/db x prisma migrate dev --name migration_name
 ```
 
 ## テストの問題
@@ -214,11 +211,11 @@ bun run coverage
 # 開発サーバーが起動しているか確認
 bun run dev
 
-# テストをヘッドモードで実行（ブラウザを表示）
-bunx playwright test --headed
+# テストをヘッドモードで実行（ブラウザを表示。-- でオプションを渡す）
+bun run e2e -- --headed
 
 # デバッグモードで実行
-bunx playwright test --debug
+bun run e2e -- --debug
 
 # スクリーンショットを確認
 open .results/playwright/
@@ -389,8 +386,9 @@ bun run fmt
 # 設定ファイルを確認
 cat biome.json
 
-# 特定のファイルのみチェック
-bunx biome check path/to/file.ts
+# 特定のファイルのみチェック（ルートの lint / fmt:check。パッケージ指定は -- で）
+bun run lint -- --filter=@portfolio/api
+bun run fmt:check -- --filter=@portfolio/api
 ```
 
 ### フォーマットが適用されない

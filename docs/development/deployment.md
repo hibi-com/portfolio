@@ -216,11 +216,10 @@ gh workflow run deploy.yml
 
 ```bash
 # 1. Prismaスキーマの変更
-cd packages/db
-# prisma/schema.prisma を編集
+# packages/db/prisma/ を編集
 
-# 2. マイグレーションファイルの生成
-bunx prisma migrate dev --name migration_name
+# 2. マイグレーションファイルの生成（db パッケージで実行）
+bun --cwd packages/db x prisma migrate dev --name migration_name
 
 # 3. 本番環境への適用
 wrangler d1 migrations apply portfolio-db
@@ -229,12 +228,11 @@ wrangler d1 migrations apply portfolio-db
 ### ローカル開発環境でのマイグレーション
 
 ```bash
-# 開発環境でのマイグレーション
-cd packages/db
-bun run push
+# 開発環境でのマイグレーション（db パッケージで実行）
+bun --cwd packages/db x prisma db push
 
 # シードデータの投入
-bun run seed
+bun run --cwd packages/db seed
 ```
 
 ## 環境別デプロイ設定
@@ -382,7 +380,7 @@ wrangler d1 execute portfolio-db --command "SELECT 1"
 1. **パッケージ・アプリをビルド**（リポジトリルートで）:
    ```bash
    bun install --frozen-lockfile
-   bunx turbo run build --filter=@portfolio/admin   # admin 用
+   bun run build -- --filter=@portfolio/admin   # admin 用
    # または --filter=@portfolio/wiki など
    ```
 2. **Docker イメージをビルド**（成果物をコンテキストに）:

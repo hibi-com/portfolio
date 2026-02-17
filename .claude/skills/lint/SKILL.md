@@ -25,8 +25,8 @@ bun run lint
 # 自動修正
 bun run lint:fix
 
-# 特定パッケージ
-turbo run lint --filter=@portfolio/{package-name}
+# 特定パッケージ（lint:ts:check が turbo run lint なので -- で filter を渡す）
+bun run lint:ts:check -- --filter=@portfolio/{package-name}
 ```
 
 ## リントツール

@@ -353,9 +353,8 @@ options:
 ### 使用方法
 
 ```bash
-# TypeSpecスキーマからOpenAPI仕様を生成
-cd packages/api
-bunx tsp compile .
+# TypeSpecスキーマからOpenAPI仕様を生成（api パッケージで実行）
+bun --cwd packages/api x tsp compile .
 ```
 
 ## 参考資料

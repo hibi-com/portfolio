@@ -20,19 +20,21 @@ Biomeでコードをフォーマットします。
 
 ## 実行コマンド
 
+ルートの package.json の script を利用する。
+
 ```bash
 # チェックのみ
-bun run biome format .
+bun run fmt:check
 
 # 修正
-bun run biome format --write .
+bun run fmt
 
-# 特定パス
-bun run biome format --write apps/api/src/
-bun run biome format --write packages/validation/
+# 特定パッケージのみ（-- で filter を渡す）
+bun run fmt -- --filter=@portfolio/api
+bun run fmt:check -- --filter=@portfolio/validation
 
-# Lint と同時実行
-bun run biome check --write .
+# Lint と同時実行（lint:fix で Biome の --write も実行される）
+bun run lint:fix
 ```
 
 ## 対象ファイル

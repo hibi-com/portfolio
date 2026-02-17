@@ -107,9 +107,8 @@ export class D1PostRepository {
 ### マイグレーションの作成
 
 ```bash
-# スキーマを変更後、マイグレーションファイルを生成
-cd packages/db
-bunx prisma migrate dev --name migration_name
+# スキーマを変更後、マイグレーションファイルを生成（db パッケージで実行）
+bun --cwd packages/db x prisma migrate dev --name migration_name
 
 # マイグレーションファイルが生成される
 # prisma/migrations/YYYYMMDDHHMMSS_migration_name/migration.sql
@@ -118,66 +117,20 @@ bunx prisma migrate dev --name migration_name
 ### 開発環境でのマイグレーション
 
 ```bash
-# スキーマをデータベースにプッシュ（開発環境のみ）
-cd packages/db
-bun run push
+# スキーマをデータベースにプッシュ（開発環境のみ、db パッケージで実行）
+bun --cwd packages/db x prisma db push
 ```
 
 ### 本番環境でのマイグレーション
 
 ```bash
-# D1データベースにマイグレーションを適用
-cd packages/db
-wrangler d1 migrations apply portfolio-db
-
-# または、package.jsonのスクリプトを使用
-bun run migrate
+bun run --cwd packages/db migrate
 ```
 
 ### マイグレーションの確認
 
 ```bash
-# マイグレーションの状態を確認
-bunx prisma migrate status
-
-# 適用済みのマイグレーションを確認
-wrangler d1 migrations list portfolio-db
-```
-
-## シードデータ
-
-### シードスクリプト
-
-```typescript
-// packages/db/src/seed.ts
-import { createPrismaClient } from "./client";
-
-export async function seed(d1?: D1Database, databaseUrl?: string) {
-    const prisma = createPrismaClient({ d1, databaseUrl });
-
-    // シードデータの投入
-    await prisma.post.createMany({
-        data: [
-            {
-                title: "First Post",
-                slug: "first-post",
-                date: new Date(),
-                content: "Content here",
-            },
-        ],
-    });
-}
-```
-
-### シードの実行
-
-```bash
-# 開発環境でシードを実行
-cd packages/db
-bun run seed
-
-# 本番環境でシードを実行（注意: 本番データを上書きする可能性あり）
-wrangler d1 execute portfolio-db --file=./seed.sql
+bun --cwd packages/db x prisma migrate status
 ```
 
 ## データベースの操作
@@ -189,25 +142,9 @@ Prisma Studioを使用してデータベースを視覚的に操作できます�
 ```bash
 # Prisma Studioを起動
 cd packages/db
-bun run dev
+bun run studio
 
 # ブラウザで http://localhost:5555 を開く
-```
-
-### D1データベースの操作
-
-```bash
-# D1データベースの一覧を表示
-wrangler d1 list
-
-# SQLクエリを実行
-wrangler d1 execute portfolio-db --command "SELECT * FROM posts"
-
-# SQLファイルを実行
-wrangler d1 execute portfolio-db --file=./query.sql
-
-# ローカルD1データベースを使用（開発環境）
-wrangler d1 execute portfolio-db --local --command "SELECT * FROM posts"
 ```
 
 ## データベースのバックアップ
@@ -276,22 +213,18 @@ const posts = await prisma.post.findMany({
 ### マイグレーションエラー
 
 ```bash
-# マイグレーションをリセット（開発環境のみ）
-bunx prisma migrate reset
+# マイグレーションをリセット（開発環境のみ、db パッケージで実行）
+bun --cwd packages/db x prisma migrate reset
 
 # マイグレーションを再適用
-bunx prisma migrate deploy
+bun --cwd packages/db x prisma migrate deploy
 ```
 
 ### Prisma Client の再生成
 
 ```bash
-# Prisma Clientを再生成
-cd packages/db
-bun run generate
-
-# または、直接実行
-bunx prisma generate
+# Prisma Clientを再生成（ルートの generate で @portfolio/db を指定）
+bun run generate --filter=@portfolio/db
 ```
 
 ### データベース接続エラー

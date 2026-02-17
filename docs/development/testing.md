@@ -589,7 +589,7 @@ CI環境では、Dockerコンテナ内でテストが実行されます。
 docker run --rm -e CI=true \
   -v $(pwd):/work -w /work \
   -v $(pwd)/node_modules:/work/node_modules \
-  e2e bunx playwright test
+  e2e bun run e2e
 ```
 
 ## テストのベストプラクティス

@@ -101,7 +101,7 @@ ENTRYPOINTスクリプトは以下を自動実行します：
 2. **セキュリティスキャン**（`SKIP_SECURITY_SCAN=true`でスキップ可能）:
    - Trivyによるファイルシステムスキャン（SAST）
    - Bun auditによる依存関係の脆弱性チェック
-3. **E2Eテスト実行**: Playwrightテストを実行（デフォルト: `bunx playwright test`）
+3. **E2Eテスト実行**: Playwrightテストを実行（デフォルト: `bun run e2e`）
 
 #### カスタムコマンドの実行
 
@@ -113,14 +113,16 @@ docker run --rm \
   -v $(pwd):/work \
   -w /work \
   e2e \
-  bunx playwright test --ui
+  bun run e2e -- --ui
 ```
 
 #### 特定のアプリのE2Eテスト実行
 
+リポジトリルートで実行し、`bun run e2e` の `--filter` でアプリを指定する。
+
 ```bash
+# リポジトリルートで実行
 # WebアプリのE2Eテスト
-cd apps/web
 docker run --rm \
   -e CI=true \
   -v $(pwd):/work \
@@ -128,10 +130,9 @@ docker run --rm \
   -v $(pwd)/node_modules:/work/node_modules \
   -v $(pwd)/docs/playwright/report:/work/docs/playwright/report \
   e2e \
-  bunx playwright test
+  bun run e2e --filter=@portfolio/web
 
 # AdminアプリのE2Eテスト
-cd apps/admin
 docker run --rm \
   -e CI=true \
   -v $(pwd):/work \
@@ -139,7 +140,7 @@ docker run --rm \
   -v $(pwd)/node_modules:/work/node_modules \
   -v $(pwd)/docs/playwright/report:/work/docs/playwright/report \
   e2e \
-  bunx playwright test
+  bun run e2e --filter=@portfolio/admin
 ```
 
 #### Storybookテスト実行
@@ -153,7 +154,7 @@ docker run --rm \
   -v $(pwd)/node_modules:/work/node_modules \
   -v $(pwd)/docs/visual/report:/work/docs/playwright/report \
   e2e \
-  bunx playwright test --config=playwright.storybook.config.ts e2e/storybook/visual
+  bun run e2e -- --config=playwright.storybook.config.ts e2e/storybook/visual
 
 # Accessibility tests
 docker run --rm \
@@ -163,7 +164,7 @@ docker run --rm \
   -v $(pwd)/node_modules:/work/node_modules \
   -v $(pwd)/docs/accessibility/report:/work/docs/playwright/report \
   e2e \
-  bunx playwright test --config=playwright.storybook.config.ts e2e/accessibility
+  bun run e2e -- --config=playwright.storybook.config.ts e2e/accessibility
 
 # Interaction tests
 docker run --rm \
@@ -173,7 +174,7 @@ docker run --rm \
   -v $(pwd)/node_modules:/work/node_modules \
   -v $(pwd)/docs/interactions/report:/work/docs/playwright/report \
   e2e \
-  bunx playwright test --config=playwright.storybook.config.ts e2e/storybook/interactions
+  bun run e2e -- --config=playwright.storybook.config.ts e2e/storybook/interactions
 ```
 
 ### 環境変数
@@ -230,7 +231,7 @@ docker run --rm \
   -v $(pwd):/work \
   -w /work \
   e2e \
-  bunx playwright test
+  bun run e2e
 ```
 
 ### デバッグモード
@@ -310,7 +311,7 @@ docker run --rm \
   -v $(pwd):/work \
   -w /work \
   e2e \
-  bunx playwright test --workers=4
+  bun run e2e -- --workers=4
 ```
 
 ### 2. 特定のブラウザでテスト
@@ -322,7 +323,7 @@ docker run --rm \
   -v $(pwd):/work \
   -w /work \
   e2e \
-  bunx playwright test --project=chromium
+  bun run e2e -- --project=chromium
 
 # 全ブラウザ
 docker run --rm \
@@ -330,7 +331,7 @@ docker run --rm \
   -v $(pwd):/work \
   -w /work \
   e2e \
-  bunx playwright test --project=chromium --project=firefox --project=webkit
+  bun run e2e -- --project=chromium --project=firefox --project=webkit
 ```
 
 ### 3. 失敗したテストのリトライ
@@ -341,7 +342,7 @@ docker run --rm \
   -v $(pwd):/work \
   -w /work \
   e2e \
-  bunx playwright test --retries=2
+  bun run e2e -- --retries=2
 ```
 
 ## 関連ドキュメント

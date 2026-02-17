@@ -318,10 +318,8 @@ TIDB_HOST="gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
 ### 使用方法
 
 ```bash
-# リポジトリルートから
-bun run check infra
-# または
-bunx check infra
+# リポジトリルートから（check は fmt/lint/type/test/knip を実行。infra は -- で渡す）
+bun run check -- infra
 ```
 
 ### 確認内容
