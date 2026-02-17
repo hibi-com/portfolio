@@ -1,6 +1,6 @@
 FROM oven/bun:1.1.43 AS builder
 
-ARG REGISTRY_URL=http://host.docker.internal:4873
+ARG REGISTRY_URL
 
 WORKDIR /app
 

@@ -1,12 +1,15 @@
-FROM oven/bun:1.1.43-alpine AS builder
+FROM oven/bun:1.1.43 AS builder
 
 WORKDIR /app
 
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends jq=1.6-2.1+deb11u1 \
+  && rm -rf /var/lib/apt/lists/*
+
 COPY package.json ./
-RUN apk add --no-cache jq=1.7.1-r0 && \
-    jq 'del(.devDependencies)' package.json > package.tmp.json && \
-    mv package.tmp.json package.json && \
-    bun install --ignore-scripts
+RUN jq 'del(.devDependencies)' package.json > package.tmp.json \
+  && mv package.tmp.json package.json \
+  && bun install --ignore-scripts
 
 COPY . .
 RUN bun build --compile --minify --sourcemap ./src/index.ts --outfile server

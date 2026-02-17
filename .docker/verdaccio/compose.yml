@@ -3,7 +3,7 @@ services:
     image: verdaccio/verdaccio:5
     container_name: verdaccio
     networks:
-      - default
+      - registry
     ports:
       - target: 4873
         published: 4873
@@ -25,3 +25,8 @@ volumes:
   verdaccio_storage:
     driver: local
     name: portfolio_verdaccio_storage
+
+networks:
+  registry:
+    driver: bridge
+    name: portfolio_registry

@@ -3,15 +3,16 @@ include:
   - .docker/verdaccio/compose.yml
 
 networks:
-  default:
-    name: portfolio_default
+  api:
+    driver: bridge
+    name: portfolio_api
 
 services:
   cache:
     image: redis:latest
     container_name: cache
     networks:
-      - default
+      - api
     ports:
       - target: 6379
         published: 6379
@@ -31,13 +32,19 @@ services:
     image: portfolio-mock-apis:local
     container_name: mock-apis
     networks:
-      - default
+      - api
     ports:
       - target: 3920
         published: 3920
         protocol: tcp
     environment:
       PORT: 3920
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3920/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
     restart: unless-stopped
 
   api:
@@ -45,12 +52,13 @@ services:
       context: apps/api
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://host.docker.internal:4873
+        REGISTRY_URL: http://verdaccio:4873
     image: portfolio-api:local
     container_name: api
     networks:
-      - default
+      - api
       - db
+      - registry
     ports:
       - target: 8080
         published: 3000
@@ -68,7 +76,7 @@ services:
       CACHE_READ_TIMEOUT: 3s
       CACHE_WRITE_TIMEOUT: 3s
       BETTER_AUTH_SECRET: dummy
-      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_URL: http://api:3000
       GOOGLE_CLIENT_ID: google-client-id
       GOOGLE_CLIENT_SECRET: google-client-secret
       FREEE_CLIENT_ID: mock-client-id
@@ -84,7 +92,7 @@ services:
       cache:
         condition: service_healthy
       mock-apis:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
 
   web:
@@ -92,11 +100,12 @@ services:
       context: apps/web
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://host.docker.internal:4873
+        REGISTRY_URL: http://verdaccio:4873
     image: portfolio-web:local
     container_name: web
     networks:
-      - default
+      - api
+      - registry
     ports:
       - target: 80
         published: 3000
@@ -119,11 +128,12 @@ services:
       context: apps/e2e
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://host.docker.internal:4873
+        REGISTRY_URL: http://verdaccio:4873
     image: portfolio-e2e:local
     container_name: e2e
     networks:
       - default
+      - registry
     ports:
       - target: 80
         published: 3921
@@ -146,11 +156,12 @@ services:
       context: apps/admin
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://host.docker.internal:4873
+        REGISTRY_URL: http://verdaccio:4873
     image: portfolio-admin:local
     container_name: admin
     networks:
-      - default
+      - api
+      - registry
     ports:
       - target: 80
         published: 3001
@@ -173,11 +184,12 @@ services:
       context: apps/wiki
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://host.docker.internal:4873
+        REGISTRY_URL: http://verdaccio:4873
     image: portfolio-wiki:local
     container_name: wiki
     networks:
-      - default
+      - api
+      - registry
     ports:
       - target: 80
         published: 3002
