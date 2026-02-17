@@ -17,6 +17,7 @@
     "fmt": "biome format --write .",
     "fmt:check": "biome format .",
     "generate": "wrangler types",
+    "integration": "vitest run -c vitest.integration.config.ts",
     "interactions": "docker run --rm -e CI=true -e APP_DIR=apps/web -v $(git rev-parse --show-toplevel):/work -w /work/apps/web -v $(git rev-parse --show-toplevel)/node_modules:/work/node_modules -v $(git rev-parse --show-toplevel)/docs/interactions/report:/work/docs/playwright/report e2e bun x playwright test --config=playwright.storybook.config.ts e2e/storybook/interactions",
     "lighthouse": "lhci autorun",
     "lint": "biome lint .",

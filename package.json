@@ -28,6 +28,7 @@
     "fmt:ts:fix": "turbo run fmt",
     "generate": "turbo run generate",
     "graph": "turbo run build --graph=graph.html",
+    "integration": "turbo run integration",
     "knip": "knip",
     "lint": "concurrently -n turbo,shell,actions,pkg,ws -c \"blue,green,yellow,magenta,cyan\" \"bun run lint:ts:check\" \"bun run lint:shell:check\" \"bun run lint:actions:check\" \"bun run lint:pkg:check\" \"bun run lint:ws:check\"",
     "lint:actions:check": "check --check-type=lint --lint-type=actions",

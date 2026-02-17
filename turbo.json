@@ -3,29 +3,36 @@
     "globalDependencies": [".env"],
     "globalEnv": ["NODE_OPTIONS"],
     "tasks": {
-        "build": {
-            "dependsOn": ["^build"],
-            "outputs": ["dist/**", "bin/**", "build/**", ".wrangler/**"],
-            "inputs": ["src/**", "cmd/**", "generated/**", "generators/**", "tsconfig.json", "package.json"],
-            "env": ["NODE_OPTIONS"]
-        },
-        "build:js": {
-            "dependsOn": ["^build:js"],
-            "outputs": ["dist/**/*.js"],
-            "inputs": ["src/**", "cmd/**", "generated/**", "generators/**"]
-        },
-        "build:types": {
-            "dependsOn": ["^build:types"],
-            "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"],
-            "inputs": ["src/**", "tsconfig.json"]
+        "@portfolio/api#build": {
+            "dependsOn": ["@portfolio/api#generate", "^build"],
+            "outputs": ["dist/**"]
         },
         "@portfolio/cms#build": {
             "dependsOn": ["^build"],
             "outputs": [".wrangler/**"]
         },
-        "@portfolio/api#build": {
-            "dependsOn": ["@portfolio/api#generate", "^build"],
-            "outputs": ["dist/**"]
+        "@portfolio/db#generate": {
+            "cache": false,
+            "dependsOn": ["@portfolio/prisma-markdown#build", "^build"]
+        },
+        "@portfolio/infra#generate": {
+            "cache": false
+        },
+        "build": {
+            "dependsOn": ["^build"],
+            "env": ["NODE_OPTIONS"],
+            "inputs": ["src/**", "cmd/**", "generated/**", "generators/**", "tsconfig.json", "package.json"],
+            "outputs": ["dist/**", "bin/**", "build/**", ".wrangler/**"]
+        },
+        "build:js": {
+            "dependsOn": ["^build:js"],
+            "inputs": ["src/**", "cmd/**", "generated/**", "generators/**"],
+            "outputs": ["dist/**/*.js"]
+        },
+        "build:types": {
+            "dependsOn": ["^build:types"],
+            "inputs": ["src/**", "tsconfig.json"],
+            "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
         },
         "build:ui": {
             "cache": true
@@ -44,16 +51,14 @@
         },
         "coverage": {
             "dependsOn": ["^build"],
-            "env": ["NODE_ENV", "CI"],
-            "outputs": [".coverage/**"]
+            "env": ["NODE_ENV", "CI"]
         },
         "deploy": {
             "dependsOn": ["^build"]
         },
         "e2e": {
-            "dependsOn": ["^build", "^e2e"],
-            "env": ["NODE_ENV", "CI"],
-            "outputs": [".results/**", ".reports/**"]
+            "dependsOn": ["^build"],
+            "env": ["NODE_ENV", "CI"]
         },
         "fmt": {
             "cache": true
@@ -62,15 +67,12 @@
             "cache": true
         },
         "generate": {
+            "cache": false,
+            "dependsOn": ["^build"]
+        },
+        "integration": {
             "dependsOn": ["^build"],
-            "cache": false
-        },
-        "@portfolio/db#generate": {
-            "dependsOn": ["@portfolio/prisma-markdown#build", "^build"],
-            "cache": false
-        },
-        "@portfolio/infra#generate": {
-            "cache": false
+            "env": ["NODE_ENV", "CI"]
         },
         "lint": {
             "cache": true
