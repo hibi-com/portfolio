@@ -17,11 +17,14 @@ describe("Portfolio Zod Schemas", () => {
     describe("portfolioSchema", () => {
         test("should validate complete portfolio", () => {
             const result = portfolioSchema.safeParse({
+                id: "portfolio-1",
                 title: "Test Portfolio",
                 slug: "test-portfolio",
                 company: "Test Company",
                 date: "2024-01-01",
                 current: true,
+                createdAt: "2024-01-01T00:00:00Z",
+                updatedAt: "2024-01-01T00:00:00Z",
             });
             expect(result.success).toBe(true);
         });
