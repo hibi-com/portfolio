@@ -106,7 +106,11 @@ export function InquiriesList() {
                                 {inquiries.map((inquiry) => (
                                     <TableRow key={inquiry.id}>
                                         <TableCell className="font-medium">
-                                            <Link to="/support/inquiries/$id" params={{ id: inquiry.id }} className="hover:underline">
+                                            <Link
+                                                to="/support/inquiries/$id"
+                                                params={{ id: inquiry.id }}
+                                                className="hover:underline"
+                                            >
                                                 {inquiry.subject}
                                             </Link>
                                         </TableCell>

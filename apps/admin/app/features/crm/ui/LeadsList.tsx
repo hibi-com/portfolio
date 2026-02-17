@@ -46,7 +46,7 @@ export function LeadsList() {
     }
 
     const handleDelete = async (id: string) => {
-        if (window.confirm("Are you sure you want to delete this lead?")) {
+        if (globalThis.confirm("Are you sure you want to delete this lead?")) {
             try {
                 await deleteLead(id);
             } catch {
@@ -56,7 +56,7 @@ export function LeadsList() {
     };
 
     const handleConvert = async (id: string) => {
-        if (window.confirm("Convert this lead to a deal?")) {
+        if (globalThis.confirm("Convert this lead to a deal?")) {
             try {
                 await convertLead(id);
             } catch {
@@ -115,7 +115,9 @@ export function LeadsList() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {leads.map((lead) => (
+                                {leads.map((lead) => {
+                                    const editPath: string = `/crm/leads/${lead.id}/edit`;
+                                    return (
                                     <TableRow key={lead.id}>
                                         <TableCell className="font-medium">{lead.name}</TableCell>
                                         <TableCell>{lead.email || "-"}</TableCell>
@@ -141,7 +143,7 @@ export function LeadsList() {
                                                     </Button>
                                                 )}
                                                 <Button variant="ghost" size="icon" asChild>
-                                                    <Link to={`/crm/leads/${lead.id}/edit` as string}>
+                                                    <Link to={editPath}>
                                                         <Edit className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
@@ -155,7 +157,8 @@ export function LeadsList() {
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </CardContent>

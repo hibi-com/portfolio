@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom/vitest";
 import type { Post } from "@portfolio/api";
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { render, screen, waitFor } from "@testing-library/react";

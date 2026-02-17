@@ -1,15 +1,6 @@
-import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "./Table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "./Table";
 
 describe("Table Component", () => {
     test("should render table with header and body", () => {

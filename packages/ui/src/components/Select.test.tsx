@@ -1,13 +1,6 @@
-import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "./Select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./Select";
 
 describe("Select Component", () => {
     test("should render select trigger with placeholder", () => {

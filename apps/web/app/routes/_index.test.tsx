@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom/vitest";
 import { createRouterWrapper } from "@portfolio/testing-vitest";
 import type { MetaArgs } from "@remix-run/node";
 import { render, screen } from "@testing-library/react";

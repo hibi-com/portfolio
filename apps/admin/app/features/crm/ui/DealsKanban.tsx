@@ -17,6 +17,7 @@ interface DealCardProps {
 }
 
 function DealCard({ deal, onDelete }: Readonly<DealCardProps>) {
+    const editPath: string = `/crm/deals/${deal.id}/edit`;
     const handleDelete = () => {
         if (globalThis.confirm("Are you sure you want to delete this deal?")) {
             onDelete(deal.id);
@@ -41,7 +42,7 @@ function DealCard({ deal, onDelete }: Readonly<DealCardProps>) {
                     </div>
                     <div className="flex items-center gap-1">
                         <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                            <Link to={`/crm/deals/${deal.id}/edit` as string}>
+                            <Link to={editPath}>
                                 <Edit className="h-3 w-3" />
                             </Link>
                         </Button>
@@ -146,8 +147,8 @@ export function DealsKanban() {
                     <p className="text-muted-foreground">Manage your sales pipeline - {activePipeline.name}</p>
                 </div>
                 <Button asChild>
-<Link to={"/crm/deals/new" as string}>
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Link to={"/crm/deals/new" as string}>
+                        <Plus className="mr-2 h-4 w-4" />
                         New Deal
                     </Link>
                 </Button>

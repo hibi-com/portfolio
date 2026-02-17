@@ -32,23 +32,32 @@ const statusOptions: { value: CustomerStatus; label: string }[] = [
     { value: "CHURNED", label: "Churned" },
 ];
 
-export function CustomerForm({ customer, mode }: CustomerFormProps) {
+function getInitialFormData(customer?: Customer): CustomerFormData {
+    return {
+        name: customer?.name ?? "",
+        email: customer?.email ?? "",
+        phone: customer?.phone ?? "",
+        company: customer?.company ?? "",
+        website: customer?.website ?? "",
+        address: customer?.address ?? "",
+        notes: customer?.notes ?? "",
+        status: customer?.status ?? "PROSPECT",
+        tags: customer?.tags ?? [],
+    };
+}
+
+function getSubmitButtonLabel(loading: boolean, mode: "create" | "edit"): string {
+    if (loading) return "Saving...";
+    if (mode === "create") return "Create Customer";
+    return "Save Changes";
+}
+
+export function CustomerForm({ customer, mode }: Readonly<CustomerFormProps>) {
     const navigate = useNavigate();
     const { createCustomer, updateCustomer } = useCustomers();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    const [formData, setFormData] = useState<CustomerFormData>({
-        name: customer?.name || "",
-        email: customer?.email || "",
-        phone: customer?.phone || "",
-        company: customer?.company || "",
-        website: customer?.website || "",
-        address: customer?.address || "",
-        notes: customer?.notes || "",
-        status: customer?.status || "PROSPECT",
-        tags: customer?.tags || [],
-    });
+    const [formData, setFormData] = useState<CustomerFormData>(() => getInitialFormData(customer));
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -69,7 +78,7 @@ export function CustomerForm({ customer, mode }: CustomerFormProps) {
         }
     };
 
-    const handleChange = (field: keyof CustomerFormData, value: string | CustomerStatus | string[]) => {
+    const handleChange = (field: keyof CustomerFormData, value: CustomerFormData[keyof CustomerFormData]) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -219,7 +228,7 @@ export function CustomerForm({ customer, mode }: CustomerFormProps) {
                             </Button>
                             <Button type="submit" disabled={loading}>
                                 <Save className="mr-2 h-4 w-4" />
-                                {loading ? "Saving..." : mode === "create" ? "Create Customer" : "Save Changes"}
+                                {getSubmitButtonLabel(loading, mode)}
                             </Button>
                         </div>
                     </CardContent>

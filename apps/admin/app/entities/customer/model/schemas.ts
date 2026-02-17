@@ -2,11 +2,10 @@ import {
     customerSchema as baseCustomerSchema,
     createCustomerInputSchema,
     customerStatusSchema,
-    updateCustomerInputSchema,
 } from "@portfolio/validation";
 import { z } from "zod";
 
-export { createCustomerInputSchema, customerStatusSchema, updateCustomerInputSchema };
+export { createCustomerInputSchema, customerStatusSchema, updateCustomerInputSchema } from "@portfolio/validation";
 export const customerSchema = baseCustomerSchema;
 
 export const customerListItemSchema = z.object({

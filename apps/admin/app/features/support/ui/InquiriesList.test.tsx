@@ -1,5 +1,4 @@
 import type { Inquiry } from "@portfolio/api";
-import "@testing-library/jest-dom/vitest";
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";

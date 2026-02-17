@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 import { Label } from "./Label";

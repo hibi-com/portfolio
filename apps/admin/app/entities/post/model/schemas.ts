@@ -1,7 +1,7 @@
 import { postSchema as basePostSchema, blogDataSchema, postContentSchema } from "@portfolio/validation";
 import { z } from "zod";
 
-export { blogDataSchema, postContentSchema };
+export { blogDataSchema, postContentSchema } from "@portfolio/validation";
 export const postSchema = basePostSchema;
 
 export const postFormDataSchema = z.object({

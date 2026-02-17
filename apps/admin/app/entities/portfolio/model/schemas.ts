@@ -1,7 +1,7 @@
 import { portfolioSchema as basePortfolioSchema, portfolioContentSchema } from "@portfolio/validation";
 import { z } from "zod";
 
-export { portfolioContentSchema };
+export { portfolioContentSchema } from "@portfolio/validation";
 export const portfolioSchema = basePortfolioSchema;
 
 export const portfolioFormDataSchema = z.object({

@@ -45,7 +45,7 @@ export function CustomersList() {
     }
 
     const handleDelete = async (id: string) => {
-        if (window.confirm("Are you sure you want to delete this customer?")) {
+        if (globalThis.confirm("Are you sure you want to delete this customer?")) {
             try {
                 await deleteCustomer(id);
             } catch {
@@ -102,7 +102,10 @@ export function CustomersList() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {customers.map((customer) => (
+                                {customers.map((customer) => {
+                                    const customerPath: string = `/crm/customers/${customer.id}`;
+                                    const customerEditPath: string = `/crm/customers/${customer.id}/edit`;
+                                    return (
                                     <TableRow key={customer.id}>
                                         <TableCell className="font-medium">{customer.name}</TableCell>
                                         <TableCell>{customer.email || "-"}</TableCell>
@@ -116,12 +119,12 @@ export function CustomersList() {
                                         <TableCell className="text-right">
                                             <div className="flex items-center justify-end gap-1">
                                                 <Button variant="ghost" size="icon" asChild>
-                                                    <Link to={`/crm/customers/${customer.id}` as string}>
+                                                    <Link to={customerPath}>
                                                         <Eye className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
                                                 <Button variant="ghost" size="icon" asChild>
-                                                    <Link to={`/crm/customers/${customer.id}/edit` as string}>
+                                                    <Link to={customerEditPath}>
                                                         <Edit className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
@@ -135,7 +138,8 @@ export function CustomersList() {
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </CardContent>

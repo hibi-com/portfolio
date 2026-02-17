@@ -7,6 +7,7 @@ export default createVitestConfig({
     testDir: "./app",
     coverageDir: "../e2e/public/reports/coverage/web",
     projectName: "web",
+    setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup.ts")],
     additionalAliases: {
         "~": resolve(__dirname, "./app"),
     },

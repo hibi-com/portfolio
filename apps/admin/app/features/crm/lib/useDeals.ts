@@ -1,10 +1,10 @@
 import {
     type CreateDealInput,
     type Deal,
-    type Pipeline,
-    type UpdateDealInput,
     deals as dealsApi,
+    type Pipeline,
     pipelines as pipelinesApi,
+    type UpdateDealInput,
 } from "@portfolio/api";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useCallback, useEffect, useState } from "react";

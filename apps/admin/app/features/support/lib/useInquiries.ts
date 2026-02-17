@@ -3,8 +3,8 @@ import {
     type CreateInquiryResponseInput,
     type Inquiry,
     type InquiryResponse,
-    type UpdateInquiryInput,
     inquiries as inquiriesApi,
+    type UpdateInquiryInput,
 } from "@portfolio/api";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import { useCallback, useEffect, useState } from "react";

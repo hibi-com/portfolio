@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom/vitest";
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { Wysiwyg } from "./Wysiwyg";
