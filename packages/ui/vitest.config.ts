@@ -5,7 +5,7 @@ import { defineConfig, mergeConfig } from "vitest/config";
 export default defineConfig(
     mergeConfig(
         createVitestConfig({
-            setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup.ts")],
+            setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup-no-msw.ts")],
             test: {
                 coverage: {
                     include: ["src/**/*.ts", "src/**/*.tsx"],
