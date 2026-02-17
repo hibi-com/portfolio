@@ -8,34 +8,34 @@ import type {
 } from "@generated/api.schemas";
 import { getPipelines } from "@generated/pipelines/pipelines";
 
-const pipelinesClient = getPipelines();
+const getClient = () => getPipelines();
 
 export const listPipelines = (): Promise<Pipeline[]> => {
-    return pipelinesClient.pipelinesListPipelines();
+    return getClient().pipelinesListPipelines();
 };
 
 export const getPipelineById = (id: string): Promise<Pipeline> => {
-    return pipelinesClient.pipelinesGetPipelineById(id);
+    return getClient().pipelinesGetPipelineById(id);
 };
 
 export const getDefaultPipeline = (): Promise<Pipeline> => {
-    return pipelinesClient.pipelinesGetDefaultPipeline();
+    return getClient().pipelinesGetDefaultPipeline();
 };
 
 export const createPipeline = (input: CreatePipelineInput): Promise<Pipeline> => {
-    return pipelinesClient.pipelinesCreatePipeline(input);
+    return getClient().pipelinesCreatePipeline(input);
 };
 
 export const updatePipeline = (id: string, input: UpdatePipelineInput): Promise<Pipeline> => {
-    return pipelinesClient.pipelinesUpdatePipeline(id, input);
+    return getClient().pipelinesUpdatePipeline(id, input);
 };
 
 export const deletePipeline = (id: string): Promise<void> => {
-    return pipelinesClient.pipelinesDeletePipeline(id);
+    return getClient().pipelinesDeletePipeline(id);
 };
 
 export const createPipelineStage = (pipelineId: string, input: CreatePipelineStageInput): Promise<PipelineStage> => {
-    return pipelinesClient.pipelinesCreatePipelineStage(pipelineId, input);
+    return getClient().pipelinesCreatePipelineStage(pipelineId, input);
 };
 
 export const updatePipelineStage = (
@@ -43,11 +43,11 @@ export const updatePipelineStage = (
     stageId: string,
     input: UpdatePipelineStageInput,
 ): Promise<PipelineStage> => {
-    return pipelinesClient.pipelinesUpdatePipelineStage(pipelineId, stageId, input);
+    return getClient().pipelinesUpdatePipelineStage(pipelineId, stageId, input);
 };
 
 export const deletePipelineStage = (pipelineId: string, stageId: string): Promise<void> => {
-    return pipelinesClient.pipelinesDeletePipelineStage(pipelineId, stageId);
+    return getClient().pipelinesDeletePipelineStage(pipelineId, stageId);
 };
 
 export const pipelines = {

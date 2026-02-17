@@ -11,49 +11,49 @@ import type {
 } from "@generated/api.schemas";
 import { getEmails } from "@generated/emails/emails";
 
-const emailsClient = getEmails();
+const getClient = () => getEmails();
 
 export const listEmailLogs = (params?: EmailsListEmailLogsParams): Promise<EmailsListEmailLogs200> => {
-    return emailsClient.emailsListEmailLogs(params);
+    return getClient().emailsListEmailLogs(params);
 };
 
 export const getEmailLogById = (id: string): Promise<EmailLog> => {
-    return emailsClient.emailsGetEmailLogById(id);
+    return getClient().emailsGetEmailLogById(id);
 };
 
 export const sendEmail = (input: SendEmailInput): Promise<EmailLog> => {
-    return emailsClient.emailsSendEmail(input);
+    return getClient().emailsSendEmail(input);
 };
 
 export const listEmailTemplates = (params?: EmailsListEmailTemplatesParams): Promise<EmailTemplate[]> => {
-    return emailsClient.emailsListEmailTemplates(params);
+    return getClient().emailsListEmailTemplates(params);
 };
 
 export const getEmailTemplateById = (id: string): Promise<EmailTemplate> => {
-    return emailsClient.emailsGetEmailTemplateById(id);
+    return getClient().emailsGetEmailTemplateById(id);
 };
 
 export const getEmailTemplateBySlug = (slug: string): Promise<EmailTemplate> => {
-    return emailsClient.emailsGetEmailTemplateBySlug(slug);
+    return getClient().emailsGetEmailTemplateBySlug(slug);
 };
 
 export const createEmailTemplate = (input: CreateEmailTemplateInput): Promise<EmailTemplate> => {
-    return emailsClient.emailsCreateEmailTemplate(input);
+    return getClient().emailsCreateEmailTemplate(input);
 };
 
 export const updateEmailTemplate = (id: string, input: UpdateEmailTemplateInput): Promise<EmailTemplate> => {
-    return emailsClient.emailsUpdateEmailTemplate(id, input);
+    return getClient().emailsUpdateEmailTemplate(id, input);
 };
 
 export const deleteEmailTemplate = (id: string): Promise<void> => {
-    return emailsClient.emailsDeleteEmailTemplate(id);
+    return getClient().emailsDeleteEmailTemplate(id);
 };
 
 export const sendEmailWithTemplate = (
     params: EmailsSendEmailWithTemplateParams,
     body?: { variables?: Record<string, string> },
 ): Promise<EmailLog> => {
-    return emailsClient.emailsSendEmailWithTemplate(params, body);
+    return getClient().emailsSendEmailWithTemplate(params, body);
 };
 
 export const emails = {

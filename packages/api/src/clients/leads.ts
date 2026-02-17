@@ -7,30 +7,30 @@ import type {
 } from "@generated/api.schemas";
 import { getLeads } from "@generated/leads/leads";
 
-const leadsClient = getLeads();
+const getClient = () => getLeads();
 
 export const listLeads = (params?: LeadsListLeadsParams): Promise<LeadsListLeads200> => {
-    return leadsClient.leadsListLeads(params);
+    return getClient().leadsListLeads(params);
 };
 
 export const getLeadById = (id: string): Promise<Lead> => {
-    return leadsClient.leadsGetLeadById(id);
+    return getClient().leadsGetLeadById(id);
 };
 
 export const createLead = (input: CreateLeadInput): Promise<Lead> => {
-    return leadsClient.leadsCreateLead(input);
+    return getClient().leadsCreateLead(input);
 };
 
 export const updateLead = (id: string, input: UpdateLeadInput): Promise<Lead> => {
-    return leadsClient.leadsUpdateLead(id, input);
+    return getClient().leadsUpdateLead(id, input);
 };
 
 export const deleteLead = (id: string): Promise<void> => {
-    return leadsClient.leadsDeleteLead(id);
+    return getClient().leadsDeleteLead(id);
 };
 
 export const convertLead = (id: string): Promise<Lead> => {
-    return leadsClient.leadsConvertLead(id);
+    return getClient().leadsConvertLead(id);
 };
 
 export const leads = {

@@ -7,26 +7,26 @@ import type {
 } from "@generated/api.schemas";
 import { getCustomers } from "@generated/customers/customers";
 
-const customersClient = getCustomers();
+const getClient = () => getCustomers();
 
 export const listCustomers = (params?: CustomersListCustomersParams): Promise<CustomersListCustomers200> => {
-    return customersClient.customersListCustomers(params);
+    return getClient().customersListCustomers(params);
 };
 
 export const getCustomerById = (id: string): Promise<Customer> => {
-    return customersClient.customersGetCustomerById(id);
+    return getClient().customersGetCustomerById(id);
 };
 
 export const createCustomer = (input: CreateCustomerInput): Promise<Customer> => {
-    return customersClient.customersCreateCustomer(input);
+    return getClient().customersCreateCustomer(input);
 };
 
 export const updateCustomer = (id: string, input: UpdateCustomerInput): Promise<Customer> => {
-    return customersClient.customersUpdateCustomer(id, input);
+    return getClient().customersUpdateCustomer(id, input);
 };
 
 export const deleteCustomer = (id: string): Promise<void> => {
-    return customersClient.customersDeleteCustomer(id);
+    return getClient().customersDeleteCustomer(id);
 };
 
 export const customers = {

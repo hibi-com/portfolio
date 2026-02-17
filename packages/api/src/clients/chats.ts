@@ -13,42 +13,42 @@ import type {
 } from "@generated/api.schemas";
 import { getChats } from "@generated/chats/chats";
 
-const chatsClient = getChats();
+const getClient = () => getChats();
 
 export const listChatRooms = (params?: ChatsListChatRoomsParams): Promise<ChatsListChatRooms200> => {
-    return chatsClient.chatsListChatRooms(params);
+    return getClient().chatsListChatRooms(params);
 };
 
 export const getChatRoomById = (id: string): Promise<ChatRoomWithParticipants> => {
-    return chatsClient.chatsGetChatRoomById(id);
+    return getClient().chatsGetChatRoomById(id);
 };
 
 export const createChatRoom = (input: CreateChatRoomInput): Promise<ChatRoom> => {
-    return chatsClient.chatsCreateChatRoom(input);
+    return getClient().chatsCreateChatRoom(input);
 };
 
 export const closeChatRoom = (id: string): Promise<ChatRoom> => {
-    return chatsClient.chatsCloseChatRoom(id);
+    return getClient().chatsCloseChatRoom(id);
 };
 
 export const getChatRoomParticipants = (id: string): Promise<ChatParticipant[]> => {
-    return chatsClient.chatsGetChatRoomParticipants(id);
+    return getClient().chatsGetChatRoomParticipants(id);
 };
 
 export const addChatParticipant = (id: string, input: AddParticipantInput): Promise<ChatParticipant> => {
-    return chatsClient.chatsAddChatParticipant(id, input);
+    return getClient().chatsAddChatParticipant(id, input);
 };
 
 export const removeChatParticipant = (roomId: string, participantId: string): Promise<void> => {
-    return chatsClient.chatsRemoveChatParticipant(roomId, participantId);
+    return getClient().chatsRemoveChatParticipant(roomId, participantId);
 };
 
 export const getChatRoomMessages = (id: string, params?: ChatsGetChatRoomMessagesParams): Promise<ChatMessage[]> => {
-    return chatsClient.chatsGetChatRoomMessages(id, params);
+    return getClient().chatsGetChatRoomMessages(id, params);
 };
 
 export const sendChatMessage = (id: string, input: SendMessageInput): Promise<ChatMessage> => {
-    return chatsClient.chatsSendChatMessage(id, input);
+    return getClient().chatsSendChatMessage(id, input);
 };
 
 export const markMessagesAsRead = (
@@ -56,7 +56,7 @@ export const markMessagesAsRead = (
     participantId: string,
     body: ChatsMarkMessagesAsReadBody,
 ): Promise<void> => {
-    return chatsClient.chatsMarkMessagesAsRead(roomId, body, { participantId });
+    return getClient().chatsMarkMessagesAsRead(roomId, body, { participantId });
 };
 
 export const chats = {

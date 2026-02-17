@@ -7,38 +7,38 @@ import type {
 } from "@generated/api.schemas";
 import { getDeals } from "@generated/deals/deals";
 
-const dealsClient = getDeals();
+const getClient = () => getDeals();
 
 export const listDeals = (params?: DealsListDealsParams): Promise<DealsListDeals200> => {
-    return dealsClient.dealsListDeals(params);
+    return getClient().dealsListDeals(params);
 };
 
 export const getDealById = (id: string): Promise<Deal> => {
-    return dealsClient.dealsGetDealById(id);
+    return getClient().dealsGetDealById(id);
 };
 
 export const createDeal = (input: CreateDealInput): Promise<Deal> => {
-    return dealsClient.dealsCreateDeal(input);
+    return getClient().dealsCreateDeal(input);
 };
 
 export const updateDeal = (id: string, input: UpdateDealInput): Promise<Deal> => {
-    return dealsClient.dealsUpdateDeal(id, input);
+    return getClient().dealsUpdateDeal(id, input);
 };
 
 export const deleteDeal = (id: string): Promise<void> => {
-    return dealsClient.dealsDeleteDeal(id);
+    return getClient().dealsDeleteDeal(id);
 };
 
 export const moveDealToStage = (id: string, stageId: string): Promise<Deal> => {
-    return dealsClient.dealsMoveDealToStage(id, { stageId });
+    return getClient().dealsMoveDealToStage(id, { stageId });
 };
 
 export const markDealAsWon = (id: string): Promise<Deal> => {
-    return dealsClient.dealsMarkDealAsWon(id);
+    return getClient().dealsMarkDealAsWon(id);
 };
 
 export const markDealAsLost = (id: string, reason?: string): Promise<Deal> => {
-    return dealsClient.dealsMarkDealAsLost(id, reason ? { reason } : undefined);
+    return getClient().dealsMarkDealAsLost(id, reason ? { reason } : undefined);
 };
 
 export const deals = {

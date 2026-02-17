@@ -9,42 +9,42 @@ import type {
 } from "@generated/api.schemas";
 import { getInquiries } from "@generated/inquiries/inquiries";
 
-const inquiriesClient = getInquiries();
+const getClient = () => getInquiries();
 
 export const listInquiries = (params?: InquiriesListInquiriesParams): Promise<InquiriesListInquiries200> => {
-    return inquiriesClient.inquiriesListInquiries(params);
+    return getClient().inquiriesListInquiries(params);
 };
 
 export const getInquiryById = (id: string): Promise<Inquiry> => {
-    return inquiriesClient.inquiriesGetInquiryById(id);
+    return getClient().inquiriesGetInquiryById(id);
 };
 
 export const createInquiry = (input: CreateInquiryInput): Promise<Inquiry> => {
-    return inquiriesClient.inquiriesCreateInquiry(input);
+    return getClient().inquiriesCreateInquiry(input);
 };
 
 export const updateInquiry = (id: string, input: UpdateInquiryInput): Promise<Inquiry> => {
-    return inquiriesClient.inquiriesUpdateInquiry(id, input);
+    return getClient().inquiriesUpdateInquiry(id, input);
 };
 
 export const deleteInquiry = (id: string): Promise<void> => {
-    return inquiriesClient.inquiriesDeleteInquiry(id);
+    return getClient().inquiriesDeleteInquiry(id);
 };
 
 export const resolveInquiry = (id: string): Promise<Inquiry> => {
-    return inquiriesClient.inquiriesResolveInquiry(id);
+    return getClient().inquiriesResolveInquiry(id);
 };
 
 export const closeInquiry = (id: string): Promise<Inquiry> => {
-    return inquiriesClient.inquiriesCloseInquiry(id);
+    return getClient().inquiriesCloseInquiry(id);
 };
 
 export const getInquiryResponses = (id: string): Promise<InquiryResponse[]> => {
-    return inquiriesClient.inquiriesGetInquiryResponses(id);
+    return getClient().inquiriesGetInquiryResponses(id);
 };
 
 export const addInquiryResponse = (id: string, input: CreateInquiryResponseInput): Promise<InquiryResponse> => {
-    return inquiriesClient.inquiriesAddInquiryResponse(id, input);
+    return getClient().inquiriesAddInquiryResponse(id, input);
 };
 
 export const inquiries = {
