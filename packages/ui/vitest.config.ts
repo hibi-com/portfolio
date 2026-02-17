@@ -7,6 +7,9 @@ export default defineConfig(
         createVitestConfig({
             setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup-no-msw.ts")],
             test: {
+                fileParallelism: false,
+                pool: "forks",
+                poolOptions: { forks: { maxForks: 1, minForks: 1 } },
                 coverage: {
                     include: ["src/**/*.ts", "src/**/*.tsx"],
                     exclude: [

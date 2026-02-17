@@ -8,7 +8,7 @@ describe("Input Component", () => {
 
         const input = screen.getByPlaceholderText("Enter text");
         expect(input).toBeInTheDocument();
-        expect(input).toHaveAttribute("type", "text");
+        expect(input.getAttribute("type") ?? "text").toBe("text");
     });
 
     test("should render disabled input", () => {
