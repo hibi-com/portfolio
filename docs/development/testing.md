@@ -820,7 +820,7 @@ describe("canAccess MC/DC", () => {
 ### カバレッジレポートの確認
 
 カバレッジレポートは `apps/e2e/public/reports/coverage/` に出力されます。
-Test Portal（http://localhost:24000）でブラウザから確認できます。
+Test Portalでブラウザから確認できます。
 
 ```bash
 # Test Portalを起動してカバレッジレポートを表示
