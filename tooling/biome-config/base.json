@@ -151,9 +151,21 @@
             "includes": ["**/package.json"]
         },
         {
-            "includes": ["**/*.test.*"],
+            "includes": ["**/*.test.*", "**/*.integration.test.*"],
             "javascript": {
-                "globals": ["expect", "test", "describe", "beforeEach", "afterEach", "vi", "it", "$", "Bun"]
+                "globals": [
+                    "expect",
+                    "test",
+                    "describe",
+                    "beforeAll",
+                    "afterAll",
+                    "beforeEach",
+                    "afterEach",
+                    "vi",
+                    "it",
+                    "$",
+                    "Bun"
+                ]
             },
             "linter": {
                 "rules": {
