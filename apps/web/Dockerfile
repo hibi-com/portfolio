@@ -6,7 +6,7 @@ WORKDIR /app
 
 RUN printf '[install.scopes]\n"@portfolio" = "%s"\n' "${REGISTRY_URL}" >> ~/.bunfig.toml
 
-RUN apt-get update && apt-get install -y --no-install-recommends jq=1.7.1 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends jq=1.6-2.1+deb11u1 && rm -rf /var/lib/apt/lists/*
 
 COPY package.json ./
 RUN jq 'del(.dependencies["@portfolio/cms"]) | '\
