@@ -12,22 +12,29 @@ function copyStaticAssets(): AstroIntegration {
         name: "copy-static-assets",
         hooks: {
             "astro:build:done": ({ dir }) => {
-                const outDir = dir.pathname;
-                const uiDesignPath = resolve("design/ui");
-                if (existsSync(uiDesignPath)) {
-                    cpSync(uiDesignPath, resolve(outDir, "design"), {
-                        recursive: true,
-                    });
+                try {
+                    const outDir = dir.pathname;
+                    const uiDesignPath = resolve("design/ui");
+                    if (existsSync(uiDesignPath)) {
+                        cpSync(uiDesignPath, resolve(outDir, "design"), {
+                            recursive: true,
+                        });
+                    }
+                    const webDesignPath = resolve("design/web");
+                    if (existsSync(webDesignPath)) {
+                        cpSync(webDesignPath, resolve(outDir, "storybook"), {
+                            recursive: true,
+                        });
+                    }
+                    const referencePath = resolve("reference");
+                    if (existsSync(referencePath)) {
+                        cpSync(referencePath, resolve(outDir, "reference"), {
+                            recursive: true,
+                        });
+                    }
+                } catch (error) {
+                    console.error("Failed to copy static assets:", error);
                 }
-                const webDesignPath = resolve("design/web");
-                if (existsSync(webDesignPath)) {
-                    cpSync(webDesignPath, resolve(outDir, "storybook"), {
-                        recursive: true,
-                    });
-                }
-                cpSync(resolve("reference"), resolve(outDir, "reference"), {
-                    recursive: true,
-                });
             },
         },
     };
@@ -40,6 +47,14 @@ export default defineConfig({
     output: "static",
     outDir: "build",
     adapter: isPreview ? undefined : cloudflare(),
+    vite: {
+        esbuild: {
+            target: "es2022",
+        },
+        build: {
+            target: "es2022",
+        },
+    },
     integrations: [
         react(),
         mermaid({
