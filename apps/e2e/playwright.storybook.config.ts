@@ -1,15 +1,16 @@
 import { defineConfig, devices } from "@playwright/test";
+import type { ReporterDescription } from "playwright/types/test";
 
 const storybookURL = process.env.STORYBOOK_URL || "http://localhost:16011";
 
 const storageType = process.env.STORAGE_TYPE || "local";
 const reportOutputDir = process.env.STORYBOOK_REPORT_OUTPUT_DIR || "./public/reports/e2e/storybook";
 
-const reporters: ("list" | ["html" | "json", { outputFolder?: string; outputFile?: string }])[] =
+const reporters: ReporterDescription[] =
     storageType === "local"
         ? [["html", { outputFolder: reportOutputDir }]]
         : [
-              "list",
+              ["list"],
               ["html", { outputFolder: reportOutputDir }],
               ["json", { outputFile: `${reportOutputDir}/results.json` }],
           ];
