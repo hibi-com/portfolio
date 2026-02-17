@@ -8,7 +8,7 @@ title: "APIキー・トークン発行手順"
 
 - **compose で使う値**: `compose.yaml` の `environment` を正とし、ローカルは `.env` や compose のデフォルト値を使用。
 - **Cloudflare Pages/Workers**: `pulumi up` 実行時に `infra/.env` の値が Pulumi 経由で Cloudflare の環境変数に反映される。デプロイ後は Cloudflare Dashboard または `wrangler secret` で管理。
-- **infra 用シークレット**（Cloudflare, Sentry, Grafana 等）: `infra/.env` または `infra/environment.yaml` に設定し、`cd infra && pulumi up` で適用。
+- **infra 用シークレット**（Cloudflare, Sentry, Grafana 等）: `infra/.env` または `infra/env.yaml` に設定し、`cd infra && pulumi up` で適用。
 
 ## 目次
 

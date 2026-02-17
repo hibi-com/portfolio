@@ -60,7 +60,7 @@ export const INFRA_ONLY_ENV_KEYS = [
 ] as const;
 
 export function getEnvironmentYamlPath(): string {
-    return path.join(findProjectRoot(), "infra", "environment.yaml");
+    return path.join(findProjectRoot(), "infra", "env.yaml");
 }
 
 const ENV_KEY_VALUE_REGEX = /^([A-Z][A-Z0-9_]*):\s*(.*)$/;

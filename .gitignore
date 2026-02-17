@@ -53,7 +53,7 @@ ehthumbs.db
 ehthumbs_vista.db
 functions/[[path]].js
 functions/[[path]].js.map
-infra/environment.yaml
+infra/env.yaml
 infra/graph.dot
 node_modules
 public/build
