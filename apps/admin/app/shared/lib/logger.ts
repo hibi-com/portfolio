@@ -30,3 +30,7 @@ export function getLogger(): Logger {
     });
     return logger;
 }
+
+export function resetLoggerForTesting(): void {
+    logger = null;
+}

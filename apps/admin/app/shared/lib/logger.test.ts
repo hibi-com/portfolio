@@ -1,6 +1,6 @@
-import { LogLevel, Logger, initSentry } from "@portfolio/log";
+import { initSentry, Logger, LogLevel } from "@portfolio/log";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { getLogger, initLogger } from "./logger";
+import { getLogger, initLogger, resetLoggerForTesting } from "./logger";
 
 vi.mock("@portfolio/log", () => ({
     Logger: vi.fn(),
@@ -15,7 +15,7 @@ vi.mock("@portfolio/log", () => ({
 describe("logger", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        // logger変数をリセット（モジュールスコープの変数なので、テスト間でリセットが必要）
+        resetLoggerForTesting();
     });
 
     describe("initLogger", () => {
@@ -206,11 +206,14 @@ describe("logger", () => {
     describe("getLogger", () => {
         describe("正常系", () => {
             test("loggerが未初期化の場合はデフォルトのLoggerを作成する", () => {
-                vi.mocked(Logger).mockImplementation(() => ({
-                    debug: vi.fn(),
-                    info: vi.fn(),
-                    logError: vi.fn(),
-                })) as unknown as typeof Logger;
+                vi.mocked(Logger).mockImplementation(
+                    () =>
+                        ({
+                            debug: vi.fn(),
+                            info: vi.fn(),
+                            logError: vi.fn(),
+                        }) as unknown as Logger,
+                );
 
                 const result = getLogger();
 
@@ -250,7 +253,6 @@ describe("logger", () => {
                 );
 
                 // 元に戻す
-                // @ts-expect-error - テストのためにwindowを復元
                 globalThis.window = originalWindow;
             });
         });
@@ -320,7 +322,6 @@ describe("logger", () => {
                 );
 
                 // 元に戻す
-                // @ts-expect-error - テストのためにwindowを復元
                 globalThis.window = originalWindow;
             });
         });
