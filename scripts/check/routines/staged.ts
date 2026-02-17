@@ -46,7 +46,10 @@ function getSourceFilesWithTests(sourceFiles: string[], rootDir: string): string
     });
 }
 
-function groupFilesByWorkspace(filteredFilenames: string[], rootDir: string): {
+function groupFilesByWorkspace(
+    filteredFilenames: string[],
+    rootDir: string,
+): {
     workspaceGroups: Map<string, string[]>;
     rootFiles: string[];
 } {
@@ -69,11 +72,7 @@ function groupFilesByWorkspace(filteredFilenames: string[], rootDir: string): {
     return { workspaceGroups, rootFiles };
 }
 
-function addWorkspaceCommands(
-    workspaceGroups: Map<string, string[]>,
-    rootDir: string,
-    commands: string[],
-): void {
+function addWorkspaceCommands(workspaceGroups: Map<string, string[]>, rootDir: string, commands: string[]): void {
     for (const [workspaceDir] of workspaceGroups) {
         commands.push(`cd ${join(rootDir, workspaceDir)} && bun run fmt:check && bun run lint`);
     }
@@ -87,19 +86,13 @@ function addRootCommands(rootFiles: string[], rootDir: string, commands: string[
         (f) => f.endsWith(".ts") || f.endsWith(".tsx") || f.endsWith(".js") || f.endsWith(".jsx"),
     );
     if (rootWorkspaceFiles.length > 0) {
-        commands.push(`cd ${rootDir} && bunx turbo run fmt:check`, `cd ${rootDir} && bunx turbo run lint`);
+        commands.push(`cd ${rootDir} && bun run fmt:check`, `cd ${rootDir} && bun run lint`);
     }
 }
 
-function addTestCommands(
-    sourceFilesWithTests: string[],
-    rootDir: string,
-    commands: string[],
-): void {
+function addTestCommands(sourceFilesWithTests: string[], rootDir: string, commands: string[]): void {
     for (const sourceFile of sourceFilesWithTests) {
-        const relativeSourceFile = sourceFile.startsWith("/")
-            ? sourceFile.replace(`${rootDir}/`, "")
-            : sourceFile;
+        const relativeSourceFile = sourceFile.startsWith("/") ? sourceFile.replace(`${rootDir}/`, "") : sourceFile;
         const workspaceDir = getWorkspaceDir(relativeSourceFile, rootDir);
         const testFile = relativeSourceFile.replace(/\.(ts|tsx)$/, ".test.$1");
         if (workspaceDir) {
@@ -129,7 +122,7 @@ function processTypeScriptFiles(filenames: string[], rootDir: string): string[] 
     addTestCommands(sourceFilesWithTests, rootDir, commands);
 
     if (hasTsFiles) {
-        commands.push(`cd ${rootDir} && bunx turbo run typecheck`);
+        commands.push(`cd ${rootDir} && bun run typecheck`);
     }
 
     return commands;
@@ -160,7 +153,6 @@ function matchesPattern(file: string, pattern: string): boolean {
     return false;
 }
 
-
 function getStagedFiles(): string[] {
     try {
         const output = execSync("git diff --cached --name-only --diff-filter=ACM", { encoding: "utf-8" });
@@ -190,10 +182,7 @@ function processFiles(filenames: string[], rootDir: string): string[] {
 
     const config: Record<string, (files: string[]) => string[]> = {
         ".github/**/*.yml": (filenames) =>
-            filenames.flatMap((f) => [
-                `bun run fmt:actions:check -- ${f}`,
-                `bun run lint:actions:check -- ${f}`,
-            ]),
+            filenames.flatMap((f) => [`bun run fmt:actions:check -- ${f}`, `bun run lint:actions:check -- ${f}`]),
         "*.{ts,tsx}": (filenames) => processTypeScriptFiles(filenames, rootDir),
         "*.config.js": (filenames) => processTypeScriptFiles(filenames, rootDir),
         "*.md": (filenames) => {
@@ -225,15 +214,9 @@ function processFiles(filenames: string[], rootDir: string): string[] {
             return commands;
         },
         "*.sh": (filenames) =>
-            filenames.flatMap((f) => [
-                `bun run fmt:shell:check -- ${f}`,
-                `bun run lint:shell:check -- ${f}`,
-            ]),
+            filenames.flatMap((f) => [`bun run fmt:shell:check -- ${f}`, `bun run lint:shell:check -- ${f}`]),
         "*.tsp": (filenames) =>
-            filenames.flatMap((f) => [
-                `bun run fmt:tsp:check -- ${f}`,
-                `bun run lint:tsp:check -- ${f}`,
-            ]),
+            filenames.flatMap((f) => [`bun run fmt:tsp:check -- ${f}`, `bun run lint:tsp:check -- ${f}`]),
         "**/*.test.{ts,tsx}": (filenames) => {
             const commands: string[] = [];
             for (const file of filenames) {
