@@ -12,6 +12,7 @@ export default createVitestConfig({
         "~": resolve(__dirname, "./app"),
     },
     test: {
+        fileParallelism: false,
         coverage: {
             include: ["app/**/*.ts", "app/**/*.tsx"],
             exclude: ["dist/**", "build/**", "**/*.test.ts", "**/*.test.tsx", "**/*.d.ts", "**/*.stories.tsx"],
