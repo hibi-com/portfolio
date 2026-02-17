@@ -13,7 +13,7 @@
     "clean:pkg": "turbo run clean:pkg",
     "coverage": "turbo run coverage",
     "deploy": "turbo run deploy",
-    "dev": "docker compose up -d --build && docker compose logs -f",
+    "dev": "bun run publish && docker compose up -d --build && docker compose logs -f",
     "dev:local": "turbo run dev --parallel",
     "doccheck": "typedoc --emit none",
     "e2e": "turbo run e2e --concurrency=1",
