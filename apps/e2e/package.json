@@ -4,6 +4,9 @@
   "name": "@portfolio/e2e",
   "type": "module",
   "scripts": {
+    "build": "remix vite:build",
+    "dev": "remix vite:dev --port 24000",
+    "start": "remix-serve ./build/server/index.js",
     "accessibility": "bun run with-env playwright test pkg/accessibility",
     "monkey": "bun run with-env playwright test pkg/monkey",
     "visual": "playwright test --config=playwright.storybook.config.ts pkg/storybook/visual",
@@ -15,14 +18,35 @@
     "fmt": "biome format --write .",
     "fmt:check": "biome format .",
     "typecheck": "tsc --noEmit",
-    "with-env": "env --"
+    "with-env": "env --",
+    "deploy": "wrangler pages deploy --project-name portfolio-portal-e2e --branch master"
+  },
+  "dependencies": {
+    "@portfolio/auth": "workspace:*",
+    "@portfolio/ui": "workspace:*",
+    "@remix-run/cloudflare": "2.16.1",
+    "@remix-run/cloudflare-pages": "2.16.1",
+    "@remix-run/react": "2.16.1",
+    "@remix-run/serve": "2.16.1",
+    "isbot": "5.1.22",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "recharts": "2.15.1"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "4.20260101.0",
     "@playwright/test": "1.57.0",
     "@portfolio/biome-config": "workspace:*",
     "@portfolio/playwright-config": "workspace:*",
     "@portfolio/tsconfig": "workspace:*",
+    "@portfolio/vite-config": "workspace:*",
+    "@remix-run/dev": "2.16.1",
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
     "playwright": "1.57.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vite": "6.1.0",
+    "vite-tsconfig-paths": "5.1.4",
+    "wrangler": "4.54.0"
   }
 }

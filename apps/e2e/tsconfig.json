@@ -3,11 +3,13 @@
     "extends": ["@portfolio/tsconfig/base.json"],
     "compilerOptions": {
         "baseUrl": ".",
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "target": "ES2022",
-        "lib": ["ES2022", "DOM"]
+        "jsx": "react-jsx",
+        "lib": ["DOM", "DOM.Iterable", "ES2022"],
+        "paths": {
+            "~/*": ["./app/*"]
+        },
+        "types": ["@cloudflare/workers-types", "vitest/globals"]
     },
-    "include": ["**/*.ts"],
-    "exclude": ["node_modules", "dist"]
+    "exclude": ["node_modules", "build", "dist", ".wrangler", "functions"],
+    "include": ["app/**/*", "env.d.ts", "vite.config.ts"]
 }
