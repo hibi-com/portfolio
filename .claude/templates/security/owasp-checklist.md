@@ -374,4 +374,3 @@ grep -r "validateUrl\|isPrivateIp" apps/api/src/lib/
 
 - [OWASP Top 10 2021](https://owasp.org/Top10/)
 - [プロジェクトセキュリティガイドライン](docs/security/guidelines.md)
-- [公開用OWASPチェックリスト](docs/security/owasp-checklist.md)

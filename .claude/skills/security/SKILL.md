@@ -172,8 +172,7 @@ grep -r "validateUrl\|isPrivateIp" apps/api/src/lib/
 ## 参考ドキュメント
 
 - [OWASP Top 10 2021](https://owasp.org/Top10/)
-- [テンプレート](.claude/templates/security/owasp-checklist.md)
-- [公開用チェックリスト](docs/security/owasp-checklist.md)
+- [チェックリストテンプレート](.claude/templates/security/owasp-checklist.md)
 - [セキュリティガイドライン](docs/security/guidelines.md)
 
 ## 関連スキル

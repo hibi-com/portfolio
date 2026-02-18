@@ -30,4 +30,4 @@ OWASP Top 10に基づくセキュリティチェックのログ。
 ## 関連ドキュメント
 
 - [セキュリティガイドライン](../docs/security/guidelines.md)
-- [公開用OWASPチェックリスト](../docs/security/owasp-checklist.md)
+- [チェックリストテンプレート](../.claude/templates/security/owasp-checklist.md)
