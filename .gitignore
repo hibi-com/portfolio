@@ -1,4 +1,3 @@
-
 $RECYCLE.BIN/
 *.cab
 *.icloud
@@ -36,6 +35,7 @@ $RECYCLE.BIN/
 .fseventsd
 .fuse_hidden*
 .nfs*
+.pnpm-debug.log*
 .results
 .tanstack
 .turbo
@@ -55,5 +55,10 @@ functions/[[path]].js
 functions/[[path]].js.map
 infra/env.yaml
 infra/graph.dot
+lerna-debug.log*
 node_modules
+npm-debug.log*
+pnpm-debug.log*
 public/build
+yarn-debug.log*
+yarn-error.log*
