@@ -2,8 +2,6 @@
 title: "E2Eテスト実行ガイド"
 ---
 
-# E2Eテスト実行ガイド
-
 このドキュメントでは、Playwrightを使用したE2Eテスト（Large Tests）の実行方法を説明します。
 
 ## 概要
@@ -216,6 +214,7 @@ apps/e2e/public/reports/e2e/
 **エラー**: `Failed to setup localhost`
 
 **解決策**:
+
 ```bash
 # 開発サーバーを起動
 bun run dev
@@ -226,6 +225,7 @@ bun run dev
 **エラー**: `Port 3000 is already in use`
 
 **解決策**:
+
 ```bash
 # 使用中のポートを確認
 lsof -i :3000
@@ -240,6 +240,7 @@ PORT=3001 bun run dev
 ### テストがタイムアウトする
 
 **解決策**:
+
 ```bash
 # タイムアウトを延長
 bun run e2e --filter=@portfolio/web -- --timeout=60000
@@ -248,6 +249,7 @@ bun run e2e --filter=@portfolio/web -- --timeout=60000
 ### ブラウザが見つからない
 
 **解決策**:
+
 ```bash
 # Playwrightブラウザをインストール
 bunx playwright install --with-deps
@@ -256,6 +258,7 @@ bunx playwright install --with-deps
 ### スナップショットの差異
 
 **解決策**:
+
 ```bash
 # スナップショットを更新
 bun run e2e --filter=@portfolio/web -- --update-snapshots
