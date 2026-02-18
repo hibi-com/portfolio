@@ -116,6 +116,14 @@ alwaysApply: true
 | 「セキュリティチェックして」「OWASP チェックして」 | `/security` |
 | 「脆弱性チェックして」 | `/security` |
 
+### 依存関係管理
+
+| トリガー | アサインするスキル |
+| -------- | ------------------ |
+| 「依存関係を更新して」「パッケージを更新して」 | `/update-deps` |
+| 「outdatedをチェックして」 | `/update-deps` |
+| 「npm updateして」「bun updateして」 | `/update-deps` |
+
 ## ワークフロー自動実行
 
 ### 新機能実装ワークフロー

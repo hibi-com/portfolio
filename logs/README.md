@@ -4,10 +4,12 @@
 
 ## ディレクトリ構成
 
-```
+```text
 logs/
 ├── security/          # セキュリティチェックログ（隔週）
 │   └── YYYY-MM-DD-security-check.md
+├── dependencies/      # 依存関係更新ログ（月次）
+│   └── YYYY-MM-DD-update.md
 └── README.md
 ```
 
@@ -20,6 +22,15 @@ OWASP Top 10に基づくセキュリティチェックのログ。
 - **頻度**: 隔週（2週間に1回）
 - **作成方法**: `/security` スキルを使用
 - **テンプレート**: `.claude/templates/security/owasp-checklist.md`
+
+### Dependencies Update Logs
+
+依存関係（npm/bunパッケージ）の更新履歴。
+
+- **頻度**: 月次（第1営業日）、またはセキュリティパッチ発見時
+- **作成方法**: `/update-deps` スキルを使用
+- **テンプレート**: `.claude/templates/dependencies/update-log.md`
+- **内容**: 更新パッケージ、破壊的変更、テスト結果
 
 ## 注意事項
 
