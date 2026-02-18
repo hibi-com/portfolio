@@ -5,12 +5,6 @@ title: "Domain-Driven Design (DDD)"
 このプロジェクトでは、**Domain-Driven Design (DDD)** アーキテクチャを採用しています。
 DDDは、複雑なビジネスロジックを扱うバックエンドアプリケーションの設計手法です。
 
-## 適用範囲
-
-DDDは次のアプリケーションで採用されています。
-
-- **`apps/api`**: Hono + Cloudflare Workers + D1ベースのCMS API
-
 ## レイヤー構造
 
 DDDは、アプリケーションを次のレイヤーに分割します。
@@ -42,13 +36,6 @@ usecase/
 └── <ドメイン名>/
     └── <ユースケース名>.ts
 ```
-
-**例:**
-
-- `usecase/getPostBySlug.ts`
-- `usecase/getPosts.ts`
-- `usecase/getPortfolioBySlug.ts`
-- `usecase/getPortfolios.ts`
 
 ### domain/ (Enterprise Rules)
 

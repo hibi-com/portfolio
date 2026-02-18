@@ -5,13 +5,6 @@ title: "Feature-Sliced Design (FSD)"
 このプロジェクトでは、**Feature-Sliced Design (FSD)** アーキテクチャを採用しています。
 FSDは、フロントエンドアプリケーションのスケーラブルな構造を提供する設計手法です。
 
-## 適用範囲
-
-FSDは次のアプリケーションで採用されています。
-
-- **`apps/web`**: Remixベースのポートフォリオサイト（BFF）
-- **`apps/admin`**: React + Vite + Tanstack Routerベースの管理ダッシュボード
-
 ## レイヤー構造
 
 FSDは、アプリケーションを次のレイヤーに分割します。
@@ -28,13 +21,14 @@ FSDは、アプリケーションを次のレイヤーに分割します。
 
 ### routes/
 
-ページレイヤー。各ページ（画面）を構築します。
+ページレイヤー。  
+各ページ（画面）を構築します。
 
-- **Remix (`apps/web`)**: ファイルベースルーティング
+- **Remix**: ファイルベースルーティング
   - `loader`関数でサーバーサイドデータフェッチ
   - `action`関数でフォーム送信処理
   - `api+/`ディレクトリでBFF Resource Routesを定義
-- **Tanstack Router (`apps/admin`)**: 型安全なルーティング
+- **Tanstack Router**: 型安全なルーティング
   - `routeTree.gen.ts`: 自動生成されるルートツリー
   - `router.tsx`: ルーター設定
 
@@ -50,7 +44,7 @@ FSDは、アプリケーションを次のレイヤーに分割します。
 ```text
 widget-name/
 ├── ui/
-│   └── WidgetName.tsx          # UIコンポーネント
+│   └── <UIコンポーネント名>.tsx   # UIコンポーネント
 ├── model/
 │   └── types.ts                # 型定義
 ├── lib/
@@ -70,7 +64,7 @@ widget-name/
 ```text
 feature-name/
 ├── ui/
-│   └── FeatureName.tsx         # UIコンポーネント
+│   └── <UIコンポーネント名>.tsx   # UIコンポーネント
 ├── model/
 │   └── types.ts                # 型定義
 ├── lib/
@@ -139,7 +133,8 @@ TypeScriptのパスエイリアスが設定されており、`~`プレフィッ�
 - `~/widgets/*` → `app/widgets/*`
 - `~/*` → `app/*`
 
-**注意:** `~/components/*`というパスエイリアスは存在しません。コンポーネントは`widgets/`、`features/`、または`shared/ui/`に配置されます。
+**注意:** `~/components/*`というパスエイリアスは存在しません。  
+コンポーネントは`widgets/`、`features/`、または`shared/ui/`に配置されます。
 
 ## ディレクトリ構造のルール
 
@@ -147,33 +142,31 @@ TypeScriptのパスエイリアスが設定されており、`~`プレフィッ�
 
 - **必須**: すべてのアプリケーションは`app/`ディレクトリをソースルートとして使用します
 - **禁止**: `src/`ディレクトリは使用しません
-- 例: `apps/web/app/`, `apps/admin/app/`
 
 ### パッケージ層 (`packages/*`, `tooling/*`)
 
 - **許可**: `src/`ディレクトリを使用できます
-- 例: `packages/ui/src/`, `tooling/config/src/`
 
 ## ファイル命名規則
 
 ### コンポーネント
 
-- PascalCaseを使用: `BlogPreview.tsx`
+- PascalCaseを使用
 - ファイル名はコンポーネント名と一致
 
 ### ユーティリティ
 
-- camelCaseを使用: `formatDate.ts`, `getUserData.ts`
+- camelCaseを使用
 - `utils`という名前は禁止。`lib`を使用
 
 ### 型定義
 
-- PascalCaseを使用: `types.ts`内で`BlogPreviewProps`など
+- PascalCaseを使用
 
 ### テストファイル
 
-- コンポーネント名に`.test.tsx`を追加: `BlogPreview.test.tsx`
-- スナップショットテスト: `BlogPreview.test.tsx.snap`
+- コンポーネント名に`.test.tsx`を追加
+- スナップショットテスト
 
 ## 参考資料
 

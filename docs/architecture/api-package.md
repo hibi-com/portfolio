@@ -59,10 +59,7 @@ packages/api/
 │                     exports                                 │
 └─────────────────────────────────────────────────────────────┘
                           ↓
-     ┌────────────────────┴────────────────────┐
-     ↓                                         ↓
-apps/web                                  apps/admin
-(フロントエンド)                           (管理画面)
+                         apps
 ```
 
 ## 生成コマンド
@@ -74,7 +71,7 @@ cd packages/api
 bun run generate
 ```
 
-このコマンドは以下を実行します：
+このコマンドは以下を実行します。
 
 1. `tsp compile schema/api.tsp` - TypeSpec から OpenAPI を生成
 2. `orval` - OpenAPI から TypeScript クライアントを生成
@@ -84,17 +81,10 @@ bun run generate
 ```text
 packages/api (クライアント)          apps/api (サーバー)
 ──────────────────────            ──────────────────────
-schema/                           domain/
-├── models/                       ├── portfolio.ts
-│   ├── post.tsp ←── 同期 ──→     ├── post.ts
-│   └── portfolio.tsp             │
-│                                 usecase/
-endpoints/                        ├── getPosts.ts
-├── posts.tsp ←── 契約 ──→       └── getPortfolios.ts
-└── portfolios.tsp                │
-                                  interface/rest/
-                                  ├── posts.ts
-                                  └── portfolios.ts
+schema/
+├── models/   ←── 同期 ──→         domain/
+│
+endpoints/    ←── 契約 ──→         usecase/
 ```
 
 **重要**: `packages/api` の TypeSpec スキーマは `apps/api` の REST インターフェースと一致する必要があります。
