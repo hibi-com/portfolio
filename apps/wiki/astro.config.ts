@@ -167,12 +167,28 @@ export default defineConfig({
                     label: "Specifications",
                     items: [
                         {
+                            label: "Overview",
+                            link: "/specs/",
+                        },
+                        {
                             label: "API",
                             autogenerate: { directory: "specs/api" },
                         },
                         {
                             label: "Database",
                             autogenerate: { directory: "specs/db" },
+                        },
+                        {
+                            label: "Admin",
+                            autogenerate: { directory: "specs/admin" },
+                        },
+                        {
+                            label: "Web",
+                            autogenerate: { directory: "specs/web" },
+                        },
+                        {
+                            label: "Infra",
+                            autogenerate: { directory: "specs/infra" },
                         },
                     ],
                 },
@@ -187,7 +203,27 @@ export default defineConfig({
                             label: "Visitor",
                             autogenerate: { directory: "user-stories/visitor" },
                         },
+                        {
+                            label: "Admin",
+                            autogenerate: { directory: "user-stories/admin" },
+                        },
+                        {
+                            label: "CRM User",
+                            autogenerate: { directory: "user-stories/crm-user" },
+                        },
                     ],
+                },
+                {
+                    label: "Testing",
+                    autogenerate: { directory: "testing" },
+                },
+                {
+                    label: "Setup",
+                    autogenerate: { directory: "setup" },
+                },
+                {
+                    label: "Security",
+                    autogenerate: { directory: "security" },
                 },
                 {
                     label: "Database",
