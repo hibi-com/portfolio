@@ -2,8 +2,6 @@
 title: "E2E Test Docker Container"
 ---
 
-# E2E Test Docker Container
-
 Playwright E2Eテスト実行用のDockerコンテナの設定ガイド。
 
 ## 概要

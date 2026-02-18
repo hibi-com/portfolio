@@ -2,8 +2,6 @@
 title: "データベース管理"
 ---
 
-# データベース管理
-
 このドキュメントでは、プロジェクトのデータベース管理方針とPrismaを使った開発ワークフローを説明します。
 
 ## データベース構成
@@ -75,9 +73,10 @@ bun --cwd packages/db run studio
 
 1. `packages/db/prisma/schema/` の該当ファイルを編集
 2. スキーマをバリデーション
-   ```bash
-   bun --cwd packages/db x prisma validate
-   ```
+
+```bash
+bun --cwd packages/db x prisma validate
+```
 
 ### 2. マイグレーション作成
 
@@ -87,6 +86,7 @@ bun --cwd packages/db x prisma migrate dev --name add-user-role
 ```
 
 これにより以下が実行されます：
+
 - マイグレーションファイル生成（`packages/db/prisma/migrations/`）
 - DBへの適用
 - Prisma Client型の再生成
@@ -116,6 +116,7 @@ bun --cwd packages/db x prisma migrate deploy
 ```
 
 **注意**:
+
 - `migrate deploy` は既存のマイグレーションファイルのみを適用
 - 新規マイグレーションは事前に `migrate dev` で作成しておく必要がある
 - ロールバックは自動化されていないため、慎重に実行
