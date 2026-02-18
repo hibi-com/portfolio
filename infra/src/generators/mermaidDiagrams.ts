@@ -1,20 +1,10 @@
----
-title: "インフラアーキテクチャ"
----
-
-このドキュメントは、`infra/` ディレクトリで Pulumi により管理されるインフラストラクチャの構成とコンポーネントの関係を図示します。
-
-> **注意**: 本ドキュメントの構成図（ランタイム構成図・プロビジョニング構成図）は**Pulumiから自動生成されています**。
-> `infra` で `bun run generate` を実行すると再生成されます。
-> 仕様駆動開発の観点から、手動で書くべき仕様は [`docs/specs/infra/`](../specs/infra/) に記載しています。
-
-**Pulumi のデフォルトコマンドで生成したリソース依存グラフ**: デプロイ済みスタックから `pulumi stack graph` で自動生成した図は [infra-stack-graph.md](./infra-stack-graph.md) を参照してください。`infra` で `bun run generate` を実行すると再生成されます。
-
-## ランタイム構成図
-
-ユーザーリクエストが DNS を経由して Cloudflare に到達し、Pages（Web/Admin/Wiki）と Workers（API）に振り分けられ、API が TiDB と Redis を利用する流れです。
-
-```mermaid
+/**
+ * ランタイム構成図を生成
+ * ユーザーリクエストがCloudflareを経由してPages/Workersに到達し、
+ * データストアとやり取りする流れを可視化
+ */
+export function generateRuntimeDiagram(): string {
+	return `\`\`\`mermaid
 flowchart TB
     subgraph Users["ユーザー"]
         Browser["ブラウザ"]
@@ -70,13 +60,15 @@ flowchart TB
 
     WorkerAPI -.->|トレース・エラー| Sentry
     WorkerAPI -.->|メトリクス・ログ| Grafana
-```
+\`\`\``;
+}
 
-## プロビジョニング構成図
-
-Pulumi がどのプロバイダーとリソースを順に作成・参照するかを示します。
-
-```mermaid
+/**
+ * プロビジョニング構成図を生成
+ * Pulumiがどのプロバイダーとリソースを順に作成・参照するかを示す
+ */
+export function generateProvisioningDiagram(): string {
+	return `\`\`\`mermaid
 flowchart LR
     subgraph Pulumi["Pulumi (infra)"]
         Config["config / .env 参照"]
@@ -124,20 +116,25 @@ flowchart LR
     Grafana --> R8
     Sentry --> R9
     Backblaze --> R10
-```
+\`\`\``;
+}
 
-## コンポーネント一覧
+/**
+ * Mermaid図を含むMarkdownセクションを生成
+ */
+export function generateMermaidSection(): string {
+	const runtimeDiagram = generateRuntimeDiagram();
+	const provisioningDiagram = generateProvisioningDiagram();
 
-カテゴリ・コンポーネント・対応する infra リソースは実装の変更に伴い変わるため、一覧はこのドキュメントでは持たず、**`infra/` 配下の Pulumi リソース（`resources/*.ts`）を直接参照**すること。
+	return `## ランタイム構成図
 
-## 環境とスタック
+ユーザーリクエストが DNS を経由して Cloudflare に到達し、Pages（Web/Admin/Wiki）と Workers（API）に振り分けられ、API が TiDB と Redis を利用する流れです。
 
-- **Pulumi スタック**: `prd`, `stg`, `rc` など（`Pulumi.*.yaml`）
-- **環境変数**: `infra/.env` を読み、Pulumi で Cloudflare Pages/Workers に反映
-- **Cloudflare Access**: プレビュー用の Access アプリは `rc` / `stg` のみ作成
+${runtimeDiagram}
 
-## 関連ドキュメント
+## プロビジョニング構成図
 
-- [Architecture Overview](./overview.md)
-- [インフラ仕様書](../specs/infra/overview.md) - 手動管理する仕様
-- [APIキー・トークン発行手順](../development/api-keys-setup.md)
+Pulumi がどのプロバイダーとリソースを順に作成・参照するかを示します。
+
+${provisioningDiagram}`;
+}

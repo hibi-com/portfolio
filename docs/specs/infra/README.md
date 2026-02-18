@@ -42,13 +42,21 @@
 - 現在のデプロイ状態（`pulumi stack`で確認）
 - 具体的なリソース定義（`infra/`で実装）
 
-## 自動生成の将来計画
+## 自動生成
 
-将来的には、以下の情報をPulumiから自動生成する予定：
+以下の情報はPulumiから自動生成されています：
 
-- ランタイム構成図
-- プロビジョニング構成図
-- リソース依存グラフ
+- **ランタイム構成図** - ユーザーリクエストの流れ
+- **プロビジョニング構成図** - Pulumiのリソース作成順序
+- **リソース依存グラフ** - `pulumi stack graph` による依存関係
+
+### 再生成方法
+
+```bash
+cd infra
+bun run generate:mermaid  # Mermaid図のみ生成
+bun run generate          # Pulumi stack graph も含めて全て生成（要Pulumiログイン）
+```
 
 ## 参考
 
