@@ -4,29 +4,32 @@ ARG REGISTRY_URL
 
 WORKDIR /app
 
-RUN printf '[install.scopes]\n"@portfolio" = "%s"\n' "${REGISTRY_URL}" >> ~/.bunfig.toml
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    jq \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y --no-install-recommends jq=1.6-2.1+deb11u1 && rm -rf /var/lib/apt/lists/*
+RUN (curl -sf "${REGISTRY_URL}/-/ping" || true) \
+  && printf '[install.scopes]\n"@portfolio" = "%s"\n' "${REGISTRY_URL}" >> ~/.bunfig.toml \
+  && printf '%s' \
+    'del(.dependencies["@portfolio/cms"]) | ' \
+    'if .dependencies then .dependencies |= ' \
+    'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end | ' \
+    'if .peerDependencies then .peerDependencies |= ' \
+    'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end | ' \
+    'if .devDependencies then .devDependencies |= ' \
+    'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end' \
+    > /tmp/jq-filter.jq
 
 COPY package.json ./
-RUN jq 'del(.devDependencies) | del(.dependencies["@portfolio/cms"]) | '\
-'if .dependencies then .dependencies |= '\
-'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end | '\
-'if .peerDependencies then .peerDependencies |= '\
-'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end' \
-  package.json > package.tmp.json \
+RUN jq -f /tmp/jq-filter.jq package.json > package.tmp.json \
   && mv package.tmp.json package.json \
+  && cp package.json /tmp/package.json \
   && bun install --ignore-scripts
 
 COPY . .
-RUN jq 'del(.devDependencies) | del(.dependencies["@portfolio/cms"]) | '\
-'if .dependencies then .dependencies |= '\
-'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end | '\
-'if .peerDependencies then .peerDependencies |= '\
-'with_entries(if .value == "workspace:*" then .value = "^1.0.0" else . end) else . end' \
-  package.json > package.tmp.json \
-  && mv package.tmp.json package.json \
-  && bun install --ignore-scripts \
+RUN cp /tmp/package.json package.json \
   && bun run build
 
 FROM nginx:alpine-slim
