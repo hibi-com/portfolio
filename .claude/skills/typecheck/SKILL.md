@@ -34,19 +34,6 @@ bun run typecheck --filter=@portfolio/db
 bun run typecheck --filter=@portfolio/api...
 ```
 
-## パッケージ一覧
-
-| パッケージ | パス |
-| ---------- | ---- |
-| @portfolio/api | apps/api |
-| @portfolio/web | apps/web |
-| @portfolio/admin | apps/admin |
-| @portfolio/db | packages/db |
-| @portfolio/api-client | packages/api |
-| @portfolio/validation | packages/validation |
-| @portfolio/auth | packages/auth |
-| @portfolio/ui | packages/ui |
-
 ## 参考ドキュメント
 
 TypeScript設定、型定義のベストプラクティスについては以下を参照：

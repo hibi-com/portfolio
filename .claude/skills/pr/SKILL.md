@@ -22,4 +22,3 @@ GitHub Pull Requestを作成します。
 ブランチ戦略、PR作成のベストプラクティスについては以下を参照：
 
 - [Git Commitガイド](docs/development/git-commit.md) - コミット形式、ブランチ戦略
-- [CI/CDツール](docs/development/ci-cd-tools.md) - GitHub Actionsワークフロー、PR自動チェック

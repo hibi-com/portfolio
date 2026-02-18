@@ -44,14 +44,4 @@ bun --cwd packages/db x prisma validate
 
 ## Prismaスキーマ構成
 
-```text
-packages/db/prisma/schema/
-├── schema.prisma      # メイン（datasource, generator）
-├── post.prisma        # Post
-├── portfolio.prisma   # Portfolio
-├── crm.prisma         # CRM
-├── chat.prisma        # Chat
-├── email.prisma       # Email
-├── inquiry.prisma     # Inquiry
-└── integration.prisma # 外部連携
-```
+スキーマの構成・ファイル一覧は [docs/development/database.md](docs/development/database.md) を参照すること。実装はリポジトリの `packages/db/prisma/schema/` を直接参照すること。
