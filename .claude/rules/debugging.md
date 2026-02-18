@@ -4,39 +4,11 @@ files: ["**/*.ts", "**/*.tsx"]
 
 # デバッグルール
 
-## トリガー＆アクション
+デバッグログの形式・埋め込みポイントはここに記載せず、必要に応じて以下のドキュメントを参照すること。ローカル慣習として `[DEBUG_TRACE]` プレフィックスを使う場合は検証後に必ず削除し、本番に残さないこと。
 
-| トリガー | アクション |
-| -------- | ---------- |
-| 動作検証が必要なとき | `[DEBUG_TRACE]` プレフィックスでログを埋め込む |
-| 検証完了後 | `[DEBUG_TRACE]` ログをすべて削除 |
-| コミット前 | デバッグログが残っていないことを確認 |
+## 参照ドキュメント
 
-## デバッグログ形式
+- [トラブルシューティング](docs/development/troubleshooting.md)（調査手順・ログ確認）
+- [セキュリティガイドライン](docs/security/guidelines.md)（本番ログ・サニタイズ）
 
-```typescript
-// Entry: 関数の開始直後
-console.log(`[DEBUG_TRACE] >>> ENTRY: functionName(arg=${arg})`);
-
-// Branch: 分岐に入った直後
-console.log(`[DEBUG_TRACE] >>> BRANCH: condition was true`);
-
-// State: 重要な変数の更新後
-console.log(`[DEBUG_TRACE] >>> STATE: status=${status}`);
-
-// Exit: return直前
-console.log(`[DEBUG_TRACE] >>> EXIT: functionName returned ${result}`);
-```
-
-## 埋め込みポイント
-
-1. **Entry**: 関数の開始直後（引数をログ）
-2. **Exit**: return直前（戻り値をログ）
-3. **Branch**: `if`, `switch`, `catch` ブロックに入った直後
-4. **State**: 重要な変数の値が更新された直後
-
-## IMPORTANT
-
-- デバッグログは**検証後に必ず削除**
-- 本番コードに `[DEBUG_TRACE]` を残さない
-- 本番用ログは `logger` インスタンスを使用
+本番用ログは `logger` インスタンスおよび `packages/log` を参照すること。

@@ -21,9 +21,16 @@ docs/
 │   └── db/            # DB仕様
 ├── user-stories/      # ユーザーストーリー
 ├── architecture/      # アーキテクチャ設計
-└── development/       # 開発ガイドライン ← スキルが参照
+├── development/       # 開発ガイドライン ← スキルが参照
+└── testing/           # テスト戦略・ガイド
 
-.claude/skills/        # スキルファイル（docs/development/を参照）
+.claude/
+├── skills/            # スキルファイル（docs/を参照）
+├── rules/             # 開発ルール ← テンプレート・エージェント参照を含む
+└── templates/         # テンプレートファイル
+
+logs/
+└── deployment/        # デプロイ手順書（deployment.mdの移行先）
 ```
 
 ## 引数による対象指定
@@ -35,8 +42,10 @@ docs/
 | `user-stories` | `docs/user-stories/` | `apps/web/e2e/large/`, `apps/admin/e2e/` |
 | `architecture` | `docs/architecture/` | プロジェクト全体構成 |
 | `development` | `docs/development/` | 開発規約・ツール設定 |
-| `skills` | `.claude/skills/` | `docs/development/` との整合性 |
-| （省略） | `docs/` 全体 + `.claude/skills/` | 全実装コード |
+| `testing` | `docs/testing/` | テスト戦略・ガイド |
+| `skills` | `.claude/skills/` | `docs/` との整合性 |
+| `rules` | `.claude/rules/` | テンプレート・エージェント参照の整合性 |
+| （省略） | `docs/` 全体 + `.claude/` | 全実装コード |
 
 ## スキル↔ドキュメント整合性チェック
 
@@ -49,7 +58,7 @@ docs/
 | `/commit` | `docs/development/git-commit.md` |
 | `/pr` | `docs/development/git-commit.md`, `ci-cd-tools.md` |
 | `/review` | `docs/development/coding-standards.md` |
-| `/build` | `docs/development/deployment.md`, `monorepo-management.md` |
+| `/build` | `docs/development/monorepo-management.md`, `ci-cd-tools.md` |
 | `/lint` | `docs/development/coding-standards.md` |
 | `/format` | `docs/development/coding-standards.md` |
 | `/typecheck` | `docs/development/coding-standards.md` |
@@ -59,6 +68,15 @@ docs/
 | `/db-migrate` | `docs/development/database.md` |
 | `/gen-mock` | `docs/testing/testing-guide.md` |
 | `/sequence-diagram` | `docs/development/api-design.md` |
+
+### `.claude/rules/`チェック対象
+
+| ルールファイル | 参照ドキュメント | チェック内容 |
+| -------------- | ---------------- | ------------ |
+| `auto-assign.md` | `.claude/agents/`, `.claude/skills/` | エージェント・スキル名の存在確認 |
+| `templates.md` | `.claude/templates/` | テンプレートファイルパスの存在確認 |
+| `spec-driven.md` | `docs/sequence/`, `docs/specs/` | 仕様書ディレクトリ参照の正確性 |
+| `testing.md` | `docs/testing/` | テスト戦略ドキュメント参照の正確性 |
 
 ### チェック項目
 

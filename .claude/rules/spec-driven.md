@@ -10,26 +10,15 @@ files: ["**/*"]
 - 不明点があるとき → 推測せずユーザーに質問
 - 破壊的変更をするとき → ユーザーの明示的な許可を得る
 
-## テンプレート参照
+トリガー＆アクション・仕様書の作成手順はここに記載せず、以下のドキュメントとテンプレートを参照すること。
 
-仕様書を作成するときは、必ず該当テンプレートを読み込んでから作成：
+## 参照ドキュメント
 
-| 仕様書 | テンプレート |
-| ------ | ------------ |
-| シーケンス図 | `.claude/templates/sdd/sequence-diagram.md` |
-| API仕様書 | `.claude/templates/sdd/api-spec.md` |
-| DB仕様書 | `.claude/templates/sdd/db-spec.md` |
-| ユーザーストーリー | `.claude/templates/sdd/user-story.md` |
+- [開発ワークフロー](docs/development/workflow.md)（SDD + TDD の流れ）
+- [ドキュメントマップ](docs/index.md)（仕様・設計の配置）
+- [シーケンス図](docs/sequence/) / [API仕様](docs/specs/api/) / [DB仕様](docs/specs/db/) / [ユーザーストーリー](docs/user-stories/)
 
-## トリガー＆アクション
-
-| トリガー | アクション |
-| -------- | ---------- |
-| 新機能を実装するとき | `docs/sequence/` のシーケンス図を確認 or テンプレートに従って作成 |
-| APIを変更するとき | `docs/specs/api/` の仕様を確認 or テンプレートに従って更新 |
-| DBスキーマを変更するとき | `docs/specs/db/` を確認、`packages/db/prisma/schema/` を編集 |
-| テストを書くとき | TDD（Red → Green → Refactor）に従う |
-| 実装計画を立てたとき | ユーザーに提示して許可を得る |
+仕様書作成時は該当テンプレートを読み込むこと: `.claude/templates/sdd/sequence-diagram.md`, `api-spec.md`, `db-spec.md`, `user-story.md`。
 
 ## 禁止
 

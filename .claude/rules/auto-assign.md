@@ -7,7 +7,7 @@ alwaysApply: true
 
 ## IMPORTANT: コンテキストに応じて適切なエージェント/スキルを自動で使用する
 
-以下のトリガー条件に合致した場合、対応するエージェントまたはスキルを**自動的に**使用してください。
+以下のトリガー条件に合致した場合、対応するエージェントまたはスキルを**自動的に**使用してください。  
 ユーザーへの確認は不要です。
 
 ## エージェント自動アサイン
@@ -43,9 +43,11 @@ alwaysApply: true
 
 | トリガー | アサインするエージェント |
 | -------- | ------------------------ |
-| 「ビルドして」「デプロイ準備して」 | `build-agent` |
+| 「ビルドして」 | `build-agent` |
 | 「型チェックして」 | `build-agent` |
 | ビルドエラー発生時 | `build-agent`（エラー解析） |
+
+**重要**: デプロイはCircleCI自動化のみ。ローカルからの手動デプロイは禁止。`bun run deploy`はテスト目的のみ使用可。
 
 ### 調査フェーズ
 
@@ -133,8 +135,8 @@ alwaysApply: true
 1. `spec-writer-agent` → シーケンス図・API仕様作成
 2. `unit-test-agent` → テスト作成（Red）
 3. 実装
-4. `/unit-test` → テスト実行（Green）
-5. `/lint` + `/format` → コード品質チェック
+4. `bun run test` → テスト実行（Green）
+5. `bun run lint` + `bun run fmt` → コード品質チェック
 6. `review-agent` → コードレビュー
 
 ### バグ修正ワークフロー
@@ -143,27 +145,29 @@ alwaysApply: true
 
 1. バグ再現テスト作成
 2. 修正実装
-3. `/unit-test` → テスト実行
-4. `/lint` → リントチェック
+3. `bun run test` → テスト実行
+4. `bun run lint` → リントチェック
 
 ### リファクタリングワークフロー
 
 ユーザーが「○○をリファクタリングして」と言った場合：
 
-1. `/unit-test` → 既存テスト確認
+1. `bun run test` → 既存テスト確認
 2. リファクタリング実施
-3. `/unit-test` → テスト再実行
-4. `/lint` + `/typecheck` → 品質チェック
+3. `bun run test` → テスト再実行
+4. `bun run lint` + `bun run typecheck` → 品質チェック
 
 ### リリースワークフロー
 
 ユーザーが「リリースして」「バージョンアップして」と言った場合：
 
 1. `/changeset` → changeset作成
-2. `/unit-test` + `/integration-test` → テスト実行
-3. `/lint` + `/typecheck` → 品質チェック
-4. `bun run version` → バージョン更新
+2. `bun run test` → 全テスト実行
+3. `bun run lint` + `bun run typecheck` → 品質チェック
+4. changesetがバージョン更新を自動実行（`.changeset/`ディレクトリから）
 5. `/pr` → Pull Request作成
+
+**重要**: デプロイはCircleCI自動化のみ。ローカルからの手動デプロイは禁止。
 
 ## ファイルパターンによる自動アサイン
 
