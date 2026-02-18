@@ -254,6 +254,7 @@
         "@pulumiverse/sentry": "0.0.9",
         "@rediscloud/pulumi-rediscloud": "1.3.3",
         "dotenv": "17.2.3",
+        "yaml": "2.8.0",
       },
       "devDependencies": {
         "@portfolio/biome-config": "tooling/biome-config",
@@ -427,17 +428,15 @@
     "scripts/changeset": {
       "name": "@portfolio/scripts-changeset",
       "version": "1.0.0",
-      "dependencies": {
-        "cac": "6.7.14",
-        "enquirer": "2.4.1",
-        "fast-glob": "3.3.3",
-        "picocolors": "1.1.1",
-      },
       "devDependencies": {
         "@portfolio/biome-config": "tooling/biome-config",
         "@portfolio/tsconfig": "tooling/tsconfig",
         "@types/bun": "1.3.5",
         "@types/node": "25.0.3",
+        "cac": "6.7.14",
+        "enquirer": "2.4.1",
+        "fast-glob": "3.3.3",
+        "picocolors": "1.1.1",
         "typescript": "5.9.3",
       },
     },
@@ -1679,7 +1678,7 @@
 
     "@portfolio/generators": ["@portfolio/generators@workspace:generators", { "dependencies": { "plop": "4.0.1" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "typescript": "5.9.3" } }],
 
-    "@portfolio/infra": ["@portfolio/infra@workspace:infra", { "dependencies": { "@pulumi/cloudflare": "6.13.0", "@pulumi/command": "1.1.3", "@pulumi/pulumi": "3.142.0", "@pulumi/random": "4.16.7", "@pulumiverse/grafana": "2.19.0", "@pulumiverse/sentry": "0.0.9", "@rediscloud/pulumi-rediscloud": "1.3.3", "dotenv": "17.2.3" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "tsx": "4.19.2", "typescript": "5.9.3" } }],
+    "@portfolio/infra": ["@portfolio/infra@workspace:infra", { "dependencies": { "@pulumi/cloudflare": "6.13.0", "@pulumi/command": "1.1.3", "@pulumi/pulumi": "3.142.0", "@pulumi/random": "4.16.7", "@pulumiverse/grafana": "2.19.0", "@pulumiverse/sentry": "0.0.9", "@rediscloud/pulumi-rediscloud": "1.3.3", "dotenv": "17.2.3", "yaml": "2.8.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/node": "25.0.3", "tsx": "4.19.2", "typescript": "5.9.3" } }],
 
     "@portfolio/log": ["@portfolio/log@workspace:packages/log", { "dependencies": { "@sentry/node": "8.48.0", "prom-client": "15.1.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@portfolio/vitest-config": "tooling/vitest-config", "@types/node": "25.0.3", "typescript": "5.9.3", "vitest": "3.2.4" } }],
 
@@ -1693,7 +1692,7 @@
 
     "@portfolio/prisma-migration": ["@portfolio/prisma-migration@workspace:tooling/prisma-migration", { "dependencies": { "@prisma/generator-helper": "7.3.0" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "typescript": "5.9.3" }, "bin": { "prisma-migration": "./dist/cmd/main.js" } }],
 
-    "@portfolio/scripts-changeset": ["@portfolio/scripts-changeset@workspace:scripts/changeset", { "dependencies": { "cac": "6.7.14", "enquirer": "2.4.1", "fast-glob": "3.3.3", "picocolors": "1.1.1" }, "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "@types/node": "25.0.3", "typescript": "5.9.3" }, "bin": { "changeset-jp": "./bin/main.js", "changeset": "./bin/main.js" } }],
+    "@portfolio/scripts-changeset": ["@portfolio/scripts-changeset@workspace:scripts/changeset", { "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "@types/node": "25.0.3", "cac": "6.7.14", "enquirer": "2.4.1", "fast-glob": "3.3.3", "picocolors": "1.1.1", "typescript": "5.9.3" }, "bin": { "changeset-jp": "./bin/main.js", "changeset": "./bin/main.js" } }],
 
     "@portfolio/scripts-check": ["@portfolio/scripts-check@workspace:scripts/check", { "devDependencies": { "@portfolio/biome-config": "tooling/biome-config", "@portfolio/tsconfig": "tooling/tsconfig", "@types/bun": "1.3.5", "@types/node": "25.0.3", "cac": "6.7.14", "picocolors": "1.1.1", "typescript": "5.9.3" }, "bin": { "check": "./bin/main.js" } }],
 
