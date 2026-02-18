@@ -11,7 +11,6 @@
     "clean:cache": "git clean -xdf .cache .turbo",
     "clean:pkg": "git clean -xdf node_modules build",
     "coverage": "vitest run --coverage",
-    "deploy": "wrangler pages deploy --project-name portfolio-web-9xkcig --branch master",
     "dev": "bun run with-env remix vite:dev",
     "e2e": "docker run --rm -e CI=true -e APP_DIR=apps/web -v $(git rev-parse --show-toplevel):/work -w /work -v $(git rev-parse --show-toplevel)/node_modules:/work/node_modules -v $(git rev-parse --show-toplevel)/docs/playwright/report:/work/docs/playwright/report -v $(git rev-parse --show-toplevel)/docs/security/e2e:/work/docs/security/e2e e2e",
     "fmt": "biome format --write .",

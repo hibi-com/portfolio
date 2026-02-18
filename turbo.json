@@ -53,9 +53,6 @@
             "dependsOn": ["^build"],
             "env": ["NODE_ENV", "CI"]
         },
-        "deploy": {
-            "dependsOn": ["^build"]
-        },
         "e2e": {
             "dependsOn": ["^build"],
             "env": ["NODE_ENV", "CI"]

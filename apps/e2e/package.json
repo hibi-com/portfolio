@@ -6,7 +6,6 @@
   "scripts": {
     "accessibility": "bun run with-env playwright test pkg/accessibility",
     "build": "remix vite:build",
-    "deploy": "wrangler pages deploy --project-name portfolio-portal-e2e --branch master",
     "dev": "remix vite:dev --port 24000",
     "e2e:admin": "bun run with-env playwright test pkg/admin-api",
     "e2e:web": "bun run with-env playwright test pkg/web-api",

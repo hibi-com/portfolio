@@ -121,7 +121,12 @@ BUN_MAX_HEAP_SIZE=4096 bun run dev
 
 **解決方法**:
 
-接続文字列が正しいか確認します。`infra/env.yaml`の`secrets.database.url`または環境変数`DATABASE_URL`を確認してください。接続文字列の形式は`mysql://ユーザー名:パスワード@ホスト:4000/データベース名?sslaccept=strict`です。TiDB Cloudコンソールで接続文字列を確認し、パスワードに特殊文字が含まれる場合はURLエンコードが必要です。また、TiDB Cloudのファイアウォール設定でIPアドレスが許可されているか確認してください。ローカル開発の場合は`0.0.0.0/0`、本番環境ではCloudflare WorkersのIPレンジを許可します。
+接続文字列が正しいか確認します。  
+`infra/env.yaml`の`secrets.database.url`または環境変数`DATABASE_URL`を確認してください。  
+接続文字列の形式は`mysql://ユーザー名:パスワード@ホスト:4000/データベース名?sslaccept=strict`です。  
+TiDB Cloudコンソールで接続文字列を確認し、パスワードに特殊文字が含まれる場合はURLエンコードが必要です。  
+また、TiDB Cloudのファイアウォール設定でIPアドレスが許可されているか確認してください。  
+ローカル開発の場合は`0.0.0.0/0`、本番環境ではCloudflare WorkersのIPレンジを許可します。
 
 **エッジケース**:
 
@@ -134,7 +139,9 @@ BUN_MAX_HEAP_SIZE=4096 bun run dev
 
 **解決方法**:
 
-マイグレーションの実行は `bun run migrate --filter=@portfolio/db` で行う。状態確認（status）・リセット（reset）・再適用（deploy）は [コマンド追加リスト](../../scripts/command-addition-list.md) の TODO を参照し、必要なら `bun run` で実行できるスクリプトを追加する。
+ローカル開発環境では、Docker Composeが自動的にマイグレーションを実行します（`.docker/db/compose.yml`の`setup-db`サービス）。  
+本番環境へのマイグレーション適用は禁止されており、CircleCI経由でのみ実行されます。  
+マイグレーションファイルは`packages/db/migration/`に配置され、`.docker/db/migration`からシンボリックリンクで参照されています。
 
 ### スキーマの変更が反映されない
 
@@ -142,7 +149,9 @@ BUN_MAX_HEAP_SIZE=4096 bun run dev
 
 **解決方法**:
 
-Prisma Client の再生成は `bun run generate --filter=@portfolio/db`。マイグレーションの新規作成・適用（migrate dev）は [コマンド追加リスト](../../scripts/command-addition-list.md) の TODO を参照し、必要なら `bun run` で実行できるスクリプトを追加する。
+Prisma Clientの再生成は `bun run generate --filter=@portfolio/db` で実行します。  
+マイグレーションファイルは `packages/db/migration/` に配置され、Docker Compose起動時に自動的に適用されます。  
+スキーマ変更後は、Docker Composeを再起動することで新しいマイグレーションが反映されます。
 
 **エッジケース**:
 
@@ -246,7 +255,10 @@ cat .env
 
 **解決方法**:
 
-環境変数は`infra/env.yaml`から読み込まれ、Pulumiが自動的にCloudflareに設定します。設定されない場合、Pulumiデプロイが正常に完了しているか`pulumi stack output`で確認してください。シークレット一覧確認や手動設定は[コマンド追加リスト](../../scripts/command-addition-list.md)のTODOを参照してください。各アプリの`wrangler.toml`には環境変数のキー名のみ記載し、値は含めません。
+環境変数は`infra/env.yaml`から読み込まれ、Pulumiが自動的にCloudflareに設定します。  
+設定されない場合、Pulumiデプロイが正常に完了しているか`pulumi stack output`で確認してください。  
+シークレットの設定は全て`infra/env.yaml`と`infra/src/resources/secrets.ts`で管理されており、手動設定は不要です。  
+各アプリの`wrangler.toml`には環境変数のキー名のみ記載し、値は含めません。
 
 **エッジケース**:
 
@@ -298,7 +310,11 @@ bun pm ls
 
 **解決方法**:
 
-CircleCIデプロイジョブはリトライロジック（最大3回）とヘルスチェックを含みます。失敗した場合、まずCircleCI UIでジョブログを確認してください。Backblaze B2からのアーティファクトダウンロードエラーの場合、CIジョブでのビルドが成功しているか、B2バケットにファイルが存在するか確認します。Wranglerデプロイエラーの場合、Cloudflare APIトークンの権限（Account:Cloudflare Pages:Edit、Account:Workers Scripts:Edit）を確認してください。デプロイ後のヘルスチェックが失敗する場合、アプリケーション起動時のエラーログをCloudflare Dashboardで確認します。
+CircleCIデプロイジョブはリトライロジック（最大3回）とヘルスチェックを含みます。  
+失敗した場合、まずCircleCI UIでジョブログを確認してください。  
+Backblaze B2からのアーティファクトダウンロードエラーの場合、CIジョブでのビルドが成功しているか、B2バケットにファイルが存在するか確認します。  
+Wranglerデプロイエラーの場合、Cloudflare APIトークンの権限（Account:Cloudflare Pages:Edit、Account:Workers Scripts:Edit）を確認してください。  
+デプロイ後のヘルスチェックが失敗する場合、アプリケーション起動時のエラーログをCloudflare Dashboardで確認します。
 
 **エッジケース**:
 
@@ -312,7 +328,9 @@ CircleCIデプロイジョブはリトライロジック（最大3回）とヘ�
 
 **解決方法**:
 
-ローカルからの手動デプロイは禁止されており、全てCircleCI経由で実行されます。テスト目的でローカルデプロイが必要な場合は`bun run deploy`を実行できますが、本番環境へのデプロイは必ずCircleCIを使用してください。Wranglerの認証確認・デプロイの詳細ログ確認は[コマンド追加リスト](../../scripts/command-addition-list.md)のTODOを参照してください。
+ローカルからの手動デプロイは禁止されており、全てCircleCI経由で実行されます。  
+デプロイログの確認はCircleCI UIまたはCloudflare Dashboardで行います。  
+Grafana/Sentryで統合的なログ監視が可能です。
 
 **エッジケース**:
 
@@ -425,7 +443,11 @@ cat biome.json
 
 **解決方法**:
 
-Bunは高速なJavaScriptランタイムですが、一部のNode.js固有APIとの互換性問題があります。エラーが発生した場合、まず該当パッケージがBunをサポートしているか確認してください。非サポートの場合、代替パッケージを検討するか、Node.jsで実行します。特に、ネイティブモジュール（node-gyp使用）やNode.js内部API（`vm`モジュール等）に依存するパッケージは動作しない可能性が高いです。ワークアラウンドとして、特定スクリプトのみ`NODE_OPTIONS`で Node.jsランタイムを使用することも可能です。
+Bunは高速なJavaScriptランタイムですが、一部のNode.js固有APIとの互換性問題があります。  
+エラーが発生した場合、まず該当パッケージがBunをサポートしているか確認してください。  
+非サポートの場合、代替パッケージを検討するか、Node.jsで実行します。  
+特に、ネイティブモジュール（node-gyp使用）やNode.js内部API（`vm`モジュール等）に依存するパッケージは動作しない可能性が高いです。  
+ワークアラウンドとして、特定スクリプトのみ`NODE_OPTIONS`で Node.jsランタイムを使用することも可能です。
 
 **エッジケース**:
 
@@ -439,7 +461,10 @@ Bunは高速なJavaScriptランタイムですが、一部のNode.js固有APIと
 
 **解決方法**:
 
-Bunは高速化のためメモリを多く使用します。メモリ不足エラーが発生した場合、`BUN_MAX_HEAP_SIZE`環境変数でヒープサイズを制限できます（例：`BUN_MAX_HEAP_SIZE=2048`で2GB）。ただし、制限しすぎるとパフォーマンスが低下します。CI環境では適切なマシンサイズ（CircleCIの場合、medium以上を推奨）を選択してください。また、Bunのバージョンによってメモリ使用量が改善されているため、最新版へのアップデートも検討してください。
+Bunは高速化のためメモリを多く使用します。  
+メモリ不足エラーが発生した場合、`BUN_MAX_HEAP_SIZE`環境変数でヒープサイズを制限できます（例：`BUN_MAX_HEAP_SIZE=2048`で2GB）。  
+ただし、制限しすぎるとパフォーマンスが低下します。CI環境では適切なマシンサイズ（CircleCIの場合、medium以上を推奨）を選択してください。  
+また、Bunのバージョンによってメモリ使用量が改善されているため、最新版へのアップデートも検討してください。
 
 ## その他の問題
 
@@ -491,7 +516,10 @@ docker build -t e2e .
 
 **解決方法**:
 
-TiDB CloudはUTCタイムゾーンを使用します。アプリケーション側でJST（日本標準時、UTC+9）に変換する必要があります。Prismaスキーマで`DateTime`型を使用している場合、JavaScriptの`Date`オブジェクトはローカルタイムゾーンを使用します。一貫性のため、全ての日時データをUTCで保存し、表示時のみローカルタイムゾーンに変換することを推奨します。CloudflareWorkersは常にUTCで動作するため、`Date.now()`の結果はUTCです。
+TiDB CloudはUTCタイムゾーンを使用します。  
+アプリケーション側でJST（日本標準時、UTC+9）に変換する必要があります。  
+Prismaスキーマで`DateTime`型を使用している場合、JavaScriptの`Date`オブジェクトはローカルタイムゾーンを使用します。  
+一貫性のため、全ての日時データをUTCで保存し、表示時のみローカルタイムゾーンに変換することを推奨します。CloudflareWorkersは常にUTCで動作するため、`Date.now()`の結果はUTCです。
 
 **エッジケース**:
 
@@ -504,7 +532,10 @@ TiDB CloudはUTCタイムゾーンを使用します。アプリケーション�
 
 **解決方法**:
 
-全てのファイルとデータベースでUTF-8エンコーディングを使用してください。TiDB CloudはデフォルトでUTF-8（utf8mb4）を使用し、絵文字を含む全てのUnicode文字をサポートします。環境変数やファイルから日本語を読み込む場合、ファイルがUTF-8で保存されているか確認してください。Cloudflare Workersは全てUTF-8で処理されますが、外部APIからのレスポンスは明示的にエンコーディングを指定する必要があります（`response.text()`の前に`Content-Type`ヘッダーを確認）。
+全てのファイルとデータベースでUTF-8エンコーディングを使用してください。  
+TiDB CloudはデフォルトでUTF-8（utf8mb4）を使用し、絵文字を含む全てのUnicode文字をサポートします。  
+環境変数やファイルから日本語を読み込む場合、ファイルがUTF-8で保存されているか確認してください。  
+Cloudflare Workersは全てUTF-8で処理されますが、外部APIからのレスポンスは明示的にエンコーディングを指定する必要があります（`response.text()`の前に`Content-Type`ヘッダーを確認）。
 
 **エッジケース**:
 
@@ -517,7 +548,10 @@ TiDB CloudはUTCタイムゾーンを使用します。アプリケーション�
 
 **解決方法**:
 
-Cloudflare Workersは並行リクエストを処理するため、グローバル変数の使用は避けてください。グローバル変数は複数リクエスト間で共有され、予期しない動作を引き起こします。リクエストスコープのデータは関数引数またはリクエストコンテキストで管理してください。データベースの楽観的ロック（Prismaの`@updatedAt`フィールドを使用したバージョン管理）を使用して、同時更新の競合を検出します。また、Cloudflare KV/R2は結果整合性モデルのため、書き込み直後の読み込みで最新データが取得できない場合があります。
+Cloudflare Workersは並行リクエストを処理するため、グローバル変数の使用は避けてください。  
+グローバル変数は複数リクエスト間で共有され、予期しない動作を引き起こします。  
+リクエストスコープのデータは関数引数またはリクエストコンテキストで管理してください。  
+データベースの楽観的ロック（Prismaの`@updatedAt`フィールドを使用したバージョン管理）を使用して、同時更新の競合を検出します。  
 
 **エッジケース**:
 
@@ -531,7 +565,10 @@ Cloudflare Workersは並行リクエストを処理するため、グローバ�
 
 **解決方法**:
 
-Cloudflare Workersは各リクエストが独立したコンテキストで実行され、リクエスト完了後にメモリが解放されます。ただし、グローバルスコープのオブジェクトは複数リクエスト間で共有されるため、大きなキャッシュやバッファをグローバルに保持するとメモリリークの原因になります。開発環境（`bun run dev`）では、長時間実行するとNode.js/Bunのメモリが増加することがあります。定期的に開発サーバーを再起動するか、`NODE_OPTIONS="--max-old-space-size=4096"`でヒープサイズを増やしてください。
+Cloudflare Workersは各リクエストが独立したコンテキストで実行され、リクエスト完了後にメモリが解放されます。  
+ただし、グローバルスコープのオブジェクトは複数リクエスト間で共有されるため、大きなキャッシュやバッファをグローバルに保持するとメモリリークの原因になります。  
+開発環境（`bun run dev`）では、長時間実行するとNode.js/Bunのメモリが増加することがあります。  
+定期的に開発サーバーを再起動するか、`NODE_OPTIONS="--max-old-space-size=4096"`でヒープサイズを増やしてください。
 
 **エッジケース**:
 

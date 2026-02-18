@@ -112,16 +112,6 @@ bun run typecheck --filter=@portfolio/{package}
 2. {step2}
 ```
 
-## デプロイ準備確認
-
-Cloudflareへのデプロイ前チェック：
-
-| 項目 | 確認コマンド | 期待値 |
-| ---- | ------------ | ------ |
-| ビルド成功 | `bun run build` | exit 0 |
-| 環境変数 | `wrangler secret list` | 必要な変数が設定済み |
-| D1マイグレーション | `wrangler d1 migrations list` | pending なし |
-
 ## 出力フォーマット
 
 ```markdown
