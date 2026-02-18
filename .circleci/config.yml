@@ -83,9 +83,6 @@ jobs:
       - run:
           name: Install dependencies
           command: bun install --frozen-lockfile
-      - run:
-          name: Run setup
-          command: bun run setup
       - save-deps
       - restore-turbo
       - save-turbo
@@ -154,6 +151,33 @@ jobs:
                 }"
             fi
 
+  integration:
+    executor: default
+    steps:
+      - attach_workspace:
+          at: .
+      - install-bun
+      - run:
+          name: Run integration tests
+          command: bun run integration
+      - store_test_results:
+          path: .results
+      - run:
+          name: Create GitHub Issue on failure
+          when: on_fail
+          command: |
+            if [ -n "${GITHUB_TOKEN}" ]; then
+              curl -X POST \
+                -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
+                -d "{
+                  \"title\": \"[CI Failure] Integration tests failed on ${CIRCLE_BRANCH}\",
+                  \"body\": \"## CI Failure Report\n\n**Job:** integration\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the build logs\n- [ ] Fix the failing tests\n- [ ] Re-run the CI pipeline\",
+                  \"labels\": [\"ci-failure\", \"automated\"]
+                }"
+            fi
+
   security-scan:
     executor: default
     steps:
@@ -163,13 +187,8 @@ jobs:
       - run:
           name: Install security scanning tools
           command: |
-            # Snyk CLI
             bun add -g snyk
-
-            # Trivy
             curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-
-            # gitleaks (secret detection)
             wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
             tar -xzf gitleaks_8.18.1_linux_x64.tar.gz
             mv gitleaks /usr/local/bin/
@@ -179,17 +198,13 @@ jobs:
           command: |
             echo "=== Snyk Dependency Scan ==="
 
-            # Snyk認証
             if [ -n "${SNYK_TOKEN}" ]; then
               snyk auth "${SNYK_TOKEN}"
 
-              # 依存関係スキャン
               snyk test --severity-threshold=high --json > snyk-report.json || true
 
-              # 結果表示
               cat snyk-report.json | jq '.vulnerabilities[] | {severity, title, packageName, version}'
 
-              # Critical/High脆弱性があればfail
               HIGH_VULNS=$(cat snyk-report.json | jq '[.vulnerabilities[] | select(.severity == "high" or .severity == "critical")] | length')
 
               if [ "${HIGH_VULNS}" -gt "0" ]; then
@@ -206,13 +221,10 @@ jobs:
           command: |
             echo "=== Trivy Filesystem Scan ==="
 
-            # Trivyスキャン
             trivy fs --severity HIGH,CRITICAL --format json --output trivy-report.json . || true
 
-            # 結果表示
             cat trivy-report.json | jq '.Results[]? | select(.Vulnerabilities) | {Target, Vulnerabilities: [.Vulnerabilities[] | {VulnerabilityID, Severity, PkgName}]}'
 
-            # Critical/High脆弱性があればfail
             HIGH_VULNS=$(cat trivy-report.json | jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length')
 
             if [ "${HIGH_VULNS}" -gt "0" ]; then
@@ -226,10 +238,8 @@ jobs:
           command: |
             echo "=== Gitleaks Secret Detection ==="
 
-            # Gitleaks実行
             gitleaks detect --report-format json --report-path gitleaks-report.json --no-git || true
 
-            # 結果表示
             if [ -f "gitleaks-report.json" ]; then
               SECRETS_FOUND=$(cat gitleaks-report.json | jq '. | length')
 
@@ -346,12 +356,10 @@ jobs:
       - run:
           name: Generate artifact version
           command: |
-            # バージョンタグ生成: {short-sha}-{timestamp}
             VERSION="${CIRCLE_SHA1:0:7}-$(date +%s)"
             echo "export ARTIFACT_VERSION=${VERSION}" >> $BASH_ENV
             echo "Artifact version: ${VERSION}"
 
-            # バージョン情報をファイルに保存
             echo "${VERSION}" > .artifact-version
             echo "${CIRCLE_SHA1}" > .artifact-sha
       - run:
@@ -360,7 +368,6 @@ jobs:
             b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
             source $BASH_ENV
 
-            # バージョン付きパスとSHAベースのパス両方にアップロード
             VERSIONED_PATH="artifacts/versions/${ARTIFACT_VERSION}"
             SHA_PATH="artifacts/${CIRCLE_SHA1}"
 
@@ -375,9 +382,7 @@ jobs:
 
               if [ -d "${APP_DIST}" ]; then
                 echo "Uploading ${APP_DIST}..."
-                # バージョン付きパス
                 b2 sync "${APP_DIST}" "b2://${B2_BUCKET_NAME}/${VERSIONED_PATH}/${app}/dist/" --skipNewer
-                # SHAベースのパス（後方互換性）
                 b2 sync "${APP_DIST}" "b2://${B2_BUCKET_NAME}/${SHA_PATH}/${app}/dist/" --skipNewer
               fi
 
@@ -388,7 +393,6 @@ jobs:
               fi
             done
 
-            # マニフェストファイル作成
             cat > manifest.json <<EOF
             {
               "version": "${ARTIFACT_VERSION}",
@@ -402,11 +406,8 @@ jobs:
             }
             EOF
 
-            # マニフェストアップロード
             b2 upload-file "${B2_BUCKET_NAME}" manifest.json "${VERSIONED_PATH}/manifest.json"
             b2 upload-file "${B2_BUCKET_NAME}" manifest.json "${SHA_PATH}/manifest.json"
-
-            # latest タグ更新（RC環境用）
             b2 upload-file "${B2_BUCKET_NAME}" manifest.json "artifacts/latest-rc/manifest.json"
 
             echo "✓ Artifacts uploaded successfully"
@@ -437,16 +438,13 @@ jobs:
           command: |
             b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
 
-            # バージョン指定がある場合はそれを使用（Artifact Promotion）
             if [ -n "<< parameters.artifact_version >>" ]; then
               ARTIFACT_PATH="artifacts/versions/<< parameters.artifact_version >>"
               echo "Using specified artifact version: << parameters.artifact_version >>"
-            # SHA指定がある場合はそれを使用
             elif [ -n "<< parameters.commit_sha >>" ]; then
               SHA="<< parameters.commit_sha >>"
               ARTIFACT_PATH="artifacts/${SHA}"
               echo "Using specified commit SHA: ${SHA}"
-            # それ以外はlatestタグを使用
             else
               ARTIFACT_PATH="artifacts/latest-<< parameters.environment >>"
               echo "Using latest artifact for << parameters.environment >>"
@@ -455,15 +453,12 @@ jobs:
             echo "=== Downloading artifacts ==="
             echo "Path: ${ARTIFACT_PATH}"
 
-            # マニフェストファイルをダウンロードして検証
             mkdir -p artifacts
             b2 download-file-by-name "${B2_BUCKET_NAME}" "${ARTIFACT_PATH}/manifest.json" "./manifest.json"
 
-            # マニフェスト情報表示
             echo "Artifact manifest:"
             cat manifest.json | jq '.'
 
-            # アーティファクトダウンロード
             b2 sync "b2://${B2_BUCKET_NAME}/${ARTIFACT_PATH}/" "./artifacts/" --skipNewer
 
             echo "✓ Artifacts downloaded successfully"
@@ -491,7 +486,6 @@ jobs:
           command: |
             b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
 
-            # 昇格元のマニフェスト取得
             b2 download-file-by-name "${B2_BUCKET_NAME}" "artifacts/latest-<< parameters.from_environment >>/manifest.json" "./from-manifest.json"
 
             VERSION=$(jq -r '.version' from-manifest.json)
@@ -502,16 +496,12 @@ jobs:
             echo "From: << parameters.from_environment >>"
             echo "To: << parameters.to_environment >>"
 
-            # 昇格先のlatest タグ更新
             VERSIONED_PATH="artifacts/versions/${VERSION}"
 
-            # マニフェスト更新（環境情報を変更）
             jq '.environment = "<< parameters.to_environment >>" | .promoted_at = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" | .promoted_from = "<< parameters.from_environment >>"' from-manifest.json > to-manifest.json
 
-            # 昇格先のlatestタグ更新
             b2 upload-file "${B2_BUCKET_NAME}" to-manifest.json "artifacts/latest-<< parameters.to_environment >>/manifest.json"
 
-            # SHAベースのパスにもコピー（オプション）
             b2 copy-file-by-name "${B2_BUCKET_NAME}" "${VERSIONED_PATH}/manifest.json" "${B2_BUCKET_NAME}" "artifacts/<< parameters.to_environment >>-${SHA}/manifest.json"
 
             echo "✓ Artifact promoted successfully"
@@ -536,15 +526,12 @@ jobs:
           command: |
             echo "=== Running database migrations for << parameters.environment >> ==="
 
-            # 環境変数を設定
             export DOPPLER_CONFIG="<< parameters.environment >>"
 
-            # マイグレーション状態確認
             cd packages/db
             echo "Checking migration status..."
             bunx prisma migrate status || true
 
-            # マイグレーション実行
             echo "Applying migrations..."
             bunx prisma migrate deploy
 
@@ -580,7 +567,6 @@ jobs:
           command: |
             echo "=== Pre-deployment checks for << parameters.environment >> ==="
 
-            # ビルドアーティファクトの存在確認
             echo "Checking build artifacts..."
             if [ ! -d "artifacts/${CIRCLE_SHA1}" ]; then
               echo "✗ Build artifacts not found"
@@ -588,7 +574,6 @@ jobs:
             fi
             echo "✓ Build artifacts verified"
 
-            # 環境変数の確認
             echo "Validating environment configuration..."
             if [ -z "${DATABASE_URL}" ]; then
               echo "⚠ DATABASE_URL not set (expected for << parameters.environment >>)"
@@ -621,7 +606,6 @@ jobs:
             echo "Commit: ${CIRCLE_SHA1}"
             echo "Build: ${CIRCLE_BUILD_NUM}"
 
-            # Preview deploymentを作成（Blue-Green準備）
             bun run deploy -- --env=preview
 
             echo "✓ Preview deployment completed"
@@ -645,7 +629,6 @@ jobs:
           command: |
             echo "=== Running smoke tests on preview deployment ==="
 
-            # Preview URLを取得
             if [ -f ".preview-url" ]; then
               PREVIEW_URL=$(cat .preview-url)
               echo "Testing: $PREVIEW_URL"
@@ -658,7 +641,6 @@ jobs:
               esac
             fi
 
-            # スモークテスト実行
             echo "Health check: ${PREVIEW_URL}/health"
             if curl -sSf "${PREVIEW_URL}/health" > /dev/null 2>&1; then
               echo "✓ Health check passed"
@@ -688,7 +670,6 @@ jobs:
             echo "=== Deployment Validation for << parameters.environment >> ==="
             echo "Monitoring duration: << parameters.monitoring_duration >>"
 
-            # 環境別URL設定
             case "<< parameters.environment >>" in
               rc)
                 BASE_URL="https://rc.www.${DOMAIN:-ageha734.jp}"
@@ -704,7 +685,6 @@ jobs:
                 ;;
             esac
 
-            # 1. Health Checks
             echo "=== 1. Health Checks ==="
             if curl -sSf "${BASE_URL}/" > /dev/null 2>&1; then
               echo "✓ Web: ${BASE_URL}"
@@ -720,7 +700,6 @@ jobs:
               exit 1
             fi
 
-            # 2. Critical Path E2E Tests
             echo "=== 2. Critical Path E2E Tests ==="
             if [ -d "apps/e2e" ]; then
               bunx playwright test --grep "@critical" --reporter=line || {
@@ -732,14 +711,11 @@ jobs:
               echo "⚠ E2E tests not found, skipping"
             fi
 
-            # 3. Error Rate Monitoring (Sentryから取得)
             echo "=== 3. Error Rate Monitoring ==="
             if [ -n "${SENTRY_AUTH_TOKEN}" ]; then
-              # 直近15分のエラー率取得
               CURRENT_ERRORS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=15m&interval=15m&field=sum(quantity)&category=error" \
                 -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."sum(quantity)"[0] // 0')
 
-              # 過去1時間の平均エラー率取得（ベースライン）
               BASELINE_ERRORS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=1h&interval=1h&field=sum(quantity)&category=error" \
                 -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."sum(quantity)"[0] // 0')
 
@@ -754,7 +730,6 @@ jobs:
               echo "⚠ SENTRY_AUTH_TOKEN not set, skipping error rate check"
             fi
 
-            # 4. Performance Metrics (Lighthouse CI)
             echo "=== 4. Performance Metrics ==="
             if command -v lighthouse > /dev/null 2>&1; then
               lighthouse "${BASE_URL}" \
@@ -777,23 +752,18 @@ jobs:
               echo "⚠ Lighthouse not installed, skipping performance check"
             fi
 
-            # 5. Resource Monitoring (Cloudflare Analytics)
             echo "=== 5. Resource Monitoring ==="
             if [ -n "${CLOUDFLARE_API_TOKEN}" ] && command -v wrangler > /dev/null 2>&1; then
-              # CPU使用率チェック（Workers）
               echo "Checking resource usage..."
-              # Note: Wrangler analytics APIの実装が必要
               echo "✓ Resource monitoring check completed"
             else
               echo "⚠ Cloudflare credentials not set, skipping resource check"
             fi
 
-            # 6. Business Metrics (PRD only)
             if [ "<< parameters.environment >>" = "prd" ]; then
               echo "=== 6. Business Metrics (PRD) ==="
 
               if [ -n "${SENTRY_AUTH_TOKEN}" ]; then
-                # アクティブユーザー数チェック
                 CURRENT_USERS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=1h&interval=1h&field=count_unique(user)&category=transaction" \
                   -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."count_unique(user)"[0] // 0')
 
@@ -838,10 +808,6 @@ jobs:
             echo "Environment: << parameters.environment >>"
             echo "Duration: << parameters.duration_minutes >> minutes"
 
-            # Cloudflare Workersのgradual rollout設定
-            # Note: Cloudflare API経由でトラフィック分割設定
-
-            # 監視期間
             sleep $(( << parameters.duration_minutes >> * 60 ))
 
             echo "✓ Gradual rollout phase completed"
@@ -872,13 +838,10 @@ jobs:
           command: |
             cd infra
 
-            # Pulumi login (backend設定)
             pulumi login
 
-            # スタック選択
             pulumi stack select << parameters.environment >>
 
-            # プレビュー実行（環境変数は除外）
             echo "=== Infrastructure Preview for << parameters.environment >> ==="
             pulumi preview --diff --non-interactive
 
@@ -918,22 +881,17 @@ jobs:
           command: |
             cd infra
 
-            # Pulumi login
             pulumi login
 
-            # スタック選択
             pulumi stack select << parameters.environment >>
 
             echo "=== Deploying Infrastructure to << parameters.environment >> ==="
             echo "Stack: << parameters.environment >>"
 
-            # 環境変数は手動管理、リソース定義のみ自動デプロイ
-            # env.yamlの変更は自動では適用されない（手動承認必要）
             pulumi up --yes --skip-preview --non-interactive
 
             echo "✓ Infrastructure deployment completed"
 
-            # デプロイ結果をエクスポート
             pulumi stack output --json > stack-outputs.json
             cat stack-outputs.json | jq '.'
       - store_artifacts:
@@ -984,7 +942,6 @@ jobs:
             echo "Commit: ${CIRCLE_SHA1}"
             echo "Build: ${CIRCLE_BUILD_NUM}"
 
-            # Deploy with retry logic
             MAX_RETRIES=3
             RETRY_COUNT=0
 
@@ -1011,10 +968,8 @@ jobs:
           command: |
             echo "=== Post-deployment Verification ==="
 
-            # Wait for propagation
             sleep 30
 
-            # Health check URLs based on environment
             case "<< parameters.environment >>" in
               rc)
                 WEB_URL="https://rc.www.${DOMAIN:-ageha734.jp}"
@@ -1032,7 +987,6 @@ jobs:
 
             DEPLOYMENT_HEALTHY=true
 
-            # Web health check
             echo "Checking Web: ${WEB_URL}"
             if curl -sSf "${WEB_URL}/" > /dev/null 2>&1; then
               echo "✓ Web is accessible"
@@ -1041,7 +995,6 @@ jobs:
               DEPLOYMENT_HEALTHY=false
             fi
 
-            # API health check
             echo "Checking API: ${API_URL}/health"
             if curl -sSf "${API_URL}/health" | jq -e '.status == "healthy"' > /dev/null 2>&1; then
               echo "✓ API is healthy"
@@ -1050,7 +1003,6 @@ jobs:
               DEPLOYMENT_HEALTHY=false
             fi
 
-            # Critical E2E smoke test
             echo "Running critical smoke test..."
             if bunx playwright test --grep "@smoke" --reporter=line; then
               echo "✓ Smoke tests passed"
@@ -1059,19 +1011,16 @@ jobs:
               DEPLOYMENT_HEALTHY=false
             fi
 
-            # Auto-rollback if unhealthy
             if [ "${DEPLOYMENT_HEALTHY}" = "false" ]; then
               echo "=== AUTO-ROLLBACK TRIGGERED ==="
               echo "Deployment validation failed, rolling back..."
 
-              # Cloudflare Pages rollback
               if wrangler pages deployment list --project-name portfolio-web | head -2 | tail -1 | awk '{print $1}' | xargs -I {} wrangler pages deployment rollback --deployment-id {}; then
                 echo "✓ Web rollback successful"
               else
                 echo "✗ Web rollback failed"
               fi
 
-              # Cloudflare Workers rollback
               if wrangler rollback --name api; then
                 echo "✓ API rollback successful"
               else
@@ -1155,7 +1104,6 @@ workflows:
       and:
         - equal: [ master, << pipeline.git.branch >> ]
     jobs:
-      # RC環境は最新ビルドを使用
       - download-artifacts:
           environment: rc
           context: backblaze-b2
@@ -1219,7 +1167,6 @@ workflows:
               only:
                 - master
     jobs:
-      # RC環境で検証済みのArtifactをPromote
       - artifact-promotion:
           from_environment: rc
           to_environment: stg
@@ -1285,7 +1232,6 @@ workflows:
               only:
                 - master
     jobs:
-      # STG環境で検証済みのArtifactをPromote
       - artifact-promotion:
           from_environment: stg
           to_environment: prd
@@ -1365,7 +1311,7 @@ workflows:
   infra-stg:
     triggers:
       - schedule:
-          cron: "0 1 * * 0"  # 毎週日曜1:00AM (Weekly)
+          cron: "0 1 * * 0"
           filters:
             branches:
               only:
@@ -1384,7 +1330,7 @@ workflows:
   infra-prd:
     triggers:
       - schedule:
-          cron: "0 2 1 * *"  # 毎月1日2:00AM (Monthly)
+          cron: "0 2 1 * *"
           filters:
             branches:
               only:
@@ -1466,4 +1412,3 @@ workflows:
                 - master
     jobs:
       - load-test
-
