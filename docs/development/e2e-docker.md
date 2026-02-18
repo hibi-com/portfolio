@@ -1,29 +1,131 @@
 ---
-title: "E2E Test Docker Container"
+title: "E2Eテスト実行ガイド"
 ---
 
-Playwright E2Eテスト実行用のDockerコンテナの設定ガイド。
+# E2Eテスト実行ガイド
+
+このドキュメントでは、Playwrightを使用したE2Eテスト（Large Tests）の実行方法を説明します。
 
 ## 概要
 
-`.docker/e2e` ディレクトリには、E2Eテスト実行に必要なDocker設定が含まれています。
-このコンテナはマルチステージビルドを使用し、ビルド→セキュリティスキャン→E2Eテストを自動実行します。
+- **テストフレームワーク**: Playwright
+- **実行方法**: Turborepo経由（並列実行）
+- **対象アプリ**: `apps/web`, `apps/admin`, `apps/e2e`, `apps/api`
+- **共通設定**: `@portfolio/playwright-config` パッケージ
 
-## ファイル構成
+## 実行方法
 
-- **Dockerfile**: マルチステージビルドのDockerイメージ定義（ENTRYPOINTで自動ビルド・セキュリティスキャン・E2Eテスト実行）
-- **.dockerignore**: Dockerビルド時に除外するファイル
-- **scripts/entrypoint.sh**: ENTRYPOINTスクリプト（ビルド + セキュリティスキャン + E2Eテストを自動実行）
+### 1. 基本的なE2Eテスト実行（推奨）
 
-## 使用方法
-
-### イメージのビルド
+開発サーバーを起動してからE2Eテストを実行します：
 
 ```bash
-docker build -t e2e -f .docker/e2e/Dockerfile .docker/e2e
+# 開発サーバー起動（Docker Compose使用）
+bun run dev
+
+# 別ターミナルでE2Eテスト実行
+bun run e2e
 ```
 
-または、プロジェクトルートから：
+または、CI環境では本番ビルドから実行：
+
+```bash
+# 本番ビルド
+bun run build
+
+# E2Eテスト実行
+bun run e2e
+```
+
+### 2. 特定アプリのE2Eテスト
+
+```bash
+# Webアプリのみ
+bun run e2e --filter=@portfolio/web
+
+# 管理画面のみ
+bun run e2e --filter=@portfolio/admin
+
+# E2Eアプリのみ
+bun run e2e --filter=@portfolio/e2e
+
+# APIのみ
+bun run e2e --filter=@portfolio/api
+```
+
+### 3. 特定テストファイル・オプション指定
+
+`--` の後にPlaywrightオプションを渡します：
+
+```bash
+# 特定ファイル
+bun run e2e --filter=@portfolio/web -- e2e/large/visitor/browse-blog.large.spec.ts
+
+# UIモード（デバッグ用）
+bun run e2e --filter=@portfolio/web -- --ui
+
+# ヘッドレスモードをOFF
+bun run e2e --filter=@portfolio/web -- --headed
+
+# スナップショット更新
+bun run e2e --filter=@portfolio/web -- --update-snapshots
+
+# レポート表示
+bun run e2e --filter=@portfolio/web -- --show-report
+```
+
+### 4. ブラウザ指定
+
+```bash
+# Chromiumのみ
+bun run e2e --filter=@portfolio/web -- --project=chromium
+
+# 全ブラウザ
+bun run e2e --filter=@portfolio/web -- --project=chromium --project=firefox --project=webkit
+```
+
+### 5. リトライ設定
+
+```bash
+# 失敗したテストを2回リトライ
+bun run e2e --filter=@portfolio/web -- --retries=2
+```
+
+## Playwright設定
+
+### 共通設定パッケージ
+
+`@portfolio/playwright-config` パッケージで以下を共通化：
+
+- ベースURL設定
+- タイムアウト設定
+- レポート出力先
+- Webサーバー起動設定
+- ブラウザプロジェクト設定
+
+### 各アプリの設定ファイル
+
+| アプリ | 設定ファイル | テストディレクトリ |
+| ------ | ------------ | ------------------ |
+| Web | `apps/web/playwright.config.ts` | `apps/web/e2e/` |
+| Admin | `apps/admin/playwright.config.ts` | `apps/admin/e2e/` |
+| E2E | `apps/e2e/playwright.config.ts` | `apps/e2e/e2e/` |
+| API | `apps/api/playwright.config.ts` | `apps/api/e2e/` |
+
+### 環境変数
+
+| 変数 | 説明 | デフォルト |
+| ---- | ---- | ---------- |
+| `BASE_URL` | テスト対象のベースURL | `http://localhost:3000` |
+| `CI` | CI環境フラグ | `false` |
+| `PORT` | 開発サーバーのポート | `3000` |
+| `REPORT_OUTPUT_DIR` | レポート出力先 | `../e2e/public/reports/e2e/{app}` |
+
+## Docker を使った実行（オプション）
+
+**注意**: 通常は `bun run e2e` で実行してください。Docker実行は特殊な環境やCI/CDで必要な場合のみ使用します。
+
+### Dockerイメージのビルド
 
 ```bash
 docker build -t e2e -f .docker/e2e/Dockerfile .
@@ -31,322 +133,185 @@ docker build -t e2e -f .docker/e2e/Dockerfile .
 
 ### コンテナの実行
 
-#### 基本的なE2Eテスト実行（推奨）
-
-ENTRYPOINTにより、コンテナ起動時に自動的にビルド→セキュリティスキャン→E2Eテストが実行されます：
-
 ```bash
-# プロジェクトルートから実行
+# 基本実行
 docker run --rm \
   -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  -v $(pwd)/node_modules:/work/node_modules \
-  -v $(pwd)/docs/playwright/report:/work/docs/playwright/report \
-  -v $(pwd)/docs/security/e2e:/work/docs/security/e2e \
-  e2e
-
-# 特定のアプリから実行
-cd apps/web
-docker run --rm \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  -v $(pwd)/node_modules:/work/node_modules \
-  -v $(pwd)/docs/playwright/report:/work/docs/playwright/report \
-  -v $(pwd)/docs/security/e2e:/work/docs/security/e2e \
-  e2e
-```
-
-または、package.jsonのスクリプトから：
-
-```bash
-# プロジェクトルートから
-bun run e2e
-
-# 特定のアプリから
-cd apps/web
-bun run e2e
-```
-
-#### 環境変数による制御
-
-ENTRYPOINTスクリプトは以下の環境変数で動作を制御できます：
-
-- `SKIP_BUILD=true`: ビルドをスキップ
-- `SKIP_SECURITY_SCAN=true`: セキュリティスキャンをスキップ
-- `WORK_DIR`: 作業ディレクトリ（デフォルト: `/work`）
-- `REPORT_DIR`: セキュリティレポートの保存先（デフォルト: `/work/docs/security/e2e`）
-
-例：
-
-```bash
-# ビルドとセキュリティスキャンをスキップしてE2Eテストのみ実行
-docker run --rm \
-  -e CI=true \
-  -e SKIP_BUILD=true \
-  -e SKIP_SECURITY_SCAN=true \
   -v $(pwd):/work \
   -w /work \
   e2e
-```
 
-#### 実行される処理
-
-ENTRYPOINTスクリプトは以下を自動実行します：
-
-1. **アプリケーションのビルド**: プロダクションビルドを実行（`SKIP_BUILD=true`でスキップ可能）
-2. **セキュリティスキャン**（`SKIP_SECURITY_SCAN=true`でスキップ可能）:
-   - Trivyによるファイルシステムスキャン（SAST）
-   - Bun auditによる依存関係の脆弱性チェック
-3. **E2Eテスト実行**: Playwrightテストを実行（デフォルト: `bun run e2e`）
-
-#### カスタムコマンドの実行
-
-ENTRYPOINTに引数を渡すことで、カスタムコマンドを実行できます：
-
-```bash
+# 特定アプリ
 docker run --rm \
   -e CI=true \
   -v $(pwd):/work \
   -w /work \
-  e2e \
-  bun run e2e -- --ui
-```
-
-#### 特定のアプリのE2Eテスト実行
-
-リポジトリルートで実行し、`bun run e2e` の `--filter` でアプリを指定する。
-
-```bash
-# リポジトリルートで実行
-# WebアプリのE2Eテスト
-docker run --rm \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  -v $(pwd)/node_modules:/work/node_modules \
-  -v $(pwd)/docs/playwright/report:/work/docs/playwright/report \
   e2e \
   bun run e2e --filter=@portfolio/web
-
-# AdminアプリのE2Eテスト
-docker run --rm \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  -v $(pwd)/node_modules:/work/node_modules \
-  -v $(pwd)/docs/playwright/report:/work/docs/playwright/report \
-  e2e \
-  bun run e2e --filter=@portfolio/admin
 ```
 
-#### Storybookテスト実行
+### Docker環境変数
 
-```bash
-# Visual regression tests
-docker run --rm \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  -v $(pwd)/node_modules:/work/node_modules \
-  -v $(pwd)/docs/visual/report:/work/docs/playwright/report \
-  e2e \
-  bun run e2e -- --config=playwright.storybook.config.ts e2e/storybook/visual
+| 変数 | 説明 | デフォルト |
+| ---- | ---- | ---------- |
+| `SKIP_BUILD` | ビルドをスキップ | `false` |
+| `SKIP_SECURITY_SCAN` | セキュリティスキャンをスキップ | `false` |
+| `PLAYWRIGHT_BROWSERS_PATH` | ブラウザパス | `/ms-playwright` |
 
-# Accessibility tests
-docker run --rm \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  -v $(pwd)/node_modules:/work/node_modules \
-  -v $(pwd)/docs/accessibility/report:/work/docs/playwright/report \
-  e2e \
-  bun run e2e -- --config=playwright.storybook.config.ts e2e/accessibility
+## CI/CD統合
 
-# Interaction tests
-docker run --rm \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  -v $(pwd)/node_modules:/work/node_modules \
-  -v $(pwd)/docs/interactions/report:/work/docs/playwright/report \
-  e2e \
-  bun run e2e -- --config=playwright.storybook.config.ts e2e/storybook/interactions
+### CircleCI
+
+CircleCIでは `bun run e2e` を直接実行：
+
+```yaml
+# .circleci/config.yml
+e2e:
+  docker:
+    - image: cimg/node:22.13
+  steps:
+    - checkout
+    - run:
+        name: Install Bun
+        command: curl -fsSL https://bun.sh/install | bash
+    - run:
+        name: Install dependencies
+        command: bun install
+    - run:
+        name: Build
+        command: bun run build
+    - run:
+        name: Run E2E tests
+        command: bun run e2e
 ```
 
-### 環境変数
+実際の設定は `.circleci/config.yml` を参照してください。
 
-以下の環境変数で設定をカスタマイズできます：
+## テスト結果
 
-- `CI`: CI環境フラグ（デフォルト: `true`）
-- `PORT`: テストサーバーのポート（デフォルト: `3000`）
-- `NODE_ENV`: Node.js環境（デフォルト: `test`）
-- `PLAYWRIGHT_BROWSERS_PATH`: Playwrightブラウザのパス（デフォルト: `/ms-playwright`）
-- `TZ`: タイムゾーン（デフォルト: `UTC`）
-
-### ビルド引数
-
-- `BUN_VERSION`: Bunのバージョン（デフォルト: `1.1.43`）
-
-カスタムバージョンでビルドする場合：
+### レポート確認
 
 ```bash
-docker build \
-  --build-arg BUN_VERSION=1.2.0 \
-  -t e2e \
-  -f .docker/e2e/Dockerfile \
-  .docker/e2e
+# HTMLレポートを開く（Web）
+open apps/e2e/public/reports/e2e/web/index.html
+
+# HTMLレポートを開く（Admin）
+open apps/e2e/public/reports/e2e/admin/index.html
+```
+
+### レポート出力先
+
+```text
+apps/e2e/public/reports/e2e/
+├── web/           # Webアプリのレポート
+├── admin/         # 管理画面のレポート
+├── e2e/           # E2Eアプリのレポート
+└── api/           # APIのレポート
 ```
 
 ## トラブルシューティング
 
-### ブラウザが見つからないエラー
+### 開発サーバーが起動していない
 
-Playwrightのベースイメージにはブラウザが含まれていますが、問題が発生する場合は：
+**エラー**: `Failed to setup localhost`
 
+**解決策**:
 ```bash
-docker run --rm e2e playwright install --with-deps
+# 開発サーバーを起動
+bun run dev
 ```
 
-### 権限エラー
+### ポート衝突
 
-テスト結果の書き込みで権限エラーが発生する場合：
+**エラー**: `Port 3000 is already in use`
 
+**解決策**:
 ```bash
-# ホスト側でディレクトリの権限を確認
-chmod -R 777 docs/playwright/report
+# 使用中のポートを確認
+lsof -i :3000
+
+# プロセスを終了
+kill -9 <PID>
+
+# または、別のポートを使用
+PORT=3001 bun run dev
 ```
 
-### ネットワークエラー
+### テストがタイムアウトする
 
-テスト中にネットワークエラーが発生する場合、コンテナのネットワーク設定を確認：
-
+**解決策**:
 ```bash
-docker run --rm \
-  --network host \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  e2e \
-  bun run e2e
+# タイムアウトを延長
+bun run e2e --filter=@portfolio/web -- --timeout=60000
 ```
 
-### デバッグモード
+### ブラウザが見つからない
 
-コンテナ内で対話的にデバッグする場合：
-
+**解決策**:
 ```bash
-docker run --rm -it \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  e2e \
-  /bin/bash
+# Playwrightブラウザをインストール
+bunx playwright install --with-deps
 ```
 
-## パフォーマンス
+### スナップショットの差異
 
-- マルチステージビルドは使用していません（シンプルな構成のため）
-- レイヤーキャッシュを最適化するため、依存関係のインストールを先に行っています
-- 不要なファイルは`.dockerignore`で除外されています
-
-## CI/CD統合
-
-### GitHub Actions での使用
-
-```yaml
-# .github/workflows/e2e.yml
-name: E2E Tests
-on:
-  pull_request:
-    branches: [main]
-
-jobs:
-  e2e:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build E2E Docker image
-        run: docker build -t e2e -f .docker/e2e/Dockerfile .
-
-      - name: Run E2E tests
-        run: |
-          docker run --rm \
-            -e CI=true \
-            -v $(pwd):/work \
-            -w /work \
-            e2e
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report
-          path: docs/playwright/report/
-```
-
-### テスト結果の確認
-
+**解決策**:
 ```bash
-# HTMLレポートを開く
-open docs/playwright/report/index.html
-
-# セキュリティレポートを確認
-cat docs/security/e2e/trivy-report.json
+# スナップショットを更新
+bun run e2e --filter=@portfolio/web -- --update-snapshots
 ```
 
 ## ベストプラクティス
 
-### 1. テストの並列実行
+### 1. デバッグには UIモードを使用
 
 ```bash
-# ワーカー数を指定
-docker run --rm \
-  -e CI=true \
-  -e PLAYWRIGHT_WORKERS=4 \
-  -v $(pwd):/work \
-  -w /work \
-  e2e \
-  bun run e2e -- --workers=4
+bun run e2e --filter=@portfolio/web -- --ui
 ```
 
-### 2. 特定のブラウザでテスト
+### 2. 並列実行でパフォーマンス向上
+
+Turborepoが自動的に並列実行しますが、ワーカー数を指定することも可能：
 
 ```bash
-# Chromiumのみ
-docker run --rm \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  e2e \
-  bun run e2e -- --project=chromium
-
-# 全ブラウザ
-docker run --rm \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  e2e \
-  bun run e2e -- --project=chromium --project=firefox --project=webkit
+bun run e2e --filter=@portfolio/web -- --workers=4
 ```
 
-### 3. 失敗したテストのリトライ
+### 3. CI環境では production ビルドを使用
 
 ```bash
-docker run --rm \
-  -e CI=true \
-  -v $(pwd):/work \
-  -w /work \
-  e2e \
-  bun run e2e -- --retries=2
+# 本番ビルド
+bun run build
+
+# E2Eテスト実行
+CI=true bun run e2e
 ```
+
+### 4. 失敗したテストのみ再実行
+
+```bash
+bun run e2e --filter=@portfolio/web -- --last-failed
+```
+
+## テストサイズとドキュメント対応
+
+| テストサイズ | 対応ドキュメント | 命名規則 |
+| ------------ | ---------------- | -------- |
+| Small Tests | コード内JSDoc | `*.test.ts` |
+| Medium Tests | `docs/sequence/` シーケンス図 | `*.integration.test.ts` |
+| **Large Tests** | **`docs/user-stories/` ユーザーストーリー** | **`*.large.spec.ts`** |
+
+E2Eテストは `docs/user-stories/` のユーザーストーリーと1:1で対応させてください。
 
 ## 関連ドキュメント
 
+- [テスト戦略](../testing/testing-strategy.md) - Google Test Sizes、Large Testsとユーザーストーリーの対応
+- [テストガイド](../testing/testing-guide.md) - Large Tests、ページオブジェクトモデル
 - [Playwright Documentation](https://playwright.dev/)
-- [Bun Documentation](https://bun.sh/docs)
-- [テストガイド](../testing/testing-guide.md)
-- [QAシート](../testing/qa-sheet.md)
-- [セキュリティガイドライン](../security/guidelines.md)
+- [Turborepo Documentation](https://turbo.build/repo/docs)
+
+## スキル
+
+E2Eテスト実行は以下のスキルを使用：
+
+- `/e2e-test` - E2Eテスト実行
