@@ -23,11 +23,6 @@ flowchart TB
     subgraph Cloudflare["Cloudflare"]
         DNS["Cloudflare DNS<br/>ゾーン"]
         subgraph Edge["エッジ"]
-            PagesWeb["Pages: Web<br/>(www)"]
-            PagesAdmin["Pages: Admin<br/>(admin)"]
-            PagesWiki["Pages: Wiki<br/>(wiki)"]
-            PagesE2e["Pages: E2E<br/>(portal)"]
-            WorkerAPI["Workers: API<br/>(api)"]
         end
     end
 
@@ -50,23 +45,6 @@ flowchart TB
     end
 
     Browser --> DNS
-    DNS --> PagesWeb
-    DNS --> PagesAdmin
-    DNS --> PagesWiki
-    DNS --> PagesE2e
-    DNS --> WorkerAPI
-    PagesWeb -->|Service Binding| WorkerAPI
-    PagesAdmin -->|Service Binding| WorkerAPI
-    WorkerAPI --> TiDB
-    WorkerAPI --> Redis
-    WorkerAPI --> Backblaze
-    CFEnv -.->|環境変数・シークレット| PagesWeb
-    CFEnv -.->|環境変数・シークレット| PagesAdmin
-    CFEnv -.->|環境変数・シークレット| PagesWiki
-    CFEnv -.->|環境変数・シークレット| PagesE2e
-    CFEnv -.->|環境変数・シークレット| WorkerAPI
-    WorkerAPI -.->|トレース・エラー| Sentry
-    WorkerAPI -.->|メトリクス・ログ| Grafana
 ```
 
 ## プロビジョニング構成図

@@ -2,12 +2,11 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { generateMermaidSection } from "./mermaidDiagrams.js";
 
-const INFRA_DIR = process.cwd();
-const REPO_ROOT = path.resolve(INFRA_DIR, "..");
+const REPO_ROOT = path.resolve(process.cwd(), "..");
 const DOCS_ARCHITECTURE = path.join(REPO_ROOT, "docs", "architecture");
 const ARCHITECTURE_DOC = path.join(DOCS_ARCHITECTURE, "infra-architecture.md");
 
-export function updateInfraArchitectureDoc(): boolean {
+export function updateInfraArchitectureDoc(infraRoot: string = process.cwd()): boolean {
     if (!fs.existsSync(ARCHITECTURE_DOC)) {
         console.error(`[update-architecture-doc] ${ARCHITECTURE_DOC} not found.`);
         return false;
@@ -28,7 +27,7 @@ export function updateInfraArchitectureDoc(): boolean {
     }
 
     const beforeSection = lines.slice(0, startIndex).join("\n");
-    const generatedSection = generateMermaidSection();
+    const generatedSection = generateMermaidSection(infraRoot);
     const afterSection = lines.slice(endIndex).join("\n");
     const updatedContent = `${beforeSection}\n${generatedSection}\n\n${afterSection}`;
 

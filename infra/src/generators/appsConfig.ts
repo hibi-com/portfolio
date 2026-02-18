@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 
 export interface AppConfig {
@@ -45,21 +46,31 @@ interface EnvYamlForApps {
     apps?: EnvAppsSection;
 }
 
-function getEnvYamlPath(): string {
+function getEnvYamlPath(overrideInfraRoot?: string): string {
     const cwd = process.cwd();
-    const tryPaths = [path.join(cwd, "env.yaml"), path.join(cwd, "..", "infra", "env.yaml")];
+    const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+    const infraRoot = overrideInfraRoot ?? process.env.INFRA_ROOT ?? null;
+    const tryPaths = [
+        ...(infraRoot ? [path.join(infraRoot, "env.yaml")] : []),
+        path.join(cwd, "env.yaml"),
+        path.join(cwd, "infra", "env.yaml"),
+        path.join(cwd, "..", "infra", "env.yaml"),
+        path.join(scriptDir, "env.yaml"),
+        path.join(scriptDir, "..", "env.yaml"),
+        path.join(scriptDir, "..", "..", "env.yaml"),
+        path.join(scriptDir, "..", "..", "..", "env.yaml"),
+    ];
     for (const p of tryPaths) {
-        if (fs.existsSync(p) && fs.statSync(p).isFile()) {
-            return p;
+        const resolved = path.resolve(p);
+        if (fs.existsSync(resolved) && fs.statSync(resolved).isFile()) {
+            return resolved;
         }
     }
-    throw new Error(
-        `env.yaml or env.example.yaml not found. Tried: ${tryPaths.join(", ")}. Run from infra directory or repo root.`,
-    );
+    throw new Error(`env.yaml or env.example.yaml not found. Tried: ${tryPaths.slice(0, 4).join(", ")} ...`);
 }
 
-function parseEnvYaml(): EnvYamlForApps {
-    const filePath = getEnvYamlPath();
+function parseEnvYaml(overrideInfraRoot?: string): EnvYamlForApps {
+    const filePath = getEnvYamlPath(overrideInfraRoot);
     const content = fs.readFileSync(filePath, "utf-8");
     const parsed = YAML.parse(content) as EnvYamlForApps;
     return parsed ?? {};
@@ -122,6 +133,33 @@ export function getAppsConfig(domain: string): AppConfig[] {
             main: app.main,
             vars: buildVarsForApp(name, app, generalNodeEnv, domain),
         });
+    }
+
+    return result;
+}
+
+export function getAppListForDiagram(
+    infraRoot?: string,
+): { name: string; type: "pages" | "worker"; subdomain: string }[] {
+    const env = parseEnvYaml(infraRoot);
+    const apps = env.apps ?? {};
+    const result: { name: string; type: "pages" | "worker"; subdomain: string }[] = [];
+
+    for (const name of Object.keys(apps)) {
+        const app = apps[name];
+        if (!app?.type) continue;
+
+        const type = app.type === "worker" ? "worker" : "pages";
+        let subdomain = name;
+        try {
+            if (app.baseUrl) {
+                const hostname = new URL(app.baseUrl).hostname;
+                subdomain = hostname.split(".")[0] ?? name;
+            }
+        } catch {
+            subdomain = name;
+        }
+        result.push({ name, type, subdomain });
     }
 
     return result;

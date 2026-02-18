@@ -33,11 +33,6 @@ export const RUNTIME_SUBGRAPHS: RuntimeSubgraph[] = [
 export const RUNTIME_NODES: RuntimeNode[] = [
     { id: "Browser", label: "ブラウザ", subgraphId: "Users" },
     { id: "DNS", label: "Cloudflare DNS<br/>ゾーン", subgraphId: "Cloudflare" },
-    { id: "PagesWeb", label: "Pages: Web<br/>(www)", subgraphId: "Edge" },
-    { id: "PagesAdmin", label: "Pages: Admin<br/>(admin)", subgraphId: "Edge" },
-    { id: "PagesWiki", label: "Pages: Wiki<br/>(wiki)", subgraphId: "Edge" },
-    { id: "PagesE2e", label: "Pages: E2E<br/>(portal)", subgraphId: "Edge" },
-    { id: "WorkerAPI", label: "Workers: API<br/>(api)", subgraphId: "Edge" },
     { id: "TiDB", label: "TiDB Cloud<br/>Serverless (AWS ap-northeast-1)", subgraphId: "Data" },
     { id: "Redis", label: "Redis Cloud<br/>(AWS ap-northeast-1) または外部", subgraphId: "Data" },
     { id: "Backblaze", label: "Backblaze B2", subgraphId: "Storage" },
@@ -48,21 +43,9 @@ export const RUNTIME_NODES: RuntimeNode[] = [
 
 export const RUNTIME_EDGES: RuntimeEdge[] = [
     { from: "Browser", to: "DNS" },
-    { from: "DNS", to: "PagesWeb" },
-    { from: "DNS", to: "PagesAdmin" },
-    { from: "DNS", to: "PagesWiki" },
-    { from: "DNS", to: "PagesE2e" },
-    { from: "DNS", to: "WorkerAPI" },
-    { from: "PagesWeb", to: "WorkerAPI", label: "Service Binding" },
-    { from: "PagesAdmin", to: "WorkerAPI", label: "Service Binding" },
     { from: "WorkerAPI", to: "TiDB" },
     { from: "WorkerAPI", to: "Redis" },
     { from: "WorkerAPI", to: "Backblaze" },
-    { from: "CFEnv", to: "PagesWeb", label: "環境変数・シークレット", style: "dashed" },
-    { from: "CFEnv", to: "PagesAdmin", label: "環境変数・シークレット", style: "dashed" },
-    { from: "CFEnv", to: "PagesWiki", label: "環境変数・シークレット", style: "dashed" },
-    { from: "CFEnv", to: "PagesE2e", label: "環境変数・シークレット", style: "dashed" },
-    { from: "CFEnv", to: "WorkerAPI", label: "環境変数・シークレット", style: "dashed" },
     { from: "WorkerAPI", to: "Sentry", label: "トレース・エラー", style: "dashed" },
     { from: "WorkerAPI", to: "Grafana", label: "メトリクス・ログ", style: "dashed" },
 ];
