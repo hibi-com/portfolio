@@ -1,7 +1,13 @@
-import enquirer from "enquirer";
+import Enquirer from "enquirer";
 import type { ChangeCategory, VersionType } from "./types.js";
 
-const { Select, MultiSelect, Input } = enquirer;
+type EnquirerWithPrompts = typeof Enquirer & {
+    Select: new (options: object) => { run(): Promise<unknown> };
+    MultiSelect: new (options: object) => { run(): Promise<unknown> };
+    Input: new (options: object) => { run(): Promise<unknown> };
+};
+
+const { Select, MultiSelect, Input } = Enquirer as EnquirerWithPrompts;
 
 export async function promptPackages(availablePackages: string[], affectedPackages: string[]): Promise<string[]> {
     if (affectedPackages.length === 0) {

@@ -16,7 +16,7 @@ export async function getAllPackages(rootDir: string): Promise<PackageInfo[]> {
         const content = await readFile(fullPath, "utf-8");
         const pkg = JSON.parse(content);
 
-        if (pkg.name && pkg.name.startsWith("@portfolio/")) {
+        if (pkg.name?.startsWith("@portfolio/")) {
             packages.push({
                 name: pkg.name,
                 path: pkgPath.replace("/package.json", ""),
@@ -38,5 +38,5 @@ export function detectAffectedPackages(changedFiles: string[], allPackages: Pack
         }
     }
 
-    return Array.from(affectedPackages).sort();
+    return Array.from(affectedPackages).sort((a, b) => a.localeCompare(b));
 }
