@@ -10,6 +10,9 @@ logs/
 │   └── YYYY-MM-DD-security-check.md
 ├── dependencies/      # 依存関係更新ログ（月次）
 │   └── YYYY-MM-DD-update.md
+├── deployment/        # デプロイ履歴ログ
+│   ├── README.md
+│   └── YYYY-MM-DD-{environment}.md
 └── README.md
 ```
 
@@ -31,6 +34,16 @@ OWASP Top 10に基づくセキュリティチェックのログ。
 - **作成方法**: `/update-deps` スキルを使用
 - **テンプレート**: `.claude/templates/dependencies/update-log.md`
 - **内容**: 更新パッケージ、破壊的変更、テスト結果
+
+### Deployment Logs
+
+デプロイ履歴と実行結果のログ。
+
+- **頻度**: デプロイ実行時（RC: 手動承認、STG: 日次0:00 UTC、PRD: 日次12:00 UTC）
+- **作成方法**: CircleCI自動実行（手動記録）
+- **テンプレート**: `.claude/templates/deployment/deployment-log.md`
+- **内容**: デプロイ対象、実行結果、エラー、ロールバック情報
+- **重要**: **ローカルからのデプロイは禁止**
 
 ## 注意事項
 

@@ -4,6 +4,9 @@ security/*.md
 # 依存関係更新ログ（内部管理）
 dependencies/*.md
 
+# デプロイ履歴ログ（内部管理）
+deployment/*.md
+
 # npm/yarn/pnp/bun logs
 npm-debug.log*
 yarn-debug.log*

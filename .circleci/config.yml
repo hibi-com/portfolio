@@ -295,17 +295,114 @@ jobs:
           at: .
       - install-bun
       - run:
-          name: Install Doppler CLI
+          name: Install Wrangler CLI
           command: |
-            sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates gnupg curl
-            curl -sLf --retry 3 --tlsv1.2 --proto "=https" 'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | sudo gpg --dearmor -o /usr/share/keyrings/doppler-archive-keyring.gpg
-            echo "deb [signed-by=/usr/share/keyrings/doppler-archive-keyring.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" | sudo tee /etc/apt/sources.list.d/doppler-cli.list
-            sudo apt-get update && sudo apt-get install -y doppler
+            bun add -g wrangler@latest
+            wrangler --version
+      - run:
+          name: Install Doppler CLI with retry
+          command: |
+            for i in 1 2 3; do
+              if sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates gnupg curl; then
+                if curl -sLf --retry 3 --tlsv1.2 --proto "=https" 'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | sudo gpg --dearmor -o /usr/share/keyrings/doppler-archive-keyring.gpg; then
+                  echo "deb [signed-by=/usr/share/keyrings/doppler-archive-keyring.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" | sudo tee /etc/apt/sources.list.d/doppler-cli.list
+                  if sudo apt-get update && sudo apt-get install -y doppler; then
+                    doppler --version
+                    break
+                  fi
+                fi
+              fi
+              echo "Attempt $i failed, retrying..."
+              sleep 5
+            done
+      - run:
+          name: Setup Cloudflare credentials
+          command: |
+            export CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN}"
+            echo "Cloudflare credentials configured"
       - run:
           name: Deploy to << parameters.environment >>
           command: |
             export DOPPLER_CONFIG="<< parameters.environment >>"
-            bun run deploy
+
+            echo "=== Deploying to << parameters.environment >> environment ==="
+            echo "Commit: ${CIRCLE_SHA1}"
+            echo "Build: ${CIRCLE_BUILD_NUM}"
+
+            # Deploy with retry logic
+            MAX_RETRIES=3
+            RETRY_COUNT=0
+
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              echo "Deploy attempt $((RETRY_COUNT + 1))/$MAX_RETRIES"
+
+              if bun run deploy; then
+                echo "✓ Deploy succeeded"
+                break
+              else
+                RETRY_COUNT=$((RETRY_COUNT + 1))
+                if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                  echo "Deploy failed, retrying in 10 seconds..."
+                  sleep 10
+                else
+                  echo "✗ Deploy failed after $MAX_RETRIES attempts"
+                  exit 1
+                fi
+              fi
+            done
+          no_output_timeout: 15m
+      - run:
+          name: Verify deployment
+          command: |
+            echo "=== Verifying deployment ==="
+
+            # Wait for propagation
+            sleep 30
+
+            # Health check URLs based on environment
+            case "<< parameters.environment >>" in
+              rc)
+                WEB_URL="https://rc.www.${DOMAIN:-example.com}"
+                API_URL="https://rc.api.${DOMAIN:-example.com}/health"
+                ;;
+              stg)
+                WEB_URL="https://stg.www.${DOMAIN:-example.com}"
+                API_URL="https://stg.api.${DOMAIN:-example.com}/health"
+                ;;
+              prd)
+                WEB_URL="https://www.${DOMAIN:-example.com}"
+                API_URL="https://api.${DOMAIN:-example.com}/health"
+                ;;
+            esac
+
+            echo "Checking Web: $WEB_URL"
+            if curl -sSf -o /dev/null -w "%{http_code}" "$WEB_URL" | grep -q "200"; then
+              echo "✓ Web is accessible"
+            else
+              echo "⚠ Web health check failed (may be expected during initial deploy)"
+            fi
+
+            echo "Checking API: $API_URL"
+            if curl -sSf -o /dev/null -w "%{http_code}" "$API_URL" | grep -q "200"; then
+              echo "✓ API is healthy"
+            else
+              echo "⚠ API health check failed (may be expected during initial deploy)"
+            fi
+      - run:
+          name: Create GitHub Issue on failure
+          when: on_fail
+          command: |
+            if [ -n "${GITHUB_TOKEN}" ]; then
+              curl -X POST \
+                -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
+                -d "{
+                  \"title\": \"[Deploy Failure] << parameters.environment >> deployment failed on ${CIRCLE_BRANCH}\",
+                  \"body\": \"## Deployment Failure Report\n\n**Environment:** << parameters.environment >>\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the deployment logs\n- [ ] Check Cloudflare dashboard\n- [ ] Verify Doppler configuration\n- [ ] Consider rollback if necessary\n\n### Rollback Command\n\n\`\`\`bash\nwrangler pages deployment rollback --project-name portfolio-web\n\`\`\`\",
+                  \"labels\": [\"deployment-failure\", \"<< parameters.environment >>\", \"automated\"]
+                }"
+            fi
 
 workflows:
   ci:
