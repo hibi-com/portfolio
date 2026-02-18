@@ -3,3 +3,6 @@ config:
   portfolio-infra:domain: ageha734.jp
   portfolio-infra:slug: portfolio
   portfolio-infra:projectName: portfolio
+  portfolio-infra:skipRedisCloud: "true"
+  portfolio-infra:createTiDBCluster: "true"
+  portfolio-infra:runMigration: "true"

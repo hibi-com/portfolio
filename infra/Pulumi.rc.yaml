@@ -5,3 +5,4 @@ config:
   portfolio-infra:projectName: portfolio
   portfolio-infra:skipRedisCloud: "true"
   portfolio-infra:createTiDBCluster: "true"
+  portfolio-infra:runMigration: "true"

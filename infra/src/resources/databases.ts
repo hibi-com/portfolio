@@ -1,3 +1,4 @@
+import * as command from "@pulumi/command";
 import * as pulumi from "@pulumi/pulumi";
 import type { SecretsFromEnv } from "../config.js";
 import { getProjectName } from "../config.js";
@@ -78,6 +79,7 @@ export function createPortfolioTiDBConfig(
     const region = "ap-northeast-1";
     const databaseName = config.get("tidbDatabase") || projectName.split("-").pop() || "portfolio";
     const shouldCreateCluster = config.getBoolean("createTiDBCluster") ?? false;
+    const shouldRunMigration = config.getBoolean("runMigration") ?? false;
 
     const clusterConfig: TiDBServerlessConfig = {
         name: `${projectName}-db`,
@@ -115,6 +117,25 @@ export function createPortfolioTiDBConfig(
         );
         connectionString = configResult.connectionString;
         host = configResult.host;
+    }
+
+    if (shouldRunMigration) {
+        connectionString.apply((dbUrl) => {
+            if (dbUrl && dbUrl.trim() !== "") {
+                new command.local.Command(
+                    "prisma-migrate-deploy",
+                    {
+                        create: pulumi.interpolate`cd ../packages/db && DATABASE_URL="${dbUrl}" bunx prisma migrate deploy`,
+                        environment: {
+                            DATABASE_URL: dbUrl,
+                        },
+                    },
+                    {
+                        dependsOn: cluster ? [cluster as any] : [],
+                    },
+                );
+            }
+        });
     }
 
     return {
