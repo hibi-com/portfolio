@@ -53,5 +53,6 @@ bun run dev
 
 詳細なテスト戦略、POM、ユーザーストーリー連携については以下を参照：
 
-- [テスト戦略](docs/development/testing.md) - Large Tests、ページオブジェクトモデル、ユーザーストーリー連携
-- [E2E Docker環境](docs/development/e2e-docker.md) - Docker Composeを使ったE2E環境構築
+- [テスト戦略](../../docs/testing/testing-strategy.md) - Google Test Sizes、Large Testsとユーザーストーリーの対応
+- [テストガイド](../../docs/testing/testing-guide.md) - Large Tests、ページオブジェクトモデル
+- [E2E Docker環境](../../docs/development/e2e-docker.md) - Docker Composeを使ったE2E環境構築

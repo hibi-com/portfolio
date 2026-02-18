@@ -53,11 +53,11 @@ docs/
 | `/lint` | `docs/development/coding-standards.md` |
 | `/format` | `docs/development/coding-standards.md` |
 | `/typecheck` | `docs/development/coding-standards.md` |
-| `/unit-test` | `docs/development/testing.md` |
-| `/integration-test` | `docs/development/testing.md` |
-| `/e2e-test` | `docs/development/testing.md`, `e2e-docker.md` |
+| `/unit-test` | `docs/testing/testing-strategy.md`, `testing-guide.md` |
+| `/integration-test` | `docs/testing/testing-strategy.md`, `testing-guide.md` |
+| `/e2e-test` | `docs/testing/testing-strategy.md`, `testing-guide.md`, `docs/development/e2e-docker.md` |
 | `/db-migrate` | `docs/development/database.md` |
-| `/gen-mock` | `docs/development/testing.md` |
+| `/gen-mock` | `docs/testing/testing-guide.md` |
 | `/sequence-diagram` | `docs/development/api-design.md` |
 
 ### チェック項目
