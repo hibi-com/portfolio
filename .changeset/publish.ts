@@ -22,25 +22,27 @@ const defaultConfig: PublishConfig = {
     composeFile: process.env.COMPOSE_FILE || "compose.yaml",
     maxStartupAttempts: 30,
     packages: [
+        "packages/api",
+        "packages/auth",
+        "packages/cache",
+        "packages/db",
+        "packages/log",
+        "packages/ui",
+        "packages/validation",
+        "testing/msw",
+        "testing/vitest",
         "tooling/biome-config",
-        "tooling/tsconfig",
-        "tooling/tailwind-config",
-        "tooling/vite-config",
-        "tooling/vitest-config",
-        "tooling/storybook-config",
+        "tooling/changelog-config",
         "tooling/playwright-config",
         "tooling/playwright-reporter",
-        "tooling/vitest-reporter",
         "tooling/prisma-markdown",
         "tooling/prisma-migration",
-        "tooling/changelog-config",
-        "packages/validation",
-        "packages/db",
-        "packages/cache",
-        "packages/log",
-        "packages/auth",
-        "packages/api",
-        "packages/ui",
+        "tooling/storybook-config",
+        "tooling/tailwind-config",
+        "tooling/tsconfig",
+        "tooling/vite-config",
+        "tooling/vitest-config",
+        "tooling/vitest-reporter",
     ],
 };
 
@@ -147,6 +149,8 @@ function resolveWorkspaceVersions(pkg: PackageJson): PackageJson {
     };
 }
 
+const DEFAULT_PUBLISH_FILES = ["dist", "src", "scripts", "prisma", "migration", "cmd"];
+
 function preparePackageJson(pkgPath: string): void {
     const pkgJsonPath = resolve(pkgPath, "package.json");
     const backupPath = resolve(pkgPath, "package.json.bak");
@@ -154,9 +158,10 @@ function preparePackageJson(pkgPath: string): void {
     copyFileSync(pkgJsonPath, backupPath);
     const pkg: PackageJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
     const { private: _, ...pkgWithoutPrivate } = pkg;
+    const files = pkg.files && pkg.files.length > 0 ? pkg.files : DEFAULT_PUBLISH_FILES;
     const modified = resolveWorkspaceVersions({
         ...pkgWithoutPrivate,
-        files: ["dist", "src", "scripts", "prisma", "migration", "cmd"],
+        files,
     });
 
     writeFileSync(pkgJsonPath, JSON.stringify(modified, null, 2));
