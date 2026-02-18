@@ -43,6 +43,7 @@ Backblaze B2から最新ビルドアーティファクトをダウンロード�
 #### 2. Pre-deployment Check
 
 デプロイ前の検証:
+
 - ビルドアーティファクトの存在確認
 - 環境変数の検証
 - 設定ファイルの整合性チェック
@@ -58,6 +59,7 @@ bunx prisma migrate deploy  # マイグレーション適用
 ```
 
 **特徴**:
+
 - 失敗時は自動でGitHub Issue作成
 - ロールバック手順をIssueに記載
 
@@ -72,6 +74,7 @@ bun run deploy -- --env=preview
 #### 5. Smoke Test
 
 Preview環境で基本動作を検証:
+
 - ヘルスチェックエンドポイント確認
 - 重要なAPIの動作確認
 
@@ -79,7 +82,7 @@ Preview環境で基本動作を検証:
 
 #### RC環境（手動承認あり）
 
-```
+```text
 smoke-test → hold-approval → deploy → verify
 ```
 
@@ -88,7 +91,7 @@ smoke-test → hold-approval → deploy → verify
 
 #### STG/PRD環境（完全自動）
 
-```
+```text
 smoke-test → deploy → verify
 ```
 
@@ -125,11 +128,13 @@ RETRY_DELAY=10s
 ### 3. GitHub Issue自動作成
 
 失敗時に自動的にIssue作成:
+
 - マイグレーション失敗
 - スモークテスト失敗
 - デプロイ失敗
 
 Issue内容:
+
 - 失敗したジョブ
 - 環境
 - コミットSHA
@@ -199,6 +204,7 @@ circleci trigger deploy --param commit_sha=<previous-commit-sha>
 1. CircleCI UIでログ確認
 2. DATABASE_URL環境変数を確認
 3. 手動でマイグレーション状態確認:
+
    ```bash
    cd packages/db
    bunx prisma migrate status
