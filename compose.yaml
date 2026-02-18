@@ -52,13 +52,13 @@ services:
       context: apps/api
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://verdaccio:4873
+        REGISTRY_URL: http://127.0.0.1:4873
+      network: host
     image: portfolio-api:local
     container_name: api
     networks:
       - api
       - db
-      - registry
     ports:
       - target: 8080
         published: 3000
@@ -100,12 +100,12 @@ services:
       context: apps/web
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://verdaccio:4873
+        REGISTRY_URL: http://127.0.0.1:4873
+      network: host
     image: portfolio-web:local
     container_name: web
     networks:
       - api
-      - registry
     ports:
       - target: 80
         published: 3000
@@ -128,12 +128,12 @@ services:
       context: apps/e2e
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://verdaccio:4873
+        REGISTRY_URL: http://127.0.0.1:4873
+      network: host
     image: portfolio-e2e:local
     container_name: e2e
     networks:
-      - default
-      - registry
+      - api
     ports:
       - target: 80
         published: 3921
@@ -156,12 +156,12 @@ services:
       context: apps/admin
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://verdaccio:4873
+        REGISTRY_URL: http://127.0.0.1:4873
+      network: host
     image: portfolio-admin:local
     container_name: admin
     networks:
       - api
-      - registry
     ports:
       - target: 80
         published: 3001
@@ -184,12 +184,12 @@ services:
       context: apps/wiki
       dockerfile: Dockerfile
       args:
-        REGISTRY_URL: http://verdaccio:4873
+        REGISTRY_URL: http://127.0.0.1:4873
+      network: host
     image: portfolio-wiki:local
     container_name: wiki
     networks:
       - api
-      - registry
     ports:
       - target: 80
         published: 3002
