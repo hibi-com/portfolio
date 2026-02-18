@@ -3,15 +3,16 @@ title: "インフラストラクチャ仕様書"
 description: インフラの要件と仕様を定義
 ---
 
-# インフラストラクチャ仕様書
+## インフラストラクチャ仕様書
 
-本ドキュメントはインフラストラクチャの**仕様**を定義します。実際のアーキテクチャ図は`docs/architecture/infra-architecture.md`を参照してください（Pulumiから自動生成）。
+本ドキュメントはインフラストラクチャの**仕様**を定義します。  
+実際のアーキテクチャ図は`docs/architecture/infra-architecture.md`を参照してください（Pulumiから自動生成）。
 
 ## 仕様駆動のアプローチ
 
 インフラの構成は以下の流れで管理します：
 
-```
+```text
 仕様定義（手動） → 実装（Pulumi） → 構成図生成（自動）
    ↑                    ↑                    ↑
    本ドキュメント      infra/            docs/architecture/
@@ -24,6 +25,7 @@ description: インフラの要件と仕様を定義
 ### このドキュメントに書くべきこと
 
 **✅ 記載すべき内容**:
+
 - インフラの要件
 - 非機能要件（パフォーマンス、可用性など）
 - 制約事項
@@ -32,6 +34,7 @@ description: インフラの要件と仕様を定義
 - 設計判断の理由
 
 **❌ 記載不要な内容**:
+
 - 実際のリソース構成図（Pulumiから自動生成）
 - 現在のデプロイ状態（`pulumi stack`で確認）
 - 具体的なリソース定義（`infra/`で実装）
@@ -45,6 +48,7 @@ description: インフラの要件と仕様を定義
 - **リソース依存グラフ** - `pulumi stack graph` による依存関係
 
 **再生成方法**:
+
 ```bash
 cd infra
 bun run generate:mermaid  # Mermaid図のみ生成
@@ -191,16 +195,19 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 ## 今後の拡張
 
 ### Phase 1（現在）
+
 - ✅ Cloudflare Pages/Workers
 - ✅ TiDB Cloud Serverless
 - ✅ Redis Cloud
 
 ### Phase 2（検討中）
+
 - [ ] CDN最適化
 - [ ] Edge KVの活用
 - [ ] Durable Objectsの検討
 
 ### Phase 3（将来）
+
 - [ ] Multi-region対応
 - [ ] より高度な可観測性
 
