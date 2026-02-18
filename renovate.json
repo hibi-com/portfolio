@@ -1,55 +1,42 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "automerge": false,
-    "automergeType": "pr",
-    "extends": ["config:recommended"],
-    "ignorePresets": [":prHourlyLimit2"],
-    "packageRules": [
-        {
-            "enabled": false,
-            "matchPackagePatterns": ["^@portfolio/"]
-        },
-        {
-            "enabled": false,
-            "matchDepTypes": ["engines"]
-        },
-        {
-            "groupName": "turborepo",
-            "matchPackageNames": ["turbo"]
-        },
-        {
-            "groupName": "biome",
-            "matchPackageNames": ["@biomejs/biome"]
-        },
-        {
-            "groupName": "typescript",
-            "matchPackageNames": ["typescript"]
-        },
-        {
-            "groupName": "remix",
-            "matchPackagePatterns": ["^@remix-run/"]
-        },
-        {
-            "groupName": "storybook",
-            "matchPackagePatterns": ["^@storybook/"]
-        },
-        {
-            "groupName": "playwright",
-            "matchPackagePatterns": ["^@playwright/", "playwright"]
-        },
-        {
-            "groupName": "vitest",
-            "matchPackagePatterns": ["^@vitest/", "vitest"]
-        },
-        {
-            "groupName": "astro",
-            "matchPackagePatterns": ["^@astrojs/"]
-        }
-    ],
-    "platform": "github",
-    "prConcurrentLimit": 5,
-    "prHourlyLimit": 10,
-    "repositories": ["ageha734/portfolio"],
-    "schedule": ["before 10am on Monday"],
-    "timezone": "Asia/Tokyo"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":enableVulnerabilityAlertsWithLabel(security)",
+    "group:monorepos"
+  ],
+  "timezone": "Asia/Tokyo",
+  "schedule": ["every weekend"],
+  "labels": ["dependencies", "automated"],
+  "prConcurrentLimit": 5,
+  "minimumReleaseAge": "3 days",
+  "packageRules": [
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["patch"],
+      "matchDepTypes": ["dependencies"],
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["patch"],
+      "labels": ["security"],
+      "automerge": true,
+      "schedule": ["at any time"]
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["major-update"]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "automerge": true
+  }
 }
