@@ -9,11 +9,5 @@
         "rule": "-",
         "ruleSpaces": false
     },
-    "plugins": [
-        "remark-preset-lint-markdown-style-guide",
-        ["remark-lint-list-item-indent", false],
-        ["remark-lint-list-item-spacing", false],
-        ["remark-lint-ordered-list-marker-value", false],
-        ["remark-lint-no-duplicate-headings", false]
-    ]
+    "plugins": [["remark-preset-lint-markdown-style-guide", false]]
 }
