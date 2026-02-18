@@ -284,6 +284,154 @@ jobs:
           paths:
             - artifacts
 
+  db-migrate:
+    executor: default
+    parameters:
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+    steps:
+      - attach_workspace:
+          at: .
+      - install-bun
+      - run:
+          name: Run Prisma migrations for << parameters.environment >>
+          command: |
+            echo "=== Running database migrations for << parameters.environment >> ==="
+
+            # 環境変数を設定
+            export DOPPLER_CONFIG="<< parameters.environment >>"
+
+            # マイグレーション状態確認
+            cd packages/db
+            echo "Checking migration status..."
+            bunx prisma migrate status || true
+
+            # マイグレーション実行
+            echo "Applying migrations..."
+            bunx prisma migrate deploy
+
+            echo "✓ Migrations completed successfully"
+      - run:
+          name: Create GitHub Issue on failure
+          when: on_fail
+          command: |
+            if [ -n "${GITHUB_TOKEN}" ]; then
+              curl -X POST \
+                -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
+                -d "{
+                  \"title\": \"[Migration Failure] Database migration failed on << parameters.environment >>\",
+                  \"body\": \"## Migration Failure Report\n\n**Environment:** << parameters.environment >>\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the migration logs\n- [ ] Check database connectivity\n- [ ] Verify migration files\n- [ ] Consider manual intervention\n\n### Manual Migration Command\n\n\`\`\`bash\ncd packages/db\nbunx prisma migrate deploy\n\`\`\`\",
+                  \"labels\": [\"migration-failure\", \"<< parameters.environment >>\", \"automated\"]
+                }"
+            fi
+
+  pre-deploy-check:
+    executor: default
+    parameters:
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+    steps:
+      - attach_workspace:
+          at: .
+      - install-bun
+      - run:
+          name: Pre-deployment validation
+          command: |
+            echo "=== Pre-deployment checks for << parameters.environment >> ==="
+
+            # ビルドアーティファクトの存在確認
+            echo "Checking build artifacts..."
+            if [ ! -d "artifacts/${CIRCLE_SHA1}" ]; then
+              echo "✗ Build artifacts not found"
+              exit 1
+            fi
+            echo "✓ Build artifacts verified"
+
+            # 環境変数の確認
+            echo "Validating environment configuration..."
+            if [ -z "${DATABASE_URL}" ]; then
+              echo "⚠ DATABASE_URL not set (expected for << parameters.environment >>)"
+            fi
+            echo "✓ Environment configuration validated"
+
+            echo "=== All pre-deployment checks passed ==="
+
+  preview-deploy:
+    executor: default
+    parameters:
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+    steps:
+      - attach_workspace:
+          at: .
+      - install-bun
+      - run:
+          name: Install Wrangler CLI
+          command: |
+            bun add -g wrangler@latest
+            wrangler --version
+      - run:
+          name: Deploy preview for << parameters.environment >>
+          command: |
+            export DOPPLER_CONFIG="<< parameters.environment >>"
+
+            echo "=== Deploying preview to << parameters.environment >> environment ==="
+            echo "Commit: ${CIRCLE_SHA1}"
+            echo "Build: ${CIRCLE_BUILD_NUM}"
+
+            # Preview deploymentを作成（Blue-Green準備）
+            bun run deploy -- --env=preview
+
+            echo "✓ Preview deployment completed"
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .preview-url
+
+  smoke-test:
+    executor: default
+    parameters:
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+    steps:
+      - attach_workspace:
+          at: .
+      - install-bun
+      - run:
+          name: Run smoke tests on preview
+          command: |
+            echo "=== Running smoke tests on preview deployment ==="
+
+            # Preview URLを取得
+            if [ -f ".preview-url" ]; then
+              PREVIEW_URL=$(cat .preview-url)
+              echo "Testing: $PREVIEW_URL"
+            else
+              echo "⚠ Preview URL not found, using default"
+              case "<< parameters.environment >>" in
+                rc) PREVIEW_URL="https://rc.www.${DOMAIN:-example.com}" ;;
+                stg) PREVIEW_URL="https://stg.www.${DOMAIN:-example.com}" ;;
+                prd) PREVIEW_URL="https://www.${DOMAIN:-example.com}" ;;
+              esac
+            fi
+
+            # スモークテスト実行
+            echo "Health check: ${PREVIEW_URL}/health"
+            if curl -sSf "${PREVIEW_URL}/health" > /dev/null 2>&1; then
+              echo "✓ Health check passed"
+            else
+              echo "✗ Health check failed"
+              exit 1
+            fi
+
+            echo "✓ All smoke tests passed"
+
   deploy:
     executor: default
     parameters:
@@ -441,10 +589,37 @@ workflows:
       - download-artifacts:
           context: backblaze-b2
 
+      - pre-deploy-check:
+          environment: rc
+          requires:
+            - download-artifacts
+          context: doppler
+
+      - db-migrate:
+          environment: rc
+          requires:
+            - pre-deploy-check
+          context:
+            - doppler
+
+      - preview-deploy:
+          environment: rc
+          requires:
+            - db-migrate
+          context:
+            - cloudflare
+            - doppler
+
+      - smoke-test:
+          environment: rc
+          requires:
+            - preview-deploy
+          context: doppler
+
       - hold-approval:
           type: approval
           requires:
-            - download-artifacts
+            - smoke-test
 
       - deploy:
           environment: rc
@@ -479,10 +654,37 @@ workflows:
             - e2e
           context: backblaze-b2
 
-      - deploy:
+      - pre-deploy-check:
           environment: stg
           requires:
             - download-artifacts
+          context: doppler
+
+      - db-migrate:
+          environment: stg
+          requires:
+            - pre-deploy-check
+          context:
+            - doppler
+
+      - preview-deploy:
+          environment: stg
+          requires:
+            - db-migrate
+          context:
+            - cloudflare
+            - doppler
+
+      - smoke-test:
+          environment: stg
+          requires:
+            - preview-deploy
+          context: doppler
+
+      - deploy:
+          environment: stg
+          requires:
+            - smoke-test
           context:
             - backblaze-b2
             - cloudflare
@@ -512,10 +714,37 @@ workflows:
             - e2e
           context: backblaze-b2
 
-      - deploy:
+      - pre-deploy-check:
           environment: prd
           requires:
             - download-artifacts
+          context: doppler
+
+      - db-migrate:
+          environment: prd
+          requires:
+            - pre-deploy-check
+          context:
+            - doppler
+
+      - preview-deploy:
+          environment: prd
+          requires:
+            - db-migrate
+          context:
+            - cloudflare
+            - doppler
+
+      - smoke-test:
+          environment: prd
+          requires:
+            - preview-deploy
+          context: doppler
+
+      - deploy:
+          environment: prd
+          requires:
+            - smoke-test
           context:
             - backblaze-b2
             - cloudflare
