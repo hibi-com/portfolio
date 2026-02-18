@@ -8,6 +8,8 @@ title: "インフラスタックグラフ（自動生成）"
 
 ![Pulumi stack graph](infra-stack-graph.svg)
 
+
+
 ## 再生成方法
 
 `infra` ディレクトリで以下を実行してください。
