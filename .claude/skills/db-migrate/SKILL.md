@@ -55,9 +55,3 @@ packages/db/prisma/schema/
 ├── inquiry.prisma     # Inquiry
 └── integration.prisma # 外部連携
 ```
-
-## 参考ドキュメント
-
-Prismaスキーマ設計、マイグレーション戦略の詳細については以下を参照：
-
-- [データベース](docs/development/database.md) - Prisma設定、マイグレーションワークフロー、D1/TiDB対応

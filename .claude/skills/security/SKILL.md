@@ -32,17 +32,20 @@ OWASP Top 10に基づくセキュリティチェックを実行し、結果を�
 OWASP Top 10の各項目について、以下を実行：
 
 #### A01: アクセス制御の不備
+
 ```bash
 grep -r "authMiddleware\|requireRole" apps/api/src/interface/rest/
 ```
 
 #### A02: 暗号化の失敗
+
 ```bash
 # Cloudflare HTTPS設定確認（本番環境の場合）
 curl -I https://your-domain.com | grep -i "strict-transport-security"
 ```
 
 #### A03: インジェクション
+
 ```bash
 # Zodバリデーション確認
 grep -r "z\." packages/validation/src/
@@ -52,12 +55,14 @@ grep -r "\$queryRaw\|\$executeRaw" packages/db/
 ```
 
 #### A04: 安全でない設計
+
 ```bash
 # レート制限確認
 grep -r "rateLimit\|throttle" apps/api/src/
 ```
 
 #### A05: セキュリティの設定ミス
+
 ```bash
 # セキュリティヘッダー確認
 curl -I https://your-domain.com
@@ -67,6 +72,7 @@ find . -name ".env*" -exec ls -la {} \;
 ```
 
 #### A06: 脆弱で古いコンポーネント
+
 ```bash
 # 脆弱性チェック
 bun audit
@@ -79,24 +85,28 @@ bunx depcheck
 ```
 
 #### A07: 識別と認証の失敗
+
 ```bash
 # パスワードポリシー確認
 grep -r "password.*validation\|passwordPolicy" packages/validation/src/
 ```
 
 #### A08: ソフトウェアとデータの整合性の失敗
+
 ```bash
 # Trivyスキャン実行
 trivy fs --severity HIGH,CRITICAL .
 ```
 
 #### A09: セキュリティログとモニタリングの失敗
+
 ```bash
 # ログ出力確認
 grep -r "logger\.\(info\|warn\|error\)" apps/api/src/
 ```
 
 #### A10: SSRF
+
 ```bash
 # URL検証確認
 grep -r "validateUrl\|isPrivateIp" apps/api/src/lib/
@@ -127,16 +137,19 @@ grep -r "validateUrl\|isPrivateIp" apps/api/src/lib/
 ## 評価基準
 
 ### ✅ 問題なし
+
 - すべてのチェック項目をクリア
 - 既知の脆弱性なし
 - 設定が適切
 
 ### ⚠️ 要注意
+
 - 軽微な問題あり
 - 改善推奨事項あり
 - 次回チェックまでに対応
 
 ### ❌ 要対応
+
 - 重大な脆弱性あり
 - 緊急対応が必要
 - すぐに修正すべき問題

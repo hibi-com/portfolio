@@ -1,10 +1,10 @@
 # OWASP Top 10 セキュリティチェック
 
+<!-- markdownlint-disable MD024 no-duplicate-heading -->
+
 **チェック日**: {DATE}
 **チェック担当**: {CHECKER}
 **対象期間**: {START_DATE} 〜 {END_DATE}
-
----
 
 ## チェック概要
 
@@ -29,17 +29,15 @@ grep -r "authMiddleware\|requireRole" apps/api/src/interface/rest/
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## A02:2021 - 暗号化の失敗
 
@@ -63,17 +61,15 @@ wrangler secret list
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## A03:2021 - インジェクション
 
@@ -97,17 +93,15 @@ grep -r "\$queryRaw\|\$executeRaw" packages/db/
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## A04:2021 - 安全でない設計
 
@@ -128,17 +122,15 @@ grep -r "rateLimit\|throttle" apps/api/src/
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## A05:2021 - セキュリティの設定ミス
 
@@ -162,17 +154,15 @@ find . -name ".env*" -exec ls -la {} \;
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## A06:2021 - 脆弱で古いコンポーネント
 
@@ -199,17 +189,15 @@ bunx depcheck
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## A07:2021 - 識別と認証の失敗
 
@@ -230,17 +218,15 @@ grep -r "password.*validation\|passwordPolicy" packages/validation/src/
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## A08:2021 - ソフトウェアとデータの整合性の失敗
 
@@ -264,17 +250,15 @@ trivy fs --severity HIGH,CRITICAL .
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## A09:2021 - セキュリティログとモニタリングの失敗
 
@@ -295,17 +279,15 @@ grep -r "logger\.\(info\|warn\|error\)" apps/api/src/
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## A10:2021 - サーバーサイドリクエストフォージェリ (SSRF)
 
@@ -326,17 +308,15 @@ grep -r "validateUrl\|isPrivateIp" apps/api/src/lib/
 
 ### 発見事項
 
-```
+```text
 {FINDINGS}
 ```
 
 ### アクション
 
-```
+```text
 {ACTIONS}
 ```
-
----
 
 ## サマリー
 
@@ -367,8 +347,6 @@ grep -r "validateUrl\|isPrivateIp" apps/api/src/lib/
 
 - **次回実施日**: {NEXT_CHECK_DATE}
 - **担当者**: {NEXT_CHECKER}
-
----
 
 ## 参考資料
 
