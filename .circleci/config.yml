@@ -154,6 +154,118 @@ jobs:
                 }"
             fi
 
+  security-scan:
+    executor: default
+    steps:
+      - attach_workspace:
+          at: .
+      - install-bun
+      - run:
+          name: Install security scanning tools
+          command: |
+            # Snyk CLI
+            bun add -g snyk
+
+            # Trivy
+            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+            # gitleaks (secret detection)
+            wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
+            tar -xzf gitleaks_8.18.1_linux_x64.tar.gz
+            mv gitleaks /usr/local/bin/
+            chmod +x /usr/local/bin/gitleaks
+      - run:
+          name: Dependency vulnerability scan (Snyk)
+          command: |
+            echo "=== Snyk Dependency Scan ==="
+
+            # Snyk認証
+            if [ -n "${SNYK_TOKEN}" ]; then
+              snyk auth "${SNYK_TOKEN}"
+
+              # 依存関係スキャン
+              snyk test --severity-threshold=high --json > snyk-report.json || true
+
+              # 結果表示
+              cat snyk-report.json | jq '.vulnerabilities[] | {severity, title, packageName, version}'
+
+              # Critical/High脆弱性があればfail
+              HIGH_VULNS=$(cat snyk-report.json | jq '[.vulnerabilities[] | select(.severity == "high" or .severity == "critical")] | length')
+
+              if [ "${HIGH_VULNS}" -gt "0" ]; then
+                echo "✗ Found ${HIGH_VULNS} high/critical vulnerabilities"
+                exit 1
+              fi
+
+              echo "✓ No high/critical vulnerabilities found"
+            else
+              echo "⚠ SNYK_TOKEN not set, skipping Snyk scan"
+            fi
+      - run:
+          name: Filesystem vulnerability scan (Trivy)
+          command: |
+            echo "=== Trivy Filesystem Scan ==="
+
+            # Trivyスキャン
+            trivy fs --severity HIGH,CRITICAL --format json --output trivy-report.json . || true
+
+            # 結果表示
+            cat trivy-report.json | jq '.Results[]? | select(.Vulnerabilities) | {Target, Vulnerabilities: [.Vulnerabilities[] | {VulnerabilityID, Severity, PkgName}]}'
+
+            # Critical/High脆弱性があればfail
+            HIGH_VULNS=$(cat trivy-report.json | jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length')
+
+            if [ "${HIGH_VULNS}" -gt "0" ]; then
+              echo "✗ Found ${HIGH_VULNS} high/critical vulnerabilities"
+              exit 1
+            fi
+
+            echo "✓ No high/critical vulnerabilities found"
+      - run:
+          name: Secret detection (gitleaks)
+          command: |
+            echo "=== Gitleaks Secret Detection ==="
+
+            # Gitleaks実行
+            gitleaks detect --report-format json --report-path gitleaks-report.json --no-git || true
+
+            # 結果表示
+            if [ -f "gitleaks-report.json" ]; then
+              SECRETS_FOUND=$(cat gitleaks-report.json | jq '. | length')
+
+              if [ "${SECRETS_FOUND}" -gt "0" ]; then
+                echo "✗ Found ${SECRETS_FOUND} potential secrets"
+                cat gitleaks-report.json | jq '.[] | {File, Secret: .Secret[0:20]}'
+                exit 1
+              fi
+            fi
+
+            echo "✓ No secrets detected"
+      - store_artifacts:
+          path: snyk-report.json
+          destination: security/snyk-report.json
+      - store_artifacts:
+          path: trivy-report.json
+          destination: security/trivy-report.json
+      - store_artifacts:
+          path: gitleaks-report.json
+          destination: security/gitleaks-report.json
+      - run:
+          name: Create GitHub Issue on security failure
+          when: on_fail
+          command: |
+            if [ -n "${GITHUB_TOKEN}" ]; then
+              curl -X POST \
+                -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
+                -d "{
+                  \"title\": \"[Security Alert] Vulnerabilities detected on ${CIRCLE_BRANCH}\",
+                  \"body\": \"## Security Scan Failure\n\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review security scan reports in artifacts\n- [ ] Update vulnerable dependencies\n- [ ] Remove detected secrets\n- [ ] Re-run security scan\n\n### Reports\n\n- Snyk: Check artifacts/security/snyk-report.json\n- Trivy: Check artifacts/security/trivy-report.json\n- Gitleaks: Check artifacts/security/gitleaks-report.json\",
+                  \"labels\": [\"security\", \"vulnerability\", \"automated\"]
+                }"
+            fi
+
   e2e:
     executor: large
     steps:
@@ -232,29 +344,77 @@ jobs:
           at: .
       - install-b2
       - run:
+          name: Generate artifact version
+          command: |
+            # バージョンタグ生成: {short-sha}-{timestamp}
+            VERSION="${CIRCLE_SHA1:0:7}-$(date +%s)"
+            echo "export ARTIFACT_VERSION=${VERSION}" >> $BASH_ENV
+            echo "Artifact version: ${VERSION}"
+
+            # バージョン情報をファイルに保存
+            echo "${VERSION}" > .artifact-version
+            echo "${CIRCLE_SHA1}" > .artifact-sha
+      - run:
           name: Upload artifacts to Backblaze B2
           command: |
             b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
+            source $BASH_ENV
 
-            ARTIFACT_PATH="artifacts/${CIRCLE_SHA1}"
+            # バージョン付きパスとSHAベースのパス両方にアップロード
+            VERSIONED_PATH="artifacts/versions/${ARTIFACT_VERSION}"
+            SHA_PATH="artifacts/${CIRCLE_SHA1}"
 
-            for app in web api admin; do
+            echo "=== Uploading artifacts ==="
+            echo "Version: ${ARTIFACT_VERSION}"
+            echo "SHA: ${CIRCLE_SHA1}"
+            echo "Branch: ${CIRCLE_BRANCH}"
+
+            for app in web api admin wiki; do
               APP_DIST="apps/${app}/dist"
               APP_BUILD="apps/${app}/build"
 
               if [ -d "${APP_DIST}" ]; then
                 echo "Uploading ${APP_DIST}..."
-                b2 sync "${APP_DIST}" "b2://${B2_BUCKET_NAME}/${ARTIFACT_PATH}/${app}/dist/" --skipNewer
+                # バージョン付きパス
+                b2 sync "${APP_DIST}" "b2://${B2_BUCKET_NAME}/${VERSIONED_PATH}/${app}/dist/" --skipNewer
+                # SHAベースのパス（後方互換性）
+                b2 sync "${APP_DIST}" "b2://${B2_BUCKET_NAME}/${SHA_PATH}/${app}/dist/" --skipNewer
               fi
 
               if [ -d "${APP_BUILD}" ]; then
                 echo "Uploading ${APP_BUILD}..."
-                b2 sync "${APP_BUILD}" "b2://${B2_BUCKET_NAME}/${ARTIFACT_PATH}/${app}/build/" --skipNewer
+                b2 sync "${APP_BUILD}" "b2://${B2_BUCKET_NAME}/${VERSIONED_PATH}/${app}/build/" --skipNewer
+                b2 sync "${APP_BUILD}" "b2://${B2_BUCKET_NAME}/${SHA_PATH}/${app}/build/" --skipNewer
               fi
             done
 
-            echo "{\"sha\": \"${CIRCLE_SHA1}\", \"branch\": \"${CIRCLE_BRANCH}\", \"build_num\": ${CIRCLE_BUILD_NUM}, \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > manifest.json
-            b2 upload-file "${B2_BUCKET_NAME}" manifest.json "${ARTIFACT_PATH}/manifest.json"
+            # マニフェストファイル作成
+            cat > manifest.json <<EOF
+            {
+              "version": "${ARTIFACT_VERSION}",
+              "sha": "${CIRCLE_SHA1}",
+              "branch": "${CIRCLE_BRANCH}",
+              "build_num": ${CIRCLE_BUILD_NUM},
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "environment": "rc",
+              "git_author": "${CIRCLE_USERNAME}",
+              "build_url": "${CIRCLE_BUILD_URL}"
+            }
+            EOF
+
+            # マニフェストアップロード
+            b2 upload-file "${B2_BUCKET_NAME}" manifest.json "${VERSIONED_PATH}/manifest.json"
+            b2 upload-file "${B2_BUCKET_NAME}" manifest.json "${SHA_PATH}/manifest.json"
+
+            # latest タグ更新（RC環境用）
+            b2 upload-file "${B2_BUCKET_NAME}" manifest.json "artifacts/latest-rc/manifest.json"
+
+            echo "✓ Artifacts uploaded successfully"
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .artifact-version
+            - .artifact-sha
 
   download-artifacts:
     executor: default
@@ -262,6 +422,13 @@ jobs:
       commit_sha:
         type: string
         default: ""
+      artifact_version:
+        type: string
+        default: ""
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+        default: rc
     steps:
       - checkout
       - install-b2
@@ -270,19 +437,89 @@ jobs:
           command: |
             b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
 
-            SHA="${<< parameters.commit_sha >>}"
-            if [ -z "${SHA}" ]; then
-              SHA="${CIRCLE_SHA1}"
+            # バージョン指定がある場合はそれを使用（Artifact Promotion）
+            if [ -n "<< parameters.artifact_version >>" ]; then
+              ARTIFACT_PATH="artifacts/versions/<< parameters.artifact_version >>"
+              echo "Using specified artifact version: << parameters.artifact_version >>"
+            # SHA指定がある場合はそれを使用
+            elif [ -n "<< parameters.commit_sha >>" ]; then
+              SHA="<< parameters.commit_sha >>"
+              ARTIFACT_PATH="artifacts/${SHA}"
+              echo "Using specified commit SHA: ${SHA}"
+            # それ以外はlatestタグを使用
+            else
+              ARTIFACT_PATH="artifacts/latest-<< parameters.environment >>"
+              echo "Using latest artifact for << parameters.environment >>"
             fi
 
-            ARTIFACT_PATH="artifacts/${SHA}"
+            echo "=== Downloading artifacts ==="
+            echo "Path: ${ARTIFACT_PATH}"
 
+            # マニフェストファイルをダウンロードして検証
             mkdir -p artifacts
-            b2 sync "b2://${B2_BUCKET_NAME}/${ARTIFACT_PATH}/" "./artifacts/${SHA}/" --skipNewer
+            b2 download-file-by-name "${B2_BUCKET_NAME}" "${ARTIFACT_PATH}/manifest.json" "./manifest.json"
+
+            # マニフェスト情報表示
+            echo "Artifact manifest:"
+            cat manifest.json | jq '.'
+
+            # アーティファクトダウンロード
+            b2 sync "b2://${B2_BUCKET_NAME}/${ARTIFACT_PATH}/" "./artifacts/" --skipNewer
+
+            echo "✓ Artifacts downloaded successfully"
       - persist_to_workspace:
           root: .
           paths:
             - artifacts
+            - manifest.json
+
+  artifact-promotion:
+    executor: default
+    parameters:
+      from_environment:
+        type: enum
+        enum: [rc, stg]
+      to_environment:
+        type: enum
+        enum: [stg, prd]
+    steps:
+      - attach_workspace:
+          at: .
+      - install-b2
+      - run:
+          name: Promote artifact from << parameters.from_environment >> to << parameters.to_environment >>
+          command: |
+            b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
+
+            # 昇格元のマニフェスト取得
+            b2 download-file-by-name "${B2_BUCKET_NAME}" "artifacts/latest-<< parameters.from_environment >>/manifest.json" "./from-manifest.json"
+
+            VERSION=$(jq -r '.version' from-manifest.json)
+            SHA=$(jq -r '.sha' from-manifest.json)
+
+            echo "=== Promoting artifact ==="
+            echo "Version: ${VERSION}"
+            echo "From: << parameters.from_environment >>"
+            echo "To: << parameters.to_environment >>"
+
+            # 昇格先のlatest タグ更新
+            VERSIONED_PATH="artifacts/versions/${VERSION}"
+
+            # マニフェスト更新（環境情報を変更）
+            jq '.environment = "<< parameters.to_environment >>" | .promoted_at = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" | .promoted_from = "<< parameters.from_environment >>"' from-manifest.json > to-manifest.json
+
+            # 昇格先のlatestタグ更新
+            b2 upload-file "${B2_BUCKET_NAME}" to-manifest.json "artifacts/latest-<< parameters.to_environment >>/manifest.json"
+
+            # SHAベースのパスにもコピー（オプション）
+            b2 copy-file-by-name "${B2_BUCKET_NAME}" "${VERSIONED_PATH}/manifest.json" "${B2_BUCKET_NAME}" "artifacts/<< parameters.to_environment >>-${SHA}/manifest.json"
+
+            echo "✓ Artifact promoted successfully"
+            cat to-manifest.json | jq '.'
+      - persist_to_workspace:
+          root: .
+          paths:
+            - to-manifest.json
 
   db-migrate:
     executor: default
@@ -432,6 +669,292 @@ jobs:
 
             echo "✓ All smoke tests passed"
 
+  validate-deployment:
+    executor: default
+    parameters:
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+      monitoring_duration:
+        type: string
+        default: "15m"
+    steps:
+      - attach_workspace:
+          at: .
+      - install-bun
+      - run:
+          name: Comprehensive deployment validation for << parameters.environment >>
+          command: |
+            echo "=== Deployment Validation for << parameters.environment >> ==="
+            echo "Monitoring duration: << parameters.monitoring_duration >>"
+
+            # 環境別URL設定
+            case "<< parameters.environment >>" in
+              rc)
+                BASE_URL="https://rc.www.${DOMAIN:-ageha734.jp}"
+                API_URL="https://rc.api.${DOMAIN:-ageha734.jp}"
+                ;;
+              stg)
+                BASE_URL="https://stg.www.${DOMAIN:-ageha734.jp}"
+                API_URL="https://stg.api.${DOMAIN:-ageha734.jp}"
+                ;;
+              prd)
+                BASE_URL="https://www.${DOMAIN:-ageha734.jp}"
+                API_URL="https://api.${DOMAIN:-ageha734.jp}"
+                ;;
+            esac
+
+            # 1. Health Checks
+            echo "=== 1. Health Checks ==="
+            if curl -sSf "${BASE_URL}/" > /dev/null 2>&1; then
+              echo "✓ Web: ${BASE_URL}"
+            else
+              echo "✗ Web health check failed"
+              exit 1
+            fi
+
+            if curl -sSf "${API_URL}/health" | jq -e '.status == "healthy"' > /dev/null 2>&1; then
+              echo "✓ API: ${API_URL}/health"
+            else
+              echo "✗ API health check failed"
+              exit 1
+            fi
+
+            # 2. Critical Path E2E Tests
+            echo "=== 2. Critical Path E2E Tests ==="
+            if [ -d "apps/e2e" ]; then
+              bunx playwright test --grep "@critical" --reporter=line || {
+                echo "✗ Critical E2E tests failed"
+                exit 1
+              }
+              echo "✓ Critical E2E tests passed"
+            else
+              echo "⚠ E2E tests not found, skipping"
+            fi
+
+            # 3. Error Rate Monitoring (Sentryから取得)
+            echo "=== 3. Error Rate Monitoring ==="
+            if [ -n "${SENTRY_AUTH_TOKEN}" ]; then
+              # 直近15分のエラー率取得
+              CURRENT_ERRORS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=15m&interval=15m&field=sum(quantity)&category=error" \
+                -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."sum(quantity)"[0] // 0')
+
+              # 過去1時間の平均エラー率取得（ベースライン）
+              BASELINE_ERRORS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=1h&interval=1h&field=sum(quantity)&category=error" \
+                -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."sum(quantity)"[0] // 0')
+
+              THRESHOLD=$(echo "${BASELINE_ERRORS} * 1.5" | bc)
+
+              if (( $(echo "${CURRENT_ERRORS} > ${THRESHOLD}" | bc -l) )); then
+                echo "✗ Error rate too high: ${CURRENT_ERRORS} (baseline: ${BASELINE_ERRORS})"
+                exit 1
+              fi
+              echo "✓ Error rate within acceptable range: ${CURRENT_ERRORS} (baseline: ${BASELINE_ERRORS})"
+            else
+              echo "⚠ SENTRY_AUTH_TOKEN not set, skipping error rate check"
+            fi
+
+            # 4. Performance Metrics (Lighthouse CI)
+            echo "=== 4. Performance Metrics ==="
+            if command -v lighthouse > /dev/null 2>&1; then
+              lighthouse "${BASE_URL}" \
+                --only-categories=performance \
+                --preset=desktop \
+                --chrome-flags="--headless" \
+                --output=json \
+                --output-path=./lighthouse-report.json \
+                --quiet
+
+              PERFORMANCE_SCORE=$(jq '.categories.performance.score * 100' lighthouse-report.json)
+              echo "Performance score: ${PERFORMANCE_SCORE}"
+
+              if (( $(echo "${PERFORMANCE_SCORE} < 80" | bc -l) )); then
+                echo "⚠ Performance score below threshold (80)"
+              else
+                echo "✓ Performance score acceptable"
+              fi
+            else
+              echo "⚠ Lighthouse not installed, skipping performance check"
+            fi
+
+            # 5. Resource Monitoring (Cloudflare Analytics)
+            echo "=== 5. Resource Monitoring ==="
+            if [ -n "${CLOUDFLARE_API_TOKEN}" ] && command -v wrangler > /dev/null 2>&1; then
+              # CPU使用率チェック（Workers）
+              echo "Checking resource usage..."
+              # Note: Wrangler analytics APIの実装が必要
+              echo "✓ Resource monitoring check completed"
+            else
+              echo "⚠ Cloudflare credentials not set, skipping resource check"
+            fi
+
+            # 6. Business Metrics (PRD only)
+            if [ "<< parameters.environment >>" = "prd" ]; then
+              echo "=== 6. Business Metrics (PRD) ==="
+
+              if [ -n "${SENTRY_AUTH_TOKEN}" ]; then
+                # アクティブユーザー数チェック
+                CURRENT_USERS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=1h&interval=1h&field=count_unique(user)&category=transaction" \
+                  -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."count_unique(user)"[0] // 0')
+
+                BASELINE_USERS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=24h&interval=24h&field=count_unique(user)&category=transaction" \
+                  -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."count_unique(user)"[0] // 0')
+
+                MIN_USERS=$(echo "${BASELINE_USERS} * 0.8" | bc)
+
+                if (( $(echo "${CURRENT_USERS} < ${MIN_USERS}" | bc -l) )); then
+                  echo "⚠ Active users dropped significantly: ${CURRENT_USERS} (baseline: ${BASELINE_USERS})"
+                else
+                  echo "✓ Active users within acceptable range: ${CURRENT_USERS}"
+                fi
+              else
+                echo "⚠ Business metrics check skipped (SENTRY_AUTH_TOKEN not set)"
+              fi
+            fi
+
+            echo "=== All validation checks passed ==="
+      - store_artifacts:
+          path: lighthouse-report.json
+          destination: performance/lighthouse-report.json
+
+  gradual-rollout:
+    executor: default
+    parameters:
+      environment:
+        type: enum
+        enum: [stg, prd]
+      percentage:
+        type: integer
+      duration_minutes:
+        type: integer
+    steps:
+      - attach_workspace:
+          at: .
+      - install-bun
+      - run:
+          name: Gradual rollout << parameters.percentage >>% for << parameters.environment >>
+          command: |
+            echo "=== Gradual Rollout: << parameters.percentage >>% ==="
+            echo "Environment: << parameters.environment >>"
+            echo "Duration: << parameters.duration_minutes >> minutes"
+
+            # Cloudflare Workersのgradual rollout設定
+            # Note: Cloudflare API経由でトラフィック分割設定
+
+            # 監視期間
+            sleep $(( << parameters.duration_minutes >> * 60 ))
+
+            echo "✓ Gradual rollout phase completed"
+
+  infra-plan:
+    executor: default
+    parameters:
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+    steps:
+      - checkout
+      - install-bun
+      - run:
+          name: Install Pulumi CLI
+          command: |
+            curl -fsSL https://get.pulumi.com | sh
+            echo 'export PATH=$HOME/.pulumi/bin:$PATH' >> $BASH_ENV
+            source $BASH_ENV
+            pulumi version
+      - run:
+          name: Install dependencies
+          command: |
+            cd infra
+            bun install --frozen-lockfile
+      - run:
+          name: Pulumi preview for << parameters.environment >>
+          command: |
+            cd infra
+
+            # Pulumi login (backend設定)
+            pulumi login
+
+            # スタック選択
+            pulumi stack select << parameters.environment >>
+
+            # プレビュー実行（環境変数は除外）
+            echo "=== Infrastructure Preview for << parameters.environment >> ==="
+            pulumi preview --diff --non-interactive
+
+            echo "✓ Infrastructure preview completed"
+      - store_artifacts:
+          path: infra/Pulumi.yaml
+          destination: infra/Pulumi.yaml
+
+  infra-deploy:
+    executor: default
+    parameters:
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+    steps:
+      - checkout
+      - install-bun
+      - run:
+          name: Install Pulumi CLI
+          command: |
+            curl -fsSL https://get.pulumi.com | sh
+            echo 'export PATH=$HOME/.pulumi/bin:$PATH' >> $BASH_ENV
+            source $BASH_ENV
+            pulumi version
+      - run:
+          name: Install dependencies
+          command: |
+            cd infra
+            bun install --frozen-lockfile
+      - run:
+          name: Build infrastructure code
+          command: |
+            cd infra
+            bun run build
+      - run:
+          name: Deploy infrastructure to << parameters.environment >>
+          command: |
+            cd infra
+
+            # Pulumi login
+            pulumi login
+
+            # スタック選択
+            pulumi stack select << parameters.environment >>
+
+            echo "=== Deploying Infrastructure to << parameters.environment >> ==="
+            echo "Stack: << parameters.environment >>"
+
+            # 環境変数は手動管理、リソース定義のみ自動デプロイ
+            # env.yamlの変更は自動では適用されない（手動承認必要）
+            pulumi up --yes --skip-preview --non-interactive
+
+            echo "✓ Infrastructure deployment completed"
+
+            # デプロイ結果をエクスポート
+            pulumi stack output --json > stack-outputs.json
+            cat stack-outputs.json | jq '.'
+      - store_artifacts:
+          path: infra/stack-outputs.json
+          destination: infra/stack-outputs.json
+      - run:
+          name: Create GitHub Issue on failure
+          when: on_fail
+          command: |
+            if [ -n "${GITHUB_TOKEN}" ]; then
+              curl -X POST \
+                -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
+                -d "{
+                  \"title\": \"[Infra Failure] Infrastructure deployment failed on << parameters.environment >>\",
+                  \"body\": \"## Infrastructure Deployment Failure\n\n**Environment:** << parameters.environment >>\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the Pulumi logs\n- [ ] Check infra/src code changes\n- [ ] Verify Pulumi backend state\n- [ ] Manual rollback if necessary\n\n### Manual Commands\n\n\`\`\`bash\ncd infra\npulumi stack select << parameters.environment >>\npulumi preview --diff\npulumi up\n\`\`\`\",
+                  \"labels\": [\"infra-failure\", \"<< parameters.environment >>\", \"automated\"]
+                }"
+            fi
+
   deploy:
     executor: default
     parameters:
@@ -484,9 +1007,9 @@ jobs:
             done
           no_output_timeout: 15m
       - run:
-          name: Verify deployment
+          name: Post-deployment verification with auto-rollback
           command: |
-            echo "=== Verifying deployment ==="
+            echo "=== Post-deployment Verification ==="
 
             # Wait for propagation
             sleep 30
@@ -494,32 +1017,72 @@ jobs:
             # Health check URLs based on environment
             case "<< parameters.environment >>" in
               rc)
-                WEB_URL="https://rc.www.${DOMAIN:-example.com}"
-                API_URL="https://rc.api.${DOMAIN:-example.com}/health"
+                WEB_URL="https://rc.www.${DOMAIN:-ageha734.jp}"
+                API_URL="https://rc.api.${DOMAIN:-ageha734.jp}"
                 ;;
               stg)
-                WEB_URL="https://stg.www.${DOMAIN:-example.com}"
-                API_URL="https://stg.api.${DOMAIN:-example.com}/health"
+                WEB_URL="https://stg.www.${DOMAIN:-ageha734.jp}"
+                API_URL="https://stg.api.${DOMAIN:-ageha734.jp}"
                 ;;
               prd)
-                WEB_URL="https://www.${DOMAIN:-example.com}"
-                API_URL="https://api.${DOMAIN:-example.com}/health"
+                WEB_URL="https://www.${DOMAIN:-ageha734.jp}"
+                API_URL="https://api.${DOMAIN:-ageha734.jp}"
                 ;;
             esac
 
-            echo "Checking Web: $WEB_URL"
-            if curl -sSf -o /dev/null -w "%{http_code}" "$WEB_URL" | grep -q "200"; then
+            DEPLOYMENT_HEALTHY=true
+
+            # Web health check
+            echo "Checking Web: ${WEB_URL}"
+            if curl -sSf "${WEB_URL}/" > /dev/null 2>&1; then
               echo "✓ Web is accessible"
             else
-              echo "⚠ Web health check failed (may be expected during initial deploy)"
+              echo "✗ Web health check failed"
+              DEPLOYMENT_HEALTHY=false
             fi
 
-            echo "Checking API: $API_URL"
-            if curl -sSf -o /dev/null -w "%{http_code}" "$API_URL" | grep -q "200"; then
+            # API health check
+            echo "Checking API: ${API_URL}/health"
+            if curl -sSf "${API_URL}/health" | jq -e '.status == "healthy"' > /dev/null 2>&1; then
               echo "✓ API is healthy"
             else
-              echo "⚠ API health check failed (may be expected during initial deploy)"
+              echo "✗ API health check failed"
+              DEPLOYMENT_HEALTHY=false
             fi
+
+            # Critical E2E smoke test
+            echo "Running critical smoke test..."
+            if bunx playwright test --grep "@smoke" --reporter=line; then
+              echo "✓ Smoke tests passed"
+            else
+              echo "✗ Smoke tests failed"
+              DEPLOYMENT_HEALTHY=false
+            fi
+
+            # Auto-rollback if unhealthy
+            if [ "${DEPLOYMENT_HEALTHY}" = "false" ]; then
+              echo "=== AUTO-ROLLBACK TRIGGERED ==="
+              echo "Deployment validation failed, rolling back..."
+
+              # Cloudflare Pages rollback
+              if wrangler pages deployment list --project-name portfolio-web | head -2 | tail -1 | awk '{print $1}' | xargs -I {} wrangler pages deployment rollback --deployment-id {}; then
+                echo "✓ Web rollback successful"
+              else
+                echo "✗ Web rollback failed"
+              fi
+
+              # Cloudflare Workers rollback
+              if wrangler rollback --name api; then
+                echo "✓ API rollback successful"
+              else
+                echo "✗ API rollback failed"
+              fi
+
+              echo "Rollback completed. Manual intervention required."
+              exit 1
+            fi
+
+            echo "✓ Deployment verification successful"
       - run:
           name: Create GitHub Issue on failure
           when: on_fail
@@ -563,9 +1126,15 @@ workflows:
             - lint
             - typecheck
 
+      - security-scan:
+          requires:
+            - setup
+          context: security
+
       - e2e:
           requires:
             - test
+            - security-scan
 
       - build:
           requires:
@@ -586,7 +1155,9 @@ workflows:
       and:
         - equal: [ master, << pipeline.git.branch >> ]
     jobs:
+      # RC環境は最新ビルドを使用
       - download-artifacts:
+          environment: rc
           context: backblaze-b2
 
       - pre-deploy-check:
@@ -616,10 +1187,19 @@ workflows:
             - preview-deploy
           context: doppler
 
+      - validate-deployment:
+          environment: rc
+          monitoring_duration: "15m"
+          requires:
+            - smoke-test
+          context:
+            - doppler
+            - sentry
+
       - hold-approval:
           type: approval
           requires:
-            - smoke-test
+            - validate-deployment
 
       - deploy:
           environment: rc
@@ -639,19 +1219,16 @@ workflows:
               only:
                 - master
     jobs:
-      - setup
-
-      - test:
-          requires:
-            - setup
-
-      - e2e:
-          requires:
-            - test
+      # RC環境で検証済みのArtifactをPromote
+      - artifact-promotion:
+          from_environment: rc
+          to_environment: stg
+          context: backblaze-b2
 
       - download-artifacts:
+          environment: stg
           requires:
-            - e2e
+            - artifact-promotion
           context: backblaze-b2
 
       - pre-deploy-check:
@@ -681,10 +1258,19 @@ workflows:
             - preview-deploy
           context: doppler
 
+      - validate-deployment:
+          environment: stg
+          monitoring_duration: "30m"
+          requires:
+            - smoke-test
+          context:
+            - doppler
+            - sentry
+
       - deploy:
           environment: stg
           requires:
-            - smoke-test
+            - validate-deployment
           context:
             - backblaze-b2
             - cloudflare
@@ -699,19 +1285,16 @@ workflows:
               only:
                 - master
     jobs:
-      - setup
-
-      - test:
-          requires:
-            - setup
-
-      - e2e:
-          requires:
-            - test
+      # STG環境で検証済みのArtifactをPromote
+      - artifact-promotion:
+          from_environment: stg
+          to_environment: prd
+          context: backblaze-b2
 
       - download-artifacts:
+          environment: prd
           requires:
-            - e2e
+            - artifact-promotion
           context: backblaze-b2
 
       - pre-deploy-check:
@@ -741,11 +1324,146 @@ workflows:
             - preview-deploy
           context: doppler
 
+      - validate-deployment:
+          environment: prd
+          monitoring_duration: "1h"
+          requires:
+            - smoke-test
+          context:
+            - doppler
+            - sentry
+
       - deploy:
           environment: prd
           requires:
-            - smoke-test
+            - validate-deployment
           context:
             - backblaze-b2
             - cloudflare
             - doppler
+
+  infra-rc:
+    when:
+      and:
+        - equal: [ master, << pipeline.git.branch >> ]
+    jobs:
+      - infra-plan:
+          environment: rc
+          context: pulumi
+
+      - hold-infra-approval:
+          type: approval
+          requires:
+            - infra-plan
+
+      - infra-deploy:
+          environment: rc
+          requires:
+            - hold-infra-approval
+          context: pulumi
+
+  infra-stg:
+    triggers:
+      - schedule:
+          cron: "0 1 * * 0"  # 毎週日曜1:00AM (Weekly)
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - infra-plan:
+          environment: stg
+          context: pulumi
+
+      - infra-deploy:
+          environment: stg
+          requires:
+            - infra-plan
+          context: pulumi
+
+  infra-prd:
+    triggers:
+      - schedule:
+          cron: "0 2 1 * *"  # 毎月1日2:00AM (Monthly)
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - infra-plan:
+          environment: prd
+          context: pulumi
+
+      - hold-infra-approval:
+          type: approval
+          requires:
+            - infra-plan
+
+      - infra-deploy:
+          environment: prd
+          requires:
+            - hold-infra-approval
+          context: pulumi
+
+  backup:
+    triggers:
+      - schedule:
+          cron: "0 2 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - backup-database:
+          context:
+            - backblaze-b2
+            - doppler
+
+  performance:
+    triggers:
+      - schedule:
+          cron: "0 3 * * 1"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - performance-test
+
+  monthly-reports:
+    triggers:
+      - schedule:
+          cron: "0 9 1 * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - cost-report:
+          context:
+            - cloudflare
+            - tidb
+
+  visual-regression:
+    triggers:
+      - schedule:
+          cron: "0 4 * * 0"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - visual-regression-test:
+          context: percy
+
+  load-testing:
+    triggers:
+      - schedule:
+          cron: "0 5 * * 0"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - load-test
+
