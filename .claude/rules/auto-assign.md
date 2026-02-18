@@ -102,6 +102,13 @@ alwaysApply: true
 | 「ナレッジを更新して」 | `/sync-knowledge` |
 | 「設定を同期して」 | `/sync-settings` |
 
+### バージョン管理
+
+| トリガー | アサインするスキル |
+| -------- | ------------------ |
+| 「changesetを作成して」「バージョンアップして」 | `/changeset` |
+| 「リリース準備して」 | `/changeset` |
+
 ## ワークフロー自動実行
 
 ### 新機能実装ワークフロー
@@ -132,6 +139,16 @@ alwaysApply: true
 2. リファクタリング実施
 3. `/unit-test` → テスト再実行
 4. `/lint` + `/typecheck` → 品質チェック
+
+### リリースワークフロー
+
+ユーザーが「リリースして」「バージョンアップして」と言った場合：
+
+1. `/changeset` → changeset作成
+2. `/unit-test` + `/integration-test` → テスト実行
+3. `/lint` + `/typecheck` → 品質チェック
+4. `bun run version` → バージョン更新
+5. `/pr` → Pull Request作成
 
 ## ファイルパターンによる自動アサイン
 

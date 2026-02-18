@@ -2,7 +2,7 @@ import { getInfo, getInfoFromPullRequest } from "@changesets/get-github-info";
 import type { ChangelogFunctions } from "@changesets/types";
 
 const REPO_ERROR_MESSAGE =
-    'Please provide a repo to this changelog generator like this:\n"changelog": ["@portfolio/changelog-config", { "repo": "org/repo" }]';
+    'リポジトリ情報を指定してください:\n"changelog": ["@portfolio/changelog-config", { "repo": "org/repo" }]';
 
 function parsePrFromFirstLine(firstLine: string): { replacedLine: string; prNumber?: number } {
     let prNumber: number | undefined;
@@ -23,7 +23,7 @@ async function fetchCommitInfo(repo: string, commit: string): Promise<{ links: {
         const info = await getInfo({ repo, commit });
         return { links: info.links, user: info.user ?? undefined };
     } catch (error) {
-        console.warn(`Failed to fetch GitHub info for commit ${commit}:`, formatError(error));
+        console.warn(`コミット ${commit} のGitHub情報取得に失敗:`, formatError(error));
         return { links: {}, user: undefined };
     }
 }
@@ -35,7 +35,7 @@ async function fetchPrInfo(
     try {
         return await getInfoFromPullRequest({ repo, pull: pr });
     } catch (error) {
-        console.warn(`Failed to fetch GitHub info for PR #${pr}:`, formatError(error));
+        console.warn(`PR #${pr} のGitHub情報取得に失敗:`, formatError(error));
         return null;
     }
 }
@@ -76,7 +76,7 @@ const changelogFunctions: ChangelogFunctions = {
 
         const changesetLinks = changesets.map((cs) => {
             const commitLink = cs.commit ? ` (${cs.commit})` : "";
-            return `- Updated dependencies${commitLink}`;
+            return `- 依存関係を更新${commitLink}`;
         });
 
         const updatedDepenenciesList = dependenciesUpdated.map((dep) => `  - ${dep.name}@${dep.newVersion}`);
