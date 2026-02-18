@@ -1,5 +1,11 @@
 # @portfolio/tsconfig
 
+## 1.0.2
+
+### Patch Changes
+
+- Publish 時に package の `files` を維持し、base.json を tarball に含める
+
 ## 1.0.1
 
 ### Patch Changes
