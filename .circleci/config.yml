@@ -393,7 +393,7 @@ jobs:
               fi
             done
 
-            cat > manifest.json <<EOF
+            cat > manifest.json \<<EOF
             {
               "version": "${ARTIFACT_VERSION}",
               "sha": "${CIRCLE_SHA1}",
