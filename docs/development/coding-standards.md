@@ -3,7 +3,7 @@ title: "コーディング規約"
 description: プロジェクトで守るべき厳格なコーディング規約
 ---
 
-# コーディング規約
+## コーディング規約
 
 このプロジェクトで**守らなければならない**コーディング規約。
 
@@ -31,14 +31,16 @@ description: プロジェクトで守るべき厳格なコーディング規約
 | `misc/` ディレクトリ | 「その他」は設計の放棄 | 適切なカテゴリに分類 |
 
 **違反例**:
-```
+
+```text
 ❌ src/utils/helpers.ts
 ❌ src/common/stuff.ts
 ❌ src/misc/things.ts
 ```
 
 **正しい例**:
-```
+
+```text
 ✅ src/lib/date-formatter.ts
 ✅ src/shared/types/user.ts
 ✅ src/helpers/string-utils.ts
@@ -76,6 +78,7 @@ description: プロジェクトで守るべき厳格なコーディング規約
 | マジックナンバー | 意図が不明確 | コードレビュー |
 
 **違反例**:
+
 ```typescript
 ❌ const apiKey = "sk_live_abcdef123456"; // ハードコード
 ❌ function process(data: any) { ... }    // any型
@@ -85,6 +88,7 @@ description: プロジェクトで守るべき厳格なコーディング規約
 ```
 
 **正しい例**:
+
 ```typescript
 ✅ const apiKey = import.meta.env.VITE_API_KEY;
 ✅ function process(data: UserData): ProcessedData { ... }
@@ -102,6 +106,7 @@ description: プロジェクトで守るべき厳格なコーディング規約
 | 相対パスの深いネスト | 可読性低下、リファクタリング困難 | エイリアス使用（`~/`、`@/`） |
 
 **違反例**:
+
 ```typescript
 ❌ import { User } from "../../../entities/user"; // 深い相対パス
 ❌ import { UserProfile } from "~/features/user-profile"; // entities が features に依存（FSD違反）
@@ -109,6 +114,7 @@ description: プロジェクトで守るべき厳格なコーディング規約
 ```
 
 **正しい例**:
+
 ```typescript
 ✅ import { User } from "~/entities/user"; // エイリアス使用
 ✅ import { User } from "~/entities/user"; // features が entities に依存（OK）
@@ -132,6 +138,7 @@ description: プロジェクトで守るべき厳格なコーディング規約
 | テストファイル | `*.test.ts` または `*.spec.ts` | `user-service.test.ts`, `login.spec.ts` |
 
 **関数名の動詞プレフィックス**:
+
 - `get` - データ取得
 - `set` - データ設定
 - `is` / `has` / `can` - 真偽値を返す
@@ -141,6 +148,7 @@ description: プロジェクトで守るべき厳格なコーディング規約
 - `validate` - バリデーション
 
 **Props型の命名**:
+
 ```typescript
 ✅ interface UserProfileProps { ... }
 ✅ type ButtonProps = { ... }
@@ -158,18 +166,21 @@ description: プロジェクトで守るべき厳格なコーディング規約
 - **アロー関数**: 引数に括弧を付ける（MUST）
 
 **違反例**:
+
 ```typescript
 ❌ const user = {name: 'John'}  // セミコロンなし、シングルクォート
 ❌ const fn = x => x * 2        // 括弧なし
 ```
 
 **正しい例**:
+
 ```typescript
 ✅ const user = { name: "John" };
 ✅ const fn = (x) => x * 2;
 ```
 
 **フォーマット確認**:
+
 ```bash
 # 必ずコミット前に実行
 bun run fmt:check  # フォーマット確認
@@ -179,12 +190,14 @@ bun run fmt        # 自動修正
 ### ✅ インポート順序
 
 **必須順序**:
+
 1. 外部ライブラリ（React, Remix等）
 2. 内部モジュール（`~/shared`, `~/features`等）
 3. 相対インポート（`./`, `../`）
 4. 型のみのインポート（`import type`）
 
 **正しい例**:
+
 ```typescript
 // 1. 外部ライブラリ
 import { useState } from "react";
@@ -204,16 +217,19 @@ import type { User } from "~/entities/user";
 ### ✅ TypeScript
 
 **必須設定**:
+
 - `strict: true` - 厳格モード有効化（MUST）
 - `noImplicitAny: true` - 暗黙のanyを禁止（MUST）
 - `strictNullChecks: true` - null/undefinedチェック（MUST）
 
 **型定義**:
+
 - `any`型は**絶対禁止**（MUST NOT）
 - 公開API・イベントハンドラには**明示的な型**を付ける（MUST）
 - Props型はコンポーネントと同じファイルで定義（MUST）
 
 **違反例**:
+
 ```typescript
 ❌ function process(data: any) { ... }              // any禁止
 ❌ const onClick = (e) => { ... }                   // 暗黙のany
@@ -221,6 +237,7 @@ import type { User } from "~/entities/user";
 ```
 
 **正しい例**:
+
 ```typescript
 ✅ function process(data: UserData): ProcessedData { ... }
 ✅ const onClick = (e: React.MouseEvent<HTMLButtonElement>) => { ... }
@@ -230,11 +247,13 @@ import type { User } from "~/entities/user";
 ### ✅ エラーハンドリング
 
 **必須要件**:
+
 - すべての非同期処理に`try-catch`（MUST）
 - エラーは`AppError`クラスで統一（MUST）
 - ログ出力必須（`logger.error`）（MUST）
 
 **違反例**:
+
 ```typescript
 ❌ async function fetchUser(id: string) {
   const user = await api.get(`/users/${id}`); // try-catchなし
@@ -243,6 +262,7 @@ import type { User } from "~/entities/user";
 ```
 
 **正しい例**:
+
 ```typescript
 ✅ async function fetchUser(id: string): Promise<User> {
   try {
@@ -258,15 +278,18 @@ import type { User } from "~/entities/user";
 ### ✅ コメント
 
 **必須要件**:
+
 - 複雑なロジックには説明コメント（MUST）
 - 公開APIにはJSDoc（MUST）
 - WHYを書く（WHATは不要）（MUST）
 
 **禁止**:
+
 - 自明なコードへのコメント（MUST NOT）
 - コメントアウトされたコード（MUST NOT）
 
 **違反例**:
+
 ```typescript
 ❌ // ユーザーを取得する
 const user = await getUser(id);
@@ -275,6 +298,7 @@ const user = await getUser(id);
 ```
 
 **正しい例**:
+
 ```typescript
 ✅ // IMPORTANT: キャッシュをクリアしないとメモリリーク発生
 clearCache();
@@ -304,6 +328,7 @@ export async function authenticate(email: string, password: string): Promise<str
 - 早期リターンを使用
 
 **推奨例**:
+
 ```typescript
 // ✅ 推奨: 早期リターン
 function process(user: User | null) {
@@ -357,6 +382,7 @@ bun run build
 ```
 
 **すべてパスしたらコミット可能**:
+
 ```bash
 git add .
 git commit -m "feat: 新機能追加"
@@ -391,6 +417,7 @@ bun run coverage     # カバレッジ
 **原則として例外は認めない**。
 
 やむを得ず例外が必要な場合:
+
 1. **理由をコメントで明記**（MUST）
 2. **レビュアーの承認を得る**（MUST）
 3. **Issue番号を記載**（MUST）
