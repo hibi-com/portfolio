@@ -17,117 +17,34 @@ OWASP Top 10に基づくセキュリティチェックを実行し、結果を�
 
 ## 実行手順
 
-### 1. テンプレート読み込み
+1. **テンプレート読み込み**: `.claude/templates/security/owasp-checklist.md` を読み込む
+2. **日付情報の設定**: チェック日、対象期間、次回チェック予定を設定
+3. **各項目のチェック実行**: OWASP Top 10の各項目について、チェックリストに従ってチェック
+4. **結果の記録**: `logs/security/YYYY-MM-DD-security-check.md` に保存
+5. **サマリー作成**: 総合評価、優先度の高いアクションをリストアップ
+6. **報告**: チェック結果のサマリーをユーザーに報告
 
-`.claude/templates/security/owasp-checklist.md` を読み込みます。
+## チェック項目
 
-### 2. 日付情報の設定
+**IMPORTANT**: セキュリティチェック実行時は以下のテンプレートを参照してください。
 
-- **チェック日**: 本日の日付
-- **対象期間**: 前回チェックから今回まで（隔週）
-- **次回チェック予定**: 2週間後
+- **[OWASPチェックリスト](../../templates/security/owasp-checklist.md)** - 具体的なチェック項目とコマンド（Single Source of Truth）
+- **[セキュリティガイドライン](docs/security/guidelines.md)** - プロジェクト固有のセキュリティ対策
 
-### 3. 各項目のチェック実行
+### チェック対象（OWASP Top 10）
 
-OWASP Top 10の各項目について、以下を実行：
+1. A01: アクセス制御の不備
+2. A02: 暗号化の失敗
+3. A03: インジェクション
+4. A04: 安全でない設計
+5. A05: セキュリティ設定ミス
+6. A06: 脆弱で古いコンポーネント
+7. A07: 識別と認証の失敗
+8. A08: ソフトウェアとデータの整合性の失敗
+9. A09: セキュリティログとモニタリングの失敗
+10. A10: SSRF
 
-#### A01: アクセス制御の不備
-
-```bash
-grep -r "authMiddleware\|requireRole" apps/api/src/interface/rest/
-```
-
-#### A02: 暗号化の失敗
-
-```bash
-# Cloudflare HTTPS設定確認（本番環境の場合）
-curl -I https://your-domain.com | grep -i "strict-transport-security"
-```
-
-#### A03: インジェクション
-
-```bash
-# Zodバリデーション確認
-grep -r "z\." packages/validation/src/
-
-# 生SQL検索
-grep -r "\$queryRaw\|\$executeRaw" packages/db/
-```
-
-#### A04: 安全でない設計
-
-```bash
-# レート制限確認
-grep -r "rateLimit\|throttle" apps/api/src/
-```
-
-#### A05: セキュリティの設定ミス
-
-```bash
-# セキュリティヘッダー確認
-curl -I https://your-domain.com
-
-# .env ファイルの権限確認
-find . -name ".env*" -exec ls -la {} \;
-```
-
-#### A06: 脆弱で古いコンポーネント
-
-```bash
-# 脆弱性チェック
-bun audit
-
-# 更新可能パッケージ確認
-bun outdated
-
-# 未使用パッケージ確認
-bunx depcheck
-```
-
-#### A07: 識別と認証の失敗
-
-```bash
-# パスワードポリシー確認
-grep -r "password.*validation\|passwordPolicy" packages/validation/src/
-```
-
-#### A08: ソフトウェアとデータの整合性の失敗
-
-```bash
-# Trivyスキャン実行
-trivy fs --severity HIGH,CRITICAL .
-```
-
-#### A09: セキュリティログとモニタリングの失敗
-
-```bash
-# ログ出力確認
-grep -r "logger\.\(info\|warn\|error\)" apps/api/src/
-```
-
-#### A10: SSRF
-
-```bash
-# URL検証確認
-grep -r "validateUrl\|isPrivateIp" apps/api/src/lib/
-```
-
-### 4. 結果の記録
-
-チェック結果を `logs/security/YYYY-MM-DD-security-check.md` に保存します。
-
-ファイル名形式: `YYYY-MM-DD-security-check.md`
-例: `2024-02-19-security-check.md`
-
-### 5. サマリー作成
-
-- 各カテゴリの状態を評価（✅ 問題なし / ⚠️ 要注意 / ❌ 要対応）
-- 優先度の高いアクションをリストアップ
-- 次回チェック予定日を設定
-
-### 6. 報告
-
-ユーザーにチェック結果のサマリーを報告し、ログファイルのパスを通知します。
+詳細なチェック項目とコマンドは `.claude/templates/security/owasp-checklist.md` を参照。
 
 ## チェック頻度
 
@@ -136,57 +53,60 @@ grep -r "validateUrl\|isPrivateIp" apps/api/src/lib/
 
 ## 評価基準
 
-### ✅ 問題なし
+| 状態 | 基準 |
+| ---- | ---- |
+| ✅ 問題なし | すべてのチェック項目をクリア、既知の脆弱性なし |
+| ⚠️ 要注意 | 軽微な問題あり、改善推奨事項あり |
+| ❌ 要対応 | 重大な脆弱性あり、緊急対応が必要 |
 
-- すべてのチェック項目をクリア
-- 既知の脆弱性なし
-- 設定が適切
+## 結果の記録
 
-### ⚠️ 要注意
+### ファイル名
 
-- 軽微な問題あり
-- 改善推奨事項あり
-- 次回チェックまでに対応
+```text
+logs/security/YYYY-MM-DD-security-check.md
+```
 
-### ❌ 要対応
+例: `2026-02-19-security-check.md`
 
-- 重大な脆弱性あり
-- 緊急対応が必要
-- すぐに修正すべき問題
-
-## 出力例
+### 出力フォーマット
 
 ```markdown
+# セキュリティチェック結果
+
 ## サマリー
 
-### 総合評価
+- **チェック日**: YYYY-MM-DD
+- **総合評価**: ✅ 合格 / ⚠️ 要改善 / ❌ 不合格
+
+## 総合評価
 
 | カテゴリ | 状態 | 備考 |
 | -------- | ---- | ---- |
-| A01: アクセス制御 | ✅ | 認証ミドルウェア適用済み |
-| A02: 暗号化 | ✅ | HTTPS強制、bcrypt使用 |
-| A03: インジェクション | ⚠️ | XSS対策の追加確認が必要 |
+| A01: アクセス制御 | ✅ | ... |
 ...
 
-### 優先度の高いアクション
+## 優先度の高いアクション
 
-1. XSS対策の追加実装（DOMPurify適用範囲を拡大）
-2. レート制限の実装（現在未実装）
-3. 依存関係の更新（3件の軽微な脆弱性）
+1. ...
+2. ...
 ```
-
-## 注意事項
-
-- **本番環境へのアクセス**: 本番環境のチェックは慎重に行う
-- **機密情報**: ログに機密情報を含めない
-- **自動化**: 可能な限りCI/CDに統合
-- **False Positive**: 誤検知の可能性を考慮
 
 ## 参考ドキュメント
 
-- [OWASP Top 10 2021](https://owasp.org/Top10/)
-- [チェックリストテンプレート](.claude/templates/security/owasp-checklist.md)
-- [セキュリティガイドライン](docs/security/guidelines.md)
+| ドキュメント | 説明 |
+| ------------ | ---- |
+| [OWASPチェックリスト](../../templates/security/owasp-checklist.md) | **具体的なチェック項目とコマンド（必読）** |
+| [セキュリティガイドライン](docs/security/guidelines.md) | プロジェクト固有のセキュリティ対策 |
+| [OWASP Top 10 2021](https://owasp.org/Top10/) | 公式ドキュメント |
+
+## 注意事項
+
+- **Single Source of Truth原則に従う**: チェックリストの詳細は `.claude/templates/security/owasp-checklist.md` を参照
+- **スキルファイルには詳細を記載しない**: 修正のヌケモレを防ぐため、詳細はテンプレートに集約
+- **本番環境へのアクセス**: 本番環境のチェックは慎重に行う
+- **機密情報**: ログに機密情報を含めない
+- **False Positive**: 誤検知の可能性を考慮
 
 ## 関連スキル
 

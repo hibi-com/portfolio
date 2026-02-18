@@ -30,5 +30,5 @@ bun run integration --filter={domain}
 
 詳細なテスト戦略、シーケンス図との対応については以下を参照：
 
-- [テスト戦略](../../docs/testing/testing-strategy.md) - Google Test Sizes、Medium Testsとシーケンス図の対応
-- [テストガイド](../../docs/testing/testing-guide.md) - Medium Testsの書き方、テストハニカム
+- [テスト戦略](docs/testing/testing-strategy.md) - Google Test Sizes、Medium Testsとシーケンス図の対応
+- [テストガイド](docs/testing/testing-guide.md) - Medium Testsの書き方、テストハニカム

@@ -26,4 +26,4 @@ testing/msw/src/handlers/
 
 MSWの使い方、テストダブル戦略については以下を参照：
 
-- [テストガイド](../../docs/testing/testing-guide.md) - MSWを使ったモック、テストダブル戦略
+- [テストガイド](docs/testing/testing-guide.md) - MSWを使ったモック、テストダブル戦略

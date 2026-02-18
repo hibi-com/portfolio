@@ -199,8 +199,8 @@ interface RequestBody {
 
 ## 関連
 
-- API仕様: [`docs/specs/api/{domain}.md`](../../specs/api/{domain}.md)
-- DB仕様: [`docs/specs/db/{domain}.md`](../../specs/db/{domain}.md)
+- API仕様: `docs/specs/api/{domain}.md`
+- DB仕様: `docs/specs/db/{domain}.md`
 - テスト: `apps/api/tests/medium/{domain}/{operation}.medium.test.ts`
 ````
 

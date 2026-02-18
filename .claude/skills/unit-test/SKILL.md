@@ -31,5 +31,5 @@ bun run test --filter={package}
 
 詳細なテスト戦略、TDD、カバレッジ目標については以下を参照：
 
-- [テスト戦略](../../docs/testing/testing-strategy.md) - Google Test Sizes、Small Tests作成基準、カバレッジ目標
-- [テストガイド](../../docs/testing/testing-guide.md) - TDD、テストハニカム、MC/DCカバレッジ
+- [テスト戦略](docs/testing/testing-strategy.md) - Google Test Sizes、Small Tests作成基準、カバレッジ目標
+- [テストガイド](docs/testing/testing-guide.md) - TDD、テストハニカム、MC/DCカバレッジ

@@ -118,7 +118,7 @@
 
 ## 参考リンク
 
-- [デプロイ手順書](../../../logs/deployment/README.md)
+- [デプロイ手順書](../../logs/deployment)
 - [CircleCI設定](.circleci/config.yml)
 - [Cloudflare Dashboard](https://dash.cloudflare.com/)
 - [Backblaze B2 Console](https://secure.backblaze.com/)

@@ -44,4 +44,5 @@ bun --cwd packages/db x prisma validate
 
 ## Prismaスキーマ構成
 
-スキーマの構成・ファイル一覧は [docs/development/database.md](docs/development/database.md) を参照すること。実装はリポジトリの `packages/db/prisma/schema/` を直接参照すること。
+スキーマの構成・ファイル一覧は [docs/development/database.md](docs/development/database.md) を参照すること。  
+実装はリポジトリの `packages/db/prisma/schema/` を直接参照すること。

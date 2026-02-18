@@ -102,5 +102,5 @@ bun run build
 
 ## 関連ドキュメント
 
-- [依存関係更新テンプレート](../../.claude/templates/dependencies/update-log.md)
-- [更新履歴](../../../logs/dependencies/)
+- [依存関係更新テンプレート](../../templates/dependencies/update-log.md)
+- [更新履歴](../../logs/dependencies/)

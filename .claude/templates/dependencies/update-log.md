@@ -69,4 +69,4 @@
 ## 参考リンク
 
 - [依存関係更新スキル](../../.claude/skills/update-deps/SKILL.md)
-- [更新履歴一覧](../../../logs/dependencies/)
+- [更新履歴](../../logs/dependencies/)

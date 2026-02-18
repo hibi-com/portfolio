@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD040 -->
 # コードレビュー結果ログ
 
 このテンプレートは、`/review` スキル実行後のレビュー結果を記録するために使用します。
@@ -96,7 +97,7 @@ logs/review/YYYY-MM-DD-{description}.md
 bun run lint
 ```
 
-```
+```text
 {lint結果を貼り付け}
 ```
 
@@ -106,7 +107,7 @@ bun run lint
 bun run typecheck
 ```
 
-```
+```text
 {型チェック結果を貼り付け}
 ```
 
@@ -116,7 +117,7 @@ bun run typecheck
 bun run test
 ```
 
-```
+```text
 {テスト結果を貼り付け}
 ```
 
@@ -126,16 +127,16 @@ bun run test
 bun run coverage
 ```
 
-```
+```text
 {カバレッジ結果を貼り付け}
 ```
 
 ## 参考ドキュメント
 
-- [コードレビューガイド](../../docs/development/code-review.md)
-- [コーディング規約](../../docs/development/coding-standards.md)
-- [セキュリティガイドライン](../../docs/security/guidelines.md)
-- [テスト戦略](../../docs/testing/testing-strategy.md)
+- [コードレビューガイド](docs/development/code-review.md)
+- [コーディング規約](docs/development/coding-standards.md)
+- [セキュリティガイドライン](docs/security/guidelines.md)
+- [テスト戦略](docs/testing/testing-strategy.md)
 
 ## 次のアクション
 
@@ -144,6 +145,7 @@ bun run coverage
 - [ ] テストの追加/更新
 - [ ] ドキュメントの更新
 - [ ] 再レビュー依頼
+
 ```
 
 ## 使用例
