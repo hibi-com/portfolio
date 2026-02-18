@@ -35,9 +35,12 @@ AskUserQuestionで以下を質問:
   - `major` - 破壊的変更
 
 ### 4. 変更カテゴリの質問
+**IMPORTANT**: `docs/development/git-commit.md`で定義されている13種類のタイプのみ使用可能
+
 AskUserQuestionで以下を質問:
 - 質問: "変更のカテゴリを選択してください"
-- 選択肢: feat, fix, docs, style, refactor, perf, test, build, ci, chore, improvement, security
+- 選択肢（13種類）: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert, improvement, security
+- 参照: `docs/development/git-commit.md` のコミットタイプ定義
 
 ### 5. サマリーの質問
 AskUserQuestionで以下を質問:
@@ -87,21 +90,23 @@ AskUserQuestionで以下を質問:
 
 ## 変更カテゴリ
 
-| カテゴリ | 説明 |
-| -------- | ---- |
-| `feat` | 新機能の追加 |
-| `fix` | バグの修正 |
-| `docs` | ドキュメントのみの変更 |
-| `style` | コードの動作に影響しない変更 |
-| `refactor` | コードのリファクタリング |
-| `perf` | パフォーマンス改善 |
-| `test` | テストの追加や修正 |
-| `build` | ビルドシステムの変更 |
-| `ci` | CI設定の変更 |
-| `chore` | その他の変更 |
-| `revert` | 以前のコミットの取り消し |
-| `improvement` | 既存機能の改善 |
-| `security` | セキュリティ関連の修正 |
+**IMPORTANT**: `docs/development/git-commit.md`で定義されている13種類のタイプのみ使用
+
+| カテゴリ | 説明 | 参照 |
+| -------- | ---- | ---- |
+| `feat` | 新機能の追加 | git-commit.md |
+| `fix` | バグの修正 | git-commit.md |
+| `docs` | ドキュメントのみの変更 | git-commit.md |
+| `style` | コードの動作に影響しない変更 | git-commit.md |
+| `refactor` | コードのリファクタリング | git-commit.md |
+| `perf` | パフォーマンス改善 | git-commit.md |
+| `test` | テストの追加や修正 | git-commit.md |
+| `build` | ビルドシステムの変更 | git-commit.md |
+| `ci` | CI設定の変更 | git-commit.md |
+| `chore` | その他の変更 | git-commit.md |
+| `revert` | 以前のコミットの取り消し | git-commit.md |
+| `improvement` | 既存機能の改善 | git-commit.md |
+| `security` | セキュリティ関連の修正 | git-commit.md |
 
 ## 事前定義サマリーテンプレート
 
@@ -122,6 +127,7 @@ AskUserQuestionで以下を質問:
 
 ## 注意事項
 
+- **変更カテゴリは`docs/development/git-commit.md`で定義されている13種類のみ使用**
 - 変更内容を正確に反映すること
 - 破壊的変更の場合は必ず詳細を記載
 - 複数パッケージに影響がある場合は全て含める
