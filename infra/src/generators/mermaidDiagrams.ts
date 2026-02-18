@@ -1,10 +1,5 @@
-/**
- * ランタイム構成図を生成
- * ユーザーリクエストがCloudflareを経由してPages/Workersに到達し、
- * データストアとやり取りする流れを可視化
- */
 export function generateRuntimeDiagram(): string {
-	return `\`\`\`mermaid
+    return `\`\`\`mermaid
 flowchart TB
     subgraph Users["ユーザー"]
         Browser["ブラウザ"]
@@ -63,12 +58,8 @@ flowchart TB
 \`\`\``;
 }
 
-/**
- * プロビジョニング構成図を生成
- * Pulumiがどのプロバイダーとリソースを順に作成・参照するかを示す
- */
 export function generateProvisioningDiagram(): string {
-	return `\`\`\`mermaid
+    return `\`\`\`mermaid
 flowchart LR
     subgraph Pulumi["Pulumi (infra)"]
         Config["config / .env 参照"]
@@ -119,14 +110,11 @@ flowchart LR
 \`\`\``;
 }
 
-/**
- * Mermaid図を含むMarkdownセクションを生成
- */
 export function generateMermaidSection(): string {
-	const runtimeDiagram = generateRuntimeDiagram();
-	const provisioningDiagram = generateProvisioningDiagram();
+    const runtimeDiagram = generateRuntimeDiagram();
+    const provisioningDiagram = generateProvisioningDiagram();
 
-	return `## ランタイム構成図
+    return `## ランタイム構成図
 
 ユーザーリクエストが DNS を経由して Cloudflare に到達し、Pages（Web/Admin/Wiki）と Workers（API）に振り分けられ、API が TiDB と Redis を利用する流れです。
 
