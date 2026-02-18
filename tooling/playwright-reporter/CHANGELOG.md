@@ -1,5 +1,11 @@
 # @portfolio/playwright-reporter
 
+## 2.0.0
+
+### Major Changes
+
+- y
+
 ## 1.0.1
 
 ### Patch Changes

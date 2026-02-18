@@ -1,5 +1,11 @@
 # @portfolio/changelog-config
 
+## 1.0.0
+
+### Major Changes
+
+- y
+
 ## 0.0.1
 
 ### Patch Changes

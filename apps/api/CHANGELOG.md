@@ -1,5 +1,21 @@
 # @portfolio/cms
 
+## 2.0.0
+
+### Major Changes
+
+- y
+
+### Patch Changes
+
+- 依存関係を更新 (a33e835ecf9cbe472e5c01d382b2f05570ade5e7)
+  - @portfolio/api@2.0.0
+  - @portfolio/auth@2.0.0
+  - @portfolio/cache@2.0.0
+  - @portfolio/db@2.0.0
+  - @portfolio/log@2.0.0
+  - @portfolio/validation@2.0.0
+
 ## 1.0.1
 
 ### Patch Changes

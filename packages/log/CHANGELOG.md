@@ -1,5 +1,11 @@
 # @portfolio/log
 
+## 2.0.0
+
+### Major Changes
+
+- y
+
 ## 1.0.0
 
 ### Added
