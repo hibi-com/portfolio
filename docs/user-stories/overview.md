@@ -3,56 +3,28 @@ title: ユーザーストーリー概要
 description: BDD形式のユーザーストーリー管理
 ---
 
-## 概要
+## 目的
 
-このディレクトリには、BDD（振る舞い駆動開発）形式のユーザーストーリーを管理しています。各ストーリーはLarge Tests（E2Eテスト）と1:1で対応します。
+このディレクトリでは、**BDD（振る舞い駆動開発）形式のユーザーストーリー**を管理する。  
+各ストーリーは Large Tests（E2E）と対応させる。
 
-## ディレクトリ構成
+- ストーリーの**一覧・ファイル構成**は、このディレクトリ（`docs/user-stories/`）を直接参照する。  
+  overview に一覧を書かず、追加・変更時もこのファイルの表は更新しない。
 
-```text
-docs/user-stories/
-├── overview.md
-├── visitor/              # 一般訪問者のストーリー
-│   ├── browse-blog.md
-│   ├── browse-portfolio.md
-│   └── submit-inquiry.md
-├── admin/                # 管理者のストーリー
-│   ├── manage-posts.md
-│   ├── manage-portfolios.md
-│   └── manage-inquiries.md
-└── crm-user/             # CRMユーザーのストーリー
-    ├── manage-customers.md
-    ├── manage-leads.md
-    └── manage-deals.md
-```
+## ペルソナ
 
-## ペルソナ定義
+| ペルソナ | 認証 | 目的の例 |
+| -------- | ---- | -------- |
+| **Visitor** | 不要 | ポートフォリオ・ブログ閲覧、問い合わせ |
+| **Admin** | 管理者権限 | コンテンツ管理、問い合わせ対応 |
+| **CRM User** | CRM権限 | 顧客・リード・案件管理 |
 
-### Visitor（一般訪問者）
+ストーリーはペルソナごとにサブディレクトリで整理する。  
+ペルソナの追加・変更時は、この表と実際のサブディレクトリを一致させる。
 
-| 属性 | 値 |
-| ---- | -- |
-| 認証 | 不要 |
-| 目的 | ポートフォリオ閲覧、ブログ閲覧、問い合わせ |
-| 技術レベル | 初心者〜上級者 |
+## ストーリーの書き方
 
-### Admin（管理者）
-
-| 属性 | 値 |
-| ---- | -- |
-| 認証 | 必要（管理者権限） |
-| 目的 | コンテンツ管理、問い合わせ対応 |
-| 技術レベル | 中級者〜上級者 |
-
-### CRM User（CRMユーザー）
-
-| 属性 | 値 |
-| ---- | -- |
-| 認証 | 必要（CRM権限） |
-| 目的 | 顧客管理、リード管理、案件管理 |
-| 技術レベル | 中級者 |
-
-## ストーリー形式
+### ストーリー文
 
 ```text
 As a {ペルソナ}
@@ -60,7 +32,7 @@ I want to {目標}
 So that {利益}
 ```
 
-## 受け入れ条件形式
+### 受け入れ条件（BDD）
 
 ```text
 Given {前提条件}
@@ -68,42 +40,14 @@ When {アクション}
 Then {期待結果}
 ```
 
-## ストーリー一覧
+## 作成時
 
-### Visitor ストーリー
+- テンプレート: `.claude/templates/sdd/user-story.md`
+- 新規ストーリー追加時は、この overview にストーリー名の一覧を追記しない（リポジトリのファイル一覧を参照する）。
 
-| ストーリー | 説明 | E2Eテスト |
-| ---------- | ---- | --------- |
-| [ブログ閲覧](./visitor/browse-blog.md) | ブログ記事を閲覧する | `browse-blog.large.spec.ts` |
-| [ポートフォリオ閲覧](./visitor/browse-portfolio.md) | ポートフォリオを閲覧する | `browse-portfolio.large.spec.ts` |
-| [問い合わせ送信](./visitor/submit-inquiry.md) | 問い合わせフォームから送信する | `submit-inquiry.large.spec.ts` |
+## 関連
 
-### Admin ストーリー
-
-| ストーリー | 説明 | E2Eテスト |
-| ---------- | ---- | --------- |
-| [記事管理](./admin/manage-posts.md) | ブログ記事のCRUD操作 | `manage-posts.large.spec.ts` |
-| [ポートフォリオ管理](./admin/manage-portfolios.md) | ポートフォリオのCRUD操作 | `manage-portfolios.large.spec.ts` |
-| [問い合わせ管理](./admin/manage-inquiries.md) | 問い合わせの確認・返信 | `manage-inquiries.large.spec.ts` |
-
-### CRM User ストーリー
-
-| ストーリー | 説明 | E2Eテスト |
-| ---------- | ---- | --------- |
-| [顧客管理](./crm-user/manage-customers.md) | 顧客情報のCRUD操作 | `manage-customers.large.spec.ts` |
-| [リード管理](./crm-user/manage-leads.md) | リードの管理と変換 | `manage-leads.large.spec.ts` |
-| [案件管理](./crm-user/manage-deals.md) | 案件パイプラインの管理 | `manage-deals.large.spec.ts` |
-
-## テンプレート
-
-ユーザーストーリーを作成する際は、以下のテンプレートを使用してください。
-
-```text
-.claude/templates/sdd/user-story.md
-```
-
-## 関連ドキュメント
-
-- [テスト戦略](../development/testing.md)
+- [テストガイド](../testing/testing-guide.md)
+- [テスト戦略](../testing/testing-strategy.md)
 - [QAシート](../testing/qa-sheet.md)
 - [シーケンス図](../sequence/)

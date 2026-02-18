@@ -1,0 +1,8 @@
+# Logs directory gitignore
+
+# すべてのログファイルを除外
+*.md
+
+# ただし、.gitkeep は追跡する
+!.gitkeep
+!README.md

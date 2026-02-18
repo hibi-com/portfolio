@@ -115,7 +115,7 @@ New → Contacted → Qualified → Converted
 
 ### E2Eテスト
 
-- ファイル: `apps/admin/e2e/large/crm-user/manage-leads.large.spec.ts`
+- ファイル: `apps/admin/e2e/manage-leads.spec.ts`
 - 対応するAC: AC1, AC2, AC3, AC4, AC5, AC6
 
 ### テストシナリオ

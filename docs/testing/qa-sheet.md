@@ -19,23 +19,6 @@ description: テストで担保している品質保証項目一覧
 | E2E Tests (Admin) | 4ファイル | 0 | ✅ 100% |
 | E2E Tests (独立) | 4カテゴリ | 0 | ✅ 100% |
 
-> **注**: テストハニカム戦略により、E2E Testsは最小限を目指しています。
-
-## テスト戦略：テストハニカム
-
-[Spotify Testing Honeycomb](https://engineering.atspotify.com/2018/01/testing-of-microservices) に基づき、**Medium Tests（Integration Tests）を最重視**します。
-
-```text
-        ┌───────────┐
-        │  Large    │  ← 最小限
-        ├───────────┤
-    ┌───┴───────────┴───┐
-    │     Medium        │  ← 最重視 ⭐⭐⭐
-    ├───────────────────┤
-        │   Small   │  ← 限定的
-        └───────────┘
-```
-
 ### テスト優先順位
 
 | 優先度 | テストタイプ | 目的 | 作成基準 |
@@ -317,7 +300,7 @@ description: テストで担保している品質保証項目一覧
 
 ## 関連ドキュメント
 
-- [テスト戦略（テストハニカム）](../development/testing.md)
+- [テストガイド（テストハニカム）](./testing-guide.md)
 - [Spotify Testing Honeycomb](https://engineering.atspotify.com/2018/01/testing-of-microservices)
 - [シーケンス図](../sequence/) - Medium Testと1:1対応
 - [ユーザーストーリー](../user-stories/) - Large Testと1:1対応

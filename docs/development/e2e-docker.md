@@ -349,6 +349,6 @@ docker run --rm \
 
 - [Playwright Documentation](https://playwright.dev/)
 - [Bun Documentation](https://bun.sh/docs)
-- [テストガイドライン](./testing.md)
+- [テストガイド](../testing/testing-guide.md)
 - [QAシート](../testing/qa-sheet.md)
 - [セキュリティガイドライン](../security/guidelines.md)

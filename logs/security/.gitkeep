@@ -1,0 +1,22 @@
+# Security Check Logs
+
+このディレクトリには、OWASP Top 10に基づくセキュリティチェックのログが保存されます。
+
+## ファイル命名規則
+
+```
+YYYY-MM-DD-security-check.md
+```
+
+## チェック頻度
+
+- 隔週（2週間に1回）
+
+## 使用方法
+
+```bash
+# セキュリティチェックを実行
+/security
+```
+
+ログファイルはGit管理対象外です（logs/.gitignoreで除外）。

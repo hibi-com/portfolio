@@ -5,31 +5,10 @@ description: 管理ダッシュボードの仕様定義
 
 ## 概要
 
-管理ダッシュボード（`apps/admin`）の仕様を定義します。
-
-## 技術スタック
-
-| 項目 | 技術 |
-| ---- | ---- |
-| フレームワーク | TanStack Router + React |
-| ビルドツール | Vite |
-| ホスティング | Cloudflare Pages |
-| スタイリング | Tailwind CSS |
-| アーキテクチャ | Feature-Sliced Design (FSD) |
-
-## ディレクトリ構造
-
-```text
-apps/admin/
-├── app/
-│   ├── routes/          # ページコンポーネント
-│   ├── widgets/         # 大きなUIブロック
-│   ├── features/        # ユーザー機能
-│   ├── entities/        # ドメインモデル
-│   └── shared/          # 共通リソース
-├── public/              # 静的ファイル
-└── e2e/                 # E2Eテスト
-```
+管理ダッシュボード（`apps/admin`）の仕様を定義します。  
+技術スタック・ディレクトリ構造は他ドキュメントで管理している。  
+[技術スタック](../../development/tech-stack.md) および [アーキテクチャ](../../architecture/overview.md) を参照。  
+実装の配置はリポジトリの `apps/admin/` を参照。
 
 ## ルーティング
 
@@ -93,9 +72,8 @@ apps/admin/
 
 ### ダッシュボード (`/`)
 
-#### 概要
-
-管理画面のメインダッシュボード。統計情報と最近のアクティビティを表示。
+管理画面のメインダッシュボード。
+統計情報と最近のアクティビティを表示。
 
 #### ウィジェット
 

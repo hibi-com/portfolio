@@ -2,7 +2,8 @@
 title: "Integration (Freee) API 仕様"
 ---
 
-freee会計との連携機能のAPI仕様書です。OAuth 2.0認証とデータ同期機能を提供します。
+freee会計との連携機能のAPI仕様書です。  
+OAuth 2.0認証とデータ同期機能を提供します。
 
 ## 概要
 
@@ -38,8 +39,8 @@ interface FreeeIntegration {
     userId: string;
     companyId: number;
     companyName: string;
-    accessToken: string;      // 暗号化保存
-    refreshToken: string;     // 暗号化保存
+    accessToken: string;
+    refreshToken: string;
     tokenExpiresAt: string;
     isActive: boolean;
     createdAt: string;

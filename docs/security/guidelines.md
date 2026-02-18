@@ -42,35 +42,8 @@ description: プロジェクトのセキュリティ基準と実装ガイドラ�
 
 ### 認証 (Authentication)
 
-#### Better Auth設定
-
-```typescript
-// packages/auth/src/config.ts
-import { betterAuth } from "better-auth";
-
-export const auth = betterAuth({
-    // セッション設定
-    session: {
-        expiresIn: 60 * 60 * 24, // 24時間
-        updateAge: 60 * 60,      // 1時間ごとに更新
-    },
-
-    // セキュリティ設定
-    rateLimit: {
-        windowMs: 15 * 60 * 1000, // 15分
-        max: 100,                  // 最大リクエスト数
-    },
-
-    // パスワードポリシー
-    password: {
-        minLength: 12,
-        requireUppercase: true,
-        requireLowercase: true,
-        requireNumbers: true,
-        requireSymbols: true,
-    },
-});
-```
+Better Auth では、セッションの有効期限・更新間隔、レート制限（ウィンドウ・最大リクエスト数）、パスワードの最小長・大文字・小文字・数字・記号の必須を設定する。  
+実装は `packages/auth/src/` を参照。
 
 #### セッション管理
 
@@ -82,45 +55,9 @@ export const auth = betterAuth({
 
 ### 認可 (Authorization)
 
-#### ロールベースアクセス制御 (RBAC)
-
-```typescript
-// packages/auth/src/roles.ts
-export const roles = {
-    admin: {
-        permissions: ["read", "write", "delete", "manage"],
-    },
-    editor: {
-        permissions: ["read", "write"],
-    },
-    viewer: {
-        permissions: ["read"],
-    },
-} as const;
-```
-
-#### 認可チェックパターン
-
-```typescript
-// apps/api/src/interface/middleware/authorization.ts
-import { AppError, ErrorCodes } from "@portfolio/log";
-
-export function requirePermission(permission: string) {
-    return async (c: Context, next: Next) => {
-        const user = c.get("user");
-
-        if (!user) {
-            throw AppError.fromCode(ErrorCodes.AUTH_UNAUTHORIZED);
-        }
-
-        if (!user.permissions.includes(permission)) {
-            throw AppError.fromCode(ErrorCodes.AUTH_FORBIDDEN);
-        }
-
-        await next();
-    };
-}
-```
+ロール（admin / editor / viewer）ごとに permissions 配列で read, write, delete, manage を定義する。  
+認可チェックでは、コンテキストから user を取得し、未認証なら AUTH_UNAUTHORIZED、要求権限が user.permissions に含まれなければ AUTH_FORBIDDEN を返す。  
+実装は `packages/auth/src/roles.ts` と `apps/api` の認可ミドルウェアを参照。
 
 ## 入力検証
 
@@ -130,62 +67,20 @@ export function requirePermission(permission: string) {
 2. **ホワイトリスト方式**: 許可する値を明示的に定義
 3. **型と範囲の検証**: データ型、長さ、範囲を検証
 
-### Zodによるスキーマ検証
-
-```typescript
-// packages/validation/src/schemas/user.ts
-import { z } from "zod";
-
-export const userInputSchema = z.object({
-    email: z.string()
-        .email("有効なメールアドレスを入力してください")
-        .max(255),
-    password: z.string()
-        .min(12, "パスワードは12文字以上必要です")
-        .regex(/[A-Z]/, "大文字を含める必要があります")
-        .regex(/[a-z]/, "小文字を含める必要があります")
-        .regex(/[0-9]/, "数字を含める必要があります")
-        .regex(/[^A-Za-z0-9]/, "記号を含める必要があります"),
-    name: z.string()
-        .min(1)
-        .max(100)
-        .regex(/^[^<>\"'&]*$/, "特殊文字は使用できません"),
-});
-```
+Zod でユーザー入力スキーマを定義する。  
+email は形式・最大長、password は最小12文字と大文字・小文字・数字・記号の各 regex、name は長さと危険な特殊文字の除外を行う。  
+実装は `packages/validation/` を参照。
 
 ### SQLインジェクション対策
 
-```typescript
-// ❌ 危険: 文字列結合
-const query = `SELECT * FROM users WHERE id = '${id}'`;
-
-// ✅ 安全: パラメータ化クエリ (Prisma)
-const user = await prisma.user.findUnique({
-    where: { id },
-});
-
-// ✅ 安全: プリペアドステートメント (D1)
-const result = await db.prepare(
-    "SELECT * FROM users WHERE id = ?"
-).bind(id).first();
-```
+クエリは文字列結合せず、Prisma の where や D1 の prepare/bind などパラメータ化クエリ・プリペアドステートメントを用いる。  
+実装例はリポジトリの DB アクセス層を参照。
 
 ### XSS対策
 
-```typescript
-// apps/web/app/shared/lib/sanitize.ts
-import DOMPurify from "dompurify";
-
-export function sanitizeHtml(dirty: string): string {
-    return DOMPurify.sanitize(dirty, {
-        ALLOWED_TAGS: ["p", "br", "strong", "em", "a", "ul", "ol", "li"],
-        ALLOWED_ATTR: ["href", "target", "rel"],
-    });
-}
-
-// 使用例
-const safeHtml = sanitizeHtml(userInput);
-```
+ユーザー入力を HTML として出力する前に DOMPurify でサニタイズする。  
+許可タグ・許可属性を制限して設定する。  
+実装は各アプリの `shared/lib/sanitize` を参照。
 
 ## データ保護
 
@@ -213,81 +108,18 @@ wrangler secret put API_KEY
 
 ### .gitignoreの必須項目
 
-```gitignore
-# 環境変数
-.env
-.env.local
-.env.*.local
-
-# シークレット
-*.pem
-*.key
-credentials.json
-
-# ログ
-*.log
-
-# ローカルデータベース
-*.db
-*.sqlite
-```
+`.env` 系、`*.pem` / `*.key` / credentials、`*.log`、ローカル DB ファイル（`*.db` / `*.sqlite`）を .gitignore に含め、リポジトリにコミットしない。  
+詳細はルートの .gitignore を参照。
 
 ## セキュリティヘッダー
 
-### HTTPヘッダー設定
-
-```typescript
-// apps/api/src/interface/middleware/security-headers.ts
-export function securityHeaders() {
-    return async (c: Context, next: Next) => {
-        // XSS対策
-        c.header("X-Content-Type-Options", "nosniff");
-        c.header("X-Frame-Options", "DENY");
-        c.header("X-XSS-Protection", "1; mode=block");
-
-        // コンテンツセキュリティポリシー
-        c.header(
-            "Content-Security-Policy",
-            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
-        );
-
-        // HTTPS強制
-        c.header(
-            "Strict-Transport-Security",
-            "max-age=31536000; includeSubDomains"
-        );
-
-        // Referrer制御
-        c.header("Referrer-Policy", "strict-origin-when-cross-origin");
-
-        await next();
-    };
-}
-```
+X-Content-Type-Options（nosniff）、X-Frame-Options（DENY）、X-XSS-Protection、Content-Security-Policy、Strict-Transport-Security、Referrer-Policy をミドルウェアで設定する。  
+実装は `apps/api` の security-headers ミドルウェアを参照。
 
 ### CORS設定
 
-```typescript
-// apps/api/src/config/cors.ts
-export const corsConfig = {
-    origin: (origin: string | undefined) => {
-        const allowedOrigins = [
-            "https://portfolio.example.com",
-            "https://admin.portfolio.example.com",
-        ];
-
-        if (process.env.NODE_ENV === "development") {
-            allowedOrigins.push("http://localhost:3000", "http://localhost:5173");
-        }
-
-        return allowedOrigins.includes(origin ?? "") ? origin : null;
-    },
-    credentials: true,
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
-    maxAge: 86400, // 24時間
-};
-```
+許可オリジンを本番ドメインと開発時の localhost に限定し、credentials・allowMethods・allowHeaders・maxAge を設定する。  
+実装は `apps/api` の CORS 設定を参照。
 
 ## レート制限
 
@@ -300,21 +132,8 @@ export const corsConfig = {
 | 検索 | 30 req/分 | リソース保護 |
 | アップロード | 10 req/分 | 帯域保護 |
 
-```typescript
-// apps/api/src/interface/middleware/rate-limit.ts
-import { rateLimiter } from "hono-rate-limiter";
-
-export const authRateLimit = rateLimiter({
-    windowMs: 60 * 1000,  // 1分
-    limit: 10,
-    message: { code: "RATE_LIMIT_EXCEEDED", message: "リクエスト数が制限を超えました" },
-});
-
-export const apiRateLimit = rateLimiter({
-    windowMs: 60 * 1000,
-    limit: 100,
-});
-```
+認証用と API 一般用で windowMs と limit を分けたレートリミッターを hono-rate-limiter 等で設定する。  
+実装は `apps/api` の rate-limit ミドルウェアを参照。
 
 ## ログとモニタリング
 
@@ -334,36 +153,13 @@ export const apiRateLimit = rateLimiter({
 - セッショントークン
 - 個人識別情報（PII）
 
-```typescript
-// packages/log/src/logger.ts
-function sanitizeLogData(data: Record<string, unknown>): Record<string, unknown> {
-    const sensitiveKeys = ["password", "token", "secret", "apiKey", "authorization"];
-    const sanitized = { ...data };
-
-    for (const key of Object.keys(sanitized)) {
-        if (sensitiveKeys.some(k => key.toLowerCase().includes(k))) {
-            sanitized[key] = "[REDACTED]";
-        }
-    }
-
-    return sanitized;
-}
-```
+ログ出力前に、password / token / secret / apiKey / authorization 等のキーを持つ値を [REDACTED] に置き換えるサニタイズ処理を行う。  
+実装は `packages/log/` を参照。
 
 ## 脆弱性管理
 
-### 定期的なセキュリティチェック
-
-```bash
-# 依存関係の脆弱性チェック（週次）
-bun audit
-
-# コンテナスキャン（デプロイ前）
-trivy fs --severity HIGH,CRITICAL .
-
-# シークレットスキャン（コミット前）
-gitleaks detect --source . --verbose
-```
+週次で `bun audit`、デプロイ前に `trivy fs --severity HIGH,CRITICAL .`、コミット前に `gitleaks detect` を実行する。  
+詳細は package.json および CI を参照。
 
 ### 脆弱性対応フロー
 

@@ -105,7 +105,7 @@ description: 管理者によるポートフォリオのCRUD操作
 
 ### E2Eテスト
 
-- ファイル: `apps/admin/e2e/large/admin/manage-portfolios.large.spec.ts`
+- ファイル: `apps/admin/e2e/manage-portfolios.spec.ts`
 - 対応するAC: AC1, AC2, AC3, AC4, AC5
 
 ### テストシナリオ

@@ -111,7 +111,7 @@ description: CRMユーザーによる顧客情報の管理
 
 ### E2Eテスト
 
-- ファイル: `apps/admin/e2e/large/crm-user/manage-customers.large.spec.ts`
+- ファイル: `apps/admin/e2e/manage-customers.spec.ts`
 - 対応するAC: AC1, AC2, AC3, AC4, AC5, AC6
 
 ### テストシナリオ

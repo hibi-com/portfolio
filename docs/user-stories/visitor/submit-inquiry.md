@@ -41,4 +41,4 @@ title: "問い合わせを送信する"
 
 ## 関連テスト
 
-- **Large Test**: `apps/web/e2e/large/visitor/submit-inquiry.large.spec.ts`
+- **Large Test**: `apps/web/e2e/submit-inquiry.spec.ts`

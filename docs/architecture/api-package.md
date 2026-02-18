@@ -10,7 +10,7 @@ title: "@portfolio/api パッケージアーキテクチャ"
 
 - **Single Source of Truth**: TypeSpec で API 仕様を一元管理
 - **Type-Safe Client**: 自動生成による型安全な API クライアント
-- **Cross-Platform**: Web/Admin 両方から利用可能な共通ライブラリ
+- **Cross-Platform**: 利用可能な共通ライブラリ
 
 ## ディレクトリ構成
 
@@ -19,28 +19,15 @@ packages/api/
 ├── schema/                  # [Layer 1: Contract Definition]
 │   ├── api.tsp             # エントリーポイント
 │   ├── endpoints/          # エンドポイント定義
-│   │   ├── posts.tsp
-│   │   └── portfolios.tsp
 │   └── models/             # ドメインモデル定義
-│       ├── post.tsp
-│       ├── portfolio.tsp
-│       ├── asset.tsp
-│       ├── error-response.tsp
-│       ├── pagination-meta.tsp
-│       └── paginated-response.tsp
 │
 ├── generated/               # [Layer 2: Generated Code] (自動生成)
 │   ├── api.schemas.ts      # 型定義
-│   ├── mutator.ts          # HTTP クライアント設定
-│   ├── posts/posts.ts      # Posts API クライアント
-│   └── portfolios/         # Portfolios API クライアント
+│   └── mutator.ts          # HTTP クライアント設定
 │
 ├── src/                     # [Layer 3: Library Interface]
 │   ├── index.ts            # 公開 API エントリーポイント
 │   └── clients/            # クライアントラッパー
-│       ├── index.ts
-│       ├── posts.ts
-│       └── portfolios.ts
 │
 ├── openapi.yaml             # 生成された OpenAPI 仕様
 ├── orval.config.ts          # Orval 設定
@@ -77,22 +64,6 @@ packages/api/
 apps/web                                  apps/admin
 (フロントエンド)                           (管理画面)
 ```
-
-## API クライアント
-
-### Posts
-
-| メソッド | 説明 | パラメータ |
-| --------- | ------ | ----------- |
-| `posts.list(params?)` | 投稿一覧を取得 | `page?`, `perPage?`, `tag?` |
-| `posts.getBySlug(slug)` | スラッグで投稿を取得 | `slug: string` |
-
-### Portfolios
-
-| メソッド | 説明 | パラメータ |
-| --------- | ------ | ----------- |
-| `portfolios.list(params?)` | ポートフォリオ一覧を取得 | `page?`, `perPage?` |
-| `portfolios.getBySlug(slug)` | スラッグでポートフォリオを取得 | `slug: string` |
 
 ## 生成コマンド
 

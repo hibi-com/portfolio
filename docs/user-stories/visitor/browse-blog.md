@@ -42,4 +42,4 @@ title: "ブログを閲覧する"
 
 ## 関連テスト
 
-- **Large Test**: `apps/web/e2e/large/visitor/browse-blog.large.spec.ts`
+- **Large Test**: `apps/web/e2e/browse-blog.spec.ts`

@@ -8,26 +8,11 @@
 2. **不明点はユーザーに確認** → 推測で実装しない
 3. **日本語でコミュニケーション** → 報告・計画・ドキュメントすべて日本語
 
-## WHAT: プロジェクト構造
+## WHAT
 
-```text
-apps/
-├── api/      # Hono + DDD - REST APIサーバー（Cloudflare Workers）
-├── web/      # Remix + FSD - 公開サイト（Cloudflare Pages）
-└── admin/    # TanStack Router + FSD - 管理画面（Cloudflare Pages）
-
-packages/
-├── db/         # Prisma - データベーススキーマ・クライアント
-├── api/        # Hono RPC - 型安全APIクライアント
-├── validation/ # Zod - バリデーションスキーマ
-├── auth/       # 認証ユーティリティ
-└── ui/         # shadcn/ui - 共通UIコンポーネント
-
-docs/
-├── sequence/   # シーケンス図 - 実装フローの可視化
-├── specs/      # API・DB仕様書
-└── user-stories/ # ユーザーストーリー
-```
+- **apps/** … デプロイ対象のアプリケーション。中身はリポジトリを参照。
+- **packages/** … アプリ間で共有するライブラリ。一覧はリポジトリを参照。
+- **docs/** … 仕様・シーケンス・ユーザーストーリー（`sequence/`, `specs/`, `user-stories/` など）。
 
 ## WHY: 設計思想
 

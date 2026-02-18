@@ -17,7 +17,10 @@ title: "Git Commit ガイドライン"
 <type>
 ```
 
+または scope を使う場合: `{type}({scope}): {subject}`
+
 - **type**: コミットの種類（必須）- 次の13種類から選択
+- **scope**: 変更対象のアプリ・パッケージ名（任意）。一覧はリポジトリの `apps/`・`packages/` を参照
 
 ## コミットタイプ
 

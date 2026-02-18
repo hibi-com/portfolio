@@ -35,4 +35,4 @@ title: "ポートフォリオを閲覧する"
 
 ## 関連テスト
 
-- **Large Test**: `apps/web/e2e/large/visitor/browse-portfolio.large.spec.ts`
+- **Large Test**: `apps/web/e2e/browse-portfolio.spec.ts`

@@ -128,7 +128,7 @@ description: CRMユーザーによる案件（商談）のパイプライン管�
 
 ### E2Eテスト
 
-- ファイル: `apps/admin/e2e/large/crm-user/manage-deals.large.spec.ts`
+- ファイル: `apps/admin/e2e/manage-deals.spec.ts`
 - 対応するAC: AC1, AC2, AC3, AC4, AC5, AC6
 
 ### テストシナリオ

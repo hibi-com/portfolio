@@ -5,25 +5,15 @@ description: PF形式の構造化エラーコード仕様
 
 ## 概要
 
-このプロジェクトでは、PF形式の構造化されたエラーコードを採用しています。すべてのエラーは `AppError` クラスを通じて管理され、一貫したエラーレスポンスを提供します。
+このプロジェクトでは、PF形式の構造化されたエラーコードを採用しています。  
+すべてのエラーは `AppError` クラスを通じて管理され、一貫したエラーレスポンスを提供します。
 
 ## エラーコード体系
 
 ### PFxxxxxx形式
 
-エラーコードは `PF` + 6桁の数字で構成されます。
-最初の桁（3文字目）がカテゴリを示します。
-
-```text
-PF1xxxxx: 認証エラー (Authentication)
-PF2xxxxx: バリデーションエラー (Validation)
-PF3xxxxx: リソース未発見 (Not Found)
-PF4xxxxx: 内部エラー (Internal)
-PF5xxxxx: 外部サービスエラー (External)
-PF6xxxxx: レート制限 (Rate Limit)
-PF7xxxxx: データベースエラー (Database)
-PF8xxxxx: キャッシュエラー (Cache)
-```
+エラーコードは `PF` + 6桁の数字で構成する。  
+3文字目（先頭桁）がカテゴリを示す: PF1=認証、PF2=バリデーション、PF3=Not Found、PF4=内部、PF5=外部サービス、PF6=レート制限、PF7=DB、PF8=キャッシュ。
 
 ### カテゴリと番号体系
 
@@ -119,118 +109,41 @@ PF8xxxxx: キャッシュエラー (Cache)
 
 ### 使用例
 
-```typescript
-import { AppError, ErrorCodes } from "@portfolio/log";
-
-// エラーの作成
-const error = AppError.fromCode(
-    ErrorCodes.VALIDATION_MISSING_FIELD,
-    "メールアドレスが必要です",
-    {
-        metadata: { field: "email" },
-    }
-);
-
-console.log(error.code);       // "PF200001"
-console.log(error.category);   // "VALIDATION"
-console.log(error.httpStatus); // 400
-
-// JSONレスポンス用
-const json = error.toJSON();
-// {
-//   code: "PF200001",
-//   category: "VALIDATION",
-//   message: "メールアドレスが必要です",
-//   httpStatus: 400,
-//   metadata: { field: "email" }
-// }
-```
+`AppError.fromCode(ErrorCodes.xxx, message, { metadata })` でエラーを生成する。  
+`error.code` / `category` / `httpStatus` で参照し、API レスポンスには `error.toJSON()` を使う。  
+実装例は `@portfolio/log` を参照。
 
 ### APIルートでのエラーハンドリング
 
-```typescript
-// apps/api/src/interface/rest/crm.ts
-import { AppError, ErrorCodes } from "@portfolio/log";
-
-app.get("/customers/:id", async (c) => {
-    try {
-        const customer = await useCase.getById(c.req.param("id"));
-        return c.json(customer);
-    } catch (error) {
-        const appError = error instanceof AppError
-            ? error
-            : AppError.fromCode(
-                ErrorCodes.INTERNAL_SERVER_ERROR,
-                "Unexpected error",
-                { originalError: error instanceof Error ? error : undefined }
-            );
-
-        return c.json(appError.toJSON(), appError.httpStatus);
-    }
-});
-```
+try 内で useCase を実行し、catch で `AppError` の場合はそのまま、それ以外は `AppError.fromCode(INTERNAL_SERVER_ERROR, ...)` に包む。  
+レスポンスは `c.json(appError.toJSON(), appError.httpStatus)` で返す。  
+実装例は `apps/api/src/interface/rest/` を参照。
 
 ## エラーレスポンス形式
 
 ### 成功レスポンス
 
-```json
-{
-    "data": {
-        "id": "123",
-        "name": "Example"
-    }
-}
-```
+成功時は `{ data: { ... } }` 形式で返す。
 
 ### エラーレスポンス
 
-```json
-{
-    "code": "PF300003",
-    "category": "NOT_FOUND",
-    "message": "ポートフォリオが見つかりません",
-    "httpStatus": 404,
-    "metadata": {
-        "slug": "non-existent-slug"
-    }
-}
-```
+エラー時は `code`（PF形式）、`category`、`message`、`httpStatus`、任意で `metadata` を含む JSON を返す。  
+例: 404 の場合は code "PF300003"、message "ポートフォリオが見つかりません"、metadata に slug 等。
 
 ## ヘルパー関数
 
 ### getErrorCategory
 
-エラーコードからカテゴリを取得します。
-
-```typescript
-import { getErrorCategory, ErrorCodes, ErrorCategory } from "@portfolio/log";
-
-const category = getErrorCategory(ErrorCodes.AUTH_INVALID_TOKEN);
-// ErrorCategory.AUTHENTICATION ("AUTH")
-```
+`getErrorCategory(ErrorCodes.xxx)` でエラーコードからカテゴリ（AUTHENTICATION 等）を取得する。  
+実装は `@portfolio/log` を参照。
 
 ### getHttpStatusFromErrorCode
 
-エラーコードからHTTPステータスを取得します。
-
-```typescript
-import { getHttpStatusFromErrorCode, ErrorCodes } from "@portfolio/log";
-
-const status = getHttpStatusFromErrorCode(ErrorCodes.NOT_FOUND_POST);
-// 404
-```
+`getHttpStatusFromErrorCode(ErrorCodes.xxx)` で HTTP ステータス（例: 404）を取得する。
 
 ### getErrorCodeName
 
-PF形式のコードから人間が読める名前を取得します。
-
-```typescript
-import { getErrorCodeName, ErrorCodes } from "@portfolio/log";
-
-const name = getErrorCodeName(ErrorCodes.AUTH_INVALID_TOKEN);
-// "AUTH_INVALID_TOKEN"
-```
+`getErrorCodeName(ErrorCodes.xxx)` で PF 形式から定数名（例: "AUTH_INVALID_TOKEN"）を取得する。
 
 ## 新規エラーコードの追加方法
 

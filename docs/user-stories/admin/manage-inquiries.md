@@ -107,7 +107,7 @@ description: 管理者による問い合わせの確認と返信
 
 ### E2Eテスト
 
-- ファイル: `apps/admin/e2e/large/admin/manage-inquiries.large.spec.ts`
+- ファイル: `apps/admin/e2e/manage-inquiries.spec.ts`
 - 対応するAC: AC1, AC2, AC3, AC4, AC5
 
 ### テストシナリオ

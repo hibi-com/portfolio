@@ -23,12 +23,4 @@ Domain → UseCase → Infrastructure → Interface
 | エラーを返すとき | `AppError` を使用: `throw new AppError("NOT_FOUND", "...", 404)` |
 | 統合テスト追加 | `tests/medium/{domain}/` に `*.medium.test.ts` で作成 |
 
-## ディレクトリ構造
-
-| パス | 役割 |
-| ---- | ---- |
-| `src/domain/` | エンティティ、値オブジェクト |
-| `src/usecase/` | ユースケース |
-| `src/infra/` | リポジトリ実装、外部サービス |
-| `src/interface/rest/` | REST APIハンドラー |
-| `src/di/` | DIコンテナ |
+ディレクトリ構成は変更されやすいため、`apps/api/src/` を直接参照すること。
