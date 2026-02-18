@@ -4,6 +4,9 @@ title: "インフラアーキテクチャ"
 
 このドキュメントは、`infra/` ディレクトリで Pulumi により管理されるインフラストラクチャの構成とコンポーネントの関係を図示します。
 
+> **注意**: 本ドキュメントの構成図は**将来的にPulumiから自動生成される予定**です。
+> 現在は手動維持していますが、仕様駆動開発の観点から、手動で書くべき仕様は [`docs/specs/infra/`](../specs/infra/) に記載しています。
+
 **Pulumi のデフォルトコマンドで生成したリソース依存グラフ**: デプロイ済みスタックから `pulumi stack graph` で自動生成した図は [infra-stack-graph.md](./infra-stack-graph.md) を参照してください。`infra` で `bun run generate` を実行すると再生成されます。
 
 ## ランタイム構成図
@@ -123,4 +126,19 @@ flowchart LR
 ## 関連ドキュメント
 
 - [Architecture Overview](./overview.md)
+- [インフラ仕様書](../specs/infra/overview.md) - 手動管理する仕様
 - [APIキー・トークン発行手順](../development/api-keys-setup.md)
+
+## TODO: 自動生成化
+
+以下の図は将来的にPulumiから自動生成する予定：
+- [ ] ランタイム構成図（9-61行目）
+- [ ] プロビジョニング構成図（63-111行目）
+
+実装例：
+```typescript
+// infra/src/generators/architecture-diagram.ts
+export function generateArchitectureDiagram() {
+  // Pulumiのリソース定義から構成図を自動生成
+}
+```
