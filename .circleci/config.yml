@@ -1048,6 +1048,251 @@ jobs:
                 }"
             fi
 
+  backup-database:
+    executor: default
+    steps:
+      - checkout
+      - install-bun
+      - install-b2
+      - run:
+          name: Install mysqldump
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y mysql-client
+      - run:
+          name: Backup TiDB database
+          command: |
+            echo "=== Database Backup ==="
+
+            TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+            BACKUP_FILE="backup-${TIMESTAMP}.sql"
+
+            echo "Creating backup: ${BACKUP_FILE}"
+
+            mysqldump -h "${TIDB_HOST}" -P 4000 -u "${TIDB_USER}" -p"${TIDB_PASSWORD}" \
+              --databases portfolio \
+              --single-transaction \
+              --quick \
+              --lock-tables=false \
+              > "${BACKUP_FILE}"
+
+            gzip "${BACKUP_FILE}"
+            BACKUP_FILE_GZ="${BACKUP_FILE}.gz"
+
+            echo "Backup size: $(du -h ${BACKUP_FILE_GZ} | cut -f1)"
+
+            b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
+
+            b2 upload-file "${B2_BUCKET_NAME}" "${BACKUP_FILE_GZ}" "backups/db/${BACKUP_FILE_GZ}"
+
+            echo "✓ Backup uploaded to B2"
+
+            BACKUP_COUNT=$(b2 ls "${B2_BUCKET_NAME}" backups/db/ | wc -l)
+            echo "Total backups: ${BACKUP_COUNT}"
+
+            if [ "${BACKUP_COUNT}" -gt "30" ]; then
+              echo "Cleaning old backups (keeping last 30)..."
+              b2 ls "${B2_BUCKET_NAME}" backups/db/ | sort | head -n -30 | while read file; do
+                b2 delete-file-version "${B2_BUCKET_NAME}" "${file}"
+                echo "Deleted old backup: ${file}"
+              done
+            fi
+
+            echo "✓ Database backup completed"
+      - run:
+          name: Create GitHub Issue on failure
+          when: on_fail
+          command: |
+            if [ -n "${GITHUB_TOKEN}" ]; then
+              curl -X POST \
+                -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
+                -d "{
+                  \"title\": \"[Backup Failure] Database backup failed\",
+                  \"body\": \"## Database Backup Failure\n\n**Timestamp:** $(date -u +%Y-%m-%dT%H:%M:%SZ)\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the backup logs\n- [ ] Check TiDB connectivity\n- [ ] Verify B2 credentials\n- [ ] Manual backup if critical\",
+                  \"labels\": [\"backup-failure\", \"automated\"]
+                }"
+            fi
+
+  performance-test:
+    executor: large
+    steps:
+      - checkout
+      - install-bun
+      - run:
+          name: Install Lighthouse CLI
+          command: |
+            bun add -g lighthouse
+            lighthouse --version
+      - run:
+          name: Run Lighthouse performance tests
+          command: |
+            echo "=== Performance Testing ==="
+
+            URLS=(
+              "https://www.ageha734.jp"
+              "https://www.ageha734.jp/blog"
+              "https://www.ageha734.jp/portfolio"
+            )
+
+            mkdir -p performance-reports
+
+            for url in "${URLS[@]}"; do
+              echo "Testing: ${url}"
+
+              SANITIZED_URL=$(echo "${url}" | sed 's/[^a-zA-Z0-9]/-/g')
+
+              lighthouse "${url}" \
+                --only-categories=performance,accessibility,best-practices,seo \
+                --preset=desktop \
+                --chrome-flags="--headless" \
+                --output=json \
+                --output=html \
+                --output-path="./performance-reports/${SANITIZED_URL}" \
+                --quiet
+
+              PERFORMANCE_SCORE=$(jq '.categories.performance.score * 100' "./performance-reports/${SANITIZED_URL}.report.json")
+              echo "Performance score for ${url}: ${PERFORMANCE_SCORE}"
+
+              if (( $(echo "${PERFORMANCE_SCORE} < 80" | bc -l) )); then
+                echo "⚠ Performance score below threshold (80) for ${url}"
+              fi
+            done
+
+            echo "✓ Performance testing completed"
+      - store_artifacts:
+          path: performance-reports
+          destination: performance-reports
+
+  cost-report:
+    executor: default
+    steps:
+      - checkout
+      - install-bun
+      - run:
+          name: Generate monthly cost report
+          command: |
+            echo "=== Monthly Cost Report ==="
+
+            MONTH=$(date +%Y-%m)
+            REPORT_FILE="cost-report-${MONTH}.md"
+
+            cat > "${REPORT_FILE}" \<<EOF
+            # Cost Report - ${MONTH}
+
+            ## Cloudflare Workers
+
+            - Workers Requests: $(curl -s "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/analytics/dashboard" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" | jq '.result.totals.requests.all')
+
+            ## TiDB Cloud
+
+            - Database Storage: Check TiDB Cloud Console
+            - Request Units: Check TiDB Cloud Console
+
+            ## Backblaze B2
+
+            - Storage Used: $(b2 get-account-info | jq '.storageUsed')
+            - API Calls: Check Backblaze Console
+
+            ## Summary
+
+            - Total Estimated Cost: \$XX.XX USD
+            - Trend: [Up/Down/Stable]
+
+            EOF
+
+            cat "${REPORT_FILE}"
+
+            echo "✓ Cost report generated"
+      - store_artifacts:
+          path: cost-report-*.md
+          destination: cost-reports
+
+  visual-regression-test:
+    executor: large
+    steps:
+      - checkout
+      - install-bun
+      - browser-tools/install-chrome
+      - run:
+          name: Install Percy CLI
+          command: |
+            bun add -g @percy/cli
+            percy --version
+      - run:
+          name: Run visual regression tests
+          command: |
+            echo "=== Visual Regression Testing ==="
+
+            if [ -n "${PERCY_TOKEN}" ]; then
+              export PERCY_TOKEN="${PERCY_TOKEN}"
+
+              bun add -g @percy/playwright
+
+              bunx playwright test --grep "@visual" --reporter=line
+
+              echo "✓ Visual regression tests completed"
+            else
+              echo "⚠ PERCY_TOKEN not set, skipping visual regression tests"
+            fi
+
+  load-test:
+    executor: default
+    steps:
+      - checkout
+      - install-bun
+      - run:
+          name: Install k6
+          command: |
+            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+            echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+            sudo apt-get update
+            sudo apt-get install k6
+            k6 version
+      - run:
+          name: Run load tests
+          command: |
+            echo "=== Load Testing ==="
+
+            cat > load-test.js \<<'EOF'
+            import http from 'k6/http';
+            import { check, sleep } from 'k6';
+
+            export const options = {
+              stages: [
+                { duration: '2m', target: 10 },
+                { duration: '5m', target: 10 },
+                { duration: '2m', target: 50 },
+                { duration: '5m', target: 50 },
+                { duration: '2m', target: 100 },
+                { duration: '5m', target: 100 },
+                { duration: '5m', target: 0 },
+              ],
+              thresholds: {
+                http_req_duration: ['p(95)<500'],
+                http_req_failed: ['rate<0.01'],
+              },
+            };
+
+            export default function () {
+              const res = http.get('https://www.ageha734.jp');
+              check(res, {
+                'status is 200': (r) => r.status === 200,
+                'response time < 500ms': (r) => r.timings.duration < 500,
+              });
+              sleep(1);
+            }
+            EOF
+
+            k6 run --out json=load-test-results.json load-test.js
+
+            echo "✓ Load testing completed"
+      - store_artifacts:
+          path: load-test-results.json
+          destination: load-test-results.json
+
 workflows:
   ci:
     jobs:
