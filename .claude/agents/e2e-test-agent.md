@@ -47,29 +47,6 @@ apps/admin/e2e/large/
 └── crm.large.spec.ts
 ```
 
-## テンプレート
-
-```typescript
-import { test, expect } from "@playwright/test";
-
-test.describe("{Persona}: {Story Title}", () => {
-    test.beforeEach(async ({ page }) => {
-        // 共通セットアップ
-    });
-
-    test("シナリオ1: {期待される動作}", async ({ page }) => {
-        // Given: ユーザーがページにアクセス
-        await page.goto("/path");
-
-        // When: ユーザーが操作を行う
-        await page.click("button");
-
-        // Then: 期待される結果を確認
-        await expect(page.locator("selector")).toBeVisible();
-    });
-});
-```
-
 ## ペルソナ別テスト観点
 
 | ペルソナ | 観点 | ディレクトリ |

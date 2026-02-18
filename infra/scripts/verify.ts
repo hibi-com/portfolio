@@ -429,61 +429,6 @@ async function verifyRedisCloudKeys(accessKey: string, secretKey: string): Promi
     }
 }
 
-async function verifyDopplerToken(serviceToken: string, project: string, config: string): Promise<void> {
-    console.log("\n🔍 Doppler Service Tokenの確認中...\n");
-
-    try {
-        if (!project || !config) {
-            console.warn("⚠️  プロジェクトとコンフィグが指定されていないため、形式チェックのみ実行します");
-            if (serviceToken && serviceToken.length > 20) {
-                console.log("✅ Doppler Service Tokenの形式は正しいです");
-                console.log(`   長さ: ${serviceToken.length}文字`);
-            } else {
-                console.error("❌ Doppler Service Tokenの形式が正しくない可能性があります");
-            }
-            console.log("\n💡 Service Tokenの作成方法:");
-            console.log("   1. https://dashboard.doppler.com/ にログイン");
-            console.log("   2. プロジェクト → Access → Service Tokens");
-            console.log("   3. Generate Service Token");
-            return;
-        }
-
-        const secretsResponse = await fetch(
-            `https://api.doppler.com/v3/configs/config/secrets?project=${project}&config=${config}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${serviceToken}`,
-                    "Content-Type": "application/json",
-                },
-                method: "GET",
-            },
-        );
-
-        if (!secretsResponse.ok) {
-            const errorText = await secretsResponse.text();
-            console.error("❌ Doppler Service Tokenが無効です");
-            console.error(`   ステータス: ${secretsResponse.status}`);
-            console.error(`   エラー: ${errorText}`);
-            console.log("\n💡 Service Tokenの作成方法:");
-            console.log("   1. https://dashboard.doppler.com/ にログイン");
-            console.log("   2. プロジェクト → Access → Service Tokens");
-            console.log("   3. Generate Service Token");
-            console.log(`   4. プロジェクト: ${project}, コンフィグ: ${config} を選択`);
-            return;
-        }
-
-        const secretsData = await secretsResponse.json();
-        console.log("✅ Doppler Service Tokenは有効です");
-        console.log(`   プロジェクト: ${project}`);
-        console.log(`   コンフィグ: ${config}`);
-        console.log(`   シークレット数: ${Object.keys(secretsData.secrets || {}).length}`);
-
-        console.log("\n✅ すべてのDoppler権限が正常です！");
-    } catch (error) {
-        console.error("❌ Doppler Service Tokenの確認中にエラーが発生しました");
-        console.error(`   エラー: ${error instanceof Error ? error.message : String(error)}`);
-    }
-}
 
 function verifyGoogleOAuth(clientId: string, clientSecret: string): void {
     console.log("\n🔍 Google OAuth認証情報の確認中...\n");
@@ -632,9 +577,6 @@ function loadEnvironmentVariables(): Record<string, string> {
         grafanaOrgSlug: getEnvVar("GRAFANA_ORG_SLUG", envVars),
         redisCloudAccessKey: getEnvVar("REDISCLOUD_ACCESS_KEY", envVars),
         redisCloudSecretKey: getEnvVar("REDISCLOUD_SECRET_KEY", envVars),
-        dopplerToken: getEnvVar("DOPPLER_TOKEN", envVars),
-        dopplerProject: getEnvVar("DOPPLER_PROJECT", envVars),
-        dopplerConfig: getEnvVar("DOPPLER_CONFIG", envVars),
         googleClientId: getEnvVar("GOOGLE_CLIENT_ID", envVars),
         googleClientSecret: getEnvVar("GOOGLE_CLIENT_SECRET", envVars),
         betterAuthSecret: getEnvVar("BETTER_AUTH_SECRET", envVars),
@@ -688,16 +630,6 @@ async function verifyRedisCloudCredentials(env: Record<string, string>): Promise
     }
 }
 
-async function verifyDopplerCredentials(env: Record<string, string>): Promise<void> {
-    if (env.dopplerToken) {
-        await verifyDopplerToken(env.dopplerToken, env.dopplerProject, env.dopplerConfig);
-    } else {
-        console.log("\n⚠️  Doppler Service Tokenが見つかりません");
-        console.log("   環境変数またはPulumi設定に以下を設定してください:");
-        console.log("   - DOPPLER_TOKEN");
-        console.log("   （または pulumi config set dopplerToken）");
-    }
-}
 
 function verifyGoogleOAuthCredentials(env: Record<string, string>): void {
     if (env.googleClientId || env.googleClientSecret) {
@@ -715,7 +647,6 @@ async function verifyAllCredentials(env: Record<string, string>): Promise<void> 
     await verifySentryCredentials(env);
     await verifyGrafanaCredentials(env);
     await verifyRedisCloudCredentials(env);
-    await verifyDopplerCredentials(env);
     verifyGoogleOAuthCredentials(env);
     verifyBetterAuthSecret(env.betterAuthSecret);
     verifyTiDBConnection(env.databaseUrl, env.tidbHost);

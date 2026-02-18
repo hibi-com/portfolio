@@ -26,11 +26,8 @@
 **使用エージェント**: `spec-writer-agent`
 **使用テンプレート**: `.claude/templates/sdd/sequence-diagram.md`
 
-```bash
-# 既存仕様の確認
-ls docs/sequence/api/{domain}/
-ls docs/specs/api/
-```
+既存仕様は `docs/sequence/`、`docs/specs/api/` を確認する。  
+ワークフロー全体は `docs/development/workflow.md` を参照。
 
 ### Step 2: テスト作成（TDD Red）
 
@@ -72,11 +69,7 @@ bun run test -- {test-file}
 1. コード品質の改善
 2. テストが引き続き通過することを確認
 
-```bash
-# リント・フォーマット
-bun run lint:fix
-bun run fmt
-```
+品質チェック: `bun run lint:fix`、`bun run fmt`、必要に応じて `bun run check`（`docs/development/workflow.md` 参照）。
 
 ### Step 5: レビュー
 

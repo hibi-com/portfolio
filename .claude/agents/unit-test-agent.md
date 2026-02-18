@@ -37,30 +37,6 @@ Red（テスト作成・失敗確認） → Green（最小限実装） → Refac
 4. **配置**: ソースファイルと同階層
 5. **カバレッジ**: 正常系、境界値、異常系、エッジケースを網羅
 
-## テンプレート（簡易版）
-
-```typescript
-describe("機能名", () => {
-    test("正常系: 期待される動作", () => {
-        // Given: 前提条件
-        const input = /* ... */;
-
-        // When: 操作
-        const result = /* ... */;
-
-        // Then: 検証
-        expect(result).toBe(/* ... */);
-    });
-
-    test("異常系: エラーケース", () => {
-        // Given
-        // When
-        // Then
-        expect(() => /* ... */).toThrow();
-    });
-});
-```
-
 ## 出力フォーマット
 
 ```markdown

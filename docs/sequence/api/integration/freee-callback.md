@@ -14,7 +14,7 @@ sequenceDiagram
     participant OAuthService as FreeeOAuthService
     participant Repository as FreeeRepository
     participant Freee as Freee API
-    participant DB as D1 Database
+    participant DB as TiDB Database
 
     Client->>API: POST /api/freee/callback
     API->>Auth: authenticate()

@@ -11,7 +11,7 @@ sequenceDiagram
     participant Auth as Auth Middleware
     participant UseCase as CloseInquiryUseCase
     participant Repository as InquiryRepository
-    participant DB as D1 Database
+    participant DB as TiDB Database
 
     Client->>API: PUT /api/inquiries/:id/close
     API->>Auth: 認証チェック

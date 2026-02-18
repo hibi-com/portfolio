@@ -21,7 +21,7 @@
 
 - [x] 全テストが通過していることを確認
 - [x] ビルド成果物がBackblaze B2に存在することを確認
-- [x] 環境変数がDopplerに設定されていることを確認
+- [x] 環境変数がCloudflareに設定されていることを確認
 
 ### 2. デプロイ実行
 
@@ -68,7 +68,7 @@
 
 - [ ] `bun run check` で全品質チェックが通過
 - [ ] Backblaze B2にartifactが存在
-- [ ] Doppler環境変数が設定済み
+- [ ] Cloudflare環境変数が設定済み
 - [ ] データベースマイグレーションが適用済み（必要な場合）
 
 ### デプロイ中
@@ -114,21 +114,7 @@
 
 1. Cloudflare APIトークンを確認
 2. `wrangler.toml` の設定を確認
-3. Doppler環境変数を確認
-
-### Doppler CLI失敗
-
-**エラー**: `doppler: command not found`
-
-**原因**:
-
-- Doppler CLIのインストールに失敗
-- apt repositoryが利用不可
-
-**解決策**:
-
-1. CircleCIジョブを再実行
-2. Dockerイメージを更新
+3. Cloudflare環境変数を確認（`env.yaml`から設定）
 
 ## 参考リンク
 
@@ -136,4 +122,3 @@
 - [CircleCI設定](.circleci/config.yml)
 - [Cloudflare Dashboard](https://dash.cloudflare.com/)
 - [Backblaze B2 Console](https://secure.backblaze.com/)
-- [Doppler Console](https://dashboard.doppler.com/)

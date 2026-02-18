@@ -19,7 +19,7 @@
 - **Monorepo（Turborepo）**: パッケージ間の型共有、一括ビルド・テスト
 - **DDD（API）**: ドメイン知識の集約、依存関係の明確化
 - **FSD（Frontend）**: 機能単位のモジュール化、レイヤー間依存の制御
-- **Cloudflare**: エッジでの高速配信、D1/KVによるデータ管理
+- **Cloudflare**: エッジでの高速配信、TiDB Cloud/KVによるデータ管理
 
 ## HOW: 変更の検証
 

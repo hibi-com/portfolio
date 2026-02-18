@@ -55,8 +55,8 @@ grep -r "authMiddleware\|requireRole" apps/api/src/interface/rest/
 # Cloudflare HTTPS設定確認
 curl -I https://your-domain.com | grep -i "strict-transport-security"
 
-# wrangler secretsの確認
-wrangler secret list
+# シークレット一覧確認
+# シークレット一覧は bun run 経由で実行（scripts/command-addition-list.md の TODO 参照）
 ```
 
 ### 発見事項

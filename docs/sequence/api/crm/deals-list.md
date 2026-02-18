@@ -11,7 +11,7 @@ sequenceDiagram
     participant Auth as Auth Middleware
     participant UseCase as ListDealsUseCase
     participant Repository as DealRepository
-    participant DB as D1 Database
+    participant DB as TiDB Database
 
     Client->>API: GET /api/crm/deals?pipelineId=xxx&stageId=yyy
     API->>Auth: 認証チェック

@@ -11,7 +11,7 @@ sequenceDiagram
     participant Auth as Auth Middleware
     participant UseCase as ListPipelinesUseCase
     participant Repository as PipelineRepository
-    participant DB as D1 Database
+    participant DB as TiDB Database
 
     Client->>API: GET /api/crm/pipelines
     API->>Auth: 認証チェック

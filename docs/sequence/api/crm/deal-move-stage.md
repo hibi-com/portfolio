@@ -14,7 +14,7 @@ sequenceDiagram
     participant UseCase as MoveDealToStageUseCase
     participant DealRepo as DealRepository
     participant StageRepo as PipelineStageRepository
-    participant DB as D1 Database
+    participant DB as TiDB Database
 
     Client->>API: PUT /api/crm/deals/:id/stage
     API->>Auth: authenticate()

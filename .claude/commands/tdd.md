@@ -53,36 +53,7 @@
 2. 仕様に基づいてテストを作成
 3. テストが失敗することを確認
 
-```bash
-# テンプレート読み込み
-cat .claude/templates/tdd/unit-test.md
-
-# テスト実行（失敗確認。ファイルは -- で渡す）
-bun run test -- {test-file}
-```
-
-### テスト作成ガイドライン
-
-```typescript
-describe("機能名", () => {
-    // 正常系
-    test("should {expected-behavior} when {condition}", () => {
-        // Given: 前提条件
-        // When: 操作
-        // Then: 検証
-    });
-
-    // 境界値
-    test("should handle edge case: {case}", () => {
-        // ...
-    });
-
-    // 異常系
-    test("should throw error when {invalid-condition}", () => {
-        expect(() => /* ... */).toThrow();
-    });
-});
-```
+テスト実行（失敗確認）: `bun run test -- {test-file}`。テンプレートは `.claude/templates/tdd/unit-test.md`。テストの書き方は `docs/testing/testing-guide.md` を参照すること。
 
 ## Green フェーズ
 
@@ -116,17 +87,8 @@ bun run test -- {test-file}
 2. 各変更後にテストを実行
 3. テストが通過し続けることを確認
 
-```bash
-# リント・フォーマット
-bun run lint:fix
-bun run fmt
-
-# 型チェック
-bun run typecheck
-
-# テスト（回帰確認）
-bun run test -- {test-file}
-```
+品質チェック: `bun run lint:fix`、`bun run fmt`、`bun run typecheck`、`bun run test -- {test-file}`。  
+一括は `bun run check`（`docs/development/workflow.md` 参照）。
 
 ### リファクタリング対象
 
@@ -137,11 +99,13 @@ bun run test -- {test-file}
 
 ## テストサイズ別テンプレート
 
-| サイズ | テンプレート | 命名 |
-| ------ | ------------ | ---- |
-| Small | `.claude/templates/tdd/unit-test.md` | `*.test.ts` |
-| Medium | `.claude/templates/tdd/integration-test.md` | `*.medium.test.ts` |
-| Large | `.claude/templates/tdd/e2e-test.md` | `*.large.spec.ts` |
+| サイズ | テンプレート | 命名・配置 |
+| ------ | ------------ | ---------- |
+| Small | `.claude/templates/tdd/unit-test.md` | `*.test.ts`（テスト対象と同じディレクトリ） |
+| Medium | `.claude/templates/tdd/integration-test.md` | `*.integration.test.ts`（`apps/api/integration/`, `apps/web/integration/`, `apps/admin/integration/`） |
+| Large | `.claude/templates/tdd/e2e-test.md` | `*.spec.ts`（各アプリの e2e） |
+
+実行: ユニット `bun run test`、統合 `bun run integration`、E2E `bun run e2e`。詳細は `docs/testing/testing-strategy.md` と `docs/testing/testing-guide.md` を参照。
 
 ## 関連リソース
 

@@ -126,7 +126,7 @@ Large Tests は `docs/user-stories/` 内のユーザーストーリーと1:1で�
 - **出力先**: `apps/e2e/public/reports/coverage/{project}/`（Test Portalで表示）
 
 実行: `bun run coverage`。  
-特定パッケージは `turbo run coverage --filter=@portfolio/...`。  
+特定パッケージは `bun run coverage --filter=@portfolio/...`。  
 詳細はルートの `package.json` を参照。
 
 ## 統合テスト

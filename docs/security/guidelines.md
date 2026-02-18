@@ -103,7 +103,8 @@ const API_KEY = "sk_live_1234567890";
 const API_KEY = process.env.API_KEY;
 
 # ✅ 安全: Cloudflareシークレット
-wrangler secret put API_KEY
+# Cloudflare環境変数は env.yaml から設定、または bun run で実行
+# （詳細は scripts/command-addition-list.md の TODO 参照）
 ```
 
 ### .gitignoreの必須項目

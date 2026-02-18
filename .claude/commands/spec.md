@@ -30,22 +30,8 @@
 2. 対象コードを分析
 3. シーケンス図を作成
 
-```bash
-# テンプレート確認
-cat .claude/templates/sdd/sequence-diagram.md
-
-# 対象コード確認
-cat apps/api/src/interface/rest/{domain}.ts
-cat apps/api/src/application/usecases/{domain}/
-```
-
-### シーケンス図の出力先
-
-```text
-docs/sequence/api/{domain}/{operation}.md
-docs/sequence/web/{feature}/{page}.md
-docs/sequence/admin/{feature}/{page}.md
-```
+対象コードは `apps/api/src/`（DDD の interface / application 等）を参照すること。  
+出力先は `docs/sequence/api|web|admin/{domain|feature}/{operation|page}.md`。
 
 ## API仕様書作成
 
@@ -77,10 +63,7 @@ docs/specs/api/{domain}.md
 2. Prismaスキーマを分析
 3. 仕様書を作成
 
-```bash
-# Prismaスキーマ確認
-cat packages/db/prisma/schema/{domain}.prisma
-```
+Prisma スキーマは `packages/db/prisma/schema/` を参照すること。
 
 ### DB仕様書の出力先
 

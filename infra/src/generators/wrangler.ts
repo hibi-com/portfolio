@@ -70,24 +70,6 @@ export function generateWranglerToml(config: WranglerConfig, outputPath: string)
     fs.writeFileSync(outputPath, content, "utf-8");
 }
 
-export function getProjectName(): string {
-    const stackConfigPath = path.join(process.cwd(), "Pulumi.rc.yaml");
-
-    if (!fs.existsSync(stackConfigPath)) {
-        throw new Error(`Pulumi stack config not found at ${stackConfigPath}`);
-    }
-
-    const content = fs.readFileSync(stackConfigPath, "utf-8");
-    const regex = /portfolio-infra:dopplerProject:\s*(.+)$/m;
-    const projectMatch = regex.exec(content);
-
-    if (!projectMatch?.[1]) {
-        throw new Error("dopplerProject not found in Pulumi.rc.yaml");
-    }
-
-    return projectMatch[1].trim();
-}
-
 export function getCompatibilityDate(): string {
     return "2025-11-17";
 }

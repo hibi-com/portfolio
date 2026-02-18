@@ -24,50 +24,27 @@
 2. 関連コードの特定
 3. 根本原因の分析
 
-```bash
-# ログの確認
-grep -r "error" apps/api/logs/
-
-# 関連コードの検索
-grep -r "{error-keyword}" apps/
-```
+ログは `logs/`（ルート）または実行環境のログ出力先を確認する。  
+関連コードは grep で `apps/`・`packages/` を検索する。  
+詳細は `docs/development/troubleshooting.md` を参照。
 
 ### Step 2: 再現テストの作成
 
-**参照ルール**: `.claude/rules/testing.md`
+**参照ルール**: `.claude/rules/testing.md`、`docs/testing/testing-guide.md`
 
-1. バグを再現するテストを作成
+1. バグを再現するテストを作成（Given/When/Then）
 2. テストが失敗することを確認（バグの証明）
 
 **使用エージェント**: `unit-test-agent`
 **使用テンプレート**: `.claude/templates/tdd/unit-test.md`
 
-```typescript
-test("バグ: {description}", () => {
-    // Given: バグが発生する条件
-    const input = /* バグを引き起こす入力 */;
-
-    // When: 操作
-    const result = /* バグが発生する操作 */;
-
-    // Then: 期待される正しい動作（現在は失敗する）
-    expect(result).toBe(/* 期待値 */);
-});
-```
-
 ### Step 3: 修正実装
 
 **参照ルール**: `.claude/rules/debugging.md`
 
-1. デバッグログを埋め込み（`[DEBUG_TRACE]`）
-2. 原因を特定
-3. 最小限の修正を実装
-4. デバッグログを削除
-
-```typescript
-console.log(`[DEBUG_TRACE] >>> ENTRY: functionName(arg=${arg})`);
-console.log(`[DEBUG_TRACE] >>> STATE: status=${status}`);
-```
+1. 必要に応じてデバッグログで原因を特定
+2. 最小限の修正を実装
+3. デバッグログは本番に残さない（コミット前に削除）
 
 ### Step 4: 修正確認
 
@@ -76,12 +53,8 @@ console.log(`[DEBUG_TRACE] >>> STATE: status=${status}`);
 1. 再現テストが通過することを確認
 2. 他のテストが壊れていないことを確認
 
-```bash
-bun run test
-
-# 特定パッケージ
-bun run test --filter={package}
-```
+`bun run test` で全テスト。  
+特定パッケージは `bun run test -- --filter=@portfolio/パッケージ名`。
 
 ### Step 5: レビュー
 
@@ -91,10 +64,8 @@ bun run test --filter={package}
 1. 修正内容のセルフレビュー
 2. リント・フォーマットチェック
 
-```bash
-bun run lint
-bun run fmt
-```
+`bun run lint`、`bun run fmt`。  
+一括は `bun run check`。
 
 ## 関連リソース
 

@@ -34,26 +34,26 @@ title: "モノレポ管理ガイド"
 
 ```bash
 # すべてのワークスペースをビルド
-turbo run build
+bun run build
 
 # 特定のワークスペースのみビルド
-turbo run build --filter=@portfolio/web
+bun run build --filter=@portfolio/web
 
 # 依存関係も含めてビルド
-turbo run build --filter=@portfolio/web...
+bun run build --filter=@portfolio/web...
 ```
 
 ### テスト
 
 ```bash
 # すべてのワークスペースのテストを実行
-turbo run test
+bun run test
 
 # 特定のワークスペースのテストのみ実行
-turbo run test --filter=@portfolio/web
+bun run test --filter=@portfolio/web
 
 # 変更されたワークスペースのテストのみ実行
-turbo run test --filter=...[origin/main]
+bun run test --filter=...[origin/main]
 ```
 
 ### 開発サーバー
@@ -63,7 +63,7 @@ turbo run test --filter=...[origin/main]
 bun run dev
 
 # 特定のワークスペースの開発サーバーのみ起動
-turbo run dev --filter=@portfolio/web
+bun run dev --filter=@portfolio/web
 ```
 
 ### キャッシュの活用
@@ -75,10 +75,10 @@ Turborepoは、ビルド結果をキャッシュして高速化します。
 rm -rf .turbo
 
 # キャッシュを無視してビルド
-turbo run build --force
+bun run build --force
 
 # キャッシュの状態を確認
-turbo run build --dry-run
+bun run build --dry-run
 ```
 
 ## Bun Workspaces の基本操作
@@ -179,7 +179,7 @@ bun remove --filter @portfolio/web package-name
 
 ```bash
 # パッケージの場所を検索
-turbo run where @portfolio/web
+bun run where @portfolio/web
 
 # または、bunを使用
 bun pm ls | grep @portfolio/web
@@ -282,23 +282,23 @@ Biomeは、フォーマットとリントを統合したツールです。
 
 ```bash
 # すべてのワークスペースをフォーマット
-turbo run fmt
+bun run fmt
 
 # 特定のワークスペースのみフォーマット
-turbo run fmt --filter=@portfolio/web
+bun run fmt --filter=@portfolio/web
 
 # リントチェック
-turbo run lint
+bun run lint
 ```
 
 ### TypeScript
 
 ```bash
 # すべてのワークスペースの型チェック
-turbo run typecheck
+bun run typecheck
 
 # 特定のワークスペースのみ型チェック
-turbo run typecheck --filter=@portfolio/web
+bun run typecheck --filter=@portfolio/web
 ```
 
 ## デバッグ
@@ -307,13 +307,13 @@ turbo run typecheck --filter=@portfolio/web
 
 ```bash
 # 詳細なログを出力
-turbo run build --verbose
+bun run build --verbose
 
 # ビルドグラフを表示
-turbo run build --graph
+bun run build --graph
 
 # 実行されるタスクを確認（実際には実行しない）
-turbo run build --dry-run
+bun run build --dry-run
 ```
 
 ### 依存関係のデバッグ
@@ -337,7 +337,7 @@ Turborepoのキャッシュを最大限に活用します。
 # Vercelやその他のサービスを使用
 
 # キャッシュの状態を確認
-turbo run build --dry-run
+bun run build --dry-run
 ```
 
 ### 並列実行
@@ -377,7 +377,7 @@ rm -rf node_modules
 bun install
 
 # 再ビルド
-turbo run build
+bun run build
 ```
 
 ### 循環依存

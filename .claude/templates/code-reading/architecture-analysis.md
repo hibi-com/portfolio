@@ -84,7 +84,7 @@ app/
 
 ```bash
 # 依存関係グラフ
-turbo run build --graph
+bun run build --graph
 ```
 
 #### 依存関係図

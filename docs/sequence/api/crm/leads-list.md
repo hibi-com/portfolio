@@ -11,7 +11,7 @@ sequenceDiagram
     participant Auth as Auth Middleware
     participant UseCase as ListLeadsUseCase
     participant Repository as LeadRepository
-    participant DB as D1 Database
+    participant DB as TiDB Database
 
     Client->>API: GET /api/crm/leads?status=NEW&limit=20
     API->>Auth: 認証チェック

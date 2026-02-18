@@ -15,7 +15,6 @@ color: red
 
 ```text
 docs/security/guidelines.md
-docs/security/owasp-checklist.md
 ```
 
 ## 役割
@@ -85,8 +84,8 @@ trivy fs --severity HIGH,CRITICAL .
 # シークレットスキャン
 gitleaks detect --source . --verbose
 
-# npm audit (互換性チェック)
-npm audit --audit-level=moderate
+# 依存関係監査
+# 監査は bun run audit で実行（scripts/command-addition-list.md の TODO 参照）
 ```
 
 ## 脆弱性報告フォーマット

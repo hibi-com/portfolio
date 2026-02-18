@@ -12,7 +12,7 @@ sequenceDiagram
     participant Container as DIContainer
     participant UseCase as CreateInquiryUseCase
     participant Repository as InquiryRepository
-    participant DB as D1 Database
+    participant DB as TiDB Database
 
     Client->>API: POST /api/support/inquiries
     API->>Validation: validateCreateInquiryInput(body)

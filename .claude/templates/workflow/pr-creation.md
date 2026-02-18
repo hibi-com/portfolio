@@ -166,7 +166,7 @@ PRを作成する前に、以下を確認:
 gh run list --workflow=deploy
 
 # 本番ログ確認
-wrangler tail --format=pretty
+# ログ監視は bun run 経由で実行（scripts/command-addition-list.md の TODO 参照）
 ```
 
 ## 出力フォーマット

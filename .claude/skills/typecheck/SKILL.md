@@ -26,12 +26,12 @@ TypeScript型チェックを実行します。
 bun run typecheck
 
 # 特定アプリ/パッケージ
-turbo run typecheck --filter=@portfolio/api
-turbo run typecheck --filter=@portfolio/web
-turbo run typecheck --filter=@portfolio/db
+bun run typecheck --filter=@portfolio/api
+bun run typecheck --filter=@portfolio/web
+bun run typecheck --filter=@portfolio/db
 
 # 依存パッケージ含む
-turbo run typecheck --filter=@portfolio/api...
+bun run typecheck --filter=@portfolio/api...
 ```
 
 ## パッケージ一覧

@@ -13,7 +13,7 @@ sequenceDiagram
     participant Container as DIContainer
     participant UseCase as CreateCustomerUseCase
     participant Repository as CustomerRepository
-    participant DB as D1 Database
+    participant DB as TiDB Database
 
     Client->>API: POST /api/crm/customers
     API->>Auth: authenticate()

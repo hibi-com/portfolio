@@ -300,22 +300,6 @@ jobs:
             bun add -g wrangler@latest
             wrangler --version
       - run:
-          name: Install Doppler CLI with retry
-          command: |
-            for i in 1 2 3; do
-              if sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates gnupg curl; then
-                if curl -sLf --retry 3 --tlsv1.2 --proto "=https" 'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | sudo gpg --dearmor -o /usr/share/keyrings/doppler-archive-keyring.gpg; then
-                  echo "deb [signed-by=/usr/share/keyrings/doppler-archive-keyring.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" | sudo tee /etc/apt/sources.list.d/doppler-cli.list
-                  if sudo apt-get update && sudo apt-get install -y doppler; then
-                    doppler --version
-                    break
-                  fi
-                fi
-              fi
-              echo "Attempt $i failed, retrying..."
-              sleep 5
-            done
-      - run:
           name: Setup Cloudflare credentials
           command: |
             export CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN}"

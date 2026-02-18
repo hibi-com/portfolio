@@ -25,25 +25,17 @@
 
 ### アーキテクチャ分析の実行手順
 
-1. ディレクトリ構造の把握
+1. ディレクトリ構造の把握（`docs/architecture/overview.md` およびリポジトリの `apps/`・`packages/` を参照）
 2. レイヤー間依存関係の確認
-3. パッケージ構成の分析
-
-```bash
-# ディレクトリ構造
-tree -L 3 apps/ packages/
-
-# パッケージ依存関係
-cat package.json
-cat apps/*/package.json
-```
+3. パッケージ構成の分析（ルートと各アプリの `package.json`）
 
 ### 参照ドキュメント
 
-- `docs/architecture/` - 既存アーキテクチャドキュメント
-- `.claude/rules/api.md` - API（Hono + DDD）ルール
-- `.claude/rules/web.md` - Web（Remix + FSD）ルール
-- `.claude/rules/admin.md` - Admin（TanStack Router + FSD）ルール
+- `docs/architecture/` - アーキテクチャ
+- `docs/index.md` - ドキュメントマップ
+- `.claude/rules/api.md` - API（Hono + DDD）
+- `.claude/rules/web.md` - Web（Remix + FSD）
+- `.claude/rules/admin.md` - Admin（TanStack Router + FSD）
 
 ## 依存関係分析
 
@@ -55,15 +47,10 @@ cat apps/*/package.json
 
 1. インポート関係の可視化
 2. 循環依存の検出
-3. 依存方向の確認
+3. 依存方向の確認（DDD: Domain → UseCase → Infrastructure → Interface）
 
-```bash
-# 依存関係チェック
-bun run lint  # Sherif による依存関係チェック
-
-# 特定モジュールの依存を確認
-grep -r "from.*{module}" apps/
-```
+ワークスペース依存チェック: `bun run lint`（sherif 含む）。  
+特定モジュールの参照は grep で `apps/`・`packages/` を検索する。
 
 ## コード調査
 
@@ -74,16 +61,8 @@ grep -r "from.*{module}" apps/
 ### コード調査の実行手順
 
 1. エントリーポイントの特定
-2. 処理フローの追跡
-3. 関連コードの把握
-
-```bash
-# キーワード検索
-grep -r "{keyword}" apps/ packages/
-
-# ファイル検索
-find . -name "*{pattern}*"
-```
+2. 処理フローの追跡（必要に応じて `docs/sequence/` を参照）
+3. 関連コードの把握（grep で `apps/`・`packages/` を検索）
 
 ## セキュリティ分析
 

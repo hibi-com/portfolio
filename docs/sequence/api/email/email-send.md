@@ -14,7 +14,7 @@ sequenceDiagram
     participant UseCase as SendEmailUseCase
     participant Service as EmailService<br/>(Resend)
     participant Repository as EmailRepository
-    participant DB as D1 Database
+    participant DB as TiDB Database
     participant Resend as Resend API
 
     Client->>API: POST /api/email/send

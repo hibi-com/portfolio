@@ -11,7 +11,7 @@ sequenceDiagram
     participant Auth as Auth Middleware
     participant UseCase as UpdateCustomerUseCase
     participant Repository as CustomerRepository
-    participant DB as D1 Database
+    participant DB as TiDB Database
 
     Client->>API: PUT /api/crm/customers/:id
     API->>Auth: 認証チェック

@@ -28,7 +28,7 @@ bun run lint:fix
 bun run typecheck
 
 # 特定パッケージ
-turbo run lint --filter=@portfolio/{package}
+bun run lint --filter=@portfolio/{package}
 ```
 
 ## 出力フォーマット

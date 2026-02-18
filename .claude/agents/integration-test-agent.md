@@ -31,36 +31,6 @@ color: blue
 4. **配置**: `apps/api/tests/medium/{domain}/`
 5. **シーケンス図との対応**: `@sequence` JSDocを必ず記載
 
-## テンプレート（簡易版）
-
-```typescript
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { setupTestDb, teardownTestDb, seedTestData } from "../setup/db.setup";
-
-describe("{Domain} {Operation} Integration", () => {
-    beforeAll(async () => {
-        await setupTestDb();
-    });
-
-    afterAll(async () => {
-        await teardownTestDb();
-    });
-
-    describe("シーケンス: Client → API → UseCase → Repository → DB", () => {
-        test("正常系: {期待される動作}", async () => {
-            // Given: DBにデータが存在する
-            await seedTestData({ /* ... */ });
-
-            // When: APIを実行
-            const response = await /* ... */;
-
-            // Then: 期待されるレスポンス
-            expect(response.status).toBe(200);
-        });
-    });
-});
-```
-
 ## 出力フォーマット
 
 ```markdown

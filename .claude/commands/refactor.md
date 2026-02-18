@@ -23,13 +23,8 @@
 1. 対象コードのテストカバレッジを確認
 2. テストがない場合は先に追加
 
-```bash
-# カバレッジ確認
-bun run coverage
-
-# 対象ファイルのテスト確認
-ls {target-file}.test.ts
-```
+カバレッジ: `bun run coverage`。  
+対象のテストは同じディレクトリの `*.test.ts` または `docs/testing/testing-guide.md` の配置ルールを参照。
 
 ### Step 2: リファクタリング計画
 
@@ -53,10 +48,7 @@ ls {target-file}.test.ts
 2. 各変更後にテストを実行
 3. テストが失敗したら即座に修正
 
-```bash
-# 変更後のテスト実行（毎回。対象は -- で渡す）
-bun run test -- {related-tests}
-```
+変更のたびに `bun run test -- {関連テスト}` で回帰確認する。
 
 ### Step 4: 全テスト確認
 
@@ -66,11 +58,8 @@ bun run test -- {related-tests}
 2. 型チェック
 3. リントチェック
 
-```bash
-bun run test
-bun run typecheck
-bun run lint
-```
+全チェック: `bun run check`（fmt / lint / typecheck / test / knip）。  
+個別は `bun run test`、`bun run typecheck`、`bun run lint`。
 
 ### Step 5: レビュー
 

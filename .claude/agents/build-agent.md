@@ -28,19 +28,19 @@ bun run build
 
 ```bash
 # API
-turbo run build --filter=@portfolio/api
+bun run build --filter=@portfolio/api
 
 # Web
-turbo run build --filter=@portfolio/web
+bun run build --filter=@portfolio/web
 
 # Admin
-turbo run build --filter=@portfolio/admin
+bun run build --filter=@portfolio/admin
 ```
 
 ### 依存パッケージ含む
 
 ```bash
-turbo run build --filter=@portfolio/api...
+bun run build --filter=@portfolio/api...
 ```
 
 ## 型チェック
@@ -54,7 +54,7 @@ bun run typecheck
 ### 特定パッケージ
 
 ```bash
-turbo run typecheck --filter=@portfolio/{package}
+bun run typecheck --filter=@portfolio/{package}
 ```
 
 ## ビルド前チェックリスト
