@@ -13,6 +13,8 @@ logs/
 ├── deployment/        # デプロイ履歴ログ
 │   ├── README.md
 │   └── YYYY-MM-DD-{environment}.md
+├── review/            # コードレビュー結果ログ
+│   └── YYYY-MM-DD-{description}.md
 └── README.md
 ```
 
@@ -44,6 +46,22 @@ OWASP Top 10に基づくセキュリティチェックのログ。
 - **テンプレート**: `.claude/templates/deployment/deployment-log.md`
 - **内容**: デプロイ対象、実行結果、エラー、ロールバック情報
 - **重要**: **ローカルからのデプロイは禁止**
+
+### Review Logs
+
+コードレビューの結果ログ。品質・セキュリティ・パフォーマンス・アーキテクチャの観点からレビュー。
+
+- **頻度**: PR作成時、機能実装完了時、または随時
+- **作成方法**: `/review` スキルを使用
+- **テンプレート**: `.claude/templates/workflow/code-review-log.md`
+- **内容**:
+  - レビュー結果サマリー（承認/要修正/却下）
+  - クリティカル項目（即修正必須）
+  - 重要項目（修正推奨）
+  - 軽微な項目（任意）
+  - 良い点（ポジティブフィードバック）
+  - 自動チェック結果（lint, typecheck, test, coverage）
+- **参照**: [コードレビューガイド](../docs/development/code-review.md)
 
 ## 注意事項
 
