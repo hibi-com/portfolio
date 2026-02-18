@@ -11,9 +11,45 @@ description: インフラの要件と仕様を定義
 
 インフラの構成は以下の流れで管理します：
 
+```
+仕様定義（手動） → 実装（Pulumi） → 構成図生成（自動）
+   ↑                    ↑                    ↑
+   本ドキュメント      infra/            docs/architecture/
+```
+
 1. **仕様定義**（本ドキュメント） - 要件と仕様を手動で記載
 2. **実装**（`infra/`） - Pulumiで実装
 3. **自動生成**（将来実装） - Pulumiから構成図を自動生成
+
+### このドキュメントに書くべきこと
+
+**✅ 記載すべき内容**:
+- インフラの要件
+- 非機能要件（パフォーマンス、可用性など）
+- 制約事項
+- コスト試算
+- 環境構成
+- 設計判断の理由
+
+**❌ 記載不要な内容**:
+- 実際のリソース構成図（Pulumiから自動生成）
+- 現在のデプロイ状態（`pulumi stack`で確認）
+- 具体的なリソース定義（`infra/`で実装）
+
+### 構成図の自動生成
+
+以下の情報はPulumiから自動生成されます：
+
+- **ランタイム構成図** - ユーザーリクエストの流れ
+- **プロビジョニング構成図** - Pulumiのリソース作成順序
+- **リソース依存グラフ** - `pulumi stack graph` による依存関係
+
+**再生成方法**:
+```bash
+cd infra
+bun run generate:mermaid  # Mermaid図のみ生成
+bun run generate          # Pulumi stack graph も含めて全て生成（要Pulumiログイン）
+```
 
 ## 要件
 
@@ -170,6 +206,8 @@ description: インフラの要件と仕様を定義
 
 ## 参考資料
 
+- [インフラアーキテクチャ図](../../architecture/infra-architecture.md)（自動生成）
+- [APIキー・トークン発行手順](../../development/api-keys-setup.md)
 - [Cloudflare Documentation](https://developers.cloudflare.com/)
 - [TiDB Cloud Documentation](https://docs.pingcap.com/tidbcloud/)
 - [Pulumi Documentation](https://www.pulumi.com/docs/)

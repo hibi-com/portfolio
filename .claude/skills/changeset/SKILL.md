@@ -18,16 +18,20 @@ allowed-tools: Bash, Read, Write, AskUserQuestion, Glob
 ## 実行手順
 
 ### 1. 変更確認
+
 - `git status`で変更されたファイルを確認
 - ユーザーに変更内容を報告
 
 ### 2. パッケージ特定
+
 - 変更されたファイルから影響を受けるパッケージを特定
 - workspaceのpackage.jsonから全パッケージリストを取得
 - 変更されたパスからパッケージを推定
 
 ### 3. バージョンアップ種類の質問
+
 AskUserQuestionで以下を質問:
+
 - 質問: "どのバージョンアップを行いますか？"
 - 選択肢:
   - `patch` - バグ修正、ドキュメント更新
@@ -35,15 +39,19 @@ AskUserQuestionで以下を質問:
   - `major` - 破壊的変更
 
 ### 4. 変更カテゴリの質問
+
 **IMPORTANT**: `docs/development/git-commit.md`で定義されている13種類のタイプのみ使用可能
 
 AskUserQuestionで以下を質問:
+
 - 質問: "変更のカテゴリを選択してください"
 - 選択肢（13種類）: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert, improvement, security
 - 参照: `docs/development/git-commit.md` のコミットタイプ定義
 
 ### 5. サマリーの質問
+
 AskUserQuestionで以下を質問:
+
 - 質問: "変更内容のサマリーを入力してください"
 - 事前定義テンプレート（選択肢として提示）:
   - "新機能を追加"
@@ -54,8 +62,11 @@ AskUserQuestionで以下を質問:
   - "リファクタリングを実施"
 
 ### 6. Changesetファイル生成
+
 - ランダムなファイル名生成（例: `random-word-word.md`）
+
 - 以下のフォーマットでファイル作成:
+
   ```markdown
   ---
   "@portfolio/package-name": バージョン種類
@@ -65,6 +76,7 @@ AskUserQuestionで以下を質問:
   ```
 
 ### 7. コミット
+
 - `git add .changeset/ファイル名.md`
 - `git commit -m "changeset: サマリー"`
 

@@ -88,6 +88,7 @@ REST APIのエンドポイント、リクエスト/レスポンス形式を定�
 
 ## 関連ドキュメント
 
-- [仕様駆動開発ルール](../.claude/rules/spec-driven.md)
-- [テンプレート一覧](../.claude/templates/)
-- [開発ワークフロー](../development/workflow.md)
+- [仕様駆動開発ルール](../../.claude/rules/spec-driven.md)
+- [テンプレート一覧](../../.claude/templates/)
+- [モノレポ管理](../development/monorepo-management.md)
+- [CI/CDツール](../development/ci-cd-tools.md)
