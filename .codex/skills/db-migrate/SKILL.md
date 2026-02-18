@@ -1,1 +1,0 @@
-../../../.claude/skills/db-migrate/SKILL.md

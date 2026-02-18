@@ -32,27 +32,6 @@ packages/db/prisma/schema/
 └── integration.prisma  # 外部連携
 ```
 
-## マイグレーションコマンド
-
-### 基本コマンド
-
-```bash
-# ステータス確認
-bun --cwd packages/db x prisma migrate status
-
-# 開発用マイグレーション（新規作成・適用）
-bun --cwd packages/db x prisma migrate dev --name {migration-name}
-
-# 本番適用
-bun --cwd packages/db x prisma migrate deploy
-
-# DBリセット（開発用のみ）
-bun --cwd packages/db x prisma migrate reset
-
-# スキーマバリデーション
-bun --cwd packages/db x prisma validate
-```
-
 ### 型生成
 
 ```bash
@@ -82,7 +61,7 @@ bun --cwd packages/db x prisma validate
 
 ```bash
 # マイグレーションファイルを生成してDBに適用
-bun --cwd packages/db x prisma migrate dev --name add-user-role
+bun --cwd packages/db x prisma migrate
 ```
 
 これにより以下が実行されます：
@@ -106,19 +85,9 @@ git add packages/db/prisma/schema/ packages/db/prisma/migrations/
 git commit -m "feat(db): ユーザーロール機能を追加"
 ```
 
-## 本番環境へのデプロイ
-
-### CI/CDでのマイグレーション適用
-
-```bash
-# 本番DBにマイグレーション適用
-bun --cwd packages/db x prisma migrate deploy
-```
-
 **注意**:
 
-- `migrate deploy` は既存のマイグレーションファイルのみを適用
-- 新規マイグレーションは事前に `migrate dev` で作成しておく必要がある
+- 新規マイグレーションは事前に `migrate` で作成しておく必要がある
 - ロールバックは自動化されていないため、慎重に実行
 
 ## トラブルシューティング
@@ -128,9 +97,6 @@ bun --cwd packages/db x prisma migrate deploy
 ```bash
 # マイグレーション履歴を確認
 bun --cwd packages/db x prisma migrate status
-
-# 開発環境でリセット（データ削除）
-bun --cwd packages/db x prisma migrate reset
 ```
 
 ### 型生成が反映されない
@@ -163,9 +129,3 @@ DB仕様書とPrismaスキーマは1:1で対応しています。変更時は両
 - [Prismaドキュメント](https://www.prisma.io/docs/)
 - [TiDB Cloud](https://docs.pingcap.com/tidbcloud/)
 - [インフラ仕様書](../specs/infra/overview.md) - データベース要件
-
-## スキル
-
-データベース操作は以下のスキルを使用：
-
-- `/db-migrate` - マイグレーション実行

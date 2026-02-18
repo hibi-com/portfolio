@@ -156,7 +156,7 @@ sequenceDiagram
 | 種類 | リソース |
 | ---- | -------- |
 | コマンド | `/spec`, `/implement` |
-| スキル | `/sequence-diagram`, `/db-migrate` |
+| スキル | `/sequence-diagram` |
 | テンプレート | `sdd/sequence-diagram.md`, `sdd/api-spec.md`, `sdd/db-spec.md`, `sdd/user-story.md` |
 | ルール | `spec-driven.md`, `sequence.md`, `api.md` |
 | ドキュメント | `docs/development/api-design.md` |

@@ -53,9 +53,8 @@ docs/specs/api/{domain}.md
 
 ## DB仕様書作成
 
-**使用エージェント**: `spec-writer-agent`, `db-migration-agent`
+**使用エージェント**: `spec-writer-agent`
 **使用テンプレート**: `.claude/templates/sdd/db-spec.md`
-**使用スキル**: `/db-migrate`
 
 ### DB仕様書の手順
 
@@ -104,7 +103,7 @@ docs/user-stories/{persona}/{story-name}.md
 | ルール | `spec-driven.md`, `sequence.md`, `api.md` |
 | テンプレート | `sdd/sequence-diagram.md`, `sdd/api-spec.md`, `sdd/db-spec.md`, `sdd/user-story.md` |
 | エージェント | `spec-writer-agent`, `db-migration-agent` |
-| スキル | `/sequence-diagram`, `/db-migrate` |
+| スキル | `/sequence-diagram` |
 
 ## 出力フォーマット
 

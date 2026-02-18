@@ -65,7 +65,6 @@ logs/
 | `/unit-test` | `docs/testing/testing-strategy.md`, `testing-guide.md` |
 | `/integration-test` | `docs/testing/testing-strategy.md`, `testing-guide.md` |
 | `/e2e-test` | `docs/testing/testing-strategy.md`, `testing-guide.md`, `docs/development/e2e-docker.md` |
-| `/db-migrate` | `docs/development/database.md` |
 | `/gen-mock` | `docs/testing/testing-guide.md` |
 | `/sequence-diagram` | `docs/development/api-design.md` |
 

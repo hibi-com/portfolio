@@ -139,6 +139,10 @@ services:
       - db
     volumes:
       - type: bind
+        source: ./migration
+        target: /migration
+        read_only: true
+      - type: bind
         source: ./sql
         target: /sql
         read_only: true
@@ -152,6 +156,10 @@ services:
           exit 0;
         fi;
         for f in $$(ls /sql/*.sql 2>/dev/null | sort); do
+          echo \"Applying $$f...\";
+          mysql -h tidb -P 4000 -u user -ppassword portfolio < \"$$f\" || exit 1;
+        done &&
+        for f in $$(find /migration -name 'migration.sql' 2>/dev/null | sort); do
           echo \"Applying $$f...\";
           mysql -h tidb -P 4000 -u user -ppassword portfolio < \"$$f\" || exit 1;
         done &&
