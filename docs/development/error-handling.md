@@ -2,192 +2,39 @@
 title: "エラーハンドリング"
 ---
 
-## Remixのエラーバウンダリ
+フロントエンドおよび API でエラーを扱う際のルールである。  
+実装例はリポジトリの ErrorBoundary・widgets/error・ローダー/アクションを参照すること。
 
-### ErrorBoundary
+## エラーバウンダリ（Remix）
 
-- `ErrorBoundary`関数をエクスポートしてエラーを処理
-- ユーザーフレンドリーなエラーページを表示
+- **root** で **ErrorBoundary** をエクスポートし、**useRouteError** でエラーを受け取ってユーザー向けのエラーページを表示する。未処理の例外をそのまま表示しない。
+- ルート単位でも **ErrorBoundary** を定義し、そのルート固有のメッセージを出してよい。
+- エラー表示コンポーネントは **widgets/error** 等にまとめ、Response と Error の両方を扱えるようにする（status と message を表示）。
 
-```typescript
-// ✅ Good: root.tsx
-export function ErrorBoundary() {
-    const error = useRouteError();
+## ローダー内のエラー
 
-    return (
-        <html lang="en">
-            <head>
-                <Meta />
-                <Links />
-            </head>
-            <body data-theme="dark">
-                <ErrorPage error={error as ErrorProps["error"]} />
-                <ScrollRestoration />
-                <Scripts />
-            </body>
-        </html>
-    );
-}
-```
+- データ取得失敗・不正なパラメータは **throw new Response(..., { status: 400 | 404 | 500 })** で返す。空の JSON で 200 を返してはならない。
+- バリデーション（Zod 等）でパラメータを検証し、失敗時は 400 で返す。エラーメッセージはユーザーに分かる文言にする。
+- try-catch で例外を捕捉し、適切なステータスで Response を throw する。握りつぶして 200 を返さない。
 
-### ルートレベルのエラーハンドリング
+## アクション（フォーム）のエラー
 
-- 各ルートで`ErrorBoundary`を定義可能
-- 特定のページでカスタムエラーハンドリング
+- バリデーション失敗時は **json({ errors: ... }, { status: 400 })** を返す。**useActionData** で errors を受け取り、フィールド横に表示する。
+- サーバーエラー時は 500 とメッセージを返し、画面で「しばらくして再試行」等を表示する。
 
-```typescript
-// ✅ Good: routes/blog.$slug.tsx
-export function ErrorBoundary() {
-    const error = useRouteError();
+## 非同期・API 呼び出し
 
-    return (
-        <div>
-            <h1>ブログ記事の読み込みに失敗しました</h1>
-            <p>{error.message}</p>
-        </div>
-    );
-}
-```
+- **async/await** を使い、失敗時は try-catch で処理する。**response.ok** が false の場合はエラーとして扱い、ステータスに応じてメッセージを出す。
+- エラーはログに残し、本番ではユーザーにスタックトレースや内部詳細を見せない。
 
-## ローダーでのエラーハンドリング
+## 本番環境のログ
 
-### try-catch
+- エラーバウンダリや API クライアントで捕捉したエラーは、本番では Sentry 等に送信する。**process.env.NODE_ENV === "production"** のときのみ送信する等、環境で分岐する。
+- ユーザーには「問題が発生しました」等の一般的なメッセージのみ表示する。
 
-- ローダー内でエラーをキャッチ
-- 適切なHTTPステータスコードを返す
+## 禁止事項
 
-```typescript
-// ✅ Good
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-    try {
-        const data = await fetchData(params.slug);
-        return json({ data });
-    } catch (error) {
-        throw new Response("Not Found", { status: 404 });
-    }
-};
-```
-
-### バリデーションエラー
-
-- Zodなどのバリデーションライブラリを使用
-- エラーメッセージをユーザーに表示
-
-```typescript
-import { z } from "zod";
-
-const schema = z.object({
-    slug: z.string().min(1),
-});
-
-// ✅ Good
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-    const result = schema.safeParse(params);
-
-    if (!result.success) {
-        throw new Response("Invalid parameters", { status: 400 });
-    }
-
-    // ...
-};
-```
-
-## アクションでのエラーハンドリング
-
-### フォームエラー
-
-- `useActionData`でエラーを取得
-- ユーザーにエラーメッセージを表示
-
-```typescript
-// ✅ Good
-export const action = async ({ request }: ActionFunctionArgs) => {
-    const formData = await request.formData();
-    const result = schema.safeParse(Object.fromEntries(formData));
-
-    if (!result.success) {
-        return json(
-            { errors: result.error.flatten().fieldErrors },
-            { status: 400 }
-        );
-    }
-
-    // ...
-};
-
-// コンポーネント内
-const actionData = useActionData<typeof action>();
-const errors = actionData?.errors;
-```
-
-## 非同期処理のエラーハンドリング
-
-### Promiseのエラーハンドリング
-
-- `async/await`を使用
-- エラーを適切にキャッチ
-
-```typescript
-// ✅ Good
-const fetchData = async () => {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Failed to fetch data:", error);
-        throw error;
-    }
-};
-```
-
-## エラーコンポーネント
-
-### ErrorPage
-
-- 再利用可能なエラーページコンポーネント
-- `widgets/error/`に配置
-
-```typescript
-// ✅ Good: widgets/error/ui/ErrorPage.tsx
-export interface ErrorProps {
-    error: Error | Response;
-}
-
-export const ErrorPage = ({ error }: ErrorProps) => {
-    const isResponse = error instanceof Response;
-    const status = isResponse ? error.status : 500;
-    const message = isResponse ? error.statusText : error.message;
-
-    return (
-        <div>
-            <h1>{status}</h1>
-            <p>{message}</p>
-        </div>
-    );
-};
-```
-
-## エラーロギング
-
-### 本番環境でのエラーロギング
-
-- エラーを外部サービスに送信（Sentryなど）
-- ユーザーには詳細を表示しない
-
-```typescript
-// ✅ Good
-export function ErrorBoundary() {
-    const error = useRouteError();
-
-    // 本番環境でのみエラーロギング
-    if (process.env.NODE_ENV === "production") {
-        // エラーロギングサービスに送信
-        logError(error);
-    }
-
-    return <ErrorPage error={error} />;
-}
-```
+- ローダー・アクションで例外を無視して 200 を返さない。
+- バリデーションエラーを 200 で返さない（400 とする）。
+- 本番でスタックトレースや内部エラー文をそのまま表示しない。
+- ErrorBoundary を定義せずにルートを公開しない。

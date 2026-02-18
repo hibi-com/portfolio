@@ -2,211 +2,51 @@
 title: "コーディング規約"
 ---
 
+このプロジェクトで守るコーディング規約である。  
+フォーマットは Biome に従い、命名・構成は以下を優先する。
+
 ## 禁止事項
 
 | 項目 | 禁止内容 | 理由 |
 | ---- | -------- | ---- |
-| ディレクトリ名 | `utils/` | 曖昧な名前は禁止。`lib/`, `shared/`, `infra/` を使用 |
+| ディレクトリ名 | `utils/` | 曖昧な名前は禁止。`lib/`, `shared/`, `infra/` 等を使う |
 | エディタ | `vim`, `nano`, `emacs` | シェルがフリーズする |
 | Git | `git push --force` | 破壊的操作 |
 | コード | 認証情報のハードコード | セキュリティリスク |
 
-## 命名規則（概要）
-
-| 要素 | 規則 | 例 |
-| ---- | ---- | -- |
-| ファイル名 | ケバブケース | `user-service.ts` |
-| クラス名 | パスカルケース | `UserService` |
-| 関数名 | キャメルケース | `getUserById` |
-| 定数 | アッパースネークケース | `MAX_RETRY_COUNT` |
-| テストファイル | `*.test.ts` / `*.spec.ts` | `user-service.test.ts` |
-
-詳細は以下および各サブセクションを参照。
-
-## フォーマット
-
-### Biome設定
-
-- **インデント**: スペース4つ
-- **行幅**: 120文字
-- **セミコロン**: 必須
-- **クォート**: ダブルクォート（JSX含む）
-- **末尾カンマ**: あり（JavaScript/TypeScript）
-- **アロー関数の括弧**: 常に使用
-
-### コードスタイル
-
-```typescript
-// ✅ Good: セミコロンあり、末尾カンマあり
-const items = [
-    "item1",
-    "item2",
-];
-
-// ✅ Good: アロー関数に括弧を使用
-const handleClick = () => {
-    // ...
-};
-
-// ✅ Good: ダブルクォートを使用
-const message = "Hello, world!";
-```
-
 ## 命名規則
 
-### コンポーネント
+- **ファイル名**: ケバブケース（例: `user-service.ts`）。コンポーネントは PascalCase のファイル名でも可（例: `BlogPreview.tsx`）。
+- **クラス・型・インターフェース**: PascalCase。コンポーネントの Props は `Props` サフィックスを付ける。
+- **関数・変数**: camelCase。関数は動詞始まり（`handleX`, `getX`, `isX`, `hasX` 等）。
+- **定数**: UPPER_SNAKE_CASE。共有定数は `shared/config/constants.ts` 等に集約する。
+- **テストファイル**: `*.test.ts` または `*.spec.ts` とする。
 
-- **PascalCase**を使用
+## フォーマット（Biome）
 
-- ファイル名はコンポーネント名と一致させる
-
-```typescript
-// ✅ Good
-export const BlogPreview = () => {
-    // ...
-};
-
-// ファイル名: BlogPreview.tsx
-```
-
-### 変数・関数
-
-- **camelCase**を使用
-
-- 関数は動詞で始める（`handle`, `get`, `set` / `is`, `has` など）
-
-```typescript
-// ✅ Good
-const userName = "John";
-const handleSubmit = () => {};
-const getUserData = () => {};
-const isVisible = true;
-const hasPermission = false;
-```
-
-### 定数
-
-- **UPPER\_SNAKE\_CASE**を使用
-
-- `shared/config/constants.ts`に集約
-
-```typescript
-// ✅ Good
-export const SITE_TITLE = "Portfolio";
-export const SOCIAL_GITHUB = "https://github.com/...";
-```
-
-### 型・インターフェース
-
-- **PascalCase**を使用
-
-- インターフェースは`Props`サフィックスを付ける
-
-```typescript
-// ✅ Good
-export interface BlogPreviewProps {
-    title: string;
-    date: string;
-}
-
-export type UserRole = "admin" | "user";
-```
+- インデント: スペース 4 つ。行幅: 120 文字。セミコロン必須。クォートはダブル。末尾カンマあり。アロー関数の引数には括弧を付ける。
+- 設定は `biome.json` を参照し、変更はそこで行う。
 
 ## インポート順序
 
-1. 外部ライブラリ（React、Remixなど）
-2. 内部モジュール（`~/shared`, `~/features`など）
+1. 外部ライブラリ（React, Remix 等）
+2. 内部モジュール（`~/shared`, `~/features` 等）
 3. 相対インポート
-4. 型インポート（`type`キーワードを使用）
-
-```typescript
-// ✅ Good
-import { Link } from "@remix-run/react";
-import classnames from "classnames";
-
-import { BlogPreview } from "~/features/blog-preview";
-import { Button } from "@portfolio/ui";
-
-import type { BlogPreviewProps } from "~/features/blog-preview";
-```
+4. 型のみのインポート（`import type` を使う）
 
 ## TypeScript
 
-### 型定義
-
-- 厳格モードを有効化
-- `any`の使用を避ける
-- 型推論を活用するが、明示的な型も適切に使用
-
-```typescript
-// ✅ Good: 型推論を活用
-const count = 0; // number
-
-// ✅ Good: 明示的な型が必要な場合
-const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    // ...
-};
-
-// ❌ Bad: anyの使用
-const data: any = fetchData();
-```
-
-### Props型定義
-
-- コンポーネントファイル内で定義
-- `export`して再利用可能にする
-
-```typescript
-// ✅ Good
-export interface BlogPreviewProps {
-    title: string;
-    date: string;
-    className?: string;
-}
-
-export const BlogPreview = (props: BlogPreviewProps) => {
-    // ...
-};
-```
+- 厳格モードを有効にする。`any` は使わない。型推論を活かしつつ、公開 API やイベントハンドラには明示的な型を付ける。
+- Props の型はコンポーネントと同じファイルで定義し、必要なら export する。
 
 ## コメント
 
-- 複雑なロジックには説明コメントを追加
-- JSDocコメントは公開APIに使用
+- 複雑なロジックには説明コメントを付ける。公開 API には JSDoc を付ける。
 
-```typescript
-// ✅ Good: 複雑なロジックの説明
-// 日付をUTCタイムゾーンでフォーマットし、ローカルタイムゾーンに変換
-const dateString = created.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "2-digit",
-    timeZone: "UTC",
-    year: "numeric",
-});
+## ファイル構造（コンポーネント）
 
-export const BlogPreview = (props: BlogPreviewProps) => {
-    // ...
-};
-```
+- インポート → 型定義 → コンポーネント実装の順とする。デフォルトエクスポートは必要な場合のみ使う。
 
-## ファイル構造
+## 参照
 
-### コンポーネントファイル
-
-```typescript
-// 1. インポート
-import { Link } from "@remix-run/react";
-
-// 2. 型定義
-export interface ComponentProps {
-    // ...
-}
-
-// 3. コンポーネント実装
-export const Component = (props: ComponentProps) => {
-    // ...
-};
-
-// 4. デフォルトエクスポート（必要な場合のみ）
-export default Component;
-```
+- フォーマット・リントの実行は [開発ワークフロー](./workflow.md) およびルートの `package.json` を参照する。

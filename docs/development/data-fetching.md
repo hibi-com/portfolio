@@ -2,239 +2,38 @@
 title: "データフェッチング"
 ---
 
-## Remixのローダー
+Remix を用いるアプリでは、データ取得・フォーム送信・キャッシュを次のルールで行う。実装例はリポジトリの routes と shared/lib を参照すること。
 
-### 基本的なローダー
+## ローダー（loader）
 
-- `loader`関数によりサーバーサイドでデータを取得
-- `useLoaderData`によりクライアント側でデータを使用
+- ページに必要なデータは **loader** でサーバー側で取得する。クライアントでは **useLoaderData** で受け取る。
+- 複数ソースのデータは **Promise.all** で並列取得し、無駄な直列化を避ける。
+- データが無い場合は **throw new Response(..., { status: 404 })** で 404 を返す。空の JSON で誤って 200 を返さない。
+- ローダー内の例外は catch し、適切な HTTP ステータス（400 / 404 / 500）で Response を throw する。詳細は [エラーハンドリング](./error-handling.md) を参照する。
 
-```typescript
-// ✅ Good: routes/blog.$slug.tsx
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-    const post = await getPost(params.slug);
+## API クライアント
 
-    if (!post) {
-        throw new Response("Not Found", { status: 404 });
-    }
+- バックエンド API を呼ぶ場合は **Orval 生成クライアント**（またはプロジェクトで定めた API ラッパー）を使う。URL を直書きした fetch は禁止する。
+- ベース URL は環境に応じて切り替え、ローダーや shared の設定で一元管理する。実装は [API 設計ガイドライン](./api-design.md) を参照する。
 
-    return json({ post });
-};
+## フォーム・アクション（action）
 
-export default function BlogPost() {
-    const { post } = useLoaderData<typeof loader>();
-
-    return (
-        <article>
-            <h1>{post.title}</h1>
-            <div>{post.content}</div>
-        </article>
-    );
-}
-```
-
-### 並列データフェッチ
-
-- `Promise.all`で複数のデータを並列取得
-- パフォーマンスを最適化
-
-```typescript
-// ✅ Good
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-    const [post, comments, relatedPosts] = await Promise.all([
-        getPost(params.slug),
-        getComments(params.slug),
-        getRelatedPosts(params.slug),
-    ]);
-
-    return json({ post, comments, relatedPosts });
-};
-```
-
-## APIクライアント
-
-### TypeSpecでAPI型を定義
-
-- TypeSpecでAPI型を定義
-- OrvalでTypeScriptクライアントを自動生成
-- 型安全なAPI呼び出し
-
-```typescript
-// ✅ Good: shared/lib/api.ts
-import { createApiClient } from "~/shared/lib/api";
-
-export const loader = async (args: LoaderFunctionArgs) => {
-    const apiUrl = (args.context.cloudflare?.env as { VITE_API_URL?: string })?.VITE_API_URL;
-    const api = createApiClient(apiUrl);
-
-    const response = await api.posts.getPostBySlug(slug);
-    const post = response.data;
-
-    if (!post) {
-        throw new Response("Not Found", { status: 404 });
-    }
-
-    return json({ post });
-};
-```
-
-## フォーム送信
-
-### Remixのアクション
-
-- `action`関数でフォームデータを処理
-- `useActionData`でエラーや成功メッセージを取得
-
-```typescript
-// ✅ Good
-export const action = async ({ request }: ActionFunctionArgs) => {
-    const formData = await request.formData();
-    const email = formData.get("email");
-
-    // バリデーション
-    if (!email || typeof email !== "string") {
-        return json({ error: "Email is required" }, { status: 400 });
-    }
-
-    // データ処理
-    await subscribeNewsletter(email);
-
-    return json({ success: true });
-};
-
-export default function Newsletter() {
-    const actionData = useActionData<typeof action>();
-    const fetcher = useFetcher();
-
-    return (
-        <fetcher.Form method="post">
-            <input name="email" type="email" />
-            {actionData?.error && <p>{actionData.error}</p>}
-            {actionData?.success && <p>登録完了しました</p>}
-            <button type="submit">登録</button>
-        </fetcher.Form>
-    );
-}
-```
+- フォーム送信は **action** で受け、**useActionData** で結果・エラーを扱う。
+- 入力はバリデーション（Zod 等）してから処理する。失敗時は 400 とフィールド単位のエラーを返し、**useActionData** で表示する。
+- **method="post"**（または put/delete）を明示する。GET で副作用を発生させない。
 
 ## useFetcher
 
-### 非同期操作
+- ページ遷移なしの取得・送信には **useFetcher** を使う。ローディング状態は fetcher.state 等で扱う。
+- オプティミスティック UI を行う場合は、送信直後に UI を更新し、エラー時はロールバックする。
 
-- ページ遷移なしでデータを取得・送信
-- ローディング状態を管理
+## キャッシュ・ヘッダー
 
-```typescript
-// ✅ Good: テーマ切り替え
-const fetcher = useFetcher();
+- 変更頻度の低いデータには **Cache-Control** を付与する。`public, max-age=..., s-maxage=...` 等をレスポンスヘッダーで返す。Cloudflare のキャッシュを活用する。
+- セッション（テーマ等）は Cookie ベースのストレージで管理する。httpOnly, secure, sameSite を適切に設定する。実装は root の loader と createCookieSessionStorage を参照する。
 
-function toggleTheme(newTheme?: string) {
-    fetcher.submit(
-        { theme: newTheme || (theme === "dark" ? "light" : "dark") },
-        { action: "/api/set-theme", method: "post" },
-    );
-}
+## 禁止事項
 
-const theme = (fetcher.formData?.get("theme") as string) || initialTheme;
-```
-
-### オプティミスティックUI
-
-- 即座にUIを更新
-- エラー時はロールバック
-
-```typescript
-// ✅ Good
-const fetcher = useFetcher();
-
-const handleLike = () => {
-    fetcher.submit(
-        { postId },
-        { action: "/api/like", method: "post" },
-    );
-};
-
-// オプティミスティックにUIを更新
-const isLiked = fetcher.formData ? true : post.isLiked;
-```
-
-## エラーハンドリング
-
-### ローダーでのエラー
-
-- 適切なHTTPステータスコードを返す
-- エラーメッセージをユーザーに表示
-
-```typescript
-// ✅ Good
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-    try {
-        const post = await getPost(params.slug);
-
-        if (!post) {
-            throw new Response("Not Found", { status: 404 });
-        }
-
-        return json({ post });
-    } catch (error) {
-        console.error("Failed to load post:", error);
-        throw new Response("Internal Server Error", { status: 500 });
-    }
-};
-```
-
-## キャッシング
-
-### HTTPキャッシング
-
-- 静的データに適切なキャッシュヘッダーを設定
-- Cloudflare Pagesのキャッシング機能を活用
-
-```typescript
-// ✅ Good
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-    const post = await getPost(params.slug);
-
-    return json(
-        { post },
-        {
-            headers: {
-                "Cache-Control": "public, max-age=3600, s-maxage=3600",
-            },
-        },
-    );
-};
-```
-
-### セッション管理
-
-- Cookieベースのセッション管理
-- ユーザー固有のデータを保存
-
-```typescript
-// ✅ Good: root.tsx
-const { getSession, commitSession } = createCookieSessionStorage({
-    cookie: {
-        name: "__session",
-        httpOnly: true,
-        maxAge: 604_800,
-        path: "/",
-        sameSite: "lax",
-        secure: true,
-    },
-});
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-    const session = await getSession(request.headers.get("Cookie"));
-    const theme = session.get("theme") || "dark";
-
-    return json(
-        { theme },
-        {
-            headers: {
-                "Set-Cookie": await commitSession(session),
-            },
-        },
-    );
-};
-```
+- ローダーで取得すべきデータをクライアントの useEffect でだけ取得しない（SEO・初回表示を考慮する）。
+- 生の fetch で API URL を直書きしない。
+- フォーム送信結果をチェックせずに成功扱いにしない。action の戻りと actionData で必ずエラーを表示する。

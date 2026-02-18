@@ -2,360 +2,94 @@
 title: "API設計ガイドライン"
 ---
 
-このプロジェクトでは、TypeSpecで定義したOpenAPI仕様からOrvalでTypeScriptクライアントを生成し、HonoでREST APIエンドポイントを実装しています。
+このドキュメントは、本プロジェクトの REST API 設計と実装に適用する**必須のガイドライン**である。  
+TypeSpec で OpenAPI 仕様を定義し、Orval で TypeScript クライアントを生成、Hono でエンドポイントを実装する構成を前提とする。  
+実装の詳細はリポジトリの `packages/api`・`apps/api` を参照すること。
 
-## アーキテクチャ概要
+## 方針と責務
 
-- **API仕様**: TypeSpecで定義し、OpenAPI仕様を生成
-- **クライアント生成**: OrvalでOpenAPI仕様からTypeScriptクライアントを生成（axios使用）
-- **バックエンド**: HonoでREST APIエンドポイント実装（BFFとして機能）
+- **API 仕様は TypeSpec で一元定義する**。OpenAPI は TypeSpec の emit 結果とし、手書きの OpenAPI ファイルで仕様を管理しない。
+- **クライアントは Orval で生成する**。生成元は OpenAPI 仕様のみとし、生成物は `packages/api` の生成ディレクトリに出力する。
+- **エンドポイントは Hono で実装する**。BFF としてフロントから呼ばれる REST は、すべて Hono のルーターで定義する。
 
-## REST APIエンドポイント
+## REST API の設計ルール
 
-### Posts API
+### エンドポイント
 
-- `GET /api/posts` - 投稿一覧取得
-- `GET /api/post/:slug` - 投稿詳細取得
+- 一覧取得は複数形のリソース名（例: `/api/posts`）とし、GET で取得する。
+- 単一取得はスラッグまたは ID をパスに含める（例: `/api/post/:slug`）。クエリのみで ID を渡す設計は避ける。
+- 新規作成・更新・削除は、HTTP メソッド（POST / PUT または PATCH / DELETE）とパスで一意に決まるようにする。
+- エンドポイント一覧と役割は `docs/specs/api/` および TypeSpec のルート定義を参照すること。
 
-### Portfolios API
+### 必須とする仕様化
 
-- `GET /api/portfolios` - ポートフォリオ一覧取得
-- `GET /api/portfolio/:slug` - ポートフォリオ詳細取得
+- 各オペレーションにルート・メソッド・要約を TypeSpec で明示する。未定義のエンドポイントを実装してはならない。
+- リクエスト・レスポンスの型は TypeSpec のモデルで定義する。レスポンスに「任意の JSON」を返す仕様は禁止する。
+- エラー応答も TypeSpec またはプロジェクト共通のエラー形式（`docs/specs/error-codes.md`）に従い、仕様に含める。
 
-## TypeSpecスキーマ定義
+## エラーハンドリング（必須）
 
-### エンドポイント定義
+### レスポンス形式
 
-```typescript
-// packages/api/src/schema/models/api.tsp
-@route("/api")
-namespace Posts {
-    @get
-    @route("/posts")
-    @summary("Get all posts")
-    op listPosts(): Post[];
+- エラー時は JSON で `error`（必須）と、必要に応じて `details` を返す。クライアントが原因を判別できるメッセージを返すこと。
+- 成功時とエラー時でフィールド構成を揃え、クライアントが `error` の有無で判定できるようにする。
 
-    @get
-    @route("/post/{slug}")
-    @summary("Get a post by slug")
-    op getPostBySlug(@path slug: string): Post | ErrorResponse;
-}
-```
+### HTTP ステータスコード
 
-### モデル定義
+- **200**: 成功。body に仕様通りのデータを返す。
+- **400**: クライアント起因の不正（バリデーションエラー、不正なスラッグ等）。`error` で理由を明示する。
+- **404**: 指定したリソースが存在しない。汎用メッセージではなく「どのリソースが無いか」が分かる文言とする。
+- **500**: サーバー内部エラー。本番では `details` に機密を含めない。ログには必ず記録する。
 
-```typescript
-// packages/api/src/schema/models/post.tsp
-model Post {
-    id: string;
-    title: string;
-    slug: string;
-    date: string;
-    description?: string;
-    content: PostContent;
-    imageTemp: string;
-    tags: string[];
-    sticky: boolean;
-    intro?: string;
-    createdAt?: string;
-    updatedAt?: string;
-    images?: Asset[];
-}
-```
+### 禁止事項
 
-## Orval設定
-
-`packages/api/orval.config.ts` でOrvalの設定を定義しています。
-
-```typescript
-// packages/api/orval.config.ts
-import type { Config } from "orval";
-
-const config: Config = {
-    api: {
-        input: {
-            target: "../../apps/wiki/reference/openapi.yaml",
-        },
-        output: {
-            target: "./src/generated/api.ts",
-            client: "axios",
-            httpClient: "axios",
-            mode: "tags-split",
-            override: {
-                mutator: {
-                    path: "./src/generated/mutator.ts",
-                    name: "customInstance",
-                },
-            },
-        },
-    },
-};
-
-export default config;
-```
-
-### クライアント生成
-
-```bash
-# TypeSpecからOpenAPI仕様を生成し、Orvalでクライアントを生成
-cd packages/api
-bun run generate
-# orval.config.tsはpackages/apiディレクトリに配置されています
-```
-
-## Hono REST API実装
-
-### エンドポイントハンドラー
-
-```typescript
-// apps/api/src/interface/rest/posts.ts
-import type { Context } from "hono";
-import { DIContainer } from "~/di/container";
-
-export async function getPosts(c: Context) {
-    const db = c.env.DB;
-    if (!db) {
-        return c.json({ error: "Database not available" }, 500);
-    }
-
-    try {
-        const container = new DIContainer(db);
-        const useCase = container.getGetPostsUseCase();
-        const posts = await useCase.execute();
-
-        if (!posts || posts.length === 0) {
-            return c.json({ error: "Posts not found" }, 404);
-        }
-
-        return c.json(posts);
-    } catch (error) {
-        console.error("Error fetching posts:", error);
-        return c.json(
-            {
-                error: "Failed to fetch posts",
-                details: error instanceof Error ? error.message : String(error),
-            },
-            500,
-        );
-    }
-}
-```
-
-### ルーター統合
-
-```typescript
-// apps/api/src/interface/rest/index.ts
-import { Hono } from "hono";
-import { getPortfolioBySlug, getPortfolios } from "./portfolios";
-import { getPostBySlug, getPosts } from "./posts";
-
-export const restRouter = new Hono();
-
-restRouter.get("/posts", getPosts);
-restRouter.get("/post/:slug", getPostBySlug);
-restRouter.get("/portfolios", getPortfolios);
-restRouter.get("/portfolio/:slug", getPortfolioBySlug);
-```
-
-## クライアント側の使用
-
-### APIクライアントの作成
-
-```typescript
-// apps/web/app/shared/lib/api.ts
-import { PostsApi, PortfoliosApi } from "@portfolio/api/generated/api";
-import { customInstance } from "@portfolio/api/generated/mutator";
-
-export const createApiClient = (apiUrl?: string) => {
-    const baseURL = getBaseUrl(apiUrl);
-    return {
-        posts: new PostsApi(undefined, baseURL, customInstance as never),
-        portfolios: new PortfoliosApi(undefined, baseURL, customInstance as never),
-    };
-};
-```
-
-### 使用例
-
-```typescript
-// apps/web/app/shared/api/blog.ts
-import { createApiClient } from "~/shared/lib/api";
-
-export const loader: LoaderFunction = async (args) => {
-    const apiUrl = (args.context.cloudflare?.env as { VITE_API_URL?: string })?.VITE_API_URL;
-    const api = createApiClient(apiUrl);
-
-    const response = await api.posts.listPosts();
-    const posts = response.data as Post[];
-
-    return Response.json({ posts, tags });
-};
-```
-
-## エラーハンドリング
-
-### エラーレスポンス形式
-
-```typescript
-{
-    error: string;
-    details?: unknown;
-}
-```
-
-### ステータスコード
-
-- `200` - 成功
-- `400` - バリデーションエラー（Invalid slugなど）
-- `404` - リソース未検出
-- `500` - サーバーエラー
-
-### エラーハンドリングの実装
-
-```typescript
-export async function getPostBySlug(c: Context) {
-    const slug = c.req.param("slug");
-    if (!slug) {
-        return c.json({ error: "Invalid slug" }, 400);
-    }
-
-    try {
-        const post = await useCase.execute(slug);
-        if (!post) {
-            return c.json({ error: "Post not found" }, 404);
-        }
-        return c.json(post);
-    } catch (error) {
-        return c.json(
-            {
-                error: "Failed to fetch post",
-                details: error instanceof Error ? error.message : String(error),
-            },
-            500,
-        );
-    }
-}
-```
+- 曖昧なエラーメッセージ（例: `"Error"` のみ）を返してはならない。
+- クライアントの入力不備とサーバー障害を同じステータスで返してはならない（400 と 500 を区別する）。
+- 例外を握りつぶして 200 を返してはならない。失敗時は必ず適切な 4xx/5xx とエラー body を返す。
 
 ## 入力バリデーション
 
-### Zodスキーマの使用
+- パスパラメータ・クエリ・body は、TypeSpec およびサーバー側で一貫したルールで検証する。
+- スラッグなど識別子は、許可する文字・形式を仕様と実装の両方で定義し、不正な値は 400 で拒否する。
+- サーバー側のバリデーションは `packages/validation` または `apps/api` の検証ロジックを参照し、Zod 等で仕様と整合させる。
 
-クライアント側では、Orval生成クライアントが型安全性を提供します。サーバー側では、必要に応じてZodスキーマを使用してバリデーションを行います。
+## 実装の責務
 
-```typescript
-// apps/web/app/shared/validation.ts
-import { z } from "zod";
+### エンドポイントハンドラー
 
-export const slugSchema = z.string().min(1).regex(/^[a-z0-9-]+$/);
-```
+- ハンドラー内で DB や UseCase の有無を確認し、利用できない場合は 500 を返す。未チェックの null 参照を返してはならない。
+- UseCase の実行結果に応じて、存在しない場合は 404、バリデーション違反は 400、それ以外の例外はログを取ったうえで 500 とエラー body を返す。
+- 成功時は TypeSpec/OpenAPI で定義した型に沿った JSON のみを返す。余計なフィールドを追加しない。
+
+### ルーター
+
+- ルートと HTTP メソッドは TypeSpec の定義と一致させる。未定義のパスを公開してはならない。
+- ルーターの統合場所は `apps/api` の REST 用エントリを参照すること。
+
+### クライアント利用
+
+- フロント・BFF から API を呼ぶ場合は、Orval 生成クライアントを利用する。生の fetch/axios で URL を直書きしてはならない（生成クライアントのラッパーで URL を集約する）。
+- ベース URL は環境に応じて切り替え、生成クライアントの設定（mutator 等）で一元管理する。実装は `packages/api` の生成物と各アプリの API ラッパーを参照すること。
 
 ## 型の共有
 
-### 生成された型定義
+- リクエスト・レスポンスの型は OpenAPI 由来の生成型を使う。クライアント・サーバー間で別定義の型を「同じ」として扱ってはならない。
+- 生成型は `packages/api` の生成出力から export し、他パッケージはそこから import する。型の二重定義をしない。
 
-Orvalで生成されたクライアントには、OpenAPI仕様から型定義が自動的に含まれます。
+## ログと観測性
 
-```typescript
-// packages/api/src/generated/api.ts (自動生成)
-export interface Post {
-    id: string;
-    title: string;
-    slug: string;
-    // ...
-}
-```
-
-### 型の使用
-
-```typescript
-import type { Post } from "@portfolio/api/generated/api";
-
-const response = await api.posts.listPosts();
-const posts = response.data as Post[];
-```
-
-## ベストプラクティス
-
-### 1. エラーメッセージの明確化
-
-```typescript
-// ✅ Good: 明確なエラーメッセージ
-return c.json({ error: "Post not found" }, 404);
-
-// ❌ Bad: 曖昧なエラーメッセージ
-return c.json({ error: "Error" }, 404);
-```
-
-### 2. 適切なHTTPステータスコードの使用
-
-```typescript
-// リソースが見つからない場合
-return c.json({ error: "Post not found" }, 404);
-
-// バリデーションエラーの場合
-return c.json({ error: "Invalid slug" }, 400);
-
-// サーバーエラーの場合
-return c.json({ error: "Internal server error" }, 500);
-```
-
-### 3. ログの記録
-
-```typescript
-try {
-    const posts = await useCase.execute();
-    return c.json(posts);
-} catch (error) {
-    console.error("Error fetching posts:", error);
-    return c.json({ error: "Failed to fetch posts" }, 500);
-}
-```
+- エラー時（特に 500 にした場合）は、必ずサーバー側でログに記録する。スタックトレースやリクエスト識別子を含め、本番では機密をマスクする。
+- エラーレスポンスの `details` に、本番で機密情報（DB 内部、内部ホスト名等）を出さない。
 
 ## テスト
 
-### E2Eテスト
+- API の振る舞い（ステータスコード・body の形）は E2E または統合テストで検証する。テストは `docs/testing/testing-guide.md` に従い、仕様・シーケンスと対応させる。
+- モックが必要な場合は MSW 等でハンドラーを定義し、生成クライアントと同じエンドポイント・形式を使う。実装はリポジトリのテスト・モック配置を参照すること。
 
-```typescript
-// apps/api/e2e/posts.spec.ts
-test("should return posts list", async ({ request }) => {
-    const response = await request.get(`${API_URL}/api/posts`);
-    expect(response.status()).toBe(200);
-    const data = await response.json();
-    expect(Array.isArray(data)).toBe(true);
-});
-```
+## 生成とビルド
 
-### モック
-
-```typescript
-// testing/msw/src/handlers/rest.ts
-export const restHandlers: HttpHandler[] = [
-    http.get(`${API_URL}/api/posts`, () => {
-        return HttpResponse.json(mockPosts);
-    }),
-];
-```
-
-## TypeSpec設定
-
-`packages/api/tspconfig.yaml` にTypeSpecの設定が定義されています。
-
-```yaml
-emit:
-- '@typespec/openapi3'
-
-options:
-    '@typespec/openapi3':
-        output-file: '../../apps/wiki/reference/openapi.yaml'
-```
-
-### 使用方法
-
-```bash
-# TypeSpecスキーマからOpenAPI仕様を生成（api パッケージで実行）
-bun --cwd packages/api x tsp compile .
-```
+- OpenAPI 仕様の生成は TypeSpec の compile で行う。実行方法はルートの `package.json` および `packages/api` のスクリプトを参照する（`bun run` のみ使用。bunx 直接利用は [コマンド追加リスト](../../scripts/command-addition-list.md) に従う）。
+- Orval によるクライアント生成は、OpenAPI 出力を入力として実行する。設定は `packages/api` の Orval 設定ファイルを参照すること。
 
 ## 参考資料
 
@@ -363,3 +97,4 @@ bun --cwd packages/api x tsp compile .
 - [Orval ドキュメント](https://orval.dev/)
 - [Hono ドキュメント](https://hono.dev/)
 - [OpenAPI 仕様](https://swagger.io/specification/)
+- プロジェクト内: [エラーコード仕様](../specs/error-codes.md)、[バリデーション仕様](../specs/validation.md)

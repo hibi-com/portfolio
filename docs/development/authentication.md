@@ -2,327 +2,86 @@
 title: "認証と認可"
 ---
 
-このプロジェクトでは、Better-authを使用して認証と認可を実装しています。
+このプロジェクトでは **Better-auth** を用いて認証と認可を実装する。  
+このドキュメントは、認証まわりで守るルールと設定の考え方を示す。  
+実装の詳細は `packages/auth` および各アプリの認証ハンドラーを参照すること。
 
-## Better-auth の概要
+## Better-auth の位置づけ
 
-Better-authは、モダンな認証ライブラリで、次の機能を提供します：
+- 認証基盤は Better-auth に統一する。別の認証ライブラリを併用しない。
+- 提供する機能: セッション管理、OAuth（Google / GitHub 等）、型安全な API、Prisma 等 DB との統合。
+- 初期化と設定は `packages/auth` で行い、各アプリ（api / web / admin / wiki）はそのパッケージを利用する。
 
-- セッション管理
-- OAuth統合（Google、GitHubなど）
-- 型安全なAPI
-- Prisma統合
+## 設定と環境変数
 
-## 認証の設定
+### 必須の設定
 
-### 初期化
+- **baseUrl / productionUrl**: 認証コールバック等で使うアプリの URL。開発・本番で切り替える。
+- **secret**: セッション等の署名に使う秘密鍵。環境変数で渡し、リポジトリに含めない。
+- **OAuth**: 利用するプロバイダ（Google 等）の Client ID / Client Secret を環境変数で渡す。
+- **データベース**: Cloudflare D1 または DATABASE_URL で、Better-auth が利用する DB を指定する。
 
-認証は `packages/auth/src/index.ts` で初期化されます。
+### シークレットの扱い
 
-```typescript
-// packages/auth/src/index.ts
-import { initAuth } from "@portfolio/auth";
+- シークレットは環境変数のみで管理する。コードにハードコードしてはならない。
+- 本番では Cloudflare のシークレット機能等で注入する。定期的なローテーションを検討する。
+- 生成方法（OpenSSL 等）は [APIキー・トークン発行手順](../setup/api-keys.md) や [セキュリティガイドライン](../security/guidelines.md) を参照する。
 
-const auth = initAuth({
-    baseUrl: "http://localhost:3000",
-    productionUrl: "https://example.com",
-    secret: process.env.BETTER_AUTH_SECRET,
-    googleClientId: process.env.GOOGLE_CLIENT_ID,
-    googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    d1: env.DB, // Cloudflare D1（本番環境）
-    databaseUrl: process.env.DATABASE_URL, // 開発環境
-});
-```
-
-### 環境変数
-
-認証に必要な環境変数：
-
-```bash
-# .env
-BETTER_AUTH_SECRET="your-secret-key-here"
-BETTER_AUTH_URL="http://localhost:3000"
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-```
-
-### シークレットの生成
-
-```bash
-# OpenSSLを使用してシークレットを生成
-openssl rand -base64 32
-
-# または、Node.jsを使用
-node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
-```
-
-## OAuth プロバイダーの設定
+## OAuth プロバイダー
 
 ### Google OAuth
 
-1. **Google Cloud Consoleでプロジェクトを作成**
+- Google Cloud Console で OAuth 2.0 クライアントを作成し、リダイレクト URI を登録する。
+- リダイレクト URI は「アプリのベース URL + `/api/auth/callback/google`」とする。本番・開発で異なる場合は両方登録する。
+- Client ID と Client Secret は環境変数で渡す。実装は `packages/auth` の初期化オプションを参照する。
 
-2. **OAuth 2.0 クライアントIDを作成**
+### その他プロバイダー（GitHub 等）
 
-3. **リダイレクトURIを設定**
-
-   ```url
-   https://your-domain.com/api/auth/callback/google
-   ```
-
-4. **環境変数を設定**
-
-```bash
-GOOGLE_CLIENT_ID="your-client-id"
-GOOGLE_CLIENT_SECRET="your-client-secret"
-```
-
-### GitHub OAuth（オプション）
-
-```typescript
-// packages/auth/src/index.ts
-socialProviders: {
-    github: {
-        clientId: options.githubClientId,
-        clientSecret: options.githubClientSecret,
-        redirectURI: `${options.productionUrl}/api/auth/callback/github`,
-    },
-}
-```
+- 利用する場合は Better-auth の socialProviders で設定する。リダイレクト URI はプロバイダーごとの仕様に合わせる。
+- 設定内容は `packages/auth` を参照すること。
 
 ## 認証エンドポイント
 
-### 認証ハンドラー
+- 認証ハンドラーは Better-auth の handler を各アプリのルーティングに組み込む。Cloudflare Pages の場合は Functions のパスで `/api/auth/[[path]]` のようにマウントする。
+- 利用するエンドポイントの例: サインイン（POST）、サインアップ（POST）、サインアウト（POST）、セッション取得（GET）、OAuth コールバック（GET）。正式な一覧は Better-auth のドキュメントと `packages/auth` の実装を参照する。
+- 認証エンドポイントの URL は、クライアントから同一オリジンまたは設定されたベース URL で参照する。直書きの絶対 URL は設定で一元管理すること。
 
-Cloudflare Pages Functionsで認証ハンドラーを設定します。
+## クライアント側の利用
 
-```typescript
-// apps/wiki/functions/api/auth/[[path]].ts
-import { initAuth } from "@portfolio/auth";
+- セッション取得は `/api/auth/session` に GET し、レスポンスの user の有無でログイン状態を判定する。
+- サインインは POST でメール・パスワードを送るか、OAuth の場合は認証開始 URL（例: `/api/auth/sign-in/google`）へリダイレクトする。
+- サインアウトは POST でサインアウトエンドポイントを呼び、成功後に必要ならトップ等へ遷移する。
+- 実装例（fetch の書き方・ラッパー）は各アプリの共有層を参照すること。
 
-export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
-    const url = new URL(request.url);
-    const baseUrl = `${url.protocol}//${url.host}`;
-    const productionUrl = "https://wiki.ageha734.jp";
+## サーバー側の認証・認可
 
-    const auth = initAuth({
-        baseUrl,
-        productionUrl,
-        secret: env.BETTER_AUTH_SECRET,
-        googleClientId: env.GOOGLE_CLIENT_ID ?? "",
-        googleClientSecret: env.GOOGLE_CLIENT_SECRET ?? "",
-        d1: env.DB,
-    });
+### 認証の必須化
 
-    return auth.handler(request);
-};
-```
+- 保護したいルートでは、必ずセッションを検証してから処理する。Better-auth の getSession 相当でヘッダーからセッションを取得し、ユーザーが居なければ 401 を返す。
+- 認証ミドルウェアは `apps/api` 等に用意し、保護対象ルートで共通利用する。実装はリポジトリの middleware / ハンドラーを参照する。
 
-### 利用可能なエンドポイント
+### 認可（Authorization）
 
-- `POST /api/auth/sign-in`: サインイン
-- `POST /api/auth/sign-up`: サインアップ
-- `POST /api/auth/sign-out`: サインアウト
-- `GET /api/auth/session`: セッション情報の取得
-- `GET /api/auth/callback/google`: Google OAuthコールバック
+- ロールベース: 管理者専用の操作では、セッションのユーザーが所定のロール（例: admin）を持つか確認する。持たない場合は 403 を返す。
+- リソースベース: 編集・削除などは「そのリソースの所有者または権限を持つユーザーか」を確認する。権限が無い場合は 403 を返す。
+- 認可チェックを省略してはならない。認証済みであれば誰でも操作できるようにしない。
 
-## クライアント側での使用
+## セキュリティ上のルール
 
-### セッションの取得
-
-```typescript
-// クライアント側でセッションを取得
-const response = await fetch("/api/auth/session");
-const session = await response.json();
-
-if (session?.user) {
-    // ユーザーがログインしている
-    console.log("User:", session.user);
-}
-```
-
-### サインイン
-
-```typescript
-// メールアドレスとパスワードでサインイン
-const response = await fetch("/api/auth/sign-in", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-        email: "user@example.com",
-        password: "password",
-    }),
-});
-
-const result = await response.json();
-```
-
-### OAuth サインイン
-
-```typescript
-// Google OAuthでサインイン
-window.location.href = "/api/auth/sign-in/google";
-```
-
-### サインアウト
-
-```typescript
-const response = await fetch("/api/auth/sign-out", {
-    method: "POST",
-});
-
-if (response.ok) {
-    // サインアウト成功
-    window.location.href = "/";
-}
-```
-
-## サーバー側での認証
-
-### セッションの検証
-
-```typescript
-// apps/api/src/interface/middleware/auth.ts
-import { auth } from "@portfolio/auth";
-
-export async function authenticate(ctx: Context): Promise<{ userId: string } | null> {
-    const session = await auth.api.getSession({
-        headers: ctx.headers,
-    });
-
-    return session?.user ? { userId: session.user.id } : null;
-}
-```
-
-### 保護されたルート
-
-```typescript
-// RESTハンドラーで認証を要求
-import type { Context } from "hono";
-import { authenticate } from "../middleware/auth";
-
-export async function createPost(c: Context) {
-    const user = await authenticate(c);
-    if (!user) {
-        return c.json({ error: "Authentication required" }, 401);
-    }
-
-    const body = await c.req.json();
-    // 認証されたユーザーのみが実行可能
-    const post = await createPostUseCase.execute(body, user.userId);
-    return c.json(post);
-}
-```
-
-## 認可（Authorization）
-
-### ロールベースのアクセス制御
-
-```typescript
-// ユーザーのロールを確認
-const user = await getUser(userId);
-if (user.role !== "admin") {
-    return c.json({ error: "Admin access required" }, 403);
-}
-```
-
-### リソースベースのアクセス制御
-
-```typescript
-// リソースの所有者を確認
-const post = await getPost(postId);
-if (post.authorId !== userId) {
-    return c.json({ error: "You don't have permission to access this resource" }, 403);
-    });
-}
-```
-
-## セキュリティベストプラクティス
-
-### 1. シークレットの管理
-
-- シークレットキーは環境変数として管理
-- 本番環境では、Cloudflareのシークレット機能を使用
-- 定期的にシークレットをローテーション
-
-### 2. セッション管理
-
-- セッションの有効期限を適切に設定
-- HTTPSを使用してセッションクッキーを保護
-- セッションの無効化を実装
-
-### 3. パスワードのハッシュ化
-
-Better-authは自動的にパスワードをハッシュ化します。
-
-### 4. CSRF保護
-
-Better-authは自動的にCSRF保護を実装します。
-
-### 5. レート制限
-
-```typescript
-// レート制限の実装（例）
-const rateLimiter = new Map<string, number[]>();
-
-function checkRateLimit(ip: string): boolean {
-    const now = Date.now();
-    const requests = rateLimiter.get(ip) || [];
-    const recentRequests = requests.filter((time) => now - time < 60000); // 1分以内
-
-    if (recentRequests.length >= 5) {
-        return false; // レート制限超過
-    }
-
-    recentRequests.push(now);
-    rateLimiter.set(ip, recentRequests);
-    return true;
-}
-```
+- **シークレット**: 環境変数で渡し、ログやレスポンスに含めない。
+- **セッション**: 有効期限を適切に設定する。HTTPS でクッキーを保護し、サインアウト・無効化を実装する。
+- **パスワード**: Better-auth の既定のハッシュ化に任せ、平文で保存・送信してはならない。
+- **CSRF**: Better-auth の CSRF 保護を有効にし、無効化しない。
+- **レート制限**: サインイン・サインアップ等のエンドポイントにはレート制限をかける。実装は `apps/api` のミドルウェアや [セキュリティガイドライン](../security/guidelines.md) を参照する。
 
 ## トラブルシューティング
 
-### セッションが取得できない
-
-```bash
-# 環境変数を確認
-echo $BETTER_AUTH_SECRET
-
-# データベースの接続を確認
-wrangler d1 execute portfolio-db --command "SELECT * FROM sessions"
-```
-
-### OAuth認証が失敗する
-
-1. **リダイレクトURIを確認**
-
-   ```url
-   https://your-domain.com/api/auth/callback/google
-   ```
-
-2. **クライアントIDとシークレットを確認**
-
-   ```bash
-   echo $GOOGLE_CLIENT_ID
-   echo $GOOGLE_CLIENT_SECRET
-   ```
-
-3. **Google Cloud Consoleの設定を確認**
-
-### データベースエラー
-
-```bash
-# Prismaスキーマを確認
-cat packages/db/prisma/schema.prisma
-
-# マイグレーションを適用（db パッケージで実行）
-bun --cwd packages/db x prisma migrate deploy
-```
+- セッションが取れない場合: 環境変数（BETTER_AUTH_SECRET 等）が設定されているか、DB にセッションが存在するかを確認する。
+- OAuth が失敗する場合: プロバイダーに登録したリダイレクト URI がアプリの URL と一致しているか、Client ID / Secret が正しいかを確認する。
+- DB エラー: スキーマとマイグレーションが適用されているか確認する。マイグレーション実行は [トラブルシューティング](./troubleshooting.md) および `bun run` で実行するスクリプトを参照する。
 
 ## 参考資料
 
 - [Better-auth ドキュメント](https://www.better-auth.com/docs)
 - [OAuth 2.0 仕様](https://oauth.net/2/)
-- [Cloudflare Workers 認証](https://developers.cloudflare.com/workers/examples/auth-with-headers/)
+- プロジェクト内: [APIキー・トークン発行手順](../setup/api-keys.md)、[セキュリティガイドライン](../security/guidelines.md)、[トラブルシューティング](./troubleshooting.md)

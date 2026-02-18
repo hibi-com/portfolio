@@ -2,363 +2,70 @@
 title: "環境変数管理"
 ---
 
-## 概要
+環境変数はセキュリティと設定の一貫性を保つため、次のルールで管理する。  
+変数一覧は **.env.example** および各アプリの型定義（env.d.ts）を**単一の参照先**とし、このドキュメントでは方針とカテゴリのみ記載する。
 
-このドキュメントでは、環境変数の管理方法、命名規則、セキュリティベストプラクティスを説明します。
+## 命名規則（必須）
 
-## 概要
+- **フロントエンド（Vite）で参照する変数**: 必ず **VITE_** プレフィックスを付ける。Vite がクライアントに露出するため、機密は入れない。
+- **サーバーサイド（Remix loader、API、Workers）**: プレフィックスは付けない。DATABASE_URL、BETTER_AUTH_SECRET、API_BASE_URL 等。
+- **禁止**: 機密を VITE_ 付きで定義しない。フロントで必要なのは公開してよい URL やフラグのみとする。
 
-このプロジェクトでは、環境変数を適切に管理し、セキュリティと設定の一貫性を保つための仕組みを提供しています。
+## 参照方法
 
-## 環境変数の種類
+- **Vite（フロント）**: **import.meta.env.VITE_*** で参照する。Cloudflare Workers 系では process.env は使わない。
+- **Remix loader**: context.cloudflare.env または process.env（開発時）。実装は各ルートを参照する。
+- **Cloudflare Pages/Workers**: wrangler.toml の vars またはシークレット（wrangler secret）。本番の機密はシークレットで渡す。
+- **型**: 使用する変数は env.d.ts（ImportMetaEnv）で宣言し、型チェックを通す。追加・変更時はそこを更新する。
 
-### 開発環境変数
+## 設定手順
 
-開発環境で使用する環境変数は `.env` ファイルに定義します。
+- **ローカル**: .env.example をコピーして .env を作成し、必要な値を設定する。.env はコミットしない。
+- **Cloudflare**: シークレットは wrangler またはダッシュボードで設定する。一括設定スクリプトがある場合はルートの scripts を参照する。
+- **禁止**: .env をリポジトリにコミットしない。.gitignore に .env, .env.local, .env.*.local を含める。
 
-```bash
-# .env
-DATABASE_URL="file:./dev.db"
-BETTER_AUTH_SECRET="your-secret-key-here"
-BETTER_AUTH_URL="http://localhost:3000"
-NODE_ENV="development"
-API_BASE_URL="http://localhost:8787"
-VITE_BASE_URL="http://localhost:5173"
-```
+## セキュリティ（必須）
 
-### 本番環境変数
+- 機密（API キー、シークレット、パスワード）は**環境変数のみ**で渡す。コードにハードコードしてはならない。
+- .env.example には**プレースホルダーや説明のみ**を書く。本番の値や実シークレットを書かない。
+- シークレットの生成は OpenSSL 等の安全な方法で行う。手順は [APIキー・トークン発行手順](./api-keys-setup.md) や [セキュリティガイドライン](../security/guidelines.md) を参照する。
+- ログやエラーレスポンスに環境変数の値を出さない。
 
-本番環境では、Cloudflare Pages/Workersの環境変数として設定します。
+## バリデーション
 
-## 環境変数の命名規則
+- 起動時または初期化時に、必須の環境変数を Zod 等で検証する。未設定・不正値の場合は起動を止めて明確にエラーを出す。
+- フロントでは import.meta.env をラップした設定モジュールで型とバリデーションを揃える。実装は各アプリの env 設定を参照する。
 
-### Vite環境変数
+## 変数のカテゴリ（一覧は .env.example を参照）
 
-フロントエンドで使用する環境変数は `VITE_` プレフィックスを付けます。
+- **データベース**: DATABASE_URL
+- **キャッシュ**: CACHE_URL
+- **認証**: BETTER_AUTH_*, GOOGLE_*, GITHUB_*（OAuth）
+- **Cloudflare**: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN（必要時）
+- **アプリ**: NODE_ENV, API_BASE_URL, VITE_BASE_URL, VITE_API_URL
+- **分析・監視**: VITE_GOOGLE_*, SENTRY_*, VITE_SENTRY_*
+- **freee 連携**: FREEE_CLIENT_ID, FREEE_CLIENT_SECRET, FREEE_AUTH_BASE_URL, FREEE_API_BASE_URL（未設定時は本番 URL。mock 利用時は mock-apis の URL）
+- **メール**: RESEND_API_KEY, RESEND_FROM_EMAIL
+- **ストレージ**: R2_BUCKET, R2_PUBLIC_URL
+- **API 共通**: CORS_ORIGINS
 
-```typescript
-// ✅ Good: VITE_プレフィックスを使用
-VITE_BASE_URL="http://localhost:5173"
-VITE_GOOGLE_ANALYTICS_ENABLED="false"
-VITE_SENTRY_ENVIRONMENT="development"
-
-// ❌ Bad: VITE_プレフィックスなし
-BASE_URL="http://localhost:5173"
-```
-
-### サーバーサイド環境変数
-
-サーバーサイド（Remix loader、API）で使用する環境変数は、プレフィックスなしで定義します。
-
-```typescript
-// ✅ Good: サーバーサイド環境変数
-DATABASE_URL="file:./dev.db"
-BETTER_AUTH_SECRET="your-secret-key-here"
-API_BASE_URL="http://localhost:8787"
-```
-
-## 環境変数の使用方法
-
-### フロントエンド（Vite）
-
-Vite環境では、`import.meta.env` を使用して環境変数にアクセスします。
-
-```typescript
-// app/shared/config/settings.ts
-export const BASE_URL = import.meta.env.VITE_BASE_URL ?? "__undefined__";
-export const GOOGLE_ANALYTICS_ENABLED =
-    import.meta.env.VITE_GOOGLE_ANALYTICS_ENABLED === "true";
-```
-
-**注意**: Cloudflare Workers環境では `process.env` は使用できません。
-`import.meta.env` を使用してください。
-
-### サーバーサイド（Remix Loader）
-
-Remixのloaderでは、Cloudflareの環境変数にアクセスできます。
-
-```typescript
-// app/routes/api.blog.ts
-export const loader = async ({ context }: LoaderFunctionArgs) => {
-    // Cloudflare環境変数にアクセス
-    const apiUrl = context.cloudflare.env.API_BASE_URL;
-
-    // または、直接process.envを使用（開発環境）
-    const apiUrl = process.env.API_BASE_URL;
-
-    return json({ apiUrl });
-};
-```
-
-### Cloudflare Workers/Pages
-
-Cloudflare環境では、`wrangler.toml` または環境変数として設定します。
-
-```toml
-# wrangler.toml
-[env.production]
-vars = { API_BASE_URL = "https://api.example.com" }
-
-# または、シークレットとして設定
-# wrangler secret put API_BASE_URL
-```
-
-## 環境変数の型定義
-
-TypeScriptで環境変数の型安全性を保つため、型定義ファイルを作成します。
-
-```typescript
-// apps/web/env.d.ts
-interface ImportMetaEnv {
-    readonly VITE_BASE_URL: string;
-    readonly VITE_GOOGLE_ANALYTICS_ENABLED: string;
-    readonly VITE_GOOGLE_TAG_MANAGER_ENABLED: string;
-    readonly VITE_SENTRY_ENVIRONMENT: string;
-    readonly VITE_SENTRY_TRACES_SAMPLE_RATE: string;
-    readonly VITE_SENTRY_REPLAY_SAMPLE_RATE: string;
-    readonly VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: string;
-}
-
-interface ImportMeta {
-    readonly env: ImportMetaEnv;
-}
-```
-
-## 環境変数の設定手順
-
-### 1. ローカル開発環境
-
-```bash
-# .env.exampleをコピー
-cp .env.example .env
-
-# .envファイルを編集して必要な値を設定
-# DATABASE_URL, BETTER_AUTH_SECRET などを設定
-```
-
-### 2. Cloudflare Pagesへの設定
-
-#### 方法1: Wrangler CLIを使用
-
-```bash
-# シークレットとして設定（推奨）
-wrangler pages secret put VITE_BASE_URL --project-name portfolio-web
-
-# 環境変数として設定
-wrangler pages secret put DATABASE_URL --project-name portfolio-web
-```
-
-#### 方法2: スクリプトを使用
-
-```bash
-# scripts/env.tsを使用して一括設定
-bun run scripts/env.ts production .env
-```
-
-このスクリプトは `.env` ファイルから `VITE_*` で始まる環境変数を読み込み、Cloudflare Pagesに設定します。
-
-### 3. Cloudflare Workersへの設定
-
-```bash
-# wrangler.tomlに設定
-[env.production]
-vars = { API_BASE_URL = "https://api.example.com" }
-
-# または、シークレットとして設定
-wrangler secret put API_BASE_URL
-```
-
-## 環境変数のバリデーション
-
-環境変数のバリデーションは、アプリケーション起動時に実行します。
-
-```typescript
-// app/env.ts
-import { z } from "zod";
-
-const envSchema = z.object({
-    VITE_BASE_URL: z.string().url(),
-    VITE_GOOGLE_ANALYTICS_ENABLED: z.enum(["true", "false"]),
-});
-
-export const env = envSchema.parse({
-    VITE_BASE_URL: import.meta.env.VITE_BASE_URL,
-    VITE_GOOGLE_ANALYTICS_ENABLED: import.meta.env.VITE_GOOGLE_ANALYTICS_ENABLED,
-});
-```
-
-## セキュリティベストプラクティス
-
-### 1. シークレットの管理
-
-機密情報（APIキー、シークレットキーなど）は、環境変数として設定し、コードに直接記述しないでください。
-
-```typescript
-// ✅ Good: 環境変数から取得
-const apiKey = process.env.API_KEY;
-
-// ❌ Bad: コードに直接記述
-const apiKey = "sk_live_1234567890abcdef";
-```
-
-### 2. .envファイルの管理
-
-`.env` ファイルは `.gitignore` に含まれているため、リポジトリにコミットされません。
-
-```gitignore
-# .gitignore
-.env
-.env.local
-.env.*.local
-```
-
-### 3. 環境変数の例ファイル
-
-`.env.example` ファイルをリポジトリに含め、必要な環境変数のテンプレートを提供します。
-
-```bash
-# .env.example
-DATABASE_URL="file:./dev.db"
-BETTER_AUTH_SECRET="your-secret-key-here"
-BETTER_AUTH_URL="http://localhost:3000"
-```
-
-### 4. シークレットの生成
-
-シークレットキーは、適切な方法で生成します。
-
-```bash
-# OpenSSLを使用してシークレットを生成
-openssl rand -base64 32
-
-# または、Node.jsを使用
-node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
-```
-
-## 環境変数の一覧
-
-### データベース
-
-- `DATABASE_URL`: データベース接続URL（開発環境: `file:./dev.db`）
-
-### キャッシュ
-
-- `CACHE_URL`: Redis/Upstash キャッシュ接続URL（旧: `REDIS_URL`）
-
-### 認証
-
-- `BETTER_AUTH_SECRET`: Better Authのシークレットキー
-- `BETTER_AUTH_URL`: Better AuthのベースURL
-- `GITHUB_CLIENT_ID`: GitHub OAuth Client ID（オプション）
-- `GITHUB_CLIENT_SECRET`: GitHub OAuth Client Secret（オプション）
-- `GOOGLE_CLIENT_ID`: Google OAuth Client ID（オプション）
-- `GOOGLE_CLIENT_SECRET`: Google OAuth Client Secret（オプション）
-
-### Cloudflare
-
-- `CLOUDFLARE_ACCOUNT_ID`: CloudflareアカウントID（オプション）
-- `CLOUDFLARE_API_TOKEN`: Cloudflare APIトークン（オプション）
-
-### アプリケーション
-
-- `NODE_ENV`: 実行環境（`development` | `production`）
-- `API_BASE_URL`: APIのベースURL
-- `VITE_BASE_URL`: フロントエンドのベースURL
-
-### 分析・監視
-
-- `VITE_GOOGLE_ANALYTICS_ENABLED`: Google Analytics有効化フラグ
-- `VITE_GOOGLE_TAG_MANAGER_ENABLED`: Google Tag Manager有効化フラグ
-- `SENTRY_DSN`: Sentry DSN（オプション）
-- `SENTRY_ORG`: Sentry組織名（オプション）
-- `SENTRY_PROJECT`: Sentryプロジェクト名（オプション）
-- `SENTRY_AUTH_TOKEN`: Sentry認証トークン（オプション）
-- `VITE_SENTRY_ENVIRONMENT`: Sentry環境名
-- `VITE_SENTRY_TRACES_SAMPLE_RATE`: Sentryトレースサンプルレート
-- `VITE_SENTRY_REPLAY_SAMPLE_RATE`: Sentryリプレイサンプルレート
-- `VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE`: エラー時のリプレイサンプルレート
-
-### 開発ツール
-
-- `VITE_XSTATE_INSPECTOR_ENABLED`: XState Inspector有効化フラグ
-
-### freee 連携（API）
-
-- `FREEE_CLIENT_ID`: freee OAuth クライアントID（freee 連携利用時）
-- `FREEE_CLIENT_SECRET`: freee OAuth クライアントシークレット（freee 連携利用時）
-- `FREEE_AUTH_BASE_URL`: freee 認証サーバー基底URL（未設定時は本番 `https://accounts.secure.freee.co.jp`。開発で mock-apis 利用時は `http://mock-apis:3920` など）
-- `FREEE_API_BASE_URL`: freee API サーバー基底URL（未設定時は本番 `https://api.freee.co.jp`。開発で mock-apis 利用時は `http://mock-apis:3920` など）
-
-### メール送信（Resend）
-
-- `RESEND_API_KEY`: Resend API キー（メール送信利用時）
-- `RESEND_FROM_EMAIL`: 送信元メールアドレス（未設定時は `noreply@example.com`）
-
-### ストレージ（Cloudflare R2）
-
-- `R2_BUCKET`: R2 バケットバインディング名（ポートフォリオファイル等。Workers の R2 バインド名）
-- `R2_PUBLIC_URL`: R2 公開URL（未設定時は R2 経由の公開URL は利用不可）
-
-### API 共通
-
-- `CORS_ORIGINS`: 許可するオリジン（カンマ区切り）。未設定時は `http://localhost:3000`, `http://localhost:5173`, `http://localhost:8787`
-- `VITE_API_URL`: フロント／E2E から参照する API の URL（admin の `VITE_API_URL`、E2E の `VITE_API_URL`。未設定時は `http://localhost:8787`）
-
-### Workers 専用（compose では未使用）
-
-- `CHAT_ROOMS`: Durable Object の ChatRoom バインディング（wrangler.toml で定義）
-
-## 開発環境での freee 擬似 API（mock-apis）
-
-docker compose で開発するとき、freee の代わりに `@portfolio/mock-apis` を使うと、本番の freee アカウントなしで連携フローをテストできる。
-
-- compose に `mock-apis` サービスが含まれており、api はデフォルトで `FREEE_AUTH_BASE_URL` / `FREEE_API_BASE_URL` を `http://mock-apis:3920` に設定する。
-- freee 連携用の `FREEE_CLIENT_ID` / `FREEE_CLIENT_SECRET` は未設定でも mock 利用時は `mock-client-id` / `mock-client-secret` がデフォルトで入る。
-- 本番の freee に接続したい場合は、`.env` や compose の `environment` で `FREEE_AUTH_BASE_URL` と `FREEE_API_BASE_URL` を未設定（または本番 URL）にし、`FREEE_CLIENT_ID` / `FREEE_CLIENT_SECRET` に本番の値を設定する。
+freee の開発用 mock（mock-apis）利用時は、FREEE_AUTH_BASE_URL / FREEE_API_BASE_URL を mock の URL にし、FREEE_CLIENT_ID / FREEE_CLIENT_SECRET は未設定で mock 用の既定値が使われる。本番の freee に繋ぐ場合は本番 URL と本番のクライアント情報を設定する。
 
 ## トラブルシューティング
 
-### 環境変数が読み込まれない
+- 読み込まれない: .env の配置・変数名（VITE_ 等）・アプリ再起動を確認する。
+- Cloudflare で効かない: シークレット／vars の設定とプロジェクト名を確認する。一覧は [コマンド追加リスト](../../scripts/command-addition-list.md) のスクリプトまたは wrangler のドキュメントを参照する。
+- 型エラー: env.d.ts にその変数を追加し、`bun run typecheck` で確認する。
 
-1. `.env` ファイルが正しい場所にあるか確認
-2. 環境変数の名前が正しいか確認（`VITE_` プレフィックスなど）
-3. アプリケーションを再起動
+## チェックリスト（運用）
 
-### Cloudflare環境で環境変数が設定されない
-
-1. `wrangler pages secret list` で設定済みのシークレットを確認
-2. プロジェクト名が正しいか確認
-3. Cloudflareダッシュボードで環境変数を確認
-
-### 型エラーが発生する
-
-1. `env.d.ts` ファイルに環境変数の型定義を追加
-2. TypeScriptの型チェックを実行: `bun run typecheck`
-
-## 環境変数チェックリスト
-
-### 新規プロジェクトセットアップ
-
-- [ ] `.env.example` をコピーして `.env` を作成
-- [ ] `BETTER_AUTH_SECRET` を生成して設定
-- [ ] `DATABASE_URL` を設定
-- [ ] 必要なOAuthクライアントIDを設定
-
-### デプロイ前
-
-- [ ] 本番用の環境変数がCloudflareに設定されている
-- [ ] シークレットが `wrangler secret` で設定されている
-- [ ] `.env` ファイルがコミットされていない
-
-### セキュリティ監査
-
-- [ ] ハードコードされた認証情報がない
-- [ ] ログに機密情報が出力されていない
-- [ ] 不要な環境変数が削除されている
+- 新規セットアップ: .env.example から .env を作成し、BETTER_AUTH_SECRET を生成、DATABASE_URL と必要な OAuth を設定する。
+- デプロイ前: 本番用の変数が Cloudflare に設定されていること、シークレットは wrangler secret 等で渡していること、.env がコミットされていないことを確認する。
+- セキュリティ: ハードコードされた認証情報がないこと、ログに機密を出していないこと、不要な変数を削除していることを確認する。
 
 ## 参考資料
 
-- [Vite環境変数とモード](https://vitejs.dev/guide/env-and-mode.html)
-- [Cloudflare Pages環境変数](https://developers.cloudflare.com/pages/platform/build-configuration/#environment-variables)
-- [Cloudflare Workers環境変数](https://developers.cloudflare.com/workers/configuration/environment-variables/)
-- [セキュリティガイドライン](../security/guidelines.md)
+- [Vite 環境変数とモード](https://vitejs.dev/guide/env-and-mode.html)
+- [Cloudflare Pages 環境変数](https://developers.cloudflare.com/pages/platform/build-configuration/#environment-variables)
+- [Cloudflare Workers 環境変数](https://developers.cloudflare.com/workers/configuration/environment-variables/)
+- プロジェクト内: [APIキー・トークン発行手順](./api-keys-setup.md)、[セキュリティガイドライン](../security/guidelines.md)

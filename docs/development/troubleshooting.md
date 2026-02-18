@@ -2,7 +2,7 @@
 title: "トラブルシューティングガイド"
 ---
 
-このドキュメントでは、開発中によく発生する問題とその解決方法をまとめています。
+このドキュメントでは、開発中によく発生する問題とその解決方法をまとめています。**コマンドは bun および `bun run` のみを利用する**（bunx・wrangler の直接実行はしない）。`bun run` で実行できるスクリプトが無い場合は [コマンド追加リスト](../../scripts/command-addition-list.md) の TODO を参照し、ルートの package.json 等にスクリプトを追加すること。
 
 ## ビルドエラー
 
@@ -123,16 +123,7 @@ BUN_MAX_HEAP_SIZE=4096 bun run dev
 
 **解決方法**:
 
-```bash
-# D1データベースの設定を確認
-wrangler d1 list
-
-# データベースの接続をテスト
-wrangler d1 execute portfolio-db --command "SELECT 1"
-
-# wrangler.toml の設定を確認
-cat apps/api/wrangler.toml
-```
+D1 の一覧取得・SQL 実行は現在 `bun run` で実行するスクリプトがない。[コマンド追加リスト](../../scripts/command-addition-list.md) の TODO を参照し、必要ならルートまたは apps/api にスクリプトを追加する。設定は `apps/api/wrangler.toml` を確認する。
 
 ### Prismaマイグレーションエラー
 
@@ -140,16 +131,7 @@ cat apps/api/wrangler.toml
 
 **解決方法**:
 
-```bash
-# マイグレーション状態を確認（db パッケージで実行）
-bun --cwd packages/db x prisma migrate status
-
-# データベースをリセット（開発環境のみ）
-bun --cwd packages/db x prisma migrate reset
-
-# マイグレーションを再適用
-bun --cwd packages/db x prisma migrate deploy
-```
+マイグレーションの実行は `bun run migrate --filter=@portfolio/db` で行う。状態確認（status）・リセット（reset）・再適用（deploy）は [コマンド追加リスト](../../scripts/command-addition-list.md) の TODO を参照し、必要なら `bun run` で実行できるスクリプトを追加する。
 
 ### スキーマの変更が反映されない
 
@@ -157,13 +139,7 @@ bun --cwd packages/db x prisma migrate deploy
 
 **解決方法**:
 
-```bash
-# Prisma Clientを再生成（ルートの generate）
-bun run generate --filter=@portfolio/db
-
-# マイグレーションを作成・適用（開発環境、db パッケージで実行）
-bun --cwd packages/db x prisma migrate dev --name migration_name
-```
+Prisma Client の再生成は `bun run generate --filter=@portfolio/db`。マイグレーションの新規作成・適用（migrate dev）は [コマンド追加リスト](../../scripts/command-addition-list.md) の TODO を参照し、必要なら `bun run` で実行できるスクリプトを追加する。
 
 ## テストの問題
 
@@ -248,16 +224,7 @@ cat .env
 
 **解決方法**:
 
-```bash
-# 設定済みのシークレットを確認
-wrangler pages secret list --project-name portfolio-web
-
-# シークレットを再設定
-wrangler pages secret put VARIABLE_NAME --project-name portfolio-web
-
-# wrangler.toml の設定を確認
-cat wrangler.toml
-```
+シークレット一覧・設定は現在 `bun run` で実行するスクリプトがない。[コマンド追加リスト](../../scripts/command-addition-list.md) の TODO を参照し、必要ならルートまたは対象アプリにスクリプトを追加する。設定は対象の `wrangler.toml` を確認する。
 
 ## パッケージ管理の問題
 
@@ -290,7 +257,7 @@ bun install --force @portfolio/web
 bun install --filter @portfolio/web
 
 # すべてのワークスペースを再ビルド
-turbo run build
+bun run build
 
 # パッケージのリンクを確認
 bun pm ls
@@ -304,19 +271,7 @@ bun pm ls
 
 **解決方法**:
 
-```bash
-# Wranglerの認証を確認
-wrangler whoami
-
-# ビルドが成功するか確認
-bun run build
-
-# デプロイログを確認
-wrangler pages deploy ./build --project-name portfolio-web --verbose
-
-# 環境変数を確認
-wrangler pages secret list --project-name portfolio-web
-```
+ビルドの確認は `bun run build`。デプロイ実行は `bun run deploy` を使う。Wrangler の認証確認（whoami）・デプロイの詳細ログ・シークレット一覧は現在 `bun run` で実行するスクリプトがないため、[コマンド追加リスト](../../scripts/command-addition-list.md) の TODO を参照し、必要ならスクリプトを追加する。
 
 ### ビルドがタイムアウトする
 
@@ -330,8 +285,8 @@ wrangler pages secret list --project-name portfolio-web
 # - コード分割を活用
 # - キャッシュを活用
 
-# Turborepoのキャッシュを確認
-turbo run build --force
+# Turborepoのキャッシュを無視して再ビルド
+bun run build -- --force
 ```
 
 ## パフォーマンスの問題
@@ -344,7 +299,7 @@ turbo run build --force
 
 ```bash
 # Turborepoのキャッシュを活用
-turbo run build
+bun run build
 
 # 並列ビルドの設定を確認
 cat turbo.json

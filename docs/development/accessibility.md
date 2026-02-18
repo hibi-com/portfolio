@@ -2,254 +2,114 @@
 title: "アクセシビリティ"
 ---
 
+このドキュメントは、プロジェクトで守るアクセシビリティのルールを定義する。  
+実装例はリポジトリの該当コンポーネントを参照すること。
+
 ## セマンティックHTML
 
 ### 適切なHTML要素の使用
 
-- 見出しは`h1`から`h6`を使用
-- リストは`ul`/`ol`を使用
-- ナビゲーションは`nav`を使用
-
-```typescript
-// ✅ Good
-<nav>
-    <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/blog">Blog</Link></li>
-    </ul>
-</nav>
-
-// ❌ Bad
-<div>
-    <div><Link to="/">Home</Link></div>
-    <div><Link to="/blog">Blog</Link></div>
-</div>
-```
+- 見出しは `h1` から `h6` を階層を崩さずに使用する。
+- リストは `ul` / `ol` / `li` を使用する。
+- ナビゲーションは `nav` を使用し、その中でリスト構造にする。
+- **避けること**: ナビを `div` の並びだけで表現しない。リンク群は `nav` とリストでマークアップする。
 
 ### ランドマーク要素
 
-- `main`, `header`, `footer`, `nav`を使用
-- ページ構造を明確にする
-
-```typescript
-// ✅ Good: root.tsx
-<body>
-    <I18nextProvider i18n={i18n}>
-        <Navbar />
-        <Header />
-        <main id="main-content" tabIndex={-1}>
-            <Outlet />
-        </main>
-        <Footer />
-    </I18nextProvider>
-</body>
-```
+- ページには `main`, `header`, `footer`, `nav` を使い、構造を明確にする。
+- メインコンテンツは `main` とし、必要に応じて `id="main-content"` を付与する（スキップリンクのターゲット用）。
+- ルートレイアウトでは、`main` に `tabIndex={-1}` を付けてキーボードフォーカスを受けられるようにする。
 
 ## ARIA属性
 
 ### aria-label
 
-- アイコンボタンなどに適切なラベルを設定
-- スクリーンリーダーで理解可能に
-
-```typescript
-// ✅ Good
-<button aria-label="メニューを開く">
-    <MenuIcon />
-</button>
-```
+- アイコンボタンやアイコンのみの操作要素には、`aria-label` で目的が分かるラベルを付ける。
+- スクリーンリーダー利用者が操作内容を理解できるようにする。
 
 ### aria-describedby
 
-- 追加の説明が必要な要素に使用
-- エラーメッセージとの関連付け
+- 入力欄などで補足説明やエラーメッセージがある場合、その要素に `id` を付け、入力要素の `aria-describedby` で参照する。
+- エラーメッセージは説明として関連付ける。
 
-```typescript
-// ✅ Good
-<input
-    aria-describedby="email-error"
-    id="email"
-    type="email"
-/>
-{error && <div id="email-error">{error}</div>}
-```
+### aria-hidden とスクリーンリーダー用テキスト
 
-### aria-hidden
-
-- 装飾的な要素をスクリーンリーダーから隠す
-- アイコンや装飾画像に使用
-
-```typescript
-// ✅ Good
-<span aria-hidden="true">✨</span>
-<span className="sr-only">新着</span>
-```
+- 装飾的な要素（アイコン、絵文字など）は `aria-hidden="true"` でスクリーンリーダーから隠す。
+- 意味を伝える必要がある場合は、見た目は非表示・スクリーンリーダーのみ読むテキスト（例: `sr-only` クラス）で「新着」などの説明を追加する。
 
 ## キーボードナビゲーション
 
 ### フォーカス管理
 
-- タブ順序が論理的であることを確認
-- フォーカス可能な要素に適切なスタイル
-
-```typescript
-// ✅ Good: スキップリンク
-<a href="#main-content" className="skip-link">
-    メインコンテンツへスキップ
-</a>
-
-<main id="main-content" tabIndex={-1}>
-    {/* ... */}
-</main>
-```
+- タブ順序が論理的であることを確認する。DOM順と操作順が一致するか、または `tabIndex` で意図的に制御する。
+- フォーカス可能な要素には、フォーカス時にはっきり分かるスタイルを付ける。
+- スキップリンクを設ける場合、`href="#main-content"` でメインコンテンツへ飛べるようにし、`main` に `id="main-content"` と `tabIndex={-1}` を付ける。
 
 ### キーボードイベント
 
-- マウスイベントだけでなくキーボードイベントも処理
-- EnterキーやSpaceキーで操作可能に
-
-```typescript
-// ✅ Good
-const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        handleClick();
-    }
-};
-
-<button onClick={handleClick} onKeyDown={handleKeyDown}>
-    Click me
-</button>
-```
+- クリックで操作するカスタムコントロールは、Enter と Space でも同じ操作ができるようにする。
+- `onClick` だけに頼らず、`onKeyDown` で Enter/Space を処理する。ボタン要素を使う場合はブラウザの既定動作に任せてよい。
 
 ## 画像のアクセシビリティ
 
 ### alt属性
 
-- すべての画像に`alt`属性を設定
-- 装飾的な画像は空文字列
-
-```typescript
-// ✅ Good: 意味のある画像
-<img alt="ブログ記事のサムネイル画像" src={image} />
-
-// ✅ Good: 装飾的な画像
-<img alt="" src="/decoration.svg" />
-
-// ❌ Bad: alt属性なし
-<img src={image} />
-```
+- すべての画像に `alt` を付ける。
+- 意味のある画像は、内容が分かる簡潔な代替テキストを `alt` に書く。
+- 装飾的な画像は `alt=""` とする。
+- **避けること**: `alt` を省略したままにしない。
 
 ### 画像の説明
 
-- 複雑な画像は`longdesc`や周囲のテキストで説明
-- チャートやグラフは代替テキストで説明
+- 複雑な図やチャートは、`longdesc` や周囲のテキストで説明を補足する。
+- グラフなどは、代替テキストまたは隣接する説明で要点が伝わるようにする。
 
 ## フォームのアクセシビリティ
 
 ### ラベル
 
-- すべての入力フィールドにラベルを関連付け
-- `htmlFor`と`id`で関連付け
-
-```typescript
-// ✅ Good
-<label htmlFor="email">メールアドレス</label>
-<input id="email" type="email" />
-
-// ✅ Good: ラベルで囲む
-<label>
-    メールアドレス
-    <input type="email" />
-</label>
-```
+- すべての入力フィールドにラベルを関連付ける。
+- `<label htmlFor="...">` と入力の `id` で対応させるか、`<label>` で入力要素を囲む。
 
 ### エラーメッセージ
 
-- エラーを明確に表示
-- `aria-invalid`と`aria-describedby`を使用
-
-```typescript
-// ✅ Good
-<input
-    aria-describedby="email-error"
-    aria-invalid={!!error}
-    id="email"
-    type="email"
-/>
-{error && (
-    <div id="email-error" role="alert">
-        {error}
-    </div>
-)}
-```
+- バリデーションエラーは、どの項目のエラーか分かるように表示する。
+- 入力要素に `aria-invalid` を付け、エラー文を `aria-describedby` で参照する。
+- エラー文のコンテナには `role="alert"` を付けて、支援技術に通知する。
 
 ## カラーコントラスト
 
 ### コントラスト比
 
-- テキストと背景のコントラスト比は4.5:1以上
-- 大きなテキストは3:1以上
+- 通常のテキストと背景のコントラスト比は 4.5:1 以上とする。
+- 大きなテキスト（約18px以上、または14px以上の太字）は 3:1 以上とする。
 
 ### カラーだけに依存しない
 
-- 情報を色だけで伝えない
-- アイコンやテキストで補完
-
-```typescript
-// ✅ Good: アイコンとテキスト
-<span className="error">
-    <ErrorIcon />
-    エラーが発生しました
-</span>
-
-// ❌ Bad: 色だけ
-<span className="error">エラーが発生しました</span>
-```
+- 情報を色だけで伝えない。エラー・成功・警告などは、アイコンやテキストで補完する。
+- **避けること**: 「赤い文字＝エラー」のように色だけに頼った表現にしない。
 
 ## 動的コンテンツ
 
 ### ライブリージョン
 
-- 動的に更新されるコンテンツに`aria-live`を使用
-- 重要度に応じて`polite`または`assertive`
-
-```typescript
-// ✅ Good
-<div aria-live="polite" role="status">
-    {message}
-</div>
-```
+- 動的に更新されるメッセージ（通知・結果表示など）には `aria-live` を付ける。
+- 重要度に応じて `polite`（読み上げを待つ）または `assertive`（割り込んで読む）を使う。
+- 必要に応じて `role="status"` を付ける。
 
 ### ローディング状態
 
-- ローディング中であることを示す
-- `aria-busy`や`aria-live`を使用
-
-```typescript
-// ✅ Good
-<div aria-busy={isLoading} aria-live="polite">
-    {isLoading ? "読み込み中..." : content}
-</div>
-```
+- 読み込み中であることを利用者に示す。
+- 該当領域に `aria-busy="true"` を付け、更新完了後に `aria-live` で結果を通知する。
 
 ## テスト
 
 ### アクセシビリティテスト
 
-- Playwrightでアクセシビリティテストを実行
-- axe-coreなどのツールを使用
+- E2E でアクセシビリティを検証する。Playwright と axe-core 等を使い、違反が無いことを確認する。
+- テストの実行方法と配置は [テストガイド](../testing/testing-guide.md) を参照する。
 
-```typescript
-// ✅ Good: E2Eテスト
-test("should be accessible", async ({ page }) => {
-    await page.goto("/");
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
-    expect(accessibilityScanResults.violations).toEqual([]);
-});
-```
+### スクリーンリーダー・キーボード操作
 
-### スクリーンリーダーテスト
-
-- 実際のスクリーンリーダーでテスト
-- キーボードのみで操作可能か確認
+- 実際のスクリーンリーダー（NVDA、VoiceOver 等）で主要画面を確認する。
+- キーボードのみで操作可能か、フォーカス移動・操作が分かりやすいかを確認する。
