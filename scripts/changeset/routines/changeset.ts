@@ -25,9 +25,19 @@ ${data.category}: ${data.summary}
 `;
 }
 
-export async function writeChangesetFile(rootDir: string, data: ChangesetData): Promise<string> {
+/**
+ * changesetファイルを作成
+ * @param rootDir リポジトリのルートディレクトリ
+ * @param data changesetデータ
+ * @param changesetDir changesetディレクトリ（デフォルト: ".changeset"）
+ */
+export async function writeChangesetFile(
+    rootDir: string,
+    data: ChangesetData,
+    changesetDir = ".changeset",
+): Promise<string> {
     const fileName = `${generateRandomId()}.md`;
-    const filePath = join(rootDir, ".changeset", fileName);
+    const filePath = join(rootDir, changesetDir, fileName);
     const content = generateChangesetContent(data);
 
     await writeFile(filePath, content, "utf-8");

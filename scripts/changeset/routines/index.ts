@@ -1,5 +1,6 @@
 import pc from "picocolors";
 import { writeChangesetFile } from "./changeset.js";
+import { loadConfig } from "./config.js";
 import { addAndCommit, getChangedFiles } from "./git.js";
 import { detectAffectedPackages, getAllPackages } from "./packages.js";
 import { confirmChangeset, promptCategory, promptPackages, promptSummary, promptVersionType } from "./prompts.js";
@@ -9,8 +10,16 @@ export async function runChangeset(rootDir: string): Promise<void> {
     console.log(pc.cyan("\n📝 Changeset 作成ツール\n"));
 
     try {
+        // 設定を自動検出
+        const config = await loadConfig(rootDir);
+
+        if (config.packageScope) {
+            console.log(pc.dim(`パッケージスコープ: ${config.packageScope}`));
+        }
+        console.log(pc.dim(`Changesetディレクトリ: ${config.changesetDir}\n`));
+
         const changedFiles = await getChangedFiles();
-        const allPackages = await getAllPackages(rootDir);
+        const allPackages = await getAllPackages(rootDir, config.packageScope);
         const packageNames = allPackages.map((p) => p.name);
         const affectedPackages = detectAffectedPackages(changedFiles, allPackages);
         const selectedPackages = await promptPackages(packageNames, affectedPackages);
@@ -37,7 +46,7 @@ export async function runChangeset(rootDir: string): Promise<void> {
             summary,
         };
 
-        const filePath = await writeChangesetFile(rootDir, changesetData);
+        const filePath = await writeChangesetFile(rootDir, changesetData, config.changesetDir);
         console.log(pc.green(`\n✅ Changesetファイルを作成しました: ${filePath}`));
 
         const commitMessage = `changeset: ${summary}`;
