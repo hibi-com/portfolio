@@ -60,10 +60,11 @@ PRD: Promote (STG→PRD) → Download (v1.2.3) → Deploy
 - `dns.ts` - DNSレコード
 - `observability.ts` - 監視設定
 
-**除外対象**:
+**環境変数管理**:
 
-- `env.yaml` の環境変数（手動管理）
-- シークレット（Pulumi Secrets経由）
+- `env.yaml` - ローカルで管理、CircleCIにbase64エンコードしてアップロード
+- `infra/scripts/upload-env-to-circleci.sh` - 自動アップロードスクリプト
+- CircleCI側で自動デコードして使用
 
 **実行スケジュール**:
 
@@ -216,16 +217,35 @@ graph TD
 
 ## 必要なCircleCI Contexts
 
-| Context名 | 環境変数 |
-| --------- | -------- |
-| `backblaze-b2` | B2_APPLICATION_KEY_ID, B2_APPLICATION_KEY, B2_BUCKET_NAME |
-| `cloudflare` | CLOUDFLARE_API_TOKEN, DOMAIN |
-| `doppler` | DOPPLER_TOKEN, DATABASE_URL |
-| `sentry` | SENTRY_AUTH_TOKEN, SENTRY_ORG |
-| `pulumi` | PULUMI_ACCESS_TOKEN |
-| `security` | SNYK_TOKEN |
-| `percy` | PERCY_TOKEN |
-| `tidb` | TIDB_API_KEY |
+| Context名 | 環境変数 | 説明 |
+| --------- | -------- | ---- |
+| `env-config` | ENV_CONFIG_RC, ENV_CONFIG_STG, ENV_CONFIG_PRD | 環境設定（base64エンコード済み） |
+| `backblaze-b2` | B2_APPLICATION_KEY_ID, B2_APPLICATION_KEY, B2_BUCKET_NAME | Backblaze B2認証情報 |
+| `cloudflare` | CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID | Cloudflare API認証情報 |
+| `sentry` | SENTRY_AUTH_TOKEN, SENTRY_ORG | Sentry監視設定 |
+| `pulumi` | PULUMI_ACCESS_TOKEN | Pulumi IaC認証情報 |
+| `security` | SNYK_TOKEN | Snyk脆弱性スキャン認証情報 |
+| `percy` | PERCY_TOKEN | Percy Visual Regression認証情報 |
+| `tidb` | TIDB_HOST, TIDB_USER, TIDB_PASSWORD | TiDB Cloud接続情報 |
+
+### 環境設定のアップロード
+
+`env-config`コンテキストの環境変数は、専用スクリプトで自動設定できます：
+
+```bash
+# 前提条件: 環境変数を設定
+export CIRCLECI_API_TOKEN="your_circleci_token"
+export CIRCLE_PROJECT_USERNAME="ageha734"
+export CIRCLE_PROJECT_REPONAME="portfolio"
+
+# すべての環境をアップロード
+./infra/scripts/upload-env-to-circleci.sh all
+
+# 特定の環境のみ
+./infra/scripts/upload-env-to-circleci.sh rc
+```
+
+詳細: [infra/scripts/README.md](../../infra/scripts/README.md)
 
 ## メリット
 
