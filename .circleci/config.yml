@@ -884,7 +884,7 @@ jobs:
           name: Install dependencies
           command: |
             cd infra
-            bun install --frozen-lockfile
+            bun install --frozen-lockfile --ignore-scripts
       - run:
           name: Pulumi preview for << parameters.environment >>
           command: |
@@ -922,7 +922,7 @@ jobs:
           name: Install dependencies
           command: |
             cd infra
-            bun install --frozen-lockfile
+            bun install --frozen-lockfile --ignore-scripts
       - run:
           name: Build infrastructure code
           command: |

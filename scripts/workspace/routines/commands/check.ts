@@ -62,6 +62,19 @@ async function promptUser(question: string): Promise<boolean> {
     });
 }
 
+function isNonInteractive(): boolean {
+    if (process.env.CI === "true" || process.env.CI === "1") {
+        return true;
+    }
+    if (process.env.CIRCLECI === "true") {
+        return true;
+    }
+    if (process.env.WORKSPACE_NONINTERACTIVE === "1") {
+        return true;
+    }
+    return !process.stdin.isTTY;
+}
+
 async function installNode(): Promise<void> {
     logStep("", "nvmをインストールしています...", "info");
     try {
@@ -210,6 +223,23 @@ function handleInstalledCommand(commandInfo: CommandInfo, inPath: boolean, isAlr
 }
 
 async function handleInstallationPrompt(commandInfo: CommandInfo, isOptional: boolean): Promise<boolean> {
+    if (isNonInteractive()) {
+        if (isOptional) {
+            logStep(
+                "",
+                `${commandInfo.name}がインストールされていません（オプション）。非対話環境のためスキップします`,
+                "info",
+            );
+            return false;
+        }
+        logStep(
+            "",
+            `${commandInfo.name}がインストールされていません。非対話環境のため自動インストールします`,
+            "info",
+        );
+        return true;
+    }
+
     const optionalText = isOptional ? "（オプション）" : "";
     const message = `${commandInfo.name}がインストールされていません${optionalText}。インストールしますか？ (y/n): `;
 
