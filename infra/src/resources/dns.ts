@@ -2,6 +2,7 @@ import * as cloudflare from "@pulumi/cloudflare";
 import * as pulumi from "@pulumi/pulumi";
 import type { InfraConfig } from "../config.js";
 import { getProjectName } from "../config.js";
+import { dnsRecordName } from "../hostname.js";
 
 export interface DnsRecordConfig {
     name: string;
@@ -79,24 +80,35 @@ export function createPortfolioDnsRecords(
     workerCustomDomains?: Record<string, cloudflare.WorkersCustomDomain>,
 ): DnsOutputs {
     const projectName = getProjectName();
+    const { environment } = config;
+
+    const wwwName = dnsRecordName(environment, "www");
+    const adminName = dnsRecordName(environment, "admin");
+    const wikiName = dnsRecordName(environment, "wiki");
+    const portalName = dnsRecordName(environment, "portal");
+    const apiName = dnsRecordName(environment, "api");
 
     const defaultWebSubdomain = `${projectName}-web.pages.dev`;
     const defaultAdminSubdomain = `${projectName}-admin.pages.dev`;
     const defaultWikiSubdomain = `${projectName}-wiki.pages.dev`;
+    const defaultPortalSubdomain = `${projectName}-e2e.pages.dev`;
     const defaultApiSubdomain = `${projectName}-api.workers.dev`;
 
     let webSubdomain: pulumi.Output<string>;
     let adminSubdomain: pulumi.Output<string>;
     let wikiSubdomain: pulumi.Output<string>;
+    let portalSubdomain: pulumi.Output<string>;
 
     if (pagesSubdomains) {
-        webSubdomain = pagesSubdomains["www"] ?? pulumi.output(defaultWebSubdomain);
-        adminSubdomain = pagesSubdomains["admin"] ?? pulumi.output(defaultAdminSubdomain);
-        wikiSubdomain = pagesSubdomains["wiki"] ?? pulumi.output(defaultWikiSubdomain);
+        webSubdomain = pagesSubdomains[wwwName] ?? pulumi.output(defaultWebSubdomain);
+        adminSubdomain = pagesSubdomains[adminName] ?? pulumi.output(defaultAdminSubdomain);
+        wikiSubdomain = pagesSubdomains[wikiName] ?? pulumi.output(defaultWikiSubdomain);
+        portalSubdomain = pagesSubdomains[portalName] ?? pulumi.output(defaultPortalSubdomain);
     } else {
         webSubdomain = pulumi.output(defaultWebSubdomain);
         adminSubdomain = pulumi.output(defaultAdminSubdomain);
         wikiSubdomain = pulumi.output(defaultWikiSubdomain);
+        portalSubdomain = pulumi.output(defaultPortalSubdomain);
     }
 
     let apiSubdomain: pulumi.Output<string>;
@@ -110,32 +122,39 @@ export function createPortfolioDnsRecords(
 
     const records: DnsRecordConfig[] = [
         {
-            name: "www",
+            name: wwwName,
             type: "CNAME",
             content: webSubdomain,
             proxied: true,
             comment: "Main web application",
         },
         {
-            name: "admin",
+            name: adminName,
             type: "CNAME",
             content: adminSubdomain,
             proxied: true,
             comment: "Admin dashboard",
         },
         {
-            name: "wiki",
+            name: wikiName,
             type: "CNAME",
             content: wikiSubdomain,
             proxied: true,
             comment: "Documentation wiki",
+        },
+        {
+            name: portalName,
+            type: "CNAME",
+            content: portalSubdomain,
+            proxied: true,
+            comment: "E2E portal",
         },
     ];
 
     const hasApiCustomDomain = workerCustomDomains && Object.keys(workerCustomDomains).length > 0;
     if (!hasApiCustomDomain) {
         records.push({
-            name: "api",
+            name: apiName,
             type: "CNAME",
             content: apiSubdomain,
             proxied: true,

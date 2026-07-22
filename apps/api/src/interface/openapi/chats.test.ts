@@ -1,7 +1,7 @@
 import { chatsRouter } from "./chats";
 
-vi.mock("~/di/container", () => ({
-    DIContainer: vi.fn().mockImplementation(() => ({
+vi.mock("~/di/create-container", () => ({
+    createContainer: vi.fn().mockImplementation(() => ({
         getGetChatRoomsUseCase: vi.fn(() => ({
             execute: vi.fn().mockResolvedValue([
                 {
@@ -94,7 +94,11 @@ vi.mock("~/lib/validation", () => ({
 describe("chatsRouter", () => {
     const mockEnv = {
         DATABASE_URL: "test-db-url",
-        CACHE_URL: "test-cache-url",
+        DB: undefined,
+        CACHE: undefined,
+        IMAGES: undefined,
+        R2_PUBLIC_URL: undefined,
+        NODE_ENV: "test",
     };
 
     beforeEach(() => {

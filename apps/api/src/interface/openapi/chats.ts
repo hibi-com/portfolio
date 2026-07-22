@@ -1,14 +1,10 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import type { Handler } from "hono";
-import { DIContainer } from "~/di/container";
+import { createContainer } from "~/di/create-container";
+import type { Env } from "~/env";
 import { getLogger, getMetrics } from "~/lib/logger";
 import { isValidUuid } from "~/lib/validation";
-
-type Env = {
-    DATABASE_URL: string;
-    CACHE_URL: string;
-};
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -197,7 +193,7 @@ const listRoomsHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetChatRoomsUseCase();
         const rooms = await useCase.execute();
 
@@ -223,7 +219,7 @@ const getRoomHandler: Handler<{ Bindings: Env }> = async (c) => {
     if (!isValidUuid(id)) return c.json({ error: "Invalid chat room ID format" }, 400);
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetChatRoomByIdUseCase();
         const room = await useCase.execute(id);
         if (!room) return c.json({ error: "Chat room not found" }, 404);
@@ -244,7 +240,7 @@ const getRoomHandler: Handler<{ Bindings: Env }> = async (c) => {
 const createRoomHandler: Handler<{ Bindings: Env }> = async (c) => {
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getCreateChatRoomUseCase();
         const room = await useCase.execute(body);
         return c.json(room, 201);
@@ -266,7 +262,7 @@ const closeRoomHandler: Handler<{ Bindings: Env }> = async (c) => {
     if (!isValidUuid(id)) return c.json({ error: "Invalid chat room ID format" }, 400);
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getCloseChatRoomUseCase();
         const room = await useCase.execute(id);
         return c.json(room, 200);
@@ -289,7 +285,7 @@ const addParticipantHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getAddChatParticipantUseCase();
         const participant = await useCase.execute({ chatRoomId, ...body });
         return c.json(participant, 201);
@@ -311,7 +307,7 @@ const getMessagesHandler: Handler<{ Bindings: Env }> = async (c) => {
     if (!isValidUuid(id)) return c.json({ error: "Invalid chat room ID format" }, 400);
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetChatMessagesUseCase();
         const messages = await useCase.execute(id);
         return c.json(messages, 200);
@@ -334,7 +330,7 @@ const sendMessageHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getSendChatMessageUseCase();
         const message = await useCase.execute({ chatRoomId, ...body });
         return c.json(message, 201);

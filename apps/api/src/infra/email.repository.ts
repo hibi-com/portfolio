@@ -1,4 +1,4 @@
-import { createPrismaClient } from "@portfolio/db";
+import { type CreatePrismaClientOptions, createPrismaClient } from "@portfolio/db";
 import type {
     CreateEmailTemplateInput,
     EmailLog,
@@ -15,7 +15,7 @@ function toDateString(d: Date | null | undefined): string | undefined {
 }
 
 export class EmailRepositoryImpl implements EmailRepository {
-    constructor(private readonly databaseUrl?: string) {}
+    constructor(private readonly options?: CreatePrismaClientOptions) {}
 
     private mapToEmailLog(data: {
         id: string;
@@ -96,7 +96,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async findAllLogs(): Promise<EmailLog[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const logs = await prisma.emailLog.findMany({
             orderBy: { createdAt: "desc" },
         });
@@ -105,7 +105,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async findLogById(id: string): Promise<EmailLog | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const log = await prisma.emailLog.findUnique({
             where: { id },
         });
@@ -116,7 +116,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async findLogsByCustomerId(customerId: string): Promise<EmailLog[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const logs = await prisma.emailLog.findMany({
             where: { customerId },
             orderBy: { createdAt: "desc" },
@@ -126,7 +126,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async createLog(log: Omit<EmailLog, "id" | "createdAt" | "updatedAt">): Promise<EmailLog> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const sentAt =
             log.sentAt == null ? null : new Date(log.sentAt as string);
         const created = await prisma.emailLog.create({
@@ -156,7 +156,7 @@ export class EmailRepositoryImpl implements EmailRepository {
         status: EmailStatus,
         details?: { resendId?: string; errorMessage?: string; sentAt?: Date },
     ): Promise<EmailLog> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const updated = await prisma.emailLog.update({
             where: { id },
             data: {
@@ -171,7 +171,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async findAllTemplates(): Promise<EmailTemplate[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const templates = await prisma.emailTemplate.findMany({
             orderBy: { createdAt: "desc" },
         });
@@ -180,7 +180,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async findTemplateById(id: string): Promise<EmailTemplate | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const template = await prisma.emailTemplate.findUnique({
             where: { id },
         });
@@ -191,7 +191,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async findTemplateBySlug(slug: string): Promise<EmailTemplate | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const template = await prisma.emailTemplate.findUnique({
             where: { slug },
         });
@@ -202,7 +202,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async createTemplate(input: CreateEmailTemplateInput): Promise<EmailTemplate> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const template = await prisma.emailTemplate.create({
             data: {
                 name: input.name,
@@ -221,7 +221,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async updateTemplate(id: string, input: UpdateEmailTemplateInput): Promise<EmailTemplate> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const template = await prisma.emailTemplate.update({
             where: { id },
             data: {
@@ -241,7 +241,7 @@ export class EmailRepositoryImpl implements EmailRepository {
     }
 
     async deleteTemplate(id: string): Promise<void> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         await prisma.emailTemplate.delete({
             where: { id },
         });

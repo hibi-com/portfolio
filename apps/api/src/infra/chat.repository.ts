@@ -1,4 +1,4 @@
-import { createPrismaClient, type PrismaClient } from "@portfolio/db";
+import { type CreatePrismaClientOptions, createPrismaClient, type PrismaClient } from "@portfolio/db";
 import type {
     AddParticipantInput,
     ChatMessage,
@@ -14,8 +14,8 @@ import type {
 export class ChatRepositoryImpl implements ChatRepository {
     private readonly prisma: PrismaClient;
 
-    constructor(databaseUrl?: string) {
-        this.prisma = createPrismaClient({ databaseUrl });
+    constructor(options?: CreatePrismaClientOptions) {
+        this.prisma = createPrismaClient(options ?? {});
     }
 
     private parseJsonField<T>(value: string | null | undefined): T | undefined {

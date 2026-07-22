@@ -1,10 +1,8 @@
 -- Seed data for tags table
 -- This script runs after database initialization
 
-USE portfolio;
-
 -- Insert sample tag data (20 tags)
-INSERT INTO `tags` (`id`, `name`)
+INSERT OR IGNORE INTO "tags" ("id", "name")
 VALUES
     ('10000000-0000-0000-0000-000000000001', 'TypeScript'),
     ('10000000-0000-0000-0000-000000000002', 'React'),
@@ -25,5 +23,4 @@ VALUES
     ('10000000-0000-0000-0000-000000000017', 'Performance'),
     ('10000000-0000-0000-0000-000000000018', 'Mobile'),
     ('10000000-0000-0000-0000-000000000019', 'Machine Learning'),
-    ('10000000-0000-0000-0000-000000000020', 'Blockchain')
-ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+    ('10000000-0000-0000-0000-000000000020', 'Blockchain');

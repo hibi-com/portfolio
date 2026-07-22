@@ -1,7 +1,7 @@
 import { emailsRouter } from "./emails";
 
-vi.mock("~/di/container", () => ({
-    DIContainer: vi.fn().mockImplementation(() => ({
+vi.mock("~/di/create-container", () => ({
+    createContainer: vi.fn().mockImplementation(() => ({
         getGetEmailLogsUseCase: vi.fn(() => ({
             execute: vi.fn().mockResolvedValue([
                 {
@@ -129,7 +129,11 @@ vi.mock("~/lib/validation", () => ({
 describe("emailsRouter", () => {
     const mockEnv = {
         DATABASE_URL: "test-db-url",
-        CACHE_URL: "test-cache-url",
+        DB: undefined,
+        CACHE: undefined,
+        IMAGES: undefined,
+        R2_PUBLIC_URL: undefined,
+        NODE_ENV: "test",
         RESEND_API_KEY: "test-api-key",
         RESEND_FROM_EMAIL: "sender@example.com",
     };

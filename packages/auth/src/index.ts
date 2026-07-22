@@ -20,12 +20,13 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
     options: InitAuthOptions<TExtraPlugins>,
 ): ReturnType<typeof betterAuth> {
     const prisma = createPrismaClient({
+        d1: options.d1,
         databaseUrl: options.databaseUrl,
     });
 
     const config = {
         database: prismaAdapter(prisma, {
-            provider: "mysql",
+            provider: "sqlite",
         }),
         baseURL: options.baseUrl,
         secret: options.secret,

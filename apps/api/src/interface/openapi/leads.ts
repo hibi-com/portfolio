@@ -1,14 +1,10 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import type { Handler } from "hono";
-import { DIContainer } from "~/di/container";
+import { createContainer } from "~/di/create-container";
+import type { Env } from "~/env";
 import { getLogger, getMetrics } from "~/lib/logger";
 import { isValidUuid } from "~/lib/validation";
-
-type Env = {
-    DATABASE_URL: string;
-    CACHE_URL: string;
-};
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -177,7 +173,7 @@ const listLeadsHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetLeadsUseCase();
         const leads = await useCase.execute();
 
@@ -210,7 +206,7 @@ const getLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
     }
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetLeadByIdUseCase();
         const lead = await useCase.execute(id);
 
@@ -243,7 +239,7 @@ const createLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getCreateLeadUseCase();
         const lead = await useCase.execute(body);
 
@@ -273,7 +269,7 @@ const updateLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getUpdateLeadUseCase();
         const lead = await useCase.execute(id, body);
 
@@ -302,7 +298,7 @@ const deleteLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getDeleteLeadUseCase();
         await useCase.execute(id);
 
@@ -331,7 +327,7 @@ const convertLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getConvertLeadToDealUseCase();
         const deal = await useCase.execute(id);
 

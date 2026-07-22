@@ -1,23 +1,21 @@
-import { createRedisClient } from "@portfolio/cache";
+import { createKvClient } from "@portfolio/cache";
 import { CacheService } from "./cache.service";
 
 vi.mock("@portfolio/cache", () => ({
-    createRedisClient: vi.fn(),
+    createKvClient: vi.fn(),
 }));
 
 describe("CacheService", () => {
-    const mockRedis = {
+    const mockKv = {
         get: vi.fn(),
-        setex: vi.fn(),
-        del: vi.fn(),
-        keys: vi.fn(),
-        quit: vi.fn(),
-        status: "ready" as const,
+        put: vi.fn(),
+        delete: vi.fn(),
+        list: vi.fn(),
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(createRedisClient).mockReturnValue(mockRedis as any);
+        vi.mocked(createKvClient).mockReturnValue(mockKv as unknown as KVNamespace);
     });
 
     afterEach(() => {
@@ -35,55 +33,58 @@ describe("CacheService", () => {
             expect(service).toBeDefined();
         });
 
-        test("should create instance with redisUrl", () => {
-            const service = new CacheService("redis://localhost:6379");
+        test("should create instance with kv namespace", () => {
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             expect(service).toBeDefined();
         });
     });
 
-    describe("getRedis", () => {
-        test("should return Redis instance on successful connection", () => {
-            const service = new CacheService();
-            expect(createRedisClient).not.toHaveBeenCalled();
+    describe("getKv", () => {
+        test("should return KV instance on successful connection", async () => {
+            const service = new CacheService(mockKv as unknown as KVNamespace);
+            expect(createKvClient).not.toHaveBeenCalled();
 
-            service.get("test-key");
-            expect(createRedisClient).toHaveBeenCalledWith({
-                redisUrl: undefined,
-                lazyConnect: false,
+            await service.get("test-key");
+            expect(createKvClient).toHaveBeenCalledWith({
+                kv: mockKv,
             });
         });
 
+        test("should return null when kv is not provided", async () => {
+            const service = new CacheService();
+            const result = await service.get("test-key");
+
+            expect(result).toBeNull();
+            expect(createKvClient).not.toHaveBeenCalled();
+        });
+
         test("should return null on connection failure", async () => {
-            vi.mocked(createRedisClient).mockImplementation(() => {
+            vi.mocked(createKvClient).mockImplementation(() => {
                 throw new Error("Connection failed");
             });
 
             const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get("test-key");
 
             expect(result).toBeNull();
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redis接続に失敗しました"));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("KV接続に失敗しました"));
 
             consoleWarnSpy.mockRestore();
         });
 
-        test("should reuse existing Redis instance", async () => {
-            const service = new CacheService();
+        test("should reuse existing KV instance", async () => {
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.get("key1");
             await service.get("key2");
 
-            expect(createRedisClient).toHaveBeenCalledTimes(1);
+            expect(createKvClient).toHaveBeenCalledTimes(1);
         });
     });
 
     describe("get", () => {
-        test("should return null when Redis is null", async () => {
-            vi.mocked(createRedisClient).mockImplementation(() => {
-                throw new Error("Connection failed");
-            });
-
+        test("should return null when KV is null", async () => {
             const service = new CacheService();
             const result = await service.get("test-key");
 
@@ -91,36 +92,36 @@ describe("CacheService", () => {
         });
 
         test("should return null when key does not exist", async () => {
-            mockRedis.get.mockResolvedValue(null);
+            mockKv.get.mockResolvedValue(null);
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get("non-existent-key");
 
             expect(result).toBeNull();
-            expect(mockRedis.get).toHaveBeenCalledWith("non-existent-key");
+            expect(mockKv.get).toHaveBeenCalledWith("non-existent-key", "text");
         });
 
         test("should return cached value when key exists", async () => {
             const cachedValue = { id: "1", name: "test" };
-            mockRedis.get.mockResolvedValue(JSON.stringify(cachedValue));
+            mockKv.get.mockResolvedValue(JSON.stringify(cachedValue));
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get<typeof cachedValue>("test-key");
 
             expect(result).toEqual(cachedValue);
-            expect(mockRedis.get).toHaveBeenCalledWith("test-key");
+            expect(mockKv.get).toHaveBeenCalledWith("test-key", "text");
         });
 
         test("should handle JSON.parse error gracefully", async () => {
-            mockRedis.get.mockResolvedValue("invalid-json");
+            mockKv.get.mockResolvedValue("invalid-json");
 
             const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get("test-key");
 
             expect(result).toBeNull();
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redis取得エラー"));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("KV取得エラー"));
 
             consoleWarnSpy.mockRestore();
         });
@@ -131,9 +132,9 @@ describe("CacheService", () => {
                 date: "2024-01-01T00:00:00.000Z",
                 createdAt: "2024-01-01T00:00:00Z",
             };
-            mockRedis.get.mockResolvedValue(JSON.stringify(cachedValue));
+            mockKv.get.mockResolvedValue(JSON.stringify(cachedValue));
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get<{
                 id: string;
                 date: Date;
@@ -152,9 +153,9 @@ describe("CacheService", () => {
                 name: "test",
                 date: "2024-01-01",
             };
-            mockRedis.get.mockResolvedValue(JSON.stringify(cachedValue));
+            mockKv.get.mockResolvedValue(JSON.stringify(cachedValue));
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get<typeof cachedValue>("test-key");
 
             expect(result?.date).toBe("2024-01-01");
@@ -169,9 +170,9 @@ describe("CacheService", () => {
                     createdAt: "2024-01-01T00:00:00Z",
                 },
             };
-            mockRedis.get.mockResolvedValue(JSON.stringify(cachedValue));
+            mockKv.get.mockResolvedValue(JSON.stringify(cachedValue));
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get<{
                 id: string;
                 post: { date: Date; createdAt: Date };
@@ -185,9 +186,9 @@ describe("CacheService", () => {
             const cachedValue = {
                 date: "2024-01-01T12:34:56.789Z",
             };
-            mockRedis.get.mockResolvedValue(JSON.stringify(cachedValue));
+            mockKv.get.mockResolvedValue(JSON.stringify(cachedValue));
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get<{ date: Date }>("test-key");
 
             expect(result?.date).toBeInstanceOf(Date);
@@ -198,9 +199,9 @@ describe("CacheService", () => {
             const cachedValue = {
                 date: "2024-01-01T00:00:00.000",
             };
-            mockRedis.get.mockResolvedValue(JSON.stringify(cachedValue));
+            mockKv.get.mockResolvedValue(JSON.stringify(cachedValue));
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get<{ date: Date }>("test-key");
 
             expect(result?.date).toBeInstanceOf(Date);
@@ -213,9 +214,9 @@ describe("CacheService", () => {
                 tags: ["tag1", "tag2"],
                 metadata: { key: "value" },
             };
-            mockRedis.get.mockResolvedValue(JSON.stringify(cachedValue));
+            mockKv.get.mockResolvedValue(JSON.stringify(cachedValue));
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const result = await service.get<typeof cachedValue>("test-key");
 
             expect(result?.id).toBe(123);
@@ -226,208 +227,202 @@ describe("CacheService", () => {
     });
 
     describe("set", () => {
-        test("should do nothing when Redis is null", async () => {
-            vi.mocked(createRedisClient).mockImplementation(() => {
-                throw new Error("Connection failed");
-            });
-
+        test("should do nothing when KV is null", async () => {
             const service = new CacheService();
             await service.set("test-key", { value: "test" });
 
-            expect(mockRedis.setex).not.toHaveBeenCalled();
+            expect(mockKv.put).not.toHaveBeenCalled();
         });
 
         test("should set value with default TTL", async () => {
-            mockRedis.setex.mockResolvedValue("OK");
+            mockKv.put.mockResolvedValue(undefined);
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const value = { id: "1", name: "test" };
             await service.set("test-key", value);
 
-            expect(mockRedis.setex).toHaveBeenCalledWith("test-key", 3600, JSON.stringify(value));
+            expect(mockKv.put).toHaveBeenCalledWith("test-key", JSON.stringify(value), { expirationTtl: 3600 });
         });
 
         test("should set value with custom TTL", async () => {
-            mockRedis.setex.mockResolvedValue("OK");
+            mockKv.put.mockResolvedValue(undefined);
 
-            const service = new CacheService(undefined, 7200);
+            const service = new CacheService(mockKv as unknown as KVNamespace, 7200);
             const value = { id: "1", name: "test" };
             await service.set("test-key", value, 1800);
 
-            expect(mockRedis.setex).toHaveBeenCalledWith("test-key", 1800, JSON.stringify(value));
+            expect(mockKv.put).toHaveBeenCalledWith("test-key", JSON.stringify(value), { expirationTtl: 1800 });
         });
 
-        test("should handle setex error gracefully", async () => {
-            mockRedis.setex.mockRejectedValue(new Error("Setex failed"));
+        test("should handle put error gracefully", async () => {
+            mockKv.put.mockRejectedValue(new Error("Put failed"));
 
             const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.set("test-key", { value: "test" });
 
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redis書き込みエラー"));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("KV書き込みエラー"));
 
             consoleWarnSpy.mockRestore();
         });
 
         test("should serialize Date objects correctly", async () => {
-            mockRedis.setex.mockResolvedValue("OK");
+            mockKv.put.mockResolvedValue(undefined);
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             const value = {
                 id: "1",
                 date: new Date("2024-01-01T00:00:00.000Z"),
             };
             await service.set("test-key", value);
 
-            expect(mockRedis.setex.mock.calls.length).toBeGreaterThan(0);
-            const callArgs = mockRedis.setex.mock.calls[0];
+            expect(mockKv.put.mock.calls.length).toBeGreaterThan(0);
+            const callArgs = mockKv.put.mock.calls[0];
             expect(callArgs).toBeDefined();
-            expect(callArgs?.[2]).toBeDefined();
-            const serialized = JSON.parse((callArgs?.[2] ?? "") as string);
+            expect(callArgs?.[1]).toBeDefined();
+            const serialized = JSON.parse((callArgs?.[1] ?? "") as string);
             expect(serialized.date).toBe("2024-01-01T00:00:00.000Z");
         });
     });
 
     describe("delete", () => {
-        test("should do nothing when Redis is null", async () => {
-            vi.mocked(createRedisClient).mockImplementation(() => {
-                throw new Error("Connection failed");
-            });
-
+        test("should do nothing when KV is null", async () => {
             const service = new CacheService();
             await service.delete("test-key");
 
-            expect(mockRedis.del).not.toHaveBeenCalled();
+            expect(mockKv.delete).not.toHaveBeenCalled();
         });
 
         test("should delete existing key", async () => {
-            mockRedis.del.mockResolvedValue(1);
+            mockKv.delete.mockResolvedValue(undefined);
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.delete("test-key");
 
-            expect(mockRedis.del).toHaveBeenCalledWith("test-key");
+            expect(mockKv.delete).toHaveBeenCalledWith("test-key");
         });
 
         test("should handle non-existent key gracefully", async () => {
-            mockRedis.del.mockResolvedValue(0);
+            mockKv.delete.mockResolvedValue(undefined);
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.delete("non-existent-key");
 
-            expect(mockRedis.del).toHaveBeenCalledWith("non-existent-key");
+            expect(mockKv.delete).toHaveBeenCalledWith("non-existent-key");
         });
 
-        test("should handle del error gracefully", async () => {
-            mockRedis.del.mockRejectedValue(new Error("Delete failed"));
+        test("should handle delete error gracefully", async () => {
+            mockKv.delete.mockRejectedValue(new Error("Delete failed"));
 
             const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.delete("test-key");
 
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redis削除エラー"));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("KV削除エラー"));
 
             consoleWarnSpy.mockRestore();
         });
     });
 
     describe("deletePattern", () => {
-        test("should do nothing when Redis is null", async () => {
-            vi.mocked(createRedisClient).mockImplementation(() => {
-                throw new Error("Connection failed");
-            });
-
+        test("should do nothing when KV is null", async () => {
             const service = new CacheService();
             await service.deletePattern("test:*");
 
-            expect(mockRedis.keys).not.toHaveBeenCalled();
+            expect(mockKv.list).not.toHaveBeenCalled();
         });
 
         test("should delete keys matching pattern", async () => {
-            mockRedis.keys.mockResolvedValue(["test:1", "test:2"]);
-            mockRedis.del.mockResolvedValue(2);
+            mockKv.list.mockResolvedValue({
+                list_complete: true,
+                keys: [{ name: "test:1" }, { name: "test:2" }],
+            });
+            mockKv.delete.mockResolvedValue(undefined);
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.deletePattern("test:*");
 
-            expect(mockRedis.keys).toHaveBeenCalledWith("test:*");
-            expect(mockRedis.del).toHaveBeenCalledWith("test:1", "test:2");
+            expect(mockKv.list).toHaveBeenCalledWith({ prefix: "test:", cursor: undefined });
+            expect(mockKv.delete).toHaveBeenCalledWith("test:1");
+            expect(mockKv.delete).toHaveBeenCalledWith("test:2");
+        });
+
+        test("should paginate with cursor", async () => {
+            mockKv.list
+                .mockResolvedValueOnce({
+                    list_complete: false,
+                    keys: [{ name: "test:1" }],
+                    cursor: "next-page",
+                })
+                .mockResolvedValueOnce({
+                    list_complete: true,
+                    keys: [{ name: "test:2" }],
+                });
+            mockKv.delete.mockResolvedValue(undefined);
+
+            const service = new CacheService(mockKv as unknown as KVNamespace);
+            await service.deletePattern("test:*");
+
+            expect(mockKv.list).toHaveBeenNthCalledWith(1, { prefix: "test:", cursor: undefined });
+            expect(mockKv.list).toHaveBeenNthCalledWith(2, { prefix: "test:", cursor: "next-page" });
+            expect(mockKv.delete).toHaveBeenCalledWith("test:1");
+            expect(mockKv.delete).toHaveBeenCalledWith("test:2");
         });
 
         test("should handle empty keys array", async () => {
-            mockRedis.keys.mockResolvedValue([]);
+            mockKv.list.mockResolvedValue({ list_complete: true, keys: [] });
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.deletePattern("test:*");
 
-            expect(mockRedis.keys).toHaveBeenCalledWith("test:*");
-            expect(mockRedis.del).not.toHaveBeenCalled();
+            expect(mockKv.list).toHaveBeenCalledWith({ prefix: "test:", cursor: undefined });
+            expect(mockKv.delete).not.toHaveBeenCalled();
         });
 
-        test("should handle keys error gracefully", async () => {
-            mockRedis.keys.mockRejectedValue(new Error("Keys failed"));
+        test("should handle list error gracefully", async () => {
+            mockKv.list.mockRejectedValue(new Error("List failed"));
 
             const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.deletePattern("test:*");
 
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redisパターン削除エラー"));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("KVパターン削除エラー"));
 
             consoleWarnSpy.mockRestore();
         });
 
-        test("should handle del error gracefully", async () => {
-            mockRedis.keys.mockResolvedValue(["test:1"]);
-            mockRedis.del.mockRejectedValue(new Error("Delete failed"));
+        test("should handle delete error gracefully", async () => {
+            mockKv.list.mockResolvedValue({
+                list_complete: true,
+                keys: [{ name: "test:1" }],
+            });
+            mockKv.delete.mockRejectedValue(new Error("Delete failed"));
 
             const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
 
-            const service = new CacheService();
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.deletePattern("test:*");
 
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redisパターン削除エラー"));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("KVパターン削除エラー"));
 
             consoleWarnSpy.mockRestore();
         });
     });
 
     describe("close", () => {
-        test("should do nothing when Redis is null", async () => {
-            vi.mocked(createRedisClient).mockImplementation(() => {
-                throw new Error("Connection failed");
-            });
-
-            const service = new CacheService();
-            await service.close();
-
-            expect(mockRedis.quit).not.toHaveBeenCalled();
-        });
-
-        test("should close Redis connection", async () => {
-            mockRedis.quit.mockResolvedValue("OK");
-
-            const service = new CacheService();
+        test("should clear KV reference", async () => {
+            const service = new CacheService(mockKv as unknown as KVNamespace);
             await service.get("test-key");
             await service.close();
 
-            expect(mockRedis.quit).toHaveBeenCalled();
-        });
+            mockKv.get.mockClear();
+            vi.mocked(createKvClient).mockClear();
 
-        test("should handle quit error gracefully", async () => {
-            mockRedis.quit.mockRejectedValue(new Error("Quit failed"));
-
-            const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
-
-            const service = new CacheService();
             await service.get("test-key");
-            await service.close();
-
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redis切断エラー"));
-
-            consoleWarnSpy.mockRestore();
+            expect(createKvClient).toHaveBeenCalledTimes(1);
         });
     });
 });

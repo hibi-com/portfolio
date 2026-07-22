@@ -48,11 +48,13 @@ describe("CachedPortfolioRepository", () => {
             expect(repository).toBeDefined();
         });
 
-        test("should create instance with databaseUrl and redisUrl", () => {
-            const repository = new CachedPortfolioRepository("mysql://localhost:3306/db", "redis://localhost:6379");
+        test("should create instance with prismaOptions and kv", () => {
+            const mockKv = {} as KVNamespace;
+            const prismaOptions = { databaseUrl: "mysql://localhost:3306/db" };
+            const repository = new CachedPortfolioRepository(prismaOptions, mockKv);
 
-            expect(CacheService).toHaveBeenCalledWith("redis://localhost:6379");
-            expect(PortfolioRepositoryImpl).toHaveBeenCalledWith("mysql://localhost:3306/db");
+            expect(CacheService).toHaveBeenCalledWith(mockKv);
+            expect(PortfolioRepositoryImpl).toHaveBeenCalledWith(prismaOptions);
             expect(repository).toBeDefined();
         });
     });

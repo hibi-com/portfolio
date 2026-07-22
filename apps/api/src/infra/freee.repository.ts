@@ -1,4 +1,4 @@
-import { createPrismaClient, type PrismaClient } from "@portfolio/db";
+import { type CreatePrismaClientOptions, createPrismaClient, type PrismaClient } from "@portfolio/db";
 import type {
     CreateCustomerMappingInput,
     CreateDealMappingInput,
@@ -18,8 +18,8 @@ import type {
 export class FreeeRepositoryImpl implements FreeeRepository {
     private readonly prisma: PrismaClient;
 
-    constructor(databaseUrl?: string) {
-        this.prisma = createPrismaClient({ databaseUrl });
+    constructor(options?: CreatePrismaClientOptions) {
+        this.prisma = createPrismaClient(options ?? {});
     }
 
     private parseJsonField<T>(value: string | null | undefined): T | undefined {

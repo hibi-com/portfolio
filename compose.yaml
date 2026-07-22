@@ -8,23 +8,6 @@ networks:
     name: portfolio_api
 
 services:
-  cache:
-    image: redis:latest
-    container_name: cache
-    networks:
-      - api
-    ports:
-      - target: 6379
-        published: 6379
-        protocol: tcp
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 30s
-      timeout: 10s
-      start_period: 10s
-      retries: 3
-    restart: unless-stopped
-
   mock-apis:
     build:
       context: testing/mock-apis
@@ -66,15 +49,8 @@ services:
     environment:
       NODE_ENV: development
       PORT: 8080
-      DATABASE_URL: mysql://user:password@tidb:4000/portfolio
-      DATABASE_MAX_OPEN_CONNS: 1
-      DATABASE_MAX_IDLE_CONNS: 10
-      DATABASE_CONN_MAX_LIFETIME: 5m
-      DATABASE_CONN_MAX_IDLE_TIME: 3m
-      DATABASE_CA: dummy
-      CACHE_URL: redis://:password@cache:6379
-      CACHE_READ_TIMEOUT: 3s
-      CACHE_WRITE_TIMEOUT: 3s
+      # Local: libSQL (sqld) container. Production Workers bind Cloudflare D1.
+      DATABASE_URL: http://sqlite:8080
       BETTER_AUTH_SECRET: dummy
       BETTER_AUTH_URL: http://api:3000
       GOOGLE_CLIENT_ID: google-client-id
@@ -87,9 +63,7 @@ services:
       FREEE_MAX_RETRIES: 3
       FREEE_RETRY_TIMEOUT: 300ms
     depends_on:
-      setup-db:
-        condition: service_completed_successfully
-      cache:
+      sqlite:
         condition: service_healthy
       mock-apis:
         condition: service_healthy

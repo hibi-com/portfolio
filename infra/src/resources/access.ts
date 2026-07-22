@@ -2,6 +2,7 @@ import * as cloudflare from "@pulumi/cloudflare";
 import * as pulumi from "@pulumi/pulumi";
 import type { InfraConfig } from "../config.js";
 import { getProjectName } from "../config.js";
+import { dnsRecordName } from "../hostname.js";
 
 export interface AccessOutputs {
     applications: Record<string, cloudflare.ZeroTrustAccessApplication>;
@@ -62,10 +63,10 @@ export function createPreviewDeploymentAccess(
     const createdApplications: Record<string, cloudflare.ZeroTrustAccessApplication> = {};
 
     const services = [
-        { key: "admin", subdomainKey: "admin", type: "pages" as const },
-        { key: "api", subdomainKey: "api", type: "workers" as const },
-        { key: "web", subdomainKey: "www", type: "pages" as const },
-        { key: "wiki", subdomainKey: "wiki", type: "pages" as const },
+        { key: "admin", subdomainKey: dnsRecordName(environment, "admin"), type: "pages" as const },
+        { key: "api", subdomainKey: dnsRecordName(environment, "api"), type: "workers" as const },
+        { key: "web", subdomainKey: dnsRecordName(environment, "www"), type: "pages" as const },
+        { key: "wiki", subdomainKey: dnsRecordName(environment, "wiki"), type: "pages" as const },
     ];
 
     for (const service of services) {

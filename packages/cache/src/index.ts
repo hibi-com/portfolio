@@ -1,5 +1,10 @@
 export {
+    type CreateKvClientOptions,
     type CreateRedisClientOptions,
+    createKvClient,
     createRedisClient,
+    type KvClientType,
     type RedisClientType,
-} from "./client/redis";
+    resetKvClient,
+    resetRedisClient,
+} from "./client/kv";

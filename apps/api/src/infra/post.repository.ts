@@ -1,4 +1,4 @@
-import { createPrismaClient } from "@portfolio/db";
+import { type CreatePrismaClientOptions, createPrismaClient } from "@portfolio/db";
 import type { Post, PostRepository } from "~/domain/post";
 
 type PostRow = Awaited<
@@ -30,10 +30,10 @@ function toPost(post: PostRow): Post {
 }
 
 export class PostRepositoryImpl implements PostRepository {
-    constructor(private readonly databaseUrl?: string) {}
+    constructor(private readonly options?: CreatePrismaClientOptions) {}
 
     async findAll(): Promise<Post[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const posts = await prisma.post.findMany({
             orderBy: { date: "desc" },
             include: {
@@ -50,7 +50,7 @@ export class PostRepositoryImpl implements PostRepository {
     }
 
     async findBySlug(slug: string): Promise<Post | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const post = await prisma.post.findUnique({
             where: { slug },
             include: {
@@ -69,7 +69,7 @@ export class PostRepositoryImpl implements PostRepository {
     }
 
     async findById(id: string): Promise<Post | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const post = await prisma.post.findUnique({
             where: { id },
             include: {

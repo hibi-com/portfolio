@@ -1,38 +1,40 @@
-import { createRedisClient } from "@portfolio/cache";
+import { createKvClient } from "@portfolio/cache";
 import { AppError, ErrorCodes } from "@portfolio/log";
-import type { Redis } from "ioredis";
 import { getLogger, getMetrics } from "~/lib/logger";
 
 export class CacheService {
-    private redis: Redis | null = null;
+    private kv: KVNamespace | null = null;
     private readonly ttl: number;
     private readonly logger = getLogger();
     private readonly metrics = getMetrics();
 
     constructor(
-        private readonly redisUrl?: string,
+        private readonly kvNamespace?: KVNamespace,
         ttlSeconds: number = 3600,
     ) {
         this.ttl = ttlSeconds;
     }
 
-    private getRedis(): Redis | null {
-        if (this.redis) {
-            return this.redis;
+    private getKv(): KVNamespace | null {
+        if (this.kv) {
+            return this.kv;
+        }
+
+        if (!this.kvNamespace) {
+            return null;
         }
 
         try {
-            this.redis = createRedisClient({
-                redisUrl: this.redisUrl,
-                lazyConnect: false,
+            this.kv = createKvClient({
+                kv: this.kvNamespace,
             });
-            return this.redis;
+            return this.kv;
         } catch (error) {
             const appError = AppError.fromCode(
                 ErrorCodes.CACHE_CONNECTION_ERROR,
-                "Redis接続に失敗しました。DBから直接読み取ります",
+                "KV接続に失敗しました。DBから直接読み取ります",
                 {
-                    metadata: { redisUrl: this.redisUrl },
+                    metadata: {},
                     originalError: error instanceof Error ? error : new Error(String(error)),
                 },
             );
@@ -50,14 +52,14 @@ export class CacheService {
     }
 
     async get<T>(key: string): Promise<T | null> {
-        const redis = this.getRedis();
-        if (!redis) {
+        const kv = this.getKv();
+        if (!kv) {
             this.metrics.cacheMisses.inc({ key });
             return null;
         }
 
         try {
-            const value = await redis.get(key);
+            const value = await kv.get(key, "text");
             if (!value) {
                 this.metrics.cacheMisses.inc({ key });
                 return null;
@@ -65,7 +67,7 @@ export class CacheService {
             this.metrics.cacheHits.inc({ key });
             return JSON.parse(value, this.reviver.bind(this)) as T;
         } catch (error) {
-            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, `Redis取得エラー (key: ${key})`, {
+            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, `KV取得エラー (key: ${key})`, {
                 metadata: { key, operation: "get" },
                 originalError: error instanceof Error ? error : new Error(String(error)),
             });
@@ -77,17 +79,17 @@ export class CacheService {
     }
 
     async set(key: string, value: unknown, ttlSeconds?: number): Promise<void> {
-        const redis = this.getRedis();
-        if (!redis) {
+        const kv = this.getKv();
+        if (!kv) {
             return;
         }
 
         const ttl = ttlSeconds ?? this.ttl;
         try {
-            await redis.setex(key, ttl, JSON.stringify(value));
+            await kv.put(key, JSON.stringify(value), { expirationTtl: ttl });
             this.metrics.cacheOperations.inc({ operation: "set", status: "success" });
         } catch (error) {
-            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, `Redis書き込みエラー (key: ${key})`, {
+            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, `KV書き込みエラー (key: ${key})`, {
                 metadata: { key, operation: "set", ttl },
                 originalError: error instanceof Error ? error : new Error(String(error)),
             });
@@ -97,16 +99,16 @@ export class CacheService {
     }
 
     async delete(key: string): Promise<void> {
-        const redis = this.getRedis();
-        if (!redis) {
+        const kv = this.getKv();
+        if (!kv) {
             return;
         }
 
         try {
-            await redis.del(key);
+            await kv.delete(key);
             this.metrics.cacheOperations.inc({ operation: "delete", status: "success" });
         } catch (error) {
-            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, `Redis削除エラー (key: ${key})`, {
+            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, `KV削除エラー (key: ${key})`, {
                 metadata: { key, operation: "delete" },
                 originalError: error instanceof Error ? error : new Error(String(error)),
             });
@@ -116,21 +118,26 @@ export class CacheService {
     }
 
     async deletePattern(pattern: string): Promise<void> {
-        const redis = this.getRedis();
-        if (!redis) {
+        const kv = this.getKv();
+        if (!kv) {
             return;
         }
 
         try {
-            const keys = await redis.keys(pattern);
-            if (keys.length > 0) {
-                await redis.del(...keys);
-            }
+            const prefix = pattern.endsWith("*") ? pattern.slice(0, -1) : pattern;
+            let cursor: string | undefined;
+
+            do {
+                const result = await kv.list({ prefix, cursor });
+                await Promise.all(result.keys.map((entry) => kv.delete(entry.name)));
+                cursor = result.list_complete ? undefined : result.cursor;
+            } while (cursor);
+
             this.metrics.cacheOperations.inc({ operation: "deletePattern", status: "success" });
         } catch (error) {
             const appError = AppError.fromCode(
                 ErrorCodes.CACHE_OPERATION_ERROR,
-                `Redisパターン削除エラー (pattern: ${pattern})`,
+                `KVパターン削除エラー (pattern: ${pattern})`,
                 {
                     metadata: { pattern, operation: "deletePattern" },
                     originalError: error instanceof Error ? error : new Error(String(error)),
@@ -142,19 +149,7 @@ export class CacheService {
     }
 
     async close(): Promise<void> {
-        if (this.redis) {
-            try {
-                await this.redis.quit();
-                this.metrics.cacheOperations.inc({ operation: "close", status: "success" });
-            } catch (error) {
-                const appError = AppError.fromCode(ErrorCodes.CACHE_CONNECTION_ERROR, "Redis切断エラー", {
-                    metadata: { operation: "close" },
-                    originalError: error instanceof Error ? error : new Error(String(error)),
-                });
-                this.logger.warn(appError.message, { error: appError });
-                this.metrics.cacheOperations.inc({ operation: "close", status: "error" });
-            }
-            this.redis = null;
-        }
+        this.kv = null;
+        this.metrics.cacheOperations.inc({ operation: "close", status: "success" });
     }
 }

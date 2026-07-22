@@ -5,92 +5,42 @@ loadEnv({ path: resolve(process.cwd(), ".env") });
 
 import * as cloudflare from "@pulumi/cloudflare";
 import * as pulumi from "@pulumi/pulumi";
-import * as grafana from "@pulumiverse/grafana";
 import * as sentry from "@pulumiverse/sentry";
-import * as rediscloud from "@rediscloud/pulumi-rediscloud";
-import { getConfig, getSecretsFromEnv } from "./config.js";
+import { getConfig, getProjectName, getSecretsFromEnv } from "./config.js";
 import { createPreviewDeploymentAccess } from "./resources/access.js";
-import { createPortfolioRedisConfig } from "./resources/cache.js";
-import {
-    createPortfolioTiDBConfig,
-    TIDB_ALLOWED_REGIONS,
-    TIDB_SERVERLESS_RECOMMENDATIONS,
-} from "./resources/databases.js";
+import { createPortfolioCloudflareData } from "./resources/cloudflare-data.js";
 import { createPortfolioDnsRecords } from "./resources/dns.js";
 import { createObservability } from "./resources/observability.js";
 import { createPortfolioPagesProjects } from "./resources/pages.js";
 import { getCloudflareEnvVars } from "./resources/secrets.js";
-import { createBackblazeBucket, getBackblazeEnvVars } from "./resources/storage.js";
 import { createPortfolioApiWorker } from "./resources/workers.js";
 
 const secrets = getSecretsFromEnv();
 const config = getConfig(secrets);
+const projectName = getProjectName();
 
 const cloudflareProvider = new cloudflare.Provider("cloudflare-provider", {
     apiToken: config.cloudflare.apiToken,
-});
-
-const grafanaOrgSlug = config.grafana.orgSlug;
-const pulumiConfig = new pulumi.Config();
-const grafanaUrlConfig = pulumiConfig.get("grafanaUrl");
-let grafanaUrl: pulumi.Output<string> | string;
-if (grafanaUrlConfig) {
-    grafanaUrl = grafanaUrlConfig;
-} else if (typeof grafanaOrgSlug === "string") {
-    grafanaUrl = grafanaOrgSlug ? `https://${grafanaOrgSlug}.grafana.net` : "https://grafana.com";
-} else {
-    grafanaUrl = grafanaOrgSlug.apply((slug) => (slug ? `https://${slug}.grafana.net` : "https://grafana.com"));
-}
-
-const grafanaProvider = new grafana.Provider("grafana-provider", {
-    auth: config.grafana.apiKey,
-    url: grafanaUrl,
 });
 
 const sentryProvider = new sentry.Provider("sentry-provider", {
     token: config.sentry.authToken,
 });
 
-const pulumiConfigForRedis = new pulumi.Config();
-const skipRedisCloud = pulumiConfigForRedis.getBoolean("skipRedisCloud") ?? false;
+const cloudflareData = createPortfolioCloudflareData(config, cloudflareProvider);
 
-let redisCloudProvider: rediscloud.Provider | undefined;
-let redis: ReturnType<typeof createPortfolioRedisConfig>;
-
-if (skipRedisCloud) {
-    redis = createPortfolioRedisConfig(secrets);
-} else {
-    redisCloudProvider = new rediscloud.Provider("rediscloud-provider", {
-        apiKey: secrets.REDISCLOUD_ACCESS_KEY,
-        secretKey: secrets.REDISCLOUD_SECRET_KEY,
-    });
-    redis = createPortfolioRedisConfig(secrets, redisCloudProvider);
-}
-
-const tidb = createPortfolioTiDBConfig(secrets, {
-    publicKey: secrets.TIDBCLOUD_PUBLIC_KEY,
-    privateKey: secrets.TIDBCLOUD_PRIVATE_KEY,
-});
-
-export const tidbConnectionString = tidb.connectionString;
-export const tidbHost = tidb.host;
-export const redisConnectionString = redis.connectionString;
-
-export const tidbClusterInfo = {
-    name: tidb.clusterConfig.name,
-    cloudProvider: tidb.clusterConfig.cloudProvider,
-    region: tidb.clusterConfig.region,
-    database: tidb.clusterConfig.database,
-    tier: "Serverless",
-    allowedRegions: TIDB_ALLOWED_REGIONS,
-    recommendations: TIDB_SERVERLESS_RECOMMENDATIONS,
-};
+export const d1DatabaseId = cloudflareData.database.id;
+export const d1DatabaseName = cloudflareData.database.name;
+export const kvNamespaceId = cloudflareData.cache.id;
+export const kvNamespaceTitle = cloudflareData.cache.title;
+export const r2BucketName = cloudflareData.images.name;
 
 const workers = createPortfolioApiWorker(
     config,
     {
-        databaseUrl: tidb.connectionString,
-        redisUrl: redis.connectionString,
+        d1DatabaseId: cloudflareData.database.id,
+        kvNamespaceId: cloudflareData.cache.id,
+        r2BucketName: cloudflareData.images.name,
     },
     cloudflareProvider,
 );
@@ -116,15 +66,7 @@ const apiWorkerScriptName = (() => {
     });
 })();
 
-const pagesProjects = createPortfolioPagesProjects(
-    config,
-    {
-        databaseUrl: tidb.connectionString,
-        redisUrl: redis.connectionString,
-    },
-    cloudflareProvider,
-    apiWorkerScriptName,
-);
+const pagesProjects = createPortfolioPagesProjects(config, cloudflareProvider, apiWorkerScriptName);
 
 export const pagesProjectNames = pulumi
     .output(pagesProjects.projects)
@@ -178,27 +120,7 @@ export const workerDomainNames = pulumi
     .output(workers.domains)
     .apply((domains) => Object.fromEntries(Object.entries(domains).map(([key, domain]) => [key, domain.hostname])));
 
-const observability = createObservability(config, grafanaProvider, sentryProvider);
-
-const backblazeStorage = createBackblazeBucket(config);
-
-export const backblazeInfo = {
-    bucketName: backblazeStorage.bucketName,
-    endpoint: backblazeStorage.endpoint,
-    region: backblazeStorage.region,
-};
-
-export const backblazeEnvVars = getBackblazeEnvVars();
-
-export const grafanaFolderUids = pulumi
-    .output(observability.grafana.folders)
-    .apply((folders) => Object.fromEntries(Object.entries(folders).map(([key, folder]) => [key, folder.uid])));
-
-export const grafanaDashboardUids = pulumi
-    .output(observability.grafana.dashboards)
-    .apply((dashboards) =>
-        Object.fromEntries(Object.entries(dashboards).map(([key, dashboard]) => [key, dashboard.uid])),
-    );
+const observability = createObservability(config, sentryProvider);
 
 export const sentryDsn = observability.sentry.dsn;
 export const sentryTeamSlug = observability.sentry.team.slug;
@@ -218,21 +140,19 @@ export const summary = {
     domain: config.cloudflare.domain,
     secretsManagement: "Cloudflare Pages/Workers",
     databases: {
-        tidb: {
-            type: "Serverless",
-            cloudProvider: "AWS",
-            region: "ap-northeast-1",
+        d1: {
+            name: `${projectName}-${config.environment}-db`,
+            type: "D1",
         },
-        redis:
-            redis.database && redis.subscription
-                ? {
-                      name: redis.database.name,
-                      subscription: redis.subscription.name,
-                  }
-                : {
-                      name: "external",
-                      subscription: "external",
-                  },
+        kv: {
+            name: `${projectName}-${config.environment}-cache`,
+            type: "Workers KV",
+        },
+        r2: {
+            name: `${projectName}-${config.environment}-images`,
+            type: "R2",
+            purpose: "app images (WebView)",
+        },
     },
     cloudflare: {
         accountId: config.cloudflare.accountId,

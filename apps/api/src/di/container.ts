@@ -1,4 +1,5 @@
-import type { R2Bucket } from "@cloudflare/workers-types";
+import type { D1Database, KVNamespace, R2Bucket } from "@cloudflare/workers-types";
+import type { CreatePrismaClientOptions } from "@portfolio/db";
 import { CachedPortfolioRepository } from "~/infra/cached-portfolio.repository";
 import { CachedPostRepository } from "~/infra/cached-post.repository";
 import { ChatRepositoryImpl } from "~/infra/chat.repository";
@@ -86,6 +87,7 @@ import { GetPortfolioBySlugUseCase, GetPortfoliosUseCase, UploadPortfolioImageUs
 import { GetPostBySlugUseCase, GetPostsUseCase } from "~/usecase/post";
 
 export class DIContainer {
+    private readonly prismaOptions?: CreatePrismaClientOptions;
     private readonly postRepository: CachedPostRepository;
     private readonly portfolioRepository: CachedPortfolioRepository;
     private readonly customerRepository: CustomerRepositoryImpl;
@@ -98,23 +100,25 @@ export class DIContainer {
     private readonly freeeRepository: FreeeRepositoryImpl;
 
     constructor(
-        readonly databaseUrl?: string,
-        readonly redisUrl?: string,
+        d1?: D1Database,
+        kv?: KVNamespace,
         private readonly r2Bucket?: R2Bucket,
         private readonly r2PublicUrl?: string,
         private readonly freeeAuthBaseUrl?: string,
         private readonly freeeApiBaseUrl?: string,
+        databaseUrl?: string,
     ) {
-        this.postRepository = new CachedPostRepository(databaseUrl, redisUrl);
-        this.portfolioRepository = new CachedPortfolioRepository(databaseUrl, redisUrl);
-        this.customerRepository = new CustomerRepositoryImpl(databaseUrl);
-        this.leadRepository = new LeadRepositoryImpl(databaseUrl);
-        this.dealRepository = new DealRepositoryImpl(databaseUrl);
-        this.pipelineRepository = new PipelineRepositoryImpl(databaseUrl);
-        this.inquiryRepository = new InquiryRepositoryImpl(databaseUrl);
-        this.emailRepository = new EmailRepositoryImpl(databaseUrl);
-        this.chatRepository = new ChatRepositoryImpl(databaseUrl);
-        this.freeeRepository = new FreeeRepositoryImpl(databaseUrl);
+        this.prismaOptions = { d1, databaseUrl };
+        this.postRepository = new CachedPostRepository(this.prismaOptions, kv);
+        this.portfolioRepository = new CachedPortfolioRepository(this.prismaOptions, kv);
+        this.customerRepository = new CustomerRepositoryImpl(this.prismaOptions);
+        this.leadRepository = new LeadRepositoryImpl(this.prismaOptions);
+        this.dealRepository = new DealRepositoryImpl(this.prismaOptions);
+        this.pipelineRepository = new PipelineRepositoryImpl(this.prismaOptions);
+        this.inquiryRepository = new InquiryRepositoryImpl(this.prismaOptions);
+        this.emailRepository = new EmailRepositoryImpl(this.prismaOptions);
+        this.chatRepository = new ChatRepositoryImpl(this.prismaOptions);
+        this.freeeRepository = new FreeeRepositoryImpl(this.prismaOptions);
     }
 
     getPostRepository() {

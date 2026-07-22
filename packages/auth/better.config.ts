@@ -7,7 +7,7 @@ const dummyPrisma = {} as any;
 
 export const auth = betterAuth({
     database: prismaAdapter(dummyPrisma, {
-        provider: "mysql",
+        provider: "sqlite",
     }),
     baseURL: "http://localhost:3000",
     secret: "secret",

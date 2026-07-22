@@ -1,13 +1,9 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import type { Handler } from "hono";
-import { DIContainer } from "~/di/container";
+import { createContainer } from "~/di/create-container";
+import type { Env } from "~/env";
 import { getLogger, getMetrics } from "~/lib/logger";
-
-type Env = {
-    DATABASE_URL: string;
-    CACHE_URL: string;
-};
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -174,7 +170,7 @@ const listCustomersHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetCustomersUseCase();
         const customers = await useCase.execute();
 
@@ -204,7 +200,7 @@ const getCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetCustomerByIdUseCase();
         const customer = await useCase.execute(id);
 
@@ -240,7 +236,7 @@ const createCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getCreateCustomerUseCase();
         const customer = await useCase.execute(body);
 
@@ -270,7 +266,7 @@ const updateCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getUpdateCustomerUseCase();
         const customer = await useCase.execute(id, body);
 
@@ -302,7 +298,7 @@ const deleteCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getDeleteCustomerUseCase();
         await useCase.execute(id);
 

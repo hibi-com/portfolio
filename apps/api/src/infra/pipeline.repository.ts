@@ -1,4 +1,4 @@
-import { createPrismaClient } from "@portfolio/db";
+import { type CreatePrismaClientOptions, createPrismaClient } from "@portfolio/db";
 import type {
     CreatePipelineInput,
     CreatePipelineStageInput,
@@ -15,7 +15,7 @@ function toDateString(d: Date | null | undefined): string | undefined {
 }
 
 export class PipelineRepositoryImpl implements PipelineRepository {
-    constructor(private readonly databaseUrl?: string) {}
+    constructor(private readonly options?: CreatePrismaClientOptions) {}
 
     private mapToStage(data: {
         id: string;
@@ -62,7 +62,7 @@ export class PipelineRepositoryImpl implements PipelineRepository {
     }
 
     async findAll(): Promise<Pipeline[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const pipelines = await prisma.pipeline.findMany({
             include: { stages: { orderBy: { order: "asc" } } },
             orderBy: { createdAt: "desc" },
@@ -77,7 +77,7 @@ export class PipelineRepositoryImpl implements PipelineRepository {
     }
 
     async findById(id: string): Promise<Pipeline | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const pipeline = await prisma.pipeline.findUnique({
             where: { id },
             include: { stages: { orderBy: { order: "asc" } } },
@@ -92,7 +92,7 @@ export class PipelineRepositoryImpl implements PipelineRepository {
     }
 
     async findDefault(): Promise<Pipeline | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const pipeline = await prisma.pipeline.findFirst({
             where: { isDefault: true },
             include: { stages: { orderBy: { order: "asc" } } },
@@ -107,7 +107,7 @@ export class PipelineRepositoryImpl implements PipelineRepository {
     }
 
     async create(input: CreatePipelineInput): Promise<Pipeline> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
 
         if (input.isDefault) {
             await prisma.pipeline.updateMany({
@@ -129,7 +129,7 @@ export class PipelineRepositoryImpl implements PipelineRepository {
     }
 
     async update(id: string, input: UpdatePipelineInput): Promise<Pipeline> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
 
         if (input.isDefault) {
             await prisma.pipeline.updateMany({
@@ -155,14 +155,14 @@ export class PipelineRepositoryImpl implements PipelineRepository {
     }
 
     async delete(id: string): Promise<void> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         await prisma.pipeline.delete({
             where: { id },
         });
     }
 
     async createStage(input: CreatePipelineStageInput): Promise<PipelineStage> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const stage = await prisma.pipelineStage.create({
             data: {
                 pipelineId: input.pipelineId,
@@ -177,7 +177,7 @@ export class PipelineRepositoryImpl implements PipelineRepository {
     }
 
     async updateStage(id: string, input: UpdatePipelineStageInput): Promise<PipelineStage> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const stage = await prisma.pipelineStage.update({
             where: { id },
             data: {
@@ -192,14 +192,14 @@ export class PipelineRepositoryImpl implements PipelineRepository {
     }
 
     async deleteStage(id: string): Promise<void> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         await prisma.pipelineStage.delete({
             where: { id },
         });
     }
 
     async findStageById(id: string): Promise<PipelineStage | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const stage = await prisma.pipelineStage.findUnique({
             where: { id },
         });

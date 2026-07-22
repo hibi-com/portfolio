@@ -1,4 +1,4 @@
-import { createPrismaClient } from "@portfolio/db";
+import { type CreatePrismaClientOptions, createPrismaClient } from "@portfolio/db";
 import type { Portfolio, PortfolioRepository } from "~/domain/portfolio";
 
 type PortfolioRow = Awaited<
@@ -27,10 +27,10 @@ function toPortfolio(row: PortfolioRow): Portfolio {
 }
 
 export class PortfolioRepositoryImpl implements PortfolioRepository {
-    constructor(private readonly databaseUrl?: string) {}
+    constructor(private readonly options?: CreatePrismaClientOptions) {}
 
     async findAll(): Promise<Portfolio[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const portfolios = await prisma.portfolio.findMany({
             orderBy: { date: "desc" },
             include: {
@@ -42,7 +42,7 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
     }
 
     async findBySlug(slug: string): Promise<Portfolio | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const portfolio = await prisma.portfolio.findUnique({
             where: { slug },
             include: {
@@ -56,7 +56,7 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
     }
 
     async findById(id: string): Promise<Portfolio | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const portfolio = await prisma.portfolio.findUnique({
             where: { id },
             include: {
@@ -70,7 +70,7 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
     }
 
     async addImage(portfolioId: string, imageUrl: string): Promise<void> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         await prisma.portfolioImage.create({
             data: {
                 portfolioId,

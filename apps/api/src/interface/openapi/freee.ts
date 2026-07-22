@@ -1,18 +1,10 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import type { Handler } from "hono";
-import { DIContainer } from "~/di/container";
+import { createContainer } from "~/di/create-container";
+import type { Env } from "~/env";
 import { getLogger } from "~/lib/logger";
 import { isValidUuid } from "~/lib/validation";
-
-type Env = {
-    DATABASE_URL: string;
-    CACHE_URL: string;
-    FREEE_CLIENT_ID?: string;
-    FREEE_CLIENT_SECRET?: string;
-    FREEE_AUTH_BASE_URL?: string;
-    FREEE_API_BASE_URL?: string;
-};
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -190,14 +182,7 @@ const getAuthUrlHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const state = crypto.randomUUID();
-        const container = new DIContainer(
-            c.env.DATABASE_URL,
-            c.env.CACHE_URL,
-            undefined,
-            undefined,
-            c.env.FREEE_AUTH_BASE_URL,
-            c.env.FREEE_API_BASE_URL,
-        );
+        const container = createContainer(c.env);
         const useCase = container.getGetFreeeAuthUrlUseCase(FREEE_CLIENT_ID, FREEE_CLIENT_SECRET);
         const authUrl = useCase.execute(state, redirectUri);
 
@@ -227,14 +212,7 @@ const callbackHandler: Handler<{ Bindings: Env }> = async (c) => {
             return c.json({ error: "code, redirectUri, and userId are required" }, 400);
         }
 
-        const container = new DIContainer(
-            c.env.DATABASE_URL,
-            c.env.CACHE_URL,
-            undefined,
-            undefined,
-            c.env.FREEE_AUTH_BASE_URL,
-            c.env.FREEE_API_BASE_URL,
-        );
+        const container = createContainer(c.env);
         const useCase = container.getHandleFreeeCallbackUseCase(FREEE_CLIENT_ID, FREEE_CLIENT_SECRET);
         const integration = await useCase.execute(code, redirectUri, userId);
 
@@ -267,14 +245,7 @@ const getIntegrationHandler: Handler<{ Bindings: Env }> = async (c) => {
     }
 
     try {
-        const container = new DIContainer(
-            c.env.DATABASE_URL,
-            c.env.CACHE_URL,
-            undefined,
-            undefined,
-            c.env.FREEE_AUTH_BASE_URL,
-            c.env.FREEE_API_BASE_URL,
-        );
+        const container = createContainer(c.env);
         const useCase = container.getGetFreeeIntegrationUseCase();
         const integration = await useCase.execute(userId);
 
@@ -311,14 +282,7 @@ const disconnectHandler: Handler<{ Bindings: Env }> = async (c) => {
     if (!isValidUuid(id)) return c.json({ error: "Invalid integration ID format" }, 400);
 
     try {
-        const container = new DIContainer(
-            c.env.DATABASE_URL,
-            c.env.CACHE_URL,
-            undefined,
-            undefined,
-            c.env.FREEE_AUTH_BASE_URL,
-            c.env.FREEE_API_BASE_URL,
-        );
+        const container = createContainer(c.env);
         const useCase = container.getDisconnectFreeeUseCase();
         await useCase.execute(id);
         return c.json({ success: true }, 200);
@@ -344,14 +308,7 @@ const syncImportHandler: Handler<{ Bindings: Env }> = async (c) => {
     if (!isValidUuid(id)) return c.json({ error: "Invalid integration ID format" }, 400);
 
     try {
-        const container = new DIContainer(
-            c.env.DATABASE_URL,
-            c.env.CACHE_URL,
-            undefined,
-            undefined,
-            c.env.FREEE_AUTH_BASE_URL,
-            c.env.FREEE_API_BASE_URL,
-        );
+        const container = createContainer(c.env);
         const useCase = container.getSyncPartnersFromFreeeUseCase(FREEE_CLIENT_ID, FREEE_CLIENT_SECRET);
         const result = await useCase.execute(id);
         return c.json(result, 200);
@@ -377,14 +334,7 @@ const syncExportHandler: Handler<{ Bindings: Env }> = async (c) => {
     if (!isValidUuid(id)) return c.json({ error: "Invalid integration ID format" }, 400);
 
     try {
-        const container = new DIContainer(
-            c.env.DATABASE_URL,
-            c.env.CACHE_URL,
-            undefined,
-            undefined,
-            c.env.FREEE_AUTH_BASE_URL,
-            c.env.FREEE_API_BASE_URL,
-        );
+        const container = createContainer(c.env);
         const useCase = container.getSyncPartnersToFreeeUseCase(FREEE_CLIENT_ID, FREEE_CLIENT_SECRET);
         const result = await useCase.execute(id);
         return c.json(result, 200);
@@ -406,14 +356,7 @@ const getSyncLogsHandler: Handler<{ Bindings: Env }> = async (c) => {
     if (!isValidUuid(id)) return c.json({ error: "Invalid integration ID format" }, 400);
 
     try {
-        const container = new DIContainer(
-            c.env.DATABASE_URL,
-            c.env.CACHE_URL,
-            undefined,
-            undefined,
-            c.env.FREEE_AUTH_BASE_URL,
-            c.env.FREEE_API_BASE_URL,
-        );
+        const container = createContainer(c.env);
         const useCase = container.getGetSyncLogsUseCase();
         const logs = await useCase.execute(id);
         return c.json(logs, 200);

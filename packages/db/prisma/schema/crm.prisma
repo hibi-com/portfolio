@@ -44,11 +44,11 @@ model Customer {
     phone          String?
     company        String?
     website        String?
-    address        String?        @db.Text
-    notes          String?        @db.Text
+    address        String?
+    notes          String?
     status         CustomerStatus @default(PROSPECT)
     tags           String?
-    customFields   String?        @map("custom_fields") @db.Text
+    customFields   String?        @map("custom_fields")
     createdAt      DateTime       @default(now()) @map("created_at")
     updatedAt      DateTime       @updatedAt @map("updated_at")
 
@@ -75,7 +75,7 @@ model Lead {
     source       String?
     status       LeadStatus @default(NEW)
     score        Int?
-    notes        String?    @db.Text
+    notes        String?
     convertedAt  DateTime?  @map("converted_at")
     createdAt    DateTime   @default(now()) @map("created_at")
     updatedAt    DateTime   @updatedAt @map("updated_at")
@@ -91,7 +91,7 @@ model Lead {
 model Pipeline {
     id          String   @id @default(uuid())
     name        String
-    description String?  @db.Text
+    description String?
     isDefault   Boolean  @default(false) @map("is_default")
     createdAt   DateTime @default(now()) @map("created_at")
     updatedAt   DateTime @updatedAt @map("updated_at")
@@ -124,13 +124,13 @@ model Deal {
     leadId         String?    @unique @map("lead_id")
     stageId        String     @map("stage_id")
     name           String
-    value          Decimal?   @db.Decimal(15, 2)
+    value          Decimal?
     currency       String     @default("JPY")
     expectedCloseDate DateTime? @map("expected_close_date")
     actualCloseDate DateTime? @map("actual_close_date")
     status         DealStatus @default(OPEN)
-    notes          String?    @db.Text
-    lostReason     String?    @map("lost_reason") @db.Text
+    notes          String?
+    lostReason     String?    @map("lost_reason")
     createdAt      DateTime   @default(now()) @map("created_at")
     updatedAt      DateTime   @updatedAt @map("updated_at")
 
@@ -151,7 +151,7 @@ model ContactHistory {
     userId      String?     @map("user_id")
     type        ContactType
     subject     String?
-    content     String?     @db.Text
+    content     String?
     contactedAt DateTime    @default(now()) @map("contacted_at")
     createdAt   DateTime    @default(now()) @map("created_at")
     updatedAt   DateTime    @updatedAt @map("updated_at")

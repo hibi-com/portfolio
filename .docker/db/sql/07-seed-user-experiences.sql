@@ -1,10 +1,8 @@
 -- Seed data for user_experiences table
 -- This script runs after database initialization
 
-USE portfolio;
-
 -- Insert sample user experience data (20 experiences)
-INSERT INTO `user_experiences` (`id`, `user_id`, `company`, `company_url`, `contract`, `date`, `date_start`, `date_end`, `description`, `highlights`, `image`, `tags`, `title`, `created_at`, `updated_at`)
+INSERT OR IGNORE INTO "user_experiences" ("id", "user_id", "company", "company_url", "contract", "date", "date_start", "date_end", "description", "highlights", "image", "tags", "title", "created_at", "updated_at")
 VALUES
     (
         '40000000-0000-0000-0000-000000000001',
@@ -20,8 +18,8 @@ VALUES
         '/images/experiences/example-company.jpg',
         '["TypeScript", "React", "Node.js"]',
         'Senior Full-Stack Developer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000002',
@@ -37,8 +35,8 @@ VALUES
         '/images/experiences/techstartup.jpg',
         '["React", "TypeScript", "GraphQL"]',
         'Frontend Lead',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000003',
@@ -54,8 +52,8 @@ VALUES
         '/images/experiences/enterprise.jpg',
         '["Node.js", "Docker", "Kubernetes"]',
         'Backend Architect',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000004',
@@ -71,8 +69,8 @@ VALUES
         '/images/experiences/cloud.jpg',
         '["AWS", "Lambda", "DynamoDB"]',
         'Cloud Engineer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000005',
@@ -88,8 +86,8 @@ VALUES
         '/images/experiences/devops.jpg',
         '["Kubernetes", "Terraform", "Ansible"]',
         'DevOps Engineer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000006',
@@ -105,8 +103,8 @@ VALUES
         '/images/experiences/design.jpg',
         '["Figma", "React", "CSS"]',
         'UI/UX Designer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000007',
@@ -122,8 +120,8 @@ VALUES
         '/images/experiences/mobile.jpg',
         '["React Native", "TypeScript", "Firebase"]',
         'Mobile Developer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000008',
@@ -139,8 +137,8 @@ VALUES
         '/images/experiences/data.jpg',
         '["Python", "PostgreSQL", "Apache Spark"]',
         'Data Engineer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000009',
@@ -156,8 +154,8 @@ VALUES
         '/images/experiences/security.jpg',
         '["Security", "Penetration Testing", "OWASP"]',
         'Security Engineer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000010',
@@ -173,8 +171,8 @@ VALUES
         '/images/experiences/ai.jpg',
         '["Python", "TensorFlow", "Machine Learning"]',
         'ML Engineer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000011',
@@ -190,8 +188,8 @@ VALUES
         '/images/experiences/game.jpg',
         '["Unity", "C#", "Game Development"]',
         'Game Developer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000012',
@@ -207,8 +205,8 @@ VALUES
         '/images/experiences/blockchain.jpg',
         '["Solidity", "Ethereum", "Web3"]',
         'Blockchain Developer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000013',
@@ -224,8 +222,8 @@ VALUES
         '/images/experiences/api.jpg',
         '["Node.js", "Express", "REST API"]',
         'API Developer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000014',
@@ -241,8 +239,8 @@ VALUES
         '/images/experiences/qa.jpg',
         '["Testing", "Selenium", "Jest"]',
         'QA Engineer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000015',
@@ -258,8 +256,8 @@ VALUES
         '/images/experiences/infrastructure.jpg',
         '["Kubernetes", "Prometheus", "Grafana"]',
         'SRE',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000016',
@@ -275,8 +273,8 @@ VALUES
         '/images/experiences/product.jpg',
         '["Product Management", "Agile", "Scrum"]',
         'Product Manager',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000017',
@@ -292,8 +290,8 @@ VALUES
         '/images/experiences/docs.jpg',
         '["Technical Writing", "Markdown", "API Docs"]',
         'Technical Writer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000018',
@@ -309,8 +307,8 @@ VALUES
         '/images/experiences/consulting.jpg',
         '["AWS", "Azure", "Cloud Architecture"]',
         'Cloud Architect',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000019',
@@ -326,8 +324,8 @@ VALUES
         '/images/experiences/startup.jpg',
         '["Full-Stack", "MVP", "Startup"]',
         'Full-Stack Developer',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '40000000-0000-0000-0000-000000000020',
@@ -343,7 +341,6 @@ VALUES
         '/images/experiences/opensource.jpg',
         '["Open Source", "GitHub", "Community"]',
         'Open Source Contributor',
-        NOW(),
-        NOW()
-    )
-ON DUPLICATE KEY UPDATE `updated_at` = NOW();
+        datetime('now'),
+        datetime('now')
+    );

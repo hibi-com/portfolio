@@ -5,6 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as random from "@pulumi/random";
 import type { InfraConfig } from "../config.js";
 import { getProjectName } from "../config.js";
+import { appHostname } from "../hostname.js";
 import { getApiEnvVars } from "./secrets.js";
 
 export interface WorkerConfig {
@@ -275,15 +276,17 @@ export function createWorkers(
 
 export function createPortfolioApiWorker(
     config: InfraConfig,
-    _secrets: {
-        databaseUrl: pulumi.Output<string>;
-        redisUrl?: pulumi.Output<string>;
+    dataBindings: {
+        d1DatabaseId: pulumi.Input<string>;
+        kvNamespaceId: pulumi.Input<string>;
+        r2BucketName: pulumi.Input<string>;
     },
     provider?: cloudflare.Provider,
 ): WorkersOutputs {
     const projectName = getProjectName();
     const { accountId, zoneId, domain } = config.cloudflare;
     const resourceName = `worker-${projectName}-api`;
+    const apiHostname = appHostname(config.environment, "api", domain);
 
     const apiRandomSuffix = generateRandomSuffix(`${projectName}-api-random`);
     const workerScriptName = pulumi
@@ -298,13 +301,38 @@ export function createPortfolioApiWorker(
         type: "plain_text" as const,
     }));
 
+    // R2 公開 URL はカスタムドメイン / r2.dev 設定後に差し替え可能なプレースホルダ
+    staticBindings.push({
+        name: "R2_PUBLIC_URL",
+        text: "",
+        type: "plain_text" as const,
+    });
+
     const secretBindings: WorkerBinding[] = Object.entries(apiConfig.secrets).map(([name, text]) => ({
         name,
         text,
         type: "secret_text" as const,
     }));
 
-    const allBindings = [...staticBindings, ...secretBindings];
+    const resourceBindings: WorkerBinding[] = [
+        {
+            name: "DB",
+            id: dataBindings.d1DatabaseId,
+            type: "d1",
+        },
+        {
+            name: "CACHE",
+            namespaceId: dataBindings.kvNamespaceId,
+            type: "kv_namespace",
+        },
+        {
+            name: "IMAGES",
+            bucketName: dataBindings.r2BucketName,
+            type: "r2_bucket",
+        },
+    ];
+
+    const allBindings = [...staticBindings, ...secretBindings, ...resourceBindings];
 
     const workerScript = new cloudflare.WorkersScript(
         resourceName,
@@ -340,7 +368,7 @@ export default {
         `${resourceName}-domain`,
         {
             accountId,
-            hostname: `api.${domain}`,
+            hostname: apiHostname,
             service: workerScript.scriptName,
             zoneId,
         },

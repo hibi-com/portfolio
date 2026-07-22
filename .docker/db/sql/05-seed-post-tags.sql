@@ -1,8 +1,6 @@
 -- Seed data for post_tags table (junction table)
 -- This script runs after database initialization
 
-USE portfolio;
-
 -- Post ID constants (avoids S1192 duplicated literal)
 SET @p1 = '20000000-0000-0000-0000-000000000001';
 SET @p2 = '20000000-0000-0000-0000-000000000002';
@@ -47,7 +45,7 @@ SET @t19 = '10000000-0000-0000-0000-000000000019';
 SET @t20 = '10000000-0000-0000-0000-000000000020';
 
 -- Insert sample post-tag relationships (multiple tags per post)
-INSERT INTO `post_tags` (`post_id`, `tag_id`)
+INSERT OR IGNORE INTO "post_tags" ("post_id", "tag_id")
 VALUES
     -- Post 1: Welcome (TypeScript, Web Development)
     (@p1, @t1),
@@ -112,5 +110,4 @@ VALUES
     (@p19, @t5),
     -- Post 20: JavaScript (JavaScript, Web Development)
     (@p20, @t6),
-    (@p20, @t5)
-ON DUPLICATE KEY UPDATE `post_id` = VALUES(`post_id`);
+    (@p20, @t5);

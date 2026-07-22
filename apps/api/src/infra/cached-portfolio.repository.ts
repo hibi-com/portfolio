@@ -1,3 +1,4 @@
+import type { CreatePrismaClientOptions } from "@portfolio/db";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import type { Portfolio, PortfolioRepository } from "~/domain/portfolio";
 import { getLogger } from "~/lib/logger";
@@ -9,9 +10,9 @@ export class CachedPortfolioRepository implements PortfolioRepository {
     private readonly dbRepository: PortfolioRepositoryImpl;
     private readonly logger = getLogger();
 
-    constructor(databaseUrl?: string, redisUrl?: string) {
-        this.cacheService = new CacheService(redisUrl);
-        this.dbRepository = new PortfolioRepositoryImpl(databaseUrl);
+    constructor(prismaOptions?: CreatePrismaClientOptions, kv?: KVNamespace) {
+        this.cacheService = new CacheService(kv);
+        this.dbRepository = new PortfolioRepositoryImpl(prismaOptions);
     }
 
     private getCacheKey(method: string, ...args: unknown[]): string {
@@ -29,7 +30,7 @@ export class CachedPortfolioRepository implements PortfolioRepository {
         const portfolios = await this.dbRepository.findAll();
 
         this.cacheService.set(cacheKey, portfolios).catch((error) => {
-            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, "Redis書き込みエラー（findAll）", {
+            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, "KV書き込みエラー（findAll）", {
                 metadata: { method: "findAll", cacheKey },
                 originalError: error instanceof Error ? error : new Error(String(error)),
             });
@@ -53,7 +54,7 @@ export class CachedPortfolioRepository implements PortfolioRepository {
             this.cacheService.set(cacheKey, portfolio).catch((error) => {
                 const appError = AppError.fromCode(
                     ErrorCodes.CACHE_OPERATION_ERROR,
-                    "Redis書き込みエラー（findBySlug）",
+                    "KV書き込みエラー（findBySlug）",
                     {
                         metadata: { method: "findBySlug", cacheKey, slug },
                         originalError: error instanceof Error ? error : new Error(String(error)),
@@ -80,7 +81,7 @@ export class CachedPortfolioRepository implements PortfolioRepository {
             this.cacheService.set(cacheKey, portfolio).catch((error) => {
                 const appError = AppError.fromCode(
                     ErrorCodes.CACHE_OPERATION_ERROR,
-                    "Redis書き込みエラー（findById）",
+                    "KV書き込みエラー（findById）",
                     {
                         metadata: { method: "findById", cacheKey, id },
                         originalError: error instanceof Error ? error : new Error(String(error)),

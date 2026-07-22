@@ -50,7 +50,7 @@ describe("initAuth", () => {
             secret: "test-secret",
             googleClientId: "test-google-client-id",
             googleClientSecret: "test-google-client-secret",
-            databaseUrl: "mysql://user:password@localhost:3306/portfolio",
+            databaseUrl: "file:./portfolio.db",
         });
 
         expect(auth).toBeDefined();

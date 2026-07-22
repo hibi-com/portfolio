@@ -1,7 +1,7 @@
 import { freeeRouter } from "./freee";
 
-vi.mock("~/di/container", () => ({
-    DIContainer: vi.fn().mockImplementation(() => ({
+vi.mock("~/di/create-container", () => ({
+    createContainer: vi.fn().mockImplementation(() => ({
         getGetFreeeAuthUrlUseCase: vi.fn(() => ({
             execute: vi.fn(
                 (state: string, redirectUri: string) =>
@@ -90,7 +90,11 @@ vi.mock("~/lib/validation", () => ({
 describe("freeeRouter", () => {
     const mockEnv = {
         DATABASE_URL: "test-db-url",
-        CACHE_URL: "test-cache-url",
+        DB: undefined,
+        CACHE: undefined,
+        IMAGES: undefined,
+        R2_PUBLIC_URL: undefined,
+        NODE_ENV: "test",
         FREEE_CLIENT_ID: "test-client-id",
         FREEE_CLIENT_SECRET: "test-client-secret",
         FREEE_AUTH_BASE_URL: "https://accounts.secure.freee.co.jp",
@@ -170,8 +174,8 @@ describe("freeeRouter", () => {
 
         describe("異常系", () => {
             test("連携がない場合はconnected: falseを返す", async () => {
-                const { DIContainer } = await import("~/di/container");
-                vi.mocked(DIContainer).mockImplementationOnce(
+                const { createContainer } = await import("~/di/create-container");
+                vi.mocked(createContainer).mockImplementationOnce(
                     () =>
                         ({
                             getGetFreeeIntegrationUseCase: vi.fn(() => ({

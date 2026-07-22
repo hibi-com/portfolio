@@ -4,4 +4,4 @@ export {
     createPrismaClient,
     type PrismaClientType,
     resetPrismaInstance,
-} from "./client/mysql.js";
+} from "./client/d1.js";

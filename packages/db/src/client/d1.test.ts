@@ -16,11 +16,15 @@ vi.mock("../../generated/prisma/client.js", () => ({
     PrismaClient: mockPrismaCtor,
 }));
 
-vi.mock("@prisma/adapter-mariadb", () => ({
-    PrismaMariaDb: vi.fn().mockImplementation((url: string) => ({ _url: url })),
+vi.mock("@prisma/adapter-d1", () => ({
+    PrismaD1: vi.fn().mockImplementation((d1: unknown) => ({ _d1: d1 })),
 }));
 
-const testDbUrl = (user: string, hostDb: string) => `mysql://${user}:x@${hostDb}`;
+vi.mock("@prisma/adapter-libsql", () => ({
+    PrismaLibSql: vi.fn().mockImplementation((opts: { url: string }) => ({ _url: opts.url })),
+}));
+
+const testDbUrl = (path: string) => `file:./${path}`;
 
 describe("createPrismaClient", () => {
     let originalEnv: string | undefined;
@@ -44,10 +48,10 @@ describe("createPrismaClient", () => {
         });
 
         test("should create a new PrismaClient instance", async () => {
-            const { createPrismaClient } = await import("./mysql.js");
+            const { createPrismaClient } = await import("./d1.js");
 
             const client = createPrismaClient({
-                databaseUrl: "mysql://test:test@localhost/test",
+                databaseUrl: "file:./test.db",
             }) as unknown as MockPrismaClient;
 
             expect(client).toBeDefined();
@@ -55,22 +59,32 @@ describe("createPrismaClient", () => {
         });
 
         test("should return the same instance on subsequent calls (singleton)", async () => {
-            const { createPrismaClient } = await import("./mysql.js");
+            const { createPrismaClient } = await import("./d1.js");
 
-            const client1 = createPrismaClient({ databaseUrl: "mysql://test:test@localhost/test" });
-            const client2 = createPrismaClient({ databaseUrl: testDbUrl("other", "localhost/other") });
+            const client1 = createPrismaClient({ databaseUrl: "file:./test.db" });
+            const client2 = createPrismaClient({ databaseUrl: testDbUrl("other.db") });
 
             expect(client1).toBe(client2);
         });
 
         test("should use provided databaseUrl option", async () => {
-            const { createPrismaClient } = await import("./mysql.js");
-            const testUrl = testDbUrl("custom", "localhost/custom");
+            const { createPrismaClient } = await import("./d1.js");
+            const testUrl = testDbUrl("custom.db");
 
             const client = createPrismaClient({ databaseUrl: testUrl }) as unknown as MockPrismaClient;
 
             expect(client._adapter).toBeDefined();
             expect((client._adapter as { _url?: string })._url).toBe(testUrl);
+        });
+
+        test("should use d1 binding when provided", async () => {
+            const { createPrismaClient } = await import("./d1.js");
+            const d1 = { prepare: vi.fn() } as unknown as D1Database;
+
+            const client = createPrismaClient({ d1 }) as unknown as MockPrismaClient;
+
+            expect(client._adapter).toBeDefined();
+            expect((client._adapter as { _d1?: unknown })._d1).toBe(d1);
         });
     });
 
@@ -80,40 +94,60 @@ describe("createPrismaClient", () => {
         });
 
         test("should fallback to DATABASE_URL environment variable when no url provided", async () => {
-            process.env.DATABASE_URL = "mysql://env:env@localhost/env";
-            const { createPrismaClient } = await import("./mysql.js");
+            process.env.DATABASE_URL = "file:./env.db";
+            const { createPrismaClient } = await import("./d1.js");
 
             const client = createPrismaClient() as unknown as MockPrismaClient;
 
-            expect((client._adapter as { _url?: string })._url).toBe("mysql://env:env@localhost/env");
+            expect((client._adapter as { _url?: string })._url).toBe("file:./env.db");
         });
 
         test("should throw when neither option nor env var is provided", async () => {
             delete process.env.DATABASE_URL;
-            const { createPrismaClient } = await import("./mysql.js");
+            const { createPrismaClient } = await import("./d1.js");
 
             expect(() => createPrismaClient()).toThrow("DATABASE_URL");
         });
 
         test("should accept empty options object", async () => {
-            process.env.DATABASE_URL = "mysql://default:default@localhost/default";
-            const { createPrismaClient } = await import("./mysql.js");
+            process.env.DATABASE_URL = "file:./default.db";
+            const { createPrismaClient } = await import("./d1.js");
 
             const client = createPrismaClient({}) as unknown as MockPrismaClient;
 
             expect(client).toBeDefined();
-            expect((client._adapter as { _url?: string })._url).toBe("mysql://default:default@localhost/default");
+            expect((client._adapter as { _url?: string })._url).toBe("file:./default.db");
+        });
+
+        test("should accept http libSQL URL", async () => {
+            const { createPrismaClient } = await import("./d1.js");
+
+            const client = createPrismaClient({
+                databaseUrl: "http://127.0.0.1:8081",
+            }) as unknown as MockPrismaClient;
+
+            expect((client._adapter as { _url?: string })._url).toBe("http://127.0.0.1:8081");
+        });
+
+        test("should accept libsql URL", async () => {
+            const { createPrismaClient } = await import("./d1.js");
+
+            const client = createPrismaClient({
+                databaseUrl: "libsql://example.turso.io",
+            }) as unknown as MockPrismaClient;
+
+            expect((client._adapter as { _url?: string })._url).toBe("libsql://example.turso.io");
         });
     });
 
     describe("singleton caching", () => {
         test("should return cached instance when called multiple times", async () => {
             vi.resetModules();
-            const { createPrismaClient } = await import("./mysql.js");
+            const { createPrismaClient } = await import("./d1.js");
 
-            const firstCall = createPrismaClient({ databaseUrl: "mysql://first:first@localhost/first" });
+            const firstCall = createPrismaClient({ databaseUrl: "file:./first.db" });
             const secondCall = createPrismaClient({
-                databaseUrl: testDbUrl("second", "localhost/second"),
+                databaseUrl: testDbUrl("second.db"),
             });
             const thirdCall = createPrismaClient();
 

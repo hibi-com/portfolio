@@ -1,4 +1,4 @@
-import type { DurableObjectNamespace } from "@cloudflare/workers-types";
+import type { Env } from "./env";
 import { createPrismaClient } from "@portfolio/db";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -7,26 +7,7 @@ import { openapiRouter } from "./interface/openapi";
 import { getLogger, initLogger } from "./lib/logger";
 
 export { ChatRoomDO } from "./interface/websocket/ChatRoomDO";
-
-type Env = {
-    DATABASE_URL: string;
-    CACHE_URL?: string;
-    NODE_ENV: string;
-    SENTRY_DSN?: string;
-    APP_VERSION?: string;
-    BETTER_AUTH_URL?: string;
-    BETTER_AUTH_SECRET?: string;
-    GOOGLE_CLIENT_ID?: string;
-    GOOGLE_CLIENT_SECRET?: string;
-    CORS_ORIGINS?: string;
-    RESEND_API_KEY?: string;
-    RESEND_FROM_EMAIL?: string;
-    CHAT_ROOMS?: DurableObjectNamespace;
-    FREEE_CLIENT_ID?: string;
-    FREEE_CLIENT_SECRET?: string;
-    FREEE_AUTH_BASE_URL?: string;
-    FREEE_API_BASE_URL?: string;
-};
+export type { Env } from "./env";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -82,7 +63,7 @@ app.get("/health", async (c) => {
     };
 
     try {
-        const prisma = createPrismaClient({ databaseUrl: c.env.DATABASE_URL });
+        const prisma = createPrismaClient({ d1: c.env.DB, databaseUrl: c.env.DATABASE_URL });
         await prisma.$queryRaw`SELECT 1`;
         health.database = "ok";
     } catch (error) {

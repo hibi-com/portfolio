@@ -1,16 +1,10 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import type { Handler } from "hono";
-import { DIContainer } from "~/di/container";
+import { createContainer } from "~/di/create-container";
+import type { Env } from "~/env";
 import { getLogger } from "~/lib/logger";
 import { isValidUuid } from "~/lib/validation";
-
-type Env = {
-    DATABASE_URL: string;
-    CACHE_URL: string;
-    RESEND_API_KEY?: string;
-    RESEND_FROM_EMAIL?: string;
-};
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -218,7 +212,7 @@ const sendWithTemplateRoute = createRoute({
 
 const listLogsHandler: Handler<{ Bindings: Env }> = async (c) => {
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetEmailLogsUseCase();
         const logs = await useCase.execute();
         return c.json(logs, 200);
@@ -240,7 +234,7 @@ const getLogHandler: Handler<{ Bindings: Env }> = async (c) => {
     if (!isValidUuid(id)) return c.json({ error: "Invalid email log ID format" }, 400);
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetEmailLogByIdUseCase();
         const log = await useCase.execute(id);
         if (!log) return c.json({ error: "Email log not found" }, 404);
@@ -260,7 +254,7 @@ const getLogHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const listTemplatesHandler: Handler<{ Bindings: Env }> = async (c) => {
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetEmailTemplatesUseCase();
         const templates = await useCase.execute();
         return c.json(templates, 200);
@@ -282,7 +276,7 @@ const getTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
     if (!isValidUuid(id)) return c.json({ error: "Invalid template ID format" }, 400);
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetEmailTemplateByIdUseCase();
         const template = await useCase.execute(id);
         if (!template) return c.json({ error: "Template not found" }, 404);
@@ -303,7 +297,7 @@ const getTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
 const createTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getCreateEmailTemplateUseCase();
         const template = await useCase.execute(body);
         return c.json(template, 201);
@@ -324,7 +318,7 @@ const updateTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getUpdateEmailTemplateUseCase();
         const template = await useCase.execute(id, body);
         return c.json(template, 200);
@@ -344,7 +338,7 @@ const updateTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
 const deleteTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getDeleteEmailTemplateUseCase();
         await useCase.execute(id);
         return c.body(null, 204);
@@ -371,7 +365,7 @@ const sendEmailHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getSendEmailUseCase(resendApiKey, defaultFromEmail);
         const result = await useCase.execute(body);
         return c.json(result, 200);
@@ -404,7 +398,7 @@ const sendWithTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
             return c.json({ error: "templateSlug and to are required" }, 400);
         }
 
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getSendEmailWithTemplateUseCase(resendApiKey, defaultFromEmail);
         const result = await useCase.execute(templateSlug, to, variables, customerId);
         return c.json(result, 200);

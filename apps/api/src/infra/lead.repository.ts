@@ -1,4 +1,4 @@
-import { createPrismaClient } from "@portfolio/db";
+import { type CreatePrismaClientOptions, createPrismaClient } from "@portfolio/db";
 import type { CreateLeadInput, Lead, LeadRepository, LeadStatus, UpdateLeadInput } from "~/domain/lead";
 
 function toDateString(d: Date | null | undefined): string | undefined {
@@ -7,7 +7,7 @@ function toDateString(d: Date | null | undefined): string | undefined {
 }
 
 export class LeadRepositoryImpl implements LeadRepository {
-    constructor(private readonly databaseUrl?: string) {}
+    constructor(private readonly options?: CreatePrismaClientOptions) {}
 
     private mapToLead(data: {
         id: string;
@@ -42,7 +42,7 @@ export class LeadRepositoryImpl implements LeadRepository {
     }
 
     async findAll(): Promise<Lead[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const leads = await prisma.lead.findMany({
             orderBy: { createdAt: "desc" },
         });
@@ -51,7 +51,7 @@ export class LeadRepositoryImpl implements LeadRepository {
     }
 
     async findById(id: string): Promise<Lead | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const lead = await prisma.lead.findUnique({
             where: { id },
         });
@@ -62,7 +62,7 @@ export class LeadRepositoryImpl implements LeadRepository {
     }
 
     async findByCustomerId(customerId: string): Promise<Lead[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const leads = await prisma.lead.findMany({
             where: { customerId },
             orderBy: { createdAt: "desc" },
@@ -72,7 +72,7 @@ export class LeadRepositoryImpl implements LeadRepository {
     }
 
     async create(input: CreateLeadInput): Promise<Lead> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const lead = await prisma.lead.create({
             data: {
                 customerId: input.customerId,
@@ -91,7 +91,7 @@ export class LeadRepositoryImpl implements LeadRepository {
     }
 
     async update(id: string, input: UpdateLeadInput): Promise<Lead> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const lead = await prisma.lead.update({
             where: { id },
             data: {
@@ -111,14 +111,14 @@ export class LeadRepositoryImpl implements LeadRepository {
     }
 
     async delete(id: string): Promise<void> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         await prisma.lead.delete({
             where: { id },
         });
     }
 
     async convertToDeal(id: string): Promise<Lead> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const lead = await prisma.lead.update({
             where: { id },
             data: {

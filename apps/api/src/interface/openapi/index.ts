@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import type { Env } from "~/env";
 import { chatsRouter } from "./chats";
 import { customersRouter } from "./customers";
 import { dealsRouter } from "./deals";
@@ -9,11 +10,6 @@ import { leadsRouter } from "./leads";
 import { pipelinesRouter } from "./pipelines";
 import { portfoliosRouter } from "./portfolios";
 import { postsRouter } from "./posts";
-
-type Env = {
-    DATABASE_URL: string;
-    CACHE_URL: string;
-};
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 

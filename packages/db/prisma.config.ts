@@ -1,18 +1,14 @@
 import { defineConfig } from "prisma/config";
 
-function deriveShadowUrl(url: string): string {
-    return url.replace(/\/([^/?]+)(\?|$)/, "/$1_shadow$2");
-}
-
 export default defineConfig({
     schema: "./prisma/schema",
     migrations: {
         path: "./migration",
     },
     datasource: {
-        url: process.env.DATABASE_URL ?? "",
-        shadowDatabaseUrl:
-            process.env.SHADOW_DATABASE_URL ??
-            (process.env.DATABASE_URL ? deriveShadowUrl(process.env.DATABASE_URL) : undefined),
+        // Local default: libSQL (sqld) from `.docker/db` (host port 8081).
+        // Production Workers use the D1 binding instead of DATABASE_URL.
+        url: process.env.DATABASE_URL ?? "http://127.0.0.1:8081",
+        shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL ?? "http://127.0.0.1:8081",
     },
 });

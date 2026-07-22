@@ -1,289 +1,286 @@
 -- Seed data for posts table
 -- This script runs after database initialization
 
-USE portfolio;
-
 -- Insert sample post data (20 posts)
-INSERT INTO `posts` (`id`, `title`, `slug`, `date`, `description`, `content`, `content_raw`, `image_temp`, `sticky`, `intro`, `created_at`, `updated_at`)
+INSERT OR IGNORE INTO "posts" ("id", "title", "slug", "date", "description", "content", "content_raw", "image_temp", "sticky", "intro", "created_at", "updated_at")
 VALUES
     (
         '20000000-0000-0000-0000-000000000001',
         'Welcome to My Portfolio',
         'welcome-to-my-portfolio',
-        NOW(),
+        datetime('now'),
         'Introduction to my portfolio website',
         '<p>Welcome to my portfolio website!</p>',
         NULL,
         '/images/posts/welcome.jpg',
         true,
         'This is the introduction post for my portfolio.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000002',
         'Building a Modern Web Application',
         'building-modern-web-application',
-        DATE_SUB(NOW(), INTERVAL 1 DAY),
+        datetime('now', '-1 day'),
         'Learn how to build modern web applications',
         '<p>In this post, I will share my experience building modern web applications.</p>',
         NULL,
         '/images/posts/modern-web.jpg',
         false,
         'A guide to building modern web applications with TypeScript and React.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000003',
         'TypeScript Best Practices',
         'typescript-best-practices',
-        DATE_SUB(NOW(), INTERVAL 2 DAY),
+        datetime('now', '-2 day'),
         'Essential TypeScript patterns and practices',
         '<p>TypeScript offers powerful features for building robust applications.</p>',
         NULL,
         '/images/posts/typescript.jpg',
         false,
         'Learn the best practices for writing maintainable TypeScript code.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000004',
         'React Performance Optimization',
         'react-performance-optimization',
-        DATE_SUB(NOW(), INTERVAL 3 DAY),
+        datetime('now', '-3 day'),
         'Tips for optimizing React applications',
         '<p>Performance is crucial for modern web applications.</p>',
         NULL,
         '/images/posts/react-perf.jpg',
         false,
         'Discover techniques to improve React application performance.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000005',
         'Database Design Patterns',
         'database-design-patterns',
-        DATE_SUB(NOW(), INTERVAL 4 DAY),
+        datetime('now', '-4 day'),
         'Common database design patterns and when to use them',
         '<p>Good database design is the foundation of scalable applications.</p>',
         NULL,
         '/images/posts/database.jpg',
         false,
         'Explore essential database design patterns for modern applications.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000006',
         'Docker Containerization Guide',
         'docker-containerization-guide',
-        DATE_SUB(NOW(), INTERVAL 5 DAY),
+        datetime('now', '-5 day'),
         'Complete guide to Docker and containerization',
         '<p>Docker has revolutionized how we deploy applications.</p>',
         NULL,
         '/images/posts/docker.jpg',
         false,
         'Learn how to containerize your applications with Docker.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000007',
         'RESTful API Design Principles',
         'restful-api-design-principles',
-        DATE_SUB(NOW(), INTERVAL 6 DAY),
+        datetime('now', '-6 day'),
         'Best practices for designing REST APIs',
         '<p>Well-designed APIs are crucial for application success.</p>',
         NULL,
         '/images/posts/api.jpg',
         false,
         'Master the art of designing clean and intuitive REST APIs.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000008',
         'GraphQL vs REST: Choosing the Right API',
         'graphql-vs-rest-choosing-right-api',
-        DATE_SUB(NOW(), INTERVAL 7 DAY),
+        datetime('now', '-7 day'),
         'Comparison between GraphQL and REST APIs',
         '<p>Both GraphQL and REST have their strengths and weaknesses.</p>',
         NULL,
         '/images/posts/graphql.jpg',
         false,
         'Understand when to use GraphQL and when to stick with REST.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000009',
         'Microservices Architecture',
         'microservices-architecture',
-        DATE_SUB(NOW(), INTERVAL 8 DAY),
+        datetime('now', '-8 day'),
         'Building scalable applications with microservices',
         '<p>Microservices offer flexibility and scalability for large applications.</p>',
         NULL,
         '/images/posts/microservices.jpg',
         false,
         'Learn how to design and implement microservices architecture.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000010',
         'CI/CD Pipeline Setup',
         'cicd-pipeline-setup',
-        DATE_SUB(NOW(), INTERVAL 9 DAY),
+        datetime('now', '-9 day'),
         'Setting up continuous integration and deployment',
         '<p>Automated pipelines improve development workflow significantly.</p>',
         NULL,
         '/images/posts/cicd.jpg',
         false,
         'Set up a robust CI/CD pipeline for your projects.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000011',
         'Testing Strategies for Web Applications',
         'testing-strategies-web-applications',
-        DATE_SUB(NOW(), INTERVAL 10 DAY),
+        datetime('now', '-10 day'),
         'Comprehensive testing approaches for web apps',
         '<p>Testing is essential for maintaining code quality.</p>',
         NULL,
         '/images/posts/testing.jpg',
         false,
         'Explore different testing strategies and their applications.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000012',
         'Web Security Best Practices',
         'web-security-best-practices',
-        DATE_SUB(NOW(), INTERVAL 11 DAY),
+        datetime('now', '-11 day'),
         'Essential security practices for web developers',
         '<p>Security should be a priority from the start.</p>',
         NULL,
         '/images/posts/security.jpg',
         false,
         'Learn critical security practices to protect your applications.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000013',
         'Performance Monitoring and Optimization',
         'performance-monitoring-optimization',
-        DATE_SUB(NOW(), INTERVAL 12 DAY),
+        datetime('now', '-12 day'),
         'Tools and techniques for monitoring application performance',
         '<p>Performance monitoring helps identify bottlenecks early.</p>',
         NULL,
         '/images/posts/performance.jpg',
         false,
         'Discover tools and techniques for optimizing application performance.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000014',
         'Mobile-First Development',
         'mobile-first-development',
-        DATE_SUB(NOW(), INTERVAL 13 DAY),
+        datetime('now', '-13 day'),
         'Building responsive applications with mobile-first approach',
         '<p>Mobile-first design ensures better user experience across devices.</p>',
         NULL,
         '/images/posts/mobile.jpg',
         false,
         'Master mobile-first development principles and practices.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000015',
         'Introduction to Machine Learning',
         'introduction-machine-learning',
-        DATE_SUB(NOW(), INTERVAL 14 DAY),
+        datetime('now', '-14 day'),
         'Getting started with machine learning for developers',
         '<p>Machine learning opens new possibilities for applications.</p>',
         NULL,
         '/images/posts/ml.jpg',
         false,
         'Begin your journey into machine learning as a developer.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000016',
         'Blockchain Development Basics',
         'blockchain-development-basics',
-        DATE_SUB(NOW(), INTERVAL 15 DAY),
+        datetime('now', '-15 day'),
         'Introduction to blockchain and smart contracts',
         '<p>Blockchain technology is transforming various industries.</p>',
         NULL,
         '/images/posts/blockchain.jpg',
         false,
         'Learn the fundamentals of blockchain development.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000017',
         'AWS Cloud Services Overview',
         'aws-cloud-services-overview',
-        DATE_SUB(NOW(), INTERVAL 16 DAY),
+        datetime('now', '-16 day'),
         'Essential AWS services for developers',
         '<p>Amazon Web Services offers powerful cloud solutions.</p>',
         NULL,
         '/images/posts/aws.jpg',
         false,
         'Explore the most important AWS services for developers.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000018',
         'Kubernetes Orchestration Guide',
         'kubernetes-orchestration-guide',
-        DATE_SUB(NOW(), INTERVAL 17 DAY),
+        datetime('now', '-17 day'),
         'Managing containers with Kubernetes',
         '<p>Kubernetes simplifies container orchestration at scale.</p>',
         NULL,
         '/images/posts/kubernetes.jpg',
         false,
         'Learn how to orchestrate containers using Kubernetes.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000019',
         'Python for Web Development',
         'python-web-development',
-        DATE_SUB(NOW(), INTERVAL 18 DAY),
+        datetime('now', '-18 day'),
         'Using Python to build web applications',
         '<p>Python is versatile and powerful for web development.</p>',
         NULL,
         '/images/posts/python.jpg',
         false,
         'Discover Python frameworks and libraries for web development.',
-        NOW(),
-        NOW()
+        datetime('now'),
+        datetime('now')
     ),
     (
         '20000000-0000-0000-0000-000000000020',
         'JavaScript ES2024 Features',
         'javascript-es2024-features',
-        DATE_SUB(NOW(), INTERVAL 19 DAY),
+        datetime('now', '-19 day'),
         'Latest JavaScript features and improvements',
         '<p>JavaScript continues to evolve with new features.</p>',
         NULL,
         '/images/posts/javascript.jpg',
         false,
         'Stay up to date with the latest JavaScript features.',
-        NOW(),
-        NOW()
-    )
-ON DUPLICATE KEY UPDATE `updated_at` = NOW();
+        datetime('now'),
+        datetime('now')
+    );

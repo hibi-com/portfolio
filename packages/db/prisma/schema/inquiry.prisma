@@ -34,13 +34,13 @@ model Inquiry {
     customerId  String?         @map("customer_id")
     assigneeId  String?         @map("assignee_id")
     subject     String
-    content     String          @db.Text
+    content     String
     status      InquiryStatus   @default(OPEN)
     priority    InquiryPriority @default(MEDIUM)
     category    InquiryCategory @default(GENERAL)
     tags        String?
     source      String?
-    metadata    String?         @db.Text
+    metadata    String?
     resolvedAt  DateTime?       @map("resolved_at")
     closedAt    DateTime?       @map("closed_at")
     createdAt   DateTime        @default(now()) @map("created_at")
@@ -62,7 +62,7 @@ model InquiryResponse {
     id          String   @id @default(uuid())
     inquiryId   String   @map("inquiry_id")
     userId      String?  @map("user_id")
-    content     String   @db.Text
+    content     String
     isInternal  Boolean  @default(false) @map("is_internal")
     attachments String?
     createdAt   DateTime @default(now()) @map("created_at")

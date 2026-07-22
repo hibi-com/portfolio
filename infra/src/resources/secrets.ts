@@ -12,39 +12,12 @@ export interface EnvYamlStructure {
             apiToken?: string;
             zoneId?: string;
         };
-        grafana?: {
-            apiKey?: string;
-            orgSlug?: string;
-        };
         sentry?: {
             authToken?: string;
             org?: string;
         };
-        tidb?: {
-            publicKey?: string;
-            privateKey?: string;
-        };
-        redis?: {
-            accessKey?: string;
-            secretKey?: string;
-            subscriptionId?: string;
-            databaseId?: string;
-        };
-        backblaze?: {
-            applicationKeyId?: string;
-            applicationKey?: string;
-            bucketName?: string;
-            endpoint?: string;
-        };
     };
     secrets?: {
-        database?: {
-            url?: string;
-        };
-        cache?: {
-            url?: string;
-            redisUrl?: string;
-        };
         auth?: {
             betterAuthSecret?: string;
             googleClientId?: string;
@@ -101,8 +74,6 @@ export interface EnvYamlStructure {
 
 export function getCloudflareEnvVars(secrets: SecretsFromEnv): Record<string, pulumi.Output<string>> {
     return {
-        DATABASE_URL: secrets.DATABASE_URL,
-        CACHE_URL: secrets.CACHE_URL,
         NODE_ENV: pulumi.output("production"),
         SENTRY_DSN: secrets.SENTRY_DSN,
         BETTER_AUTH_SECRET: secrets.BETTER_AUTH_SECRET,
@@ -224,8 +195,6 @@ export function getWebEnvVars(): {
             ),
         },
         secrets: {
-            DATABASE_URL: getSecretValue("DATABASE_URL", ["secrets", "database", "url"], envYaml),
-            CACHE_URL: getSecretValue("CACHE_URL", ["secrets", "cache", "url"], envYaml),
             SENTRY_DSN: getSecretValue("SENTRY_DSN", ["secrets", "sentry", "dsn"], envYaml),
         },
     };
@@ -264,8 +233,6 @@ export function getAdminEnvVars(): {
             ),
         },
         secrets: {
-            DATABASE_URL: getSecretValue("DATABASE_URL", ["secrets", "database", "url"], envYaml),
-            CACHE_URL: getSecretValue("CACHE_URL", ["secrets", "cache", "url"], envYaml),
             SENTRY_DSN: getSecretValue("SENTRY_DSN", ["secrets", "sentry", "dsn"], envYaml),
             BETTER_AUTH_SECRET: getSecretValue("BETTER_AUTH_SECRET", ["secrets", "auth", "betterAuthSecret"], envYaml),
             GOOGLE_CLIENT_ID: getSecretValue("GOOGLE_CLIENT_ID", ["secrets", "auth", "googleClientId"], envYaml),
@@ -305,7 +272,6 @@ export function getE2eEnvVars(): {
             PRODUCTION_URL: getEnvValue("PORTAL_BASE_URL", ["apps", "portal", "baseUrl"], envYaml),
         },
         secrets: {
-            DATABASE_URL: getSecretValue("DATABASE_URL", ["secrets", "database", "url"], envYaml),
             AUTH_SECRET: getSecretValue("AUTH_SECRET", ["secrets", "auth", "betterAuthSecret"], envYaml),
             GOOGLE_CLIENT_ID: getSecretValue("GOOGLE_CLIENT_ID", ["secrets", "auth", "googleClientId"], envYaml),
             GOOGLE_CLIENT_SECRET: getSecretValue(
@@ -329,8 +295,6 @@ export function getApiEnvVars(): {
             API_BASE_URL: getValueFromEnvOrYaml("API_BASE_URL", ["apps", "api", "baseUrl"], envYaml),
         },
         secrets: {
-            DATABASE_URL: getSecretValue("DATABASE_URL", ["secrets", "database", "url"], envYaml),
-            CACHE_URL: getSecretValue("CACHE_URL", ["secrets", "cache", "url"], envYaml),
             SENTRY_DSN: getSecretValue("SENTRY_DSN", ["secrets", "sentry", "dsn"], envYaml),
             BETTER_AUTH_SECRET: getSecretValue("BETTER_AUTH_SECRET", ["secrets", "auth", "betterAuthSecret"], envYaml),
             GOOGLE_CLIENT_ID: getSecretValue("GOOGLE_CLIENT_ID", ["secrets", "auth", "googleClientId"], envYaml),
@@ -340,34 +304,6 @@ export function getApiEnvVars(): {
                 envYaml,
             ),
         },
-    };
-}
-
-export function getBackblazeConfig(): {
-    applicationKeyId: string;
-    applicationKey: pulumi.Output<string>;
-    bucketName: string;
-    endpoint: string;
-} {
-    const envYaml = parseEnvironmentYaml();
-
-    return {
-        applicationKeyId: getValueFromEnvOrYaml(
-            "BACKBLAZE_APPLICATION_KEY_ID",
-            ["infra", "backblaze", "applicationKeyId"],
-            envYaml,
-        ),
-        applicationKey: getSecretValue(
-            "BACKBLAZE_APPLICATION_KEY",
-            ["infra", "backblaze", "applicationKey"],
-            envYaml,
-        ),
-        bucketName:
-            getValueFromEnvOrYaml("BACKBLAZE_BUCKET_NAME", ["infra", "backblaze", "bucketName"], envYaml) ||
-            "portfolio-test-reports",
-        endpoint:
-            getValueFromEnvOrYaml("BACKBLAZE_ENDPOINT", ["infra", "backblaze", "endpoint"], envYaml) ||
-            "s3.us-west-002.backblazeb2.com",
     };
 }
 

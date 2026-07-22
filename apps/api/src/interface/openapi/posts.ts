@@ -1,13 +1,9 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import type { Handler } from "hono";
-import { DIContainer } from "~/di/container";
+import { createContainer } from "~/di/create-container";
+import type { Env } from "~/env";
 import { getLogger, getMetrics } from "~/lib/logger";
-
-type Env = {
-    DATABASE_URL: string;
-    CACHE_URL: string;
-};
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -86,7 +82,7 @@ const listPostsHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetPostsUseCase();
         const posts = await useCase.execute();
 
@@ -120,7 +116,7 @@ const getPostBySlugHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetPostBySlugUseCase();
         const post = await useCase.execute(slug);
 

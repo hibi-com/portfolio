@@ -1,4 +1,4 @@
-import type { Prisma } from "@portfolio/db";
+import type { CreatePrismaClientOptions, Prisma } from "@portfolio/db";
 import { createPrismaClient } from "@portfolio/db";
 import type { CreateDealInput, Deal, DealRepository, DealStatus, UpdateDealInput } from "~/domain/deal";
 
@@ -8,7 +8,7 @@ function toDateString(d: Date | null | undefined): string | undefined {
 }
 
 export class DealRepositoryImpl implements DealRepository {
-    constructor(private readonly databaseUrl?: string) {}
+    constructor(private readonly options?: CreatePrismaClientOptions) {}
 
     private mapToDeal(data: {
         id: string;
@@ -45,7 +45,7 @@ export class DealRepositoryImpl implements DealRepository {
     }
 
     async findAll(): Promise<Deal[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const deals = await prisma.deal.findMany({
             orderBy: { createdAt: "desc" },
         });
@@ -54,7 +54,7 @@ export class DealRepositoryImpl implements DealRepository {
     }
 
     async findById(id: string): Promise<Deal | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const deal = await prisma.deal.findUnique({
             where: { id },
         });
@@ -65,7 +65,7 @@ export class DealRepositoryImpl implements DealRepository {
     }
 
     async findByCustomerId(customerId: string): Promise<Deal[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const deals = await prisma.deal.findMany({
             where: { customerId },
             orderBy: { createdAt: "desc" },
@@ -75,7 +75,7 @@ export class DealRepositoryImpl implements DealRepository {
     }
 
     async findByStageId(stageId: string): Promise<Deal[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const deals = await prisma.deal.findMany({
             where: { stageId },
             orderBy: { createdAt: "desc" },
@@ -85,7 +85,7 @@ export class DealRepositoryImpl implements DealRepository {
     }
 
     async create(input: CreateDealInput): Promise<Deal> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const deal = await prisma.deal.create({
             data: {
                 customerId: input.customerId,
@@ -104,7 +104,7 @@ export class DealRepositoryImpl implements DealRepository {
     }
 
     async update(id: string, input: UpdateDealInput): Promise<Deal> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const deal = await prisma.deal.update({
             where: { id },
             data: {
@@ -125,14 +125,14 @@ export class DealRepositoryImpl implements DealRepository {
     }
 
     async delete(id: string): Promise<void> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         await prisma.deal.delete({
             where: { id },
         });
     }
 
     async moveToStage(id: string, stageId: string): Promise<Deal> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const deal = await prisma.deal.update({
             where: { id },
             data: { stageId },
@@ -142,7 +142,7 @@ export class DealRepositoryImpl implements DealRepository {
     }
 
     async markAsWon(id: string): Promise<Deal> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const deal = await prisma.deal.update({
             where: { id },
             data: {
@@ -155,7 +155,7 @@ export class DealRepositoryImpl implements DealRepository {
     }
 
     async markAsLost(id: string, reason?: string): Promise<Deal> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const deal = await prisma.deal.update({
             where: { id },
             data: {

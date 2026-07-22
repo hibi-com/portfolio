@@ -29,7 +29,7 @@ model ChatRoom {
     inquiryId   String?        @unique @map("inquiry_id")
     name        String?
     status      ChatRoomStatus @default(ACTIVE)
-    metadata    String?        @db.Text
+    metadata    String?
     closedAt    DateTime?      @map("closed_at")
     createdAt   DateTime       @default(now()) @map("created_at")
     updatedAt   DateTime       @updatedAt @map("updated_at")
@@ -71,8 +71,8 @@ model ChatMessage {
     chatRoomId    String          @map("chat_room_id")
     participantId String          @map("participant_id")
     type          ChatMessageType @default(TEXT)
-    content       String          @db.Text
-    metadata      String?         @db.Text
+    content       String
+    metadata      String?
     readBy        String?         @map("read_by")
     createdAt     DateTime        @default(now()) @map("created_at")
     updatedAt     DateTime        @updatedAt @map("updated_at")

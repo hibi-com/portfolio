@@ -1,4 +1,4 @@
-import { createPrismaClient } from "@portfolio/db";
+import { type CreatePrismaClientOptions, createPrismaClient } from "@portfolio/db";
 import type {
     CreateInquiryInput,
     CreateInquiryResponseInput,
@@ -17,7 +17,7 @@ function toDateString(d: Date | null | undefined): string | undefined {
 }
 
 export class InquiryRepositoryImpl implements InquiryRepository {
-    constructor(private readonly databaseUrl?: string) {}
+    constructor(private readonly options?: CreatePrismaClientOptions) {}
 
     private mapToInquiry(data: {
         id: string;
@@ -78,7 +78,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async findAll(): Promise<Inquiry[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const inquiries = await prisma.inquiry.findMany({
             orderBy: { createdAt: "desc" },
         });
@@ -87,7 +87,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async findById(id: string): Promise<Inquiry | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const inquiry = await prisma.inquiry.findUnique({
             where: { id },
         });
@@ -98,7 +98,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async findByCustomerId(customerId: string): Promise<Inquiry[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const inquiries = await prisma.inquiry.findMany({
             where: { customerId },
             orderBy: { createdAt: "desc" },
@@ -108,7 +108,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async findByAssigneeId(assigneeId: string): Promise<Inquiry[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const inquiries = await prisma.inquiry.findMany({
             where: { assigneeId },
             orderBy: { createdAt: "desc" },
@@ -118,7 +118,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async findByStatus(status: InquiryStatus): Promise<Inquiry[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const inquiries = await prisma.inquiry.findMany({
             where: { status },
             orderBy: { createdAt: "desc" },
@@ -128,7 +128,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async create(input: CreateInquiryInput): Promise<Inquiry> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const inquiry = await prisma.inquiry.create({
             data: {
                 customerId: input.customerId,
@@ -148,7 +148,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async update(id: string, input: UpdateInquiryInput): Promise<Inquiry> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const inquiry = await prisma.inquiry.update({
             where: { id },
             data: {
@@ -169,14 +169,14 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async delete(id: string): Promise<void> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         await prisma.inquiry.delete({
             where: { id },
         });
     }
 
     async resolve(id: string): Promise<Inquiry> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const inquiry = await prisma.inquiry.update({
             where: { id },
             data: {
@@ -189,7 +189,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async close(id: string): Promise<Inquiry> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const inquiry = await prisma.inquiry.update({
             where: { id },
             data: {
@@ -202,7 +202,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async addResponse(input: CreateInquiryResponseInput): Promise<InquiryResponse> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const response = await prisma.inquiryResponse.create({
             data: {
                 inquiryId: input.inquiryId,
@@ -217,7 +217,7 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     async getResponses(inquiryId: string): Promise<InquiryResponse[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const responses = await prisma.inquiryResponse.findMany({
             where: { inquiryId },
             orderBy: { createdAt: "asc" },

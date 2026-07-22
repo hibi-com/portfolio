@@ -8,11 +8,10 @@ title: "データベース管理"
 
 | 項目 | 内容 |
 | ---- | ---- |
-| **データベース** | TiDB Cloud Serverless |
-| **リージョン** | AWS ap-northeast-1（東京） |
-| **互換性** | MySQL 8.0互換 |
+| **データベース** | Cloudflare D1（本番） / libSQL sqld（ローカル Docker） |
+| **互換性** | SQLite |
 | **ORM** | Prisma 7.x |
-| **接続方法** | `@prisma/adapter-mariadb` |
+| **接続方法** | `@prisma/adapter-d1`（Workers） / `@prisma/adapter-libsql`（ローカル `http://127.0.0.1:8081`） |
 
 ## Prismaスキーマ構成
 
@@ -127,5 +126,6 @@ DB仕様書とPrismaスキーマは1:1で対応しています。変更時は両
 
 - [DB仕様書](../specs/db/) - テーブル設計
 - [Prismaドキュメント](https://www.prisma.io/docs/)
-- [TiDB Cloud](https://docs.pingcap.com/tidbcloud/)
+- [Cloudflare D1](https://developers.cloudflare.com/d1/)
+- [ローカル Docker DB](../../.docker/db/README.md)
 - [インフラ仕様書](../specs/infra/overview.md) - データベース要件

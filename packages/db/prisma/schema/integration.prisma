@@ -20,8 +20,8 @@ model FreeeIntegration {
     userId            String    @map("user_id")
     companyId         Int       @map("company_id")
     companyName       String?   @map("company_name")
-    accessToken       String    @map("access_token") @db.Text
-    refreshToken      String    @map("refresh_token") @db.Text
+    accessToken       String    @map("access_token")
+    refreshToken      String    @map("refresh_token")
     tokenExpiresAt    DateTime  @map("token_expires_at")
     scopes            String?
     isActive          Boolean   @default(true) @map("is_active")
@@ -47,7 +47,7 @@ model FreeeSyncLog {
     totalRecords   Int?          @map("total_records")
     successCount   Int?          @map("success_count")
     errorCount     Int?          @map("error_count")
-    errorDetails   String?       @map("error_details") @db.Text
+    errorDetails   String?       @map("error_details")
     startedAt      DateTime?     @map("started_at")
     completedAt    DateTime?     @map("completed_at")
     createdAt      DateTime      @default(now()) @map("created_at")

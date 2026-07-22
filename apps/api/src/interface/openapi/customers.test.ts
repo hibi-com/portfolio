@@ -1,7 +1,7 @@
 import { customersRouter } from "./customers";
 
-vi.mock("~/di/container", () => ({
-    DIContainer: vi.fn().mockImplementation(() => ({
+vi.mock("~/di/create-container", () => ({
+    createContainer: vi.fn().mockImplementation(() => ({
         getGetCustomersUseCase: vi.fn(() => ({
             execute: vi.fn().mockResolvedValue([
                 {
@@ -67,7 +67,11 @@ vi.mock("~/lib/logger", () => ({
 describe("customersRouter", () => {
     const mockEnv = {
         DATABASE_URL: "test-db-url",
-        CACHE_URL: "test-cache-url",
+        DB: undefined,
+        CACHE: undefined,
+        IMAGES: undefined,
+        R2_PUBLIC_URL: undefined,
+        NODE_ENV: "test",
     };
 
     beforeEach(() => {
@@ -111,8 +115,8 @@ describe("customersRouter", () => {
 
         describe("異常系", () => {
             test("顧客が見つからない場合は404を返す", async () => {
-                const { DIContainer } = await import("~/di/container");
-                vi.mocked(DIContainer).mockImplementationOnce(
+                const { createContainer } = await import("~/di/create-container");
+                vi.mocked(createContainer).mockImplementationOnce(
                     () =>
                         ({
                             getGetCustomerByIdUseCase: vi.fn(() => ({

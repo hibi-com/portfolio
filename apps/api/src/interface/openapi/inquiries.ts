@@ -1,14 +1,10 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import type { Handler } from "hono";
-import { DIContainer } from "~/di/container";
+import { createContainer } from "~/di/create-container";
+import type { Env } from "~/env";
 import { getLogger, getMetrics } from "~/lib/logger";
 import { isValidUuid } from "~/lib/validation";
-
-type Env = {
-    DATABASE_URL: string;
-    CACHE_URL: string;
-};
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -269,7 +265,7 @@ const listInquiriesHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetInquiriesUseCase();
         const inquiries = await useCase.execute();
 
@@ -305,7 +301,7 @@ const getInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
     }
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetInquiryByIdUseCase();
         const inquiry = await useCase.execute(id);
 
@@ -341,7 +337,7 @@ const createInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getCreateInquiryUseCase();
         const inquiry = await useCase.execute(body);
 
@@ -374,7 +370,7 @@ const updateInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getUpdateInquiryUseCase();
         const inquiry = await useCase.execute(id, body);
 
@@ -406,7 +402,7 @@ const deleteInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getDeleteInquiryUseCase();
         await useCase.execute(id);
 
@@ -438,7 +434,7 @@ const resolveInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getResolveInquiryUseCase();
         const inquiry = await useCase.execute(id);
 
@@ -470,7 +466,7 @@ const closeInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getCloseInquiryUseCase();
         const inquiry = await useCase.execute(id);
 
@@ -502,7 +498,7 @@ const getResponsesHandler: Handler<{ Bindings: Env }> = async (c) => {
     const startTime = Date.now();
 
     try {
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getGetInquiryResponsesUseCase();
         const responses = await useCase.execute(id);
 
@@ -535,7 +531,7 @@ const addResponseHandler: Handler<{ Bindings: Env }> = async (c) => {
 
     try {
         const body = await c.req.json();
-        const container = new DIContainer(c.env.DATABASE_URL, c.env.CACHE_URL);
+        const container = createContainer(c.env);
         const useCase = container.getAddInquiryResponseUseCase();
         const response = await useCase.execute({ ...body, inquiryId: id });
 

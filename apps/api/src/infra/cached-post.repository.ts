@@ -1,3 +1,4 @@
+import type { CreatePrismaClientOptions } from "@portfolio/db";
 import { AppError, ErrorCodes } from "@portfolio/log";
 import type { Post, PostRepository } from "~/domain/post";
 import { getLogger } from "~/lib/logger";
@@ -9,9 +10,9 @@ export class CachedPostRepository implements PostRepository {
     private readonly dbRepository: PostRepositoryImpl;
     private readonly logger = getLogger();
 
-    constructor(databaseUrl?: string, redisUrl?: string) {
-        this.cacheService = new CacheService(redisUrl);
-        this.dbRepository = new PostRepositoryImpl(databaseUrl);
+    constructor(prismaOptions?: CreatePrismaClientOptions, kv?: KVNamespace) {
+        this.cacheService = new CacheService(kv);
+        this.dbRepository = new PostRepositoryImpl(prismaOptions);
     }
 
     private getCacheKey(method: string, ...args: unknown[]): string {
@@ -29,7 +30,7 @@ export class CachedPostRepository implements PostRepository {
         const posts = await this.dbRepository.findAll();
 
         this.cacheService.set(cacheKey, posts).catch((error) => {
-            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, "Redis書き込みエラー（findAll）", {
+            const appError = AppError.fromCode(ErrorCodes.CACHE_OPERATION_ERROR, "KV書き込みエラー（findAll）", {
                 metadata: { method: "findAll", cacheKey },
                 originalError: error instanceof Error ? error : new Error(String(error)),
             });
@@ -53,7 +54,7 @@ export class CachedPostRepository implements PostRepository {
             this.cacheService.set(cacheKey, post).catch((error) => {
                 const appError = AppError.fromCode(
                     ErrorCodes.CACHE_OPERATION_ERROR,
-                    "Redis書き込みエラー（findBySlug）",
+                    "KV書き込みエラー（findBySlug）",
                     {
                         metadata: { method: "findBySlug", cacheKey, slug },
                         originalError: error instanceof Error ? error : new Error(String(error)),
@@ -80,7 +81,7 @@ export class CachedPostRepository implements PostRepository {
             this.cacheService.set(cacheKey, post).catch((error) => {
                 const appError = AppError.fromCode(
                     ErrorCodes.CACHE_OPERATION_ERROR,
-                    "Redis書き込みエラー（findById）",
+                    "KV書き込みエラー（findById）",
                     {
                         metadata: { method: "findById", cacheKey, id },
                         originalError: error instanceof Error ? error : new Error(String(error)),

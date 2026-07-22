@@ -1,10 +1,8 @@
 -- Seed data for user_socials table
 -- This script runs after database initialization
 
-USE portfolio;
-
 -- Constants to satisfy S1192 (no duplicated string literals)
-SET @now = NOW();
+SET @now = datetime('now');
 SET @u1 = '00000000-0000-0000-0000-000000000001';
 SET @u2 = '00000000-0000-0000-0000-000000000002';
 SET @u3 = '00000000-0000-0000-0000-000000000003';
@@ -29,7 +27,7 @@ SET @icon_dribbble = 'dribbble';
 SET @title_dribbble = 'Dribbble';
 
 -- Insert sample user social data (20 social links)
-INSERT INTO `user_socials` (`id`, `user_id`, `icon`, `title`, `url`, `created_at`, `updated_at`)
+INSERT OR IGNORE INTO "user_socials" ("id", "user_id", "icon", "title", "url", "created_at", "updated_at")
 VALUES
     (
         '50000000-0000-0000-0000-000000000001',
@@ -210,5 +208,4 @@ VALUES
         'https://github.com/mia',
         @now,
         @now
-    )
-ON DUPLICATE KEY UPDATE `updated_at` = NOW();
+    );

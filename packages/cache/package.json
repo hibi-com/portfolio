@@ -28,10 +28,8 @@
     "typecheck": "tsc --noEmit",
     "with-env": "env --"
   },
-  "dependencies": {
-    "ioredis": "5.4.1"
-  },
   "devDependencies": {
+    "@cloudflare/workers-types": "4.20260101.0",
     "@portfolio/biome-config": "workspace:*",
     "@portfolio/tsconfig": "workspace:*",
     "@portfolio/vitest-config": "workspace:*",

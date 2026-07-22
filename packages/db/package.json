@@ -32,10 +32,13 @@
     "with-env": "env --"
   },
   "dependencies": {
-    "@prisma/adapter-mariadb": "7.3.0",
+    "@libsql/client": "0.14.0",
+    "@prisma/adapter-d1": "7.3.0",
+    "@prisma/adapter-libsql": "7.3.0",
     "@prisma/client": "7.3.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "4.20260101.0",
     "@portfolio/biome-config": "workspace:*",
     "@portfolio/prisma-markdown": "workspace:*",
     "@portfolio/prisma-migration": "workspace:*",

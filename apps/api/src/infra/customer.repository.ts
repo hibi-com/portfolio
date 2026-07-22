@@ -1,4 +1,4 @@
-import { createPrismaClient } from "@portfolio/db";
+import { type CreatePrismaClientOptions, createPrismaClient } from "@portfolio/db";
 import type {
     CreateCustomerInput,
     Customer,
@@ -13,7 +13,7 @@ function toDateString(d: Date | null | undefined): string | undefined {
 }
 
 export class CustomerRepositoryImpl implements CustomerRepository {
-    constructor(private readonly databaseUrl?: string) {}
+    constructor(private readonly options?: CreatePrismaClientOptions) {}
 
     private mapToCustomer(data: {
         id: string;
@@ -48,7 +48,7 @@ export class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     async findAll(): Promise<Customer[]> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const customers = await prisma.customer.findMany({
             orderBy: { createdAt: "desc" },
         });
@@ -57,7 +57,7 @@ export class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     async findById(id: string): Promise<Customer | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const customer = await prisma.customer.findUnique({
             where: { id },
         });
@@ -68,7 +68,7 @@ export class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     async findByEmail(email: string): Promise<Customer | null> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const customer = await prisma.customer.findFirst({
             where: { email },
         });
@@ -79,7 +79,7 @@ export class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     async create(input: CreateCustomerInput): Promise<Customer> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const customer = await prisma.customer.create({
             data: {
                 name: input.name,
@@ -99,7 +99,7 @@ export class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     async update(id: string, input: UpdateCustomerInput): Promise<Customer> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         const customer = await prisma.customer.update({
             where: { id },
             data: {
@@ -120,7 +120,7 @@ export class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     async delete(id: string): Promise<void> {
-        const prisma = createPrismaClient({ databaseUrl: this.databaseUrl });
+        const prisma = createPrismaClient(this.options ?? {});
         await prisma.customer.delete({
             where: { id },
         });

@@ -3,20 +3,21 @@ import { getTestDatabaseUrlForContainer } from "./db.setup";
 
 export interface TestContainerOptions {
     useCache?: boolean;
-    r2Bucket?: any;
+    kv?: KVNamespace;
+    r2Bucket?: R2Bucket;
     r2PublicUrl?: string;
 }
 
 export function createTestContainer(options: TestContainerOptions = {}): DIContainer {
     const databaseUrl = getTestDatabaseUrlForContainer();
-    const redisUrl = options.useCache ? process.env.TEST_REDIS_URL : undefined;
+    const kv = options.useCache ? options.kv : undefined;
     const r2Bucket = options.r2Bucket;
     const r2PublicUrl = options.r2PublicUrl || "https://test-r2.example.com";
 
-    return new DIContainer(databaseUrl, redisUrl, r2Bucket, r2PublicUrl);
+    return new DIContainer(undefined, kv, r2Bucket, r2PublicUrl, undefined, undefined, databaseUrl);
 }
 
-export function createMockR2Bucket(): any {
+export function createMockR2Bucket(): R2Bucket {
     const storage = new Map<string, ArrayBuffer>();
 
     return {
@@ -61,5 +62,30 @@ export function createMockR2Bucket(): any {
                 objects: Array.from(storage.keys()).map((key) => ({ key })),
             };
         },
-    };
+    } as unknown as R2Bucket;
+}
+
+export function createMockKv(): KVNamespace {
+    const storage = new Map<string, string>();
+
+    return {
+        get: async (key: string): Promise<string | null> => storage.get(key) ?? null,
+        put: async (key: string, value: string): Promise<void> => {
+            storage.set(key, value);
+        },
+        delete: async (key: string): Promise<void> => {
+            storage.delete(key);
+        },
+        list: async (options?: { prefix?: string }): Promise<{
+            list_complete: true;
+            keys: Array<{ name: string }>;
+        }> => {
+            const prefix = options?.prefix ?? "";
+            const keys = Array.from(storage.keys())
+                .filter((name) => name.startsWith(prefix))
+                .map((name) => ({ name }));
+            return { list_complete: true, keys };
+        },
+        getWithMetadata: async () => ({ value: null, metadata: null, cacheStatus: null }),
+    } as unknown as KVNamespace;
 }

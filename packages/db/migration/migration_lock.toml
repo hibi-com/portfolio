@@ -1,0 +1,3 @@
+# Provider: sqlite
+# This lock file tells Prisma Migrate which database provider to use for migrations.
+provider = "sqlite"

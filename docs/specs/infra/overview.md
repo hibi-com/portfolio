@@ -69,9 +69,10 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 
 | 項目 | 要件 | 理由 |
 | ---- | ---- | ---- |
-| データベース | TiDB Cloud Serverless | MySQL互換、サーバーレス、低コスト |
-| キャッシュ | Redis Cloud | 高速キャッシュ、セッション管理 |
-| リージョン | AWS ap-northeast-1（東京） | 日本向けサービスのため |
+| データベース | Cloudflare D1 | Workers と同一エッジでの低レイテンシ、サーバーレス |
+| キャッシュ | Cloudflare Workers KV | エッジキャッシュ・セッション |
+| オブジェクトストレージ | Cloudflare R2（アプリ画像専用） | WebView 表示用画像。CI 成果物用途ではない |
+| リージョン | Cloudflare グローバル | エッジ配信との一体運用 |
 
 ### セキュリティ
 
@@ -86,23 +87,33 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 | 項目 | 要件 | 理由 |
 | ---- | ---- | ---- |
 | エラートラッキング | Sentry | エラー監視、デバッグ |
-| メトリクス・ログ | Grafana Cloud | パフォーマンス監視 |
 
 ## アプリケーション構成
 
 ### フロントエンド（Cloudflare Pages）
 
-| アプリ | サブドメイン | 説明 |
-| ------ | ------------ | ---- |
+| アプリ | サブドメイン（prd） | 説明 |
+| ------ | ------------------- | ---- |
 | Web | `www` | 公開サイト（Remix） |
 | Admin | `admin` | 管理画面（TanStack Router） |
 | Wiki | `wiki` | ドキュメント（Astro） |
+| Portal | `portal` | E2E ポータル |
 
 ### バックエンド（Cloudflare Workers）
 
-| アプリ | サブドメイン | 説明 |
-| ------ | ------------ | ---- |
+| アプリ | サブドメイン（prd） | 説明 |
+| ------ | ------------------- | ---- |
 | API | `api` | REST API（Hono + DDD） |
+
+### ドメイン命名規則
+
+ベースドメインは全環境で `ageha734.jp`。prd 以外は **環境プレフィックスをアプリ名の前** に付ける。
+
+| 環境 | Web 例 | API 例 |
+| ---- | ------ | ------ |
+| `prd` | `www.ageha734.jp` | `api.ageha734.jp` |
+| `rc` | `rc.www.ageha734.jp` | `rc.api.ageha734.jp` |
+| `stg` | `stg.www.ageha734.jp` | `stg.api.ageha734.jp` |
 
 ### Service Binding
 
@@ -120,25 +131,23 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 ### 環境変数管理
 
 - `infra/.env` - ローカル環境用
-- Cloudflare環境変数 - 本番・ステージング用
+- Cloudflare環境変数 / Worker Bindings - 本番・ステージング用
 
 ## DNS構成
 
-| サブドメイン | 種別 | 対象 |
-| ------------ | ---- | ---- |
+| レコード名（prd） | 種別 | 対象 |
+| ----------------- | ---- | ---- |
 | `www` | CNAME | Cloudflare Pages (web) |
 | `admin` | CNAME | Cloudflare Pages (admin) |
 | `wiki` | CNAME | Cloudflare Pages (wiki) |
-| `api` | CNAME | Cloudflare Workers (api) |
+| `portal` | CNAME | Cloudflare Pages (e2e) |
+| `api` | Custom Domain | Cloudflare Workers (api) |
 
 ## プロバイダー
 
 | プロバイダー | 用途 | 管理ツール |
 | ------------ | ---- | ---------- |
-| Cloudflare | ホスティング、DNS、CDN | Pulumi |
-| TiDB Cloud | データベース | Pulumi（オプション） |
-| Redis Cloud | キャッシュ | Pulumi（オプション） |
-| Grafana Cloud | 可観測性 | Pulumi |
+| Cloudflare | ホスティング、DNS、CDN、D1、KV、R2 | Pulumi |
 | Sentry | エラートラッキング | Pulumi |
 
 ## 非機能要件
@@ -152,12 +161,13 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 ### 可用性
 
 - **稼働率**: 99.9%以上（Cloudflareの SLA に依存）
-- **障害検知**: Sentry、Grafana でモニタリング
+- **障害検知**: Sentry でモニタリング
 
 ### スケーラビリティ
 
 - **自動スケーリング**: Cloudflare Pages/Workers
-- **データベース**: TiDB Serverless（自動スケーリング）
+- **データベース**: D1（サーバーレス）
+- **キャッシュ**: Workers KV
 
 ## 制約事項
 
@@ -167,10 +177,9 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 - **メモリ**: 128MB
 - **CPU**: 10ms〜50ms（無料プランの場合）
 
-### TiDB Cloud Serverless
+### Cloudflare D1
 
-- **接続数**: 最大 1000接続
-- **ストレージ**: 5GB（無料プラン）
+- **無料プラン**: アカウントあたり DB 数・ストレージに上限あり（プラン依存）
 
 ## コスト試算
 
@@ -185,9 +194,9 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 | -------- | ------ | ------ |
 | Cloudflare Pages | Free | $0 |
 | Cloudflare Workers | Free | $0 |
-| TiDB Cloud | Serverless Free | $0 |
-| Redis Cloud | Free | $0 |
-| Grafana Cloud | Free | $0 |
+| Cloudflare D1 | Free | $0 |
+| Cloudflare Workers KV | Free | $0 |
+| Cloudflare R2 | Free | $0 |
 | Sentry | Developer | $0 |
 
 **合計**: $0/月（無料プラン範囲内）
@@ -197,14 +206,14 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 ### Phase 1（現在）
 
 - ✅ Cloudflare Pages/Workers
-- ✅ TiDB Cloud Serverless
-- ✅ Redis Cloud
+- ✅ Cloudflare D1 / Workers KV / R2（画像）
+- ✅ Sentry
 
 ### Phase 2（検討中）
 
 - [ ] CDN最適化
-- [ ] Edge KVの活用
 - [ ] Durable Objectsの検討
+- [ ] R2 カスタムドメイン / 公開 URL の本設定
 
 ### Phase 3（将来）
 
@@ -216,11 +225,11 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 - [インフラアーキテクチャ図](../../architecture/infra-architecture.md)（自動生成）
 - [APIキー・トークン発行手順](../../development/api-keys-setup.md)
 - [Cloudflare Documentation](https://developers.cloudflare.com/)
-- [TiDB Cloud Documentation](https://docs.pingcap.com/tidbcloud/)
 - [Pulumi Documentation](https://www.pulumi.com/docs/)
 
 ## 変更履歴
 
 | 日付 | 変更内容 | 担当 |
 | ---- | -------- | ---- |
+| 2026-07-23 | Cloudflare 専用化（D1/KV/R2、TiDB/Redis/Grafana/B2 削除） | - |
 | 2024-02-19 | 初版作成 | - |

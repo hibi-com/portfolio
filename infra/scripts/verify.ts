@@ -285,151 +285,6 @@ async function verifySentryToken(authToken: string, org: string): Promise<void> 
     }
 }
 
-async function verifyGrafanaApiKey(apiKey: string, orgSlug: string): Promise<void> {
-    console.log("\n🔍 Grafana APIキーの確認中...\n");
-
-    try {
-        const grafanaUrl = `https://${orgSlug}.grafana.net`;
-
-        const userResponse = await fetch(`${grafanaUrl}/api/user`, {
-            headers: {
-                Authorization: `Bearer ${apiKey}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (!userResponse.ok) {
-            const selfHostedResponse = await fetch(`${orgSlug}/api/user`, {
-                headers: {
-                    Authorization: `Bearer ${apiKey}`,
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (!selfHostedResponse.ok) {
-                const errorText = await userResponse.text();
-                console.error("❌ Grafana APIキーが無効です");
-                console.error(`   ステータス: ${userResponse.status}`);
-                console.error(`   エラー: ${errorText}`);
-                console.log("\n💡 APIキーの作成方法:");
-                console.log("   Grafana Cloud: https://grafana.com/orgs/{org-slug}/api-keys");
-                console.log("   セルフホスト: Configuration → API Keys");
-                return;
-            }
-
-            const userData = await selfHostedResponse.json();
-            console.log("✅ Grafana APIキーは有効です（セルフホスト）");
-            console.log(`   ユーザー: ${userData.login || userData.name || "不明"}`);
-            return;
-        }
-
-        const userData = await userResponse.json();
-        console.log("✅ Grafana APIキーは有効です（Grafana Cloud）");
-        console.log(`   ユーザー: ${userData.login || userData.name || "不明"}`);
-
-        const foldersResponse = await fetch(`${grafanaUrl}/api/folders?limit=1`, {
-            headers: {
-                Authorization: `Bearer ${apiKey}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (!foldersResponse.ok) {
-            const errorText = await foldersResponse.text();
-            console.error("❌ フォルダへのアクセス権限がありません");
-            console.error(`   ステータス: ${foldersResponse.status}`);
-            console.error(`   エラー: ${errorText}`);
-            console.log("\n💡 必要な権限:");
-            console.log("   - folders:read (フォルダの読み取り)");
-            console.log("   - folders:create (フォルダの作成)");
-            return;
-        }
-
-        console.log("✅ フォルダへのアクセス権限があります");
-
-        const dashboardsResponse = await fetch(`${grafanaUrl}/api/search?type=dash-db&limit=1`, {
-            headers: {
-                Authorization: `Bearer ${apiKey}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (!dashboardsResponse.ok) {
-            const errorText = await dashboardsResponse.text();
-            console.error("❌ ダッシュボードへのアクセス権限がありません");
-            console.error(`   ステータス: ${dashboardsResponse.status}`);
-            console.error(`   エラー: ${errorText}`);
-            console.log("\n💡 必要な権限:");
-            console.log("   - dashboards:read (ダッシュボードの読み取り)");
-            console.log("   - dashboards:write (ダッシュボードの書き込み)");
-            return;
-        }
-
-        console.log("✅ ダッシュボードへのアクセス権限があります");
-
-        console.log("\n✅ すべてのGrafana権限が正常です！");
-    } catch (error) {
-        console.error("❌ Grafana APIキーの確認中にエラーが発生しました");
-        console.error(`   エラー: ${error instanceof Error ? error.message : String(error)}`);
-    }
-}
-
-async function verifyRedisCloudKeys(accessKey: string, secretKey: string): Promise<void> {
-    console.log("\n🔍 Redis Cloud APIキーの確認中...\n");
-
-    try {
-        const authString = Buffer.from(`${accessKey}:${secretKey}`).toString("base64");
-
-        const subscriptionsResponse = await fetch("https://api.redislabs.com/v1/subscriptions", {
-            headers: {
-                Authorization: `Basic ${authString}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (!subscriptionsResponse.ok) {
-            const errorText = await subscriptionsResponse.text();
-            console.error("❌ Redis Cloud APIキーが無効です");
-            console.error(`   ステータス: ${subscriptionsResponse.status}`);
-            console.error(`   エラー: ${errorText}`);
-            console.log("\n💡 APIキーの作成方法:");
-            console.log("   1. https://app.redislabs.com/ にログイン");
-            console.log("   2. Account Settings → Access Keys & Security");
-            console.log("   3. Generate New Access Key");
-            return;
-        }
-
-        const subscriptionsData = await subscriptionsResponse.json();
-        console.log("✅ Redis Cloud APIキーは有効です");
-        console.log(`   サブスクリプション数: ${subscriptionsData.subscriptions?.length || 0}`);
-
-        if (subscriptionsData.subscriptions && subscriptionsData.subscriptions.length > 0) {
-            const subscriptionId = subscriptionsData.subscriptions[0].id;
-            const databasesResponse = await fetch(
-                `https://api.redislabs.com/v1/subscriptions/${subscriptionId}/databases`,
-                {
-                    headers: {
-                        Authorization: `Basic ${authString}`,
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
-
-            if (databasesResponse.ok) {
-                const databasesData = await databasesResponse.json();
-                console.log("✅ データベースへのアクセス権限があります");
-                console.log(`   データベース数: ${databasesData.databases?.length || 0}`);
-            }
-        }
-
-        console.log("\n✅ すべてのRedis Cloud権限が正常です！");
-    } catch (error) {
-        console.error("❌ Redis Cloud APIキーの確認中にエラーが発生しました");
-        console.error(`   エラー: ${error instanceof Error ? error.message : String(error)}`);
-    }
-}
-
-
 function verifyGoogleOAuth(clientId: string, clientSecret: string): void {
     console.log("\n🔍 Google OAuth認証情報の確認中...\n");
 
@@ -503,61 +358,6 @@ function verifyBetterAuthSecret(secret: string): void {
     }
 }
 
-function verifyDatabaseUrl(databaseUrl: string): void {
-    if (!databaseUrl || databaseUrl.trim() === "") {
-        console.warn("⚠️  DATABASE_URLが設定されていません");
-        console.log("   （TiDBクラスター作成後に自動設定されます）");
-        return;
-    }
-
-    if (!databaseUrl.startsWith("mysql://")) {
-        console.warn("⚠️  DATABASE_URLの形式が正しくない可能性があります");
-        console.warn("   通常は 'mysql://user:password@host:port/database?sslaccept=strict' の形式です");
-        return;
-    }
-
-    console.log("✅ DATABASE_URLの形式は正しいです（MySQL形式）");
-    if (databaseUrl.includes("localhost")) {
-        console.warn("⚠️  DATABASE_URLにlocalhostが含まれています");
-        console.warn("   本番環境では使用できません");
-    }
-}
-
-function verifyTiDBHost(tidbHost: string): void {
-    if (!tidbHost || tidbHost.trim() === "") {
-        console.warn("⚠️  TIDB_HOSTが設定されていません");
-        console.log("   （TiDBクラスター作成後に設定されます）");
-        return;
-    }
-
-    console.log("✅ TIDB_HOSTが設定されています");
-    console.log(`   Host: ${tidbHost}`);
-
-    if (tidbHost.includes(".tidbcloud.com") || tidbHost.includes(".aws.tidbcloud.com")) {
-        console.log("✅ TiDB Cloudのホスト名形式です");
-    } else {
-        console.warn("⚠️  ホスト名がTiDB Cloudの形式ではない可能性があります");
-    }
-}
-
-function verifyTiDBConnection(databaseUrl: string, tidbHost: string): void {
-    console.log("\n🔍 TiDB Cloud接続情報の確認中...\n");
-
-    try {
-        verifyDatabaseUrl(databaseUrl);
-        verifyTiDBHost(tidbHost);
-
-        console.log("\n💡 実際の接続確認:");
-        console.log("   データベース接続は実際の接続テストで確認する必要があります");
-        console.log("   発行手順: https://tidbcloud.com/ → クラスター → Connect");
-
-        console.log("\n✅ TiDB Cloud接続情報の形式チェック完了");
-    } catch (error) {
-        console.error("❌ TiDB Cloud接続情報の確認中にエラーが発生しました");
-        console.error(`   エラー: ${error instanceof Error ? error.message : String(error)}`);
-    }
-}
-
 function getEnvVar(key: string, envVars: Record<string, string>): string {
     return process.env[key] || envVars[key] || "";
 }
@@ -573,15 +373,9 @@ function loadEnvironmentVariables(): Record<string, string> {
         cloudflareZoneId: getEnvVar("CLOUDFLARE_ZONE_ID", envVars),
         sentryAuthToken: getEnvVar("SENTRY_AUTH_TOKEN", envVars),
         sentryOrg: getEnvVar("SENTRY_ORG", envVars),
-        grafanaApiKey: getEnvVar("GRAFANA_API_KEY", envVars),
-        grafanaOrgSlug: getEnvVar("GRAFANA_ORG_SLUG", envVars),
-        redisCloudAccessKey: getEnvVar("REDISCLOUD_ACCESS_KEY", envVars),
-        redisCloudSecretKey: getEnvVar("REDISCLOUD_SECRET_KEY", envVars),
         googleClientId: getEnvVar("GOOGLE_CLIENT_ID", envVars),
         googleClientSecret: getEnvVar("GOOGLE_CLIENT_SECRET", envVars),
         betterAuthSecret: getEnvVar("BETTER_AUTH_SECRET", envVars),
-        databaseUrl: getEnvVar("DATABASE_URL", envVars),
-        tidbHost: getEnvVar("TIDB_HOST", envVars),
     };
 }
 
@@ -608,29 +402,6 @@ async function verifySentryCredentials(env: Record<string, string>): Promise<voi
     }
 }
 
-async function verifyGrafanaCredentials(env: Record<string, string>): Promise<void> {
-    if (env.grafanaApiKey && env.grafanaOrgSlug) {
-        await verifyGrafanaApiKey(env.grafanaApiKey, env.grafanaOrgSlug);
-    } else {
-        console.log("\n⚠️  Grafana APIキーが見つかりません");
-        console.log("   .envファイルに以下を設定してください:");
-        console.log("   - GRAFANA_API_KEY");
-        console.log("   - GRAFANA_ORG_SLUG");
-    }
-}
-
-async function verifyRedisCloudCredentials(env: Record<string, string>): Promise<void> {
-    if (env.redisCloudAccessKey && env.redisCloudSecretKey) {
-        await verifyRedisCloudKeys(env.redisCloudAccessKey, env.redisCloudSecretKey);
-    } else {
-        console.log("\n⚠️  Redis Cloud APIキーが見つかりません");
-        console.log("   .envファイルに以下を設定してください:");
-        console.log("   - REDISCLOUD_ACCESS_KEY");
-        console.log("   - REDISCLOUD_SECRET_KEY");
-    }
-}
-
-
 function verifyGoogleOAuthCredentials(env: Record<string, string>): void {
     if (env.googleClientId || env.googleClientSecret) {
         verifyGoogleOAuth(env.googleClientId, env.googleClientSecret);
@@ -645,11 +416,8 @@ function verifyGoogleOAuthCredentials(env: Record<string, string>): void {
 async function verifyAllCredentials(env: Record<string, string>): Promise<void> {
     await verifyCloudflareCredentials(env);
     await verifySentryCredentials(env);
-    await verifyGrafanaCredentials(env);
-    await verifyRedisCloudCredentials(env);
     verifyGoogleOAuthCredentials(env);
     verifyBetterAuthSecret(env.betterAuthSecret);
-    verifyTiDBConnection(env.databaseUrl, env.tidbHost);
 }
 
 async function main() {

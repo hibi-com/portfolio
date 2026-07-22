@@ -4,6 +4,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as random from "@pulumi/random";
 import type { InfraConfig } from "../config.js";
 import { getProjectName } from "../config.js";
+import { dnsRecordName } from "../hostname.js";
 import { getAdminEnvVars, getE2eEnvVars, getWebEnvVars, getWikiEnvVars } from "./secrets.js";
 
 type EnvVarConfig = cloudflare.types.input.PagesProjectDeploymentConfigsProductionEnvVars;
@@ -211,14 +212,11 @@ export function createPagesProjects(
 
 export function createPortfolioPagesProjects(
     config: InfraConfig,
-    _secrets: {
-        databaseUrl: pulumi.Output<string>;
-        redisUrl?: pulumi.Output<string>;
-    },
     provider?: cloudflare.Provider,
     apiWorkerScriptName?: pulumi.Output<string>,
 ): PagesOutputs {
     const projectName = getProjectName();
+    const { environment } = config;
 
     const webRandomSuffix = generateRandomSuffix(`${projectName}-web-random`);
     const adminRandomSuffix = generateRandomSuffix(`${projectName}-admin-random`);
@@ -263,7 +261,7 @@ export function createPortfolioPagesProjects(
             buildCommand: "bun run build",
             destinationDir: "build/client",
             rootDir: "apps/web",
-            customDomain: "www",
+            customDomain: dnsRecordName(environment, "www"),
             environmentVariables: webConfig.envVars,
             secrets: webConfig.secrets,
             serviceBinding: webServiceBinding,
@@ -276,7 +274,7 @@ export function createPortfolioPagesProjects(
             buildCommand: "bun run build",
             destinationDir: "build",
             rootDir: "apps/admin",
-            customDomain: "admin",
+            customDomain: dnsRecordName(environment, "admin"),
             environmentVariables: adminConfig.envVars,
             secrets: adminConfig.secrets,
             serviceBinding: adminServiceBinding,
@@ -287,7 +285,7 @@ export function createPortfolioPagesProjects(
             buildCommand: "bun run build",
             destinationDir: "build/client",
             rootDir: "apps/e2e",
-            customDomain: "portal",
+            customDomain: dnsRecordName(environment, "portal"),
             environmentVariables: e2eConfig.envVars,
             secrets: e2eConfig.secrets,
         },
@@ -299,7 +297,7 @@ export function createPortfolioPagesProjects(
             buildCommand: "bun run build",
             destinationDir: "build",
             rootDir: "apps/wiki",
-            customDomain: "wiki",
+            customDomain: dnsRecordName(environment, "wiki"),
             environmentVariables: wikiConfig.envVars,
         },
     ];
