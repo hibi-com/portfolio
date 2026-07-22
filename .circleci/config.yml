@@ -403,7 +403,7 @@ jobs:
               done
             done
 
-            cat > manifest.json <<EOF
+            cat > manifest.json \<<EOF
             {
               "version": "${ARTIFACT_VERSION}",
               "sha": "${CIRCLE_SHA1}",
@@ -474,7 +474,7 @@ jobs:
               done
             done
 
-            cat > manifest.json <<EOF
+            cat > manifest.json \<<EOF
             {
               "version": "${CIRCLE_SHA1:0:7}-rebuild",
               "sha": "${CIRCLE_SHA1}",
