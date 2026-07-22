@@ -2,7 +2,7 @@
 title: "CI/CDツール"
 ---
 
-このプロジェクトの CI/CD は **CircleCI** で実行し、ビルド成果物は **Backblaze B2** に保存する。  
+このプロジェクトの CI/CD は **CircleCI** で実行し、ビルド成果物は **CircleCI Artifacts**（`store_artifacts` / workspace）に保存する。  
 ジョブ構成・トリガー・コマンド・環境変数は設定ファイルと CircleCI の画面が**単一の参照先**であり、このドキュメントでは概要と運用方針のみ記載する。
 
 ## 参照先（更新はここで行う）
@@ -11,20 +11,20 @@ title: "CI/CDツール"
 | ---- | ------ |
 | ワークフロー定義 | `.circleci/config.yml` |
 | 環境変数・Contexts | CircleCI の Project Settings / Contexts |
-| 成果物ストレージ | Backblaze B2 のバケット・料金設定 |
+| 成果物ストレージ | CircleCI Artifacts（B2 は使用しない） |
 
 ## 概要
 
-- **CI**: push 時に品質チェック（format / lint / typecheck）→ test → e2e → build → 成果物を B2 へアップロード。`copilot/` で始まるブランチは除外。
-- **CD**: RC は承認後に B2 から取得してデプロイ。STG / PRD はスケジュール（日次等）で同様にデプロイ。いずれもテスト成功が前提。
+- **CI**: push 時に品質チェック（format / lint / typecheck）→ test → e2e → build → 成果物を CircleCI Artifacts へ保存。`copilot/` で始まるブランチは除外。
+- **CD**: デプロイ workflow はソースから再ビルドしてデプロイ。DB は Cloudflare D1（`wrangler d1 migrations apply`）。
 - **失敗時**: テスト・E2E・ビルド・デプロイの失敗で GitHub Issue を自動作成（ジョブ名・ブランチ・コミット・ログリンク・ラベル付与）。詳細な条件は `.circleci/config.yml` を参照。
 - **デプロイ**: **ローカルからのデプロイは禁止**。すべて CircleCI 経由で実行。デプロイログは `logs/deployment/` に記録。
 
 ## 運用上の注意
 
 - ジョブの追加・変更・トリガー条件を変えたら **`.circleci/config.yml` を更新**する。このドキュメントの「ジョブ一覧」は持たない。
-- 環境変数（B2、Cloudflare、Doppler、GITHUB_TOKEN 等）を変えたら **CircleCI の Contexts / Project Settings** を更新する。変数一覧はこのドキュメントで保持しない。
-- 成果物のパスやバケット名を変えたら **B2 と config.yml** を整合させる。料金・無料枠は B2 のダッシュボードを参照する。
+- 環境変数（Cloudflare、Sentry、GITHUB_TOKEN 等）を変えたら **CircleCI の Contexts / Project Settings** を更新する。変数一覧はこのドキュメントで保持しない。
+- 成果物のパスを変えたら **config.yml の `store_artifacts` / `persist_to_workspace`** を整合させる。
 
 ## 依存関係管理
 

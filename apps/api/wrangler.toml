@@ -1,10 +1,27 @@
-name = "portfolio-api-tntk2h"
+name = "portfolio-api"
 compatibility_date = "2025-11-17"
 compatibility_flags = ["nodejs_compat"]
 main = "src/index.ts"
 
 [vars]
 NODE_ENV = "production"
+
+# Binding IDs are filled by Pulumi / wrangler after infra up.
+# Local: bunx wrangler d1/kv/r2 create または infra stack output を反映。
+
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-prd-db"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "../../packages/db/migrations"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "portfolio-prd-images"
 
 [durable_objects]
 bindings = [{ name = "CHAT_ROOMS", class_name = "ChatRoomDO" }]

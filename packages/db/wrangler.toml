@@ -1,0 +1,12 @@
+# Used by `wrangler d1 migrations apply` in CI / local.
+# Prisma schema migrations remain under ./migration/ (source of truth for Prisma).
+# Keep this SQL in sync when regenerating the initial SQLite migration.
+
+name = "portfolio-db"
+compatibility_date = "2025-11-17"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-prd-db"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"

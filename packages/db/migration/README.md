@@ -24,8 +24,10 @@ Or create and apply interactively (requires sqld on localhost:8081):
 DATABASE_URL="http://127.0.0.1:8081" bunx prisma migrate dev --name init
 ```
 
-For Cloudflare D1, apply with Wrangler after generating SQL:
+For Cloudflare D1, apply with Wrangler after syncing flat SQL into `packages/db/migrations/`:
 
 ```bash
-bunx wrangler d1 migrations apply <DATABASE_NAME>
+# Keep wrangler migrations in sync with Prisma SQL
+cp migration/20260723000000_init_sqlite/migration.sql migrations/0001_init.sql
+bunx wrangler d1 migrations apply <DATABASE_NAME> --remote
 ```

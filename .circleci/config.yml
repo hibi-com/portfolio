@@ -29,15 +29,6 @@ commands:
             echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $BASH_ENV
             source $BASH_ENV
 
-  install-b2:
-    description: Install Backblaze B2 CLI
-    steps:
-      - run:
-          name: Install b2-tools
-          command: |
-            pip3 install --upgrade b2
-            echo 'export PATH="$HOME/.local/bin:$PATH"' >> $BASH_ENV
-            source $BASH_ENV
 
   load-env-config:
     description: Load and decode environment configuration from CircleCI variables
@@ -389,48 +380,30 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - install-b2
       - run:
-          name: Generate artifact version
+          name: Package build artifacts for CircleCI
           command: |
             VERSION="${CIRCLE_SHA1:0:7}-$(date +%s)"
             echo "export ARTIFACT_VERSION=${VERSION}" >> $BASH_ENV
-            echo "Artifact version: ${VERSION}"
+            source $BASH_ENV
 
             echo "${VERSION}" > .artifact-version
             echo "${CIRCLE_SHA1}" > .artifact-sha
-      - run:
-          name: Upload artifacts to Backblaze B2
-          command: |
-            b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
-            source $BASH_ENV
 
-            VERSIONED_PATH="artifacts/versions/${ARTIFACT_VERSION}"
-            SHA_PATH="artifacts/${CIRCLE_SHA1}"
-
-            echo "=== Uploading artifacts ==="
-            echo "Version: ${ARTIFACT_VERSION}"
-            echo "SHA: ${CIRCLE_SHA1}"
-            echo "Branch: ${CIRCLE_BRANCH}"
+            mkdir -p ci-artifacts/versions/${ARTIFACT_VERSION} ci-artifacts/${CIRCLE_SHA1}
 
             for app in web api admin wiki; do
-              APP_DIST="apps/${app}/dist"
-              APP_BUILD="apps/${app}/build"
-
-              if [ -d "${APP_DIST}" ]; then
-                echo "Uploading ${APP_DIST}..."
-                b2 sync "${APP_DIST}" "b2://${B2_BUCKET_NAME}/${VERSIONED_PATH}/${app}/dist/" --skipNewer
-                b2 sync "${APP_DIST}" "b2://${B2_BUCKET_NAME}/${SHA_PATH}/${app}/dist/" --skipNewer
-              fi
-
-              if [ -d "${APP_BUILD}" ]; then
-                echo "Uploading ${APP_BUILD}..."
-                b2 sync "${APP_BUILD}" "b2://${B2_BUCKET_NAME}/${VERSIONED_PATH}/${app}/build/" --skipNewer
-                b2 sync "${APP_BUILD}" "b2://${B2_BUCKET_NAME}/${SHA_PATH}/${app}/build/" --skipNewer
-              fi
+              for kind in dist build; do
+                SRC="apps/${app}/${kind}"
+                if [ -d "${SRC}" ]; then
+                  mkdir -p "ci-artifacts/versions/${ARTIFACT_VERSION}/${app}" "ci-artifacts/${CIRCLE_SHA1}/${app}"
+                  cp -R "${SRC}" "ci-artifacts/versions/${ARTIFACT_VERSION}/${app}/${kind}"
+                  cp -R "${SRC}" "ci-artifacts/${CIRCLE_SHA1}/${app}/${kind}"
+                fi
+              done
             done
 
-            cat > manifest.json \<<EOF
+            cat > manifest.json <<EOF
             {
               "version": "${ARTIFACT_VERSION}",
               "sha": "${CIRCLE_SHA1}",
@@ -443,16 +416,29 @@ jobs:
             }
             EOF
 
-            b2 upload-file "${B2_BUCKET_NAME}" manifest.json "${VERSIONED_PATH}/manifest.json"
-            b2 upload-file "${B2_BUCKET_NAME}" manifest.json "${SHA_PATH}/manifest.json"
-            b2 upload-file "${B2_BUCKET_NAME}" manifest.json "artifacts/latest-rc/manifest.json"
+            cp manifest.json "ci-artifacts/versions/${ARTIFACT_VERSION}/manifest.json"
+            cp manifest.json "ci-artifacts/${CIRCLE_SHA1}/manifest.json"
+            mkdir -p ci-artifacts/latest-rc
+            cp manifest.json ci-artifacts/latest-rc/manifest.json
 
-            echo "✓ Artifacts uploaded successfully"
+            echo "Artifacts packaged under ci-artifacts/"
       - persist_to_workspace:
           root: .
           paths:
             - .artifact-version
             - .artifact-sha
+            - manifest.json
+            - ci-artifacts
+            - apps/web/dist
+            - apps/web/build
+            - apps/api/dist
+            - apps/admin/dist
+            - apps/admin/build
+            - apps/wiki/dist
+            - apps/wiki/build
+      - store_artifacts:
+          path: ci-artifacts
+          destination: build-artifacts
 
   download-artifacts:
     executor: default
@@ -469,41 +455,54 @@ jobs:
         default: rc
     steps:
       - checkout
-      - install-b2
+      - install-bun
       - run:
-          name: Download artifacts from Backblaze B2
+          name: Prepare artifacts (rebuild from source)
           command: |
-            b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
-
-            if [ -n "<< parameters.artifact_version >>" ]; then
-              ARTIFACT_PATH="artifacts/versions/<< parameters.artifact_version >>"
-              echo "Using specified artifact version: << parameters.artifact_version >>"
-            elif [ -n "<< parameters.commit_sha >>" ]; then
-              SHA="<< parameters.commit_sha >>"
-              ARTIFACT_PATH="artifacts/${SHA}"
-              echo "Using specified commit SHA: ${SHA}"
-            else
-              ARTIFACT_PATH="artifacts/latest-<< parameters.environment >>"
-              echo "Using latest artifact for << parameters.environment >>"
-            fi
-
-            echo "=== Downloading artifacts ==="
-            echo "Path: ${ARTIFACT_PATH}"
+            echo "=== Preparing artifacts for << parameters.environment >> ==="
+            bun install --frozen-lockfile
+            bun run build
 
             mkdir -p artifacts
-            b2 download-file-by-name "${B2_BUCKET_NAME}" "${ARTIFACT_PATH}/manifest.json" "./manifest.json"
+            for app in web api admin wiki; do
+              for kind in dist build; do
+                SRC="apps/${app}/${kind}"
+                if [ -d "${SRC}" ]; then
+                  mkdir -p "artifacts/${app}"
+                  cp -R "${SRC}" "artifacts/${app}/${kind}"
+                fi
+              done
+            done
 
-            echo "Artifact manifest:"
-            cat manifest.json | jq '.'
+            cat > manifest.json <<EOF
+            {
+              "version": "${CIRCLE_SHA1:0:7}-rebuild",
+              "sha": "${CIRCLE_SHA1}",
+              "branch": "${CIRCLE_BRANCH}",
+              "build_num": ${CIRCLE_BUILD_NUM},
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "environment": "<< parameters.environment >>",
+              "source": "rebuild"
+            }
+            EOF
 
-            b2 sync "b2://${B2_BUCKET_NAME}/${ARTIFACT_PATH}/" "./artifacts/" --skipNewer
-
-            echo "✓ Artifacts downloaded successfully"
+            cp manifest.json artifacts/manifest.json
+            echo "Artifacts prepared"
       - persist_to_workspace:
           root: .
           paths:
             - artifacts
             - manifest.json
+            - apps/web/dist
+            - apps/web/build
+            - apps/api/dist
+            - apps/admin/dist
+            - apps/admin/build
+            - apps/wiki/dist
+            - apps/wiki/build
+      - store_artifacts:
+          path: artifacts
+          destination: deploy-artifacts-<< parameters.environment >>
 
   artifact-promotion:
     executor: default
@@ -517,36 +516,36 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - install-b2
       - run:
-          name: Promote artifact from << parameters.from_environment >> to << parameters.to_environment >>
+          name: Record promotion << parameters.from_environment >> to << parameters.to_environment >>
           command: |
-            b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
+            if [ -f manifest.json ]; then
+              FROM_MANIFEST=manifest.json
+            elif [ -f artifacts/manifest.json ]; then
+              FROM_MANIFEST=artifacts/manifest.json
+            else
+              echo '{"version":"unknown","sha":"'"${CIRCLE_SHA1}"'"}' > from-manifest.json
+              FROM_MANIFEST=from-manifest.json
+            fi
 
-            b2 download-file-by-name "${B2_BUCKET_NAME}" "artifacts/latest-<< parameters.from_environment >>/manifest.json" "./from-manifest.json"
+            jq --arg env "<< parameters.to_environment >>" \
+               --arg from "<< parameters.from_environment >>" \
+               --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+               '.environment = $env | .promoted_at = $at | .promoted_from = $from' \
+               "${FROM_MANIFEST}" > to-manifest.json
 
-            VERSION=$(jq -r '.version' from-manifest.json)
-            SHA=$(jq -r '.sha' from-manifest.json)
-
-            echo "=== Promoting artifact ==="
-            echo "Version: ${VERSION}"
-            echo "From: << parameters.from_environment >>"
-            echo "To: << parameters.to_environment >>"
-
-            VERSIONED_PATH="artifacts/versions/${VERSION}"
-
-            jq '.environment = "<< parameters.to_environment >>" | .promoted_at = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" | .promoted_from = "<< parameters.from_environment >>"' from-manifest.json > to-manifest.json
-
-            b2 upload-file "${B2_BUCKET_NAME}" to-manifest.json "artifacts/latest-<< parameters.to_environment >>/manifest.json"
-
-            b2 copy-file-by-name "${B2_BUCKET_NAME}" "${VERSIONED_PATH}/manifest.json" "${B2_BUCKET_NAME}" "artifacts/<< parameters.to_environment >>-${SHA}/manifest.json"
-
-            echo "✓ Artifact promoted successfully"
+            mkdir -p "ci-artifacts/latest-<< parameters.to_environment >>"
+            cp to-manifest.json "ci-artifacts/latest-<< parameters.to_environment >>/manifest.json"
+            echo "Promotion recorded"
             cat to-manifest.json | jq '.'
       - persist_to_workspace:
           root: .
           paths:
             - to-manifest.json
+            - ci-artifacts
+      - store_artifacts:
+          path: to-manifest.json
+          destination: promotion-<< parameters.to_environment >>
 
   db-migrate:
     executor: default
@@ -561,22 +560,18 @@ jobs:
       - load-env-config:
           environment: << parameters.environment >>
       - run:
-          name: Run Prisma migrations for << parameters.environment >>
+          name: Apply D1 migrations for << parameters.environment >>
           command: |
-            echo "=== Running database migrations for << parameters.environment >> ==="
+            echo "=== Applying Cloudflare D1 migrations for << parameters.environment >> ==="
+            bun add -g wrangler@latest
 
-            # Load DATABASE_URL from env.yaml
-            DATABASE_URL=$(bun -e "import {readFileSync} from 'fs'; import yaml from 'yaml'; const env = yaml.parse(readFileSync('infra/env.yaml', 'utf8')); console.log(env.secrets.database.url);")
-            export DATABASE_URL
+            DB_NAME="${D1_DATABASE_NAME:-portfolio-<< parameters.environment >>-db}"
+            echo "Database: ${DB_NAME}"
 
             cd packages/db
-            echo "Checking migration status..."
-            bunx prisma migrate status || true
+            bunx wrangler d1 migrations apply "${DB_NAME}" --remote
 
-            echo "Applying migrations..."
-            bunx prisma migrate deploy
-
-            echo "✓ Migrations completed successfully"
+            echo "D1 migrations completed"
       - run:
           name: Create GitHub Issue on failure
           when: on_fail
@@ -587,8 +582,8 @@ jobs:
                 -H "Accept: application/vnd.github.v3+json" \
                 https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
                 -d "{
-                  \"title\": \"[Migration Failure] Database migration failed on << parameters.environment >>\",
-                  \"body\": \"## Migration Failure Report\n\n**Environment:** << parameters.environment >>\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the migration logs\n- [ ] Check database connectivity\n- [ ] Verify migration files\n- [ ] Consider manual intervention\n\n### Manual Migration Command\n\n\`\`\`bash\ncd packages/db\nbunx prisma migrate deploy\n\`\`\`\",
+                  \"title\": \"[Migration Failure] D1 migration failed on << parameters.environment >>\",
+                  \"body\": \"## D1 Migration Failure\n\n**Environment:** << parameters.environment >>\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\",
                   \"labels\": [\"migration-failure\", \"<< parameters.environment >>\", \"automated\"]
                 }"
             fi
@@ -1100,69 +1095,16 @@ jobs:
   backup-database:
     executor: default
     steps:
-      - checkout
-      - install-bun
-      - install-b2
       - run:
-          name: Install mysqldump
+          name: Skip legacy database object-store backup
           command: |
-            sudo apt-get update
-            sudo apt-get install -y mysql-client
-      - run:
-          name: Backup TiDB database
-          command: |
-            echo "=== Database Backup ==="
-
-            TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-            BACKUP_FILE="backup-${TIMESTAMP}.sql"
-
-            echo "Creating backup: ${BACKUP_FILE}"
-
-            mysqldump -h "${TIDB_HOST}" -P 4000 -u "${TIDB_USER}" -p"${TIDB_PASSWORD}" \
-              --databases portfolio \
-              --single-transaction \
-              --quick \
-              --lock-tables=false \
-              > "${BACKUP_FILE}"
-
-            gzip "${BACKUP_FILE}"
-            BACKUP_FILE_GZ="${BACKUP_FILE}.gz"
-
-            echo "Backup size: $(du -h ${BACKUP_FILE_GZ} | cut -f1)"
-
-            b2 authorize-account "${B2_APPLICATION_KEY_ID}" "${B2_APPLICATION_KEY}"
-
-            b2 upload-file "${B2_BUCKET_NAME}" "${BACKUP_FILE_GZ}" "backups/db/${BACKUP_FILE_GZ}"
-
-            echo "✓ Backup uploaded to B2"
-
-            BACKUP_COUNT=$(b2 ls "${B2_BUCKET_NAME}" backups/db/ | wc -l)
-            echo "Total backups: ${BACKUP_COUNT}"
-
-            if [ "${BACKUP_COUNT}" -gt "30" ]; then
-              echo "Cleaning old backups (keeping last 30)..."
-              b2 ls "${B2_BUCKET_NAME}" backups/db/ | sort | head -n -30 | while read file; do
-                b2 delete-file-version "${B2_BUCKET_NAME}" "${file}"
-                echo "Deleted old backup: ${file}"
-              done
-            fi
-
-            echo "✓ Database backup completed"
-      - run:
-          name: Create GitHub Issue on failure
-          when: on_fail
-          command: |
-            if [ -n "${GITHUB_TOKEN}" ]; then
-              curl -X POST \
-                -H "Authorization: token ${GITHUB_TOKEN}" \
-                -H "Accept: application/vnd.github.v3+json" \
-                https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
-                -d "{
-                  \"title\": \"[Backup Failure] Database backup failed\",
-                  \"body\": \"## Database Backup Failure\n\n**Timestamp:** $(date -u +%Y-%m-%dT%H:%M:%SZ)\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the backup logs\n- [ ] Check TiDB connectivity\n- [ ] Verify B2 credentials\n- [ ] Manual backup if critical\",
-                  \"labels\": [\"backup-failure\", \"automated\"]
-                }"
-            fi
+            echo "Cloudflare D1 backups use Dashboard / Time Travel."
+            echo "Object-store mysqldump path removed."
+            mkdir -p backup-notes
+            echo "D1 backups: Cloudflare dashboard / wrangler d1" > backup-notes/README.md
+      - store_artifacts:
+          path: backup-notes
+          destination: backup-notes
 
   performance-test:
     executor: large
@@ -1235,15 +1177,13 @@ jobs:
             - Workers Requests: $(curl -s "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/analytics/dashboard" \
               -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" | jq '.result.totals.requests.all')
 
-            ## TiDB Cloud
+            ## Cloudflare D1 / KV / R2
 
-            - Database Storage: Check TiDB Cloud Console
-            - Request Units: Check TiDB Cloud Console
+            - D1 / KV / R2 usage: Check Cloudflare Dashboard Storage
 
-            ## Backblaze B2
+            ## CircleCI Artifacts
 
-            - Storage Used: $(b2 get-account-info | jq '.storageUsed')
-            - API Calls: Check Backblaze Console
+            - Build artifacts via CircleCI store_artifacts
 
             ## Summary
 
@@ -1386,7 +1326,6 @@ workflows:
       - upload-artifacts:
           requires:
             - build
-          context: backblaze-b2
           filters:
             branches:
               only:
@@ -1400,7 +1339,6 @@ workflows:
     jobs:
       - download-artifacts:
           environment: rc
-          context: backblaze-b2
 
       - pre-deploy-check:
           environment: rc
@@ -1447,7 +1385,6 @@ workflows:
           requires:
             - hold-approval
           context:
-            - backblaze-b2
             - cloudflare
             - env-config
 
@@ -1463,13 +1400,11 @@ workflows:
       - artifact-promotion:
           from_environment: rc
           to_environment: stg
-          context: backblaze-b2
 
       - download-artifacts:
           environment: stg
           requires:
             - artifact-promotion
-          context: backblaze-b2
 
       - pre-deploy-check:
           environment: stg
@@ -1511,7 +1446,6 @@ workflows:
           requires:
             - validate-deployment
           context:
-            - backblaze-b2
             - cloudflare
             - env-config
 
@@ -1527,13 +1461,11 @@ workflows:
       - artifact-promotion:
           from_environment: stg
           to_environment: prd
-          context: backblaze-b2
 
       - download-artifacts:
           environment: prd
           requires:
             - artifact-promotion
-          context: backblaze-b2
 
       - pre-deploy-check:
           environment: prd
@@ -1575,7 +1507,6 @@ workflows:
           requires:
             - validate-deployment
           context:
-            - backblaze-b2
             - cloudflare
             - env-config
 
@@ -1652,9 +1583,6 @@ workflows:
                 - master
     jobs:
       - backup-database:
-          context:
-            - backblaze-b2
-            - tidb
 
   performance:
     triggers:
@@ -1679,7 +1607,6 @@ workflows:
       - cost-report:
           context:
             - cloudflare
-            - tidb
 
   visual-regression:
     triggers:
