@@ -12,51 +12,6 @@ volumes:
     name: portfolio_sqlite_data
 
 services:
-  setup-db:
-    image: keinos/sqlite3:3.50.4
-    container_name: setup-db
-    networks:
-      - db
-    volumes:
-      - type: volume
-        source: sqlite_data
-        target: /var/lib/sqld
-      - type: bind
-        source: ./migration
-        target: /migration
-        read_only: true
-      - type: bind
-        source: ./sql
-        target: /sql
-        read_only: true
-    entrypoint:
-      - sh
-      - -c
-      - |
-        set -eu
-        DB=/var/lib/sqld/portfolio.db
-        mkdir -p /var/lib/sqld
-
-        if [ -f "$$DB" ] && sqlite3 "$$DB" "SELECT 1 FROM \"user\" LIMIT 1;" >/dev/null 2>&1; then
-          echo "SQLite DB already initialized; skipping setup-db."
-          exit 0
-        fi
-
-        rm -f "$$DB"
-        echo "Applying Prisma SQLite migrations..."
-        for f in $$(find /migration -name 'migration.sql' | sort); do
-          echo "  -> $$f"
-          sqlite3 "$$DB" < "$$f"
-        done
-
-        echo "Applying seed SQL..."
-        for f in $$(ls /sql/*.sql 2>/dev/null | sort); do
-          echo "  -> $$f"
-          sqlite3 "$$DB" < "$$f"
-        done
-
-        echo "SQLite schema and seed completed: $$DB"
-
   sqlite:
     image: ghcr.io/tursodatabase/libsql-server:v0.24.31
     platform: linux/amd64
@@ -69,21 +24,42 @@ services:
         protocol: tcp
     environment:
       SQLD_NODE: primary
-    command:
-      - sqld
-      - --db-path=/var/lib/sqld/portfolio.db
-      - --http-listen-addr=0.0.0.0:8080
     volumes:
       - type: volume
         source: sqlite_data
         target: /var/lib/sqld
-    depends_on:
-      setup-db:
-        condition: service_completed_successfully
+    # Image may not include curl; setup-db waits on /health via HTTP instead.
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health >/dev/null || exit 1"]
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080'"]
       interval: 5s
       timeout: 5s
       retries: 12
       start_period: 10s
     restart: unless-stopped
+
+  setup-db:
+    image: oven/bun:1.1.43
+    container_name: setup-db
+    networks:
+      - db
+    environment:
+      DATABASE_URL: http://sqlite:8080
+      MIGRATION_DIR: /migration
+      SQL_DIR: /sql
+    volumes:
+      - type: bind
+        source: ./migration
+        target: /migration
+        read_only: true
+      - type: bind
+        source: ./sql
+        target: /sql
+        read_only: true
+      - type: bind
+        source: ./scripts/setup-via-http.mjs
+        target: /setup-via-http.mjs
+        read_only: true
+    depends_on:
+      - sqlite
+    entrypoint: ["bun", "/setup-via-http.mjs"]
+    restart: "no"

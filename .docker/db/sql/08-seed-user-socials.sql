@@ -2,210 +2,187 @@
 -- This script runs after database initialization
 
 -- Constants to satisfy S1192 (no duplicated string literals)
-SET @now = datetime('now');
-SET @u1 = '00000000-0000-0000-0000-000000000001';
-SET @u2 = '00000000-0000-0000-0000-000000000002';
-SET @u3 = '00000000-0000-0000-0000-000000000003';
-SET @u4 = '00000000-0000-0000-0000-000000000004';
-SET @u5 = '00000000-0000-0000-0000-000000000005';
-SET @u6 = '00000000-0000-0000-0000-000000000006';
-SET @u7 = '00000000-0000-0000-0000-000000000007';
-SET @u8 = '00000000-0000-0000-0000-000000000008';
-SET @u9 = '00000000-0000-0000-0000-000000000009';
-SET @u10 = '00000000-0000-0000-0000-000000000010';
-SET @u11 = '00000000-0000-0000-0000-000000000011';
-SET @u12 = '00000000-0000-0000-0000-000000000012';
-SET @u13 = '00000000-0000-0000-0000-000000000013';
-SET @u14 = '00000000-0000-0000-0000-000000000014';
-SET @icon_github = 'github';
-SET @title_github = 'GitHub';
-SET @icon_twitter = 'twitter';
-SET @title_twitter = 'Twitter';
-SET @icon_linkedin = 'linkedin';
-SET @title_linkedin = 'LinkedIn';
-SET @icon_dribbble = 'dribbble';
-SET @title_dribbble = 'Dribbble';
 
 -- Insert sample user social data (20 social links)
 INSERT OR IGNORE INTO "user_socials" ("id", "user_id", "icon", "title", "url", "created_at", "updated_at")
 VALUES
     (
         '50000000-0000-0000-0000-000000000001',
-        @u1,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000001',
+        'github',
+        'GitHub',
         'https://github.com/username',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000002',
-        @u1,
-        @icon_twitter,
-        @title_twitter,
+        '00000000-0000-0000-0000-000000000001',
+        'twitter',
+        'Twitter',
         'https://twitter.com/username',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000003',
-        @u1,
-        @icon_linkedin,
-        @title_linkedin,
+        '00000000-0000-0000-0000-000000000001',
+        'linkedin',
+        'LinkedIn',
         'https://linkedin.com/in/username',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000004',
-        @u2,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000002',
+        'github',
+        'GitHub',
         'https://github.com/alice',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000005',
-        @u2,
-        @icon_linkedin,
-        @title_linkedin,
+        '00000000-0000-0000-0000-000000000002',
+        'linkedin',
+        'LinkedIn',
         'https://linkedin.com/in/alice',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000006',
-        @u3,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000003',
+        'github',
+        'GitHub',
         'https://github.com/bob',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000007',
-        @u3,
-        @icon_twitter,
-        @title_twitter,
+        '00000000-0000-0000-0000-000000000003',
+        'twitter',
+        'Twitter',
         'https://twitter.com/bob',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000008',
-        @u4,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000004',
+        'github',
+        'GitHub',
         'https://github.com/carol',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000009',
-        @u5,
-        @icon_linkedin,
-        @title_linkedin,
+        '00000000-0000-0000-0000-000000000005',
+        'linkedin',
+        'LinkedIn',
         'https://linkedin.com/in/david',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000010',
-        @u6,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000006',
+        'github',
+        'GitHub',
         'https://github.com/eva',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000011',
-        @u6,
-        @icon_dribbble,
-        @title_dribbble,
+        '00000000-0000-0000-0000-000000000006',
+        'dribbble',
+        'Dribbble',
         'https://dribbble.com/eva',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000012',
-        @u7,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000007',
+        'github',
+        'GitHub',
         'https://github.com/frank',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000013',
-        @u8,
-        @icon_linkedin,
-        @title_linkedin,
+        '00000000-0000-0000-0000-000000000008',
+        'linkedin',
+        'LinkedIn',
         'https://linkedin.com/in/grace',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000014',
-        @u9,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000009',
+        'github',
+        'GitHub',
         'https://github.com/henry',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000015',
-        @u10,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000010',
+        'github',
+        'GitHub',
         'https://github.com/ivy',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000016',
-        @u10,
-        @icon_linkedin,
-        @title_linkedin,
+        '00000000-0000-0000-0000-000000000010',
+        'linkedin',
+        'LinkedIn',
         'https://linkedin.com/in/ivy',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000017',
-        @u11,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000011',
+        'github',
+        'GitHub',
         'https://github.com/jack',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000018',
-        @u12,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000012',
+        'github',
+        'GitHub',
         'https://github.com/kate',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000019',
-        @u13,
-        @icon_linkedin,
-        @title_linkedin,
+        '00000000-0000-0000-0000-000000000013',
+        'linkedin',
+        'LinkedIn',
         'https://linkedin.com/in/liam',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     ),
     (
         '50000000-0000-0000-0000-000000000020',
-        @u14,
-        @icon_github,
-        @title_github,
+        '00000000-0000-0000-0000-000000000014',
+        'github',
+        'GitHub',
         'https://github.com/mia',
-        @now,
-        @now
+        datetime('now'),
+        datetime('now')
     );

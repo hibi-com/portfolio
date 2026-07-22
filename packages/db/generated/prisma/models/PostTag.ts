@@ -167,7 +167,6 @@ export type PostTagOrderByWithRelationInput = {
   tagId?: Prisma.SortOrder
   post?: Prisma.PostOrderByWithRelationInput
   tag?: Prisma.TagOrderByWithRelationInput
-  _relevance?: Prisma.PostTagOrderByRelevanceInput
 }
 
 export type PostTagWhereUniqueInput = Prisma.AtLeast<{
@@ -239,12 +238,6 @@ export type PostTagListRelationFilter = {
 
 export type PostTagOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type PostTagOrderByRelevanceInput = {
-  fields: Prisma.PostTagOrderByRelevanceFieldEnum | Prisma.PostTagOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type PostTagPostIdTagIdCompoundUniqueInput = {
@@ -366,7 +359,6 @@ export type PostTagCreateOrConnectWithoutPostInput = {
 
 export type PostTagCreateManyPostInputEnvelope = {
   data: Prisma.PostTagCreateManyPostInput | Prisma.PostTagCreateManyPostInput[]
-  skipDuplicates?: boolean
 }
 
 export type PostTagUpsertWithWhereUniqueWithoutPostInput = {
@@ -408,7 +400,6 @@ export type PostTagCreateOrConnectWithoutTagInput = {
 
 export type PostTagCreateManyTagInputEnvelope = {
   data: Prisma.PostTagCreateManyTagInput | Prisma.PostTagCreateManyTagInput[]
-  skipDuplicates?: boolean
 }
 
 export type PostTagUpsertWithWhereUniqueWithoutTagInput = {
@@ -468,7 +459,19 @@ export type PostTagSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["postTag"]>
 
+export type PostTagSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  postId?: boolean
+  tagId?: boolean
+  post?: boolean | Prisma.PostDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["postTag"]>
 
+export type PostTagSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  postId?: boolean
+  tagId?: boolean
+  post?: boolean | Prisma.PostDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["postTag"]>
 
 export type PostTagSelectScalar = {
   postId?: boolean
@@ -477,6 +480,14 @@ export type PostTagSelectScalar = {
 
 export type PostTagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"postId" | "tagId", ExtArgs["result"]["postTag"]>
 export type PostTagInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  post?: boolean | Prisma.PostDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
+}
+export type PostTagIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  post?: boolean | Prisma.PostDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
+}
+export type PostTagIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   post?: boolean | Prisma.PostDefaultArgs<ExtArgs>
   tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
 }
@@ -608,6 +619,30 @@ export interface PostTagDelegate<ExtArgs extends runtime.Types.Extensions.Intern
   createMany<T extends PostTagCreateManyArgs>(args?: Prisma.SelectSubset<T, PostTagCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many PostTags and returns the data saved in the database.
+   * @param {PostTagCreateManyAndReturnArgs} args - Arguments to create many PostTags.
+   * @example
+   * // Create many PostTags
+   * const postTag = await prisma.postTag.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many PostTags and only return the `postId`
+   * const postTagWithPostIdOnly = await prisma.postTag.createManyAndReturn({
+   *   select: { postId: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends PostTagCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, PostTagCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostTagPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a PostTag.
    * @param {PostTagDeleteArgs} args - Arguments to delete one PostTag.
    * @example
@@ -670,6 +705,36 @@ export interface PostTagDelegate<ExtArgs extends runtime.Types.Extensions.Intern
    * 
    */
   updateMany<T extends PostTagUpdateManyArgs>(args: Prisma.SelectSubset<T, PostTagUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more PostTags and returns the data updated in the database.
+   * @param {PostTagUpdateManyAndReturnArgs} args - Arguments to update many PostTags.
+   * @example
+   * // Update many PostTags
+   * const postTag = await prisma.postTag.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more PostTags and only return the `postId`
+   * const postTagWithPostIdOnly = await prisma.postTag.updateManyAndReturn({
+   *   select: { postId: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends PostTagUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, PostTagUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostTagPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one PostTag.
@@ -1092,7 +1157,28 @@ export type PostTagCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many PostTags.
    */
   data: Prisma.PostTagCreateManyInput | Prisma.PostTagCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * PostTag createManyAndReturn
+ */
+export type PostTagCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PostTag
+   */
+  select?: Prisma.PostTagSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the PostTag
+   */
+  omit?: Prisma.PostTagOmit<ExtArgs> | null
+  /**
+   * The data used to create many PostTags.
+   */
+  data: Prisma.PostTagCreateManyInput | Prisma.PostTagCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PostTagIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1137,6 +1223,36 @@ export type PostTagUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many PostTags to update.
    */
   limit?: number
+}
+
+/**
+ * PostTag updateManyAndReturn
+ */
+export type PostTagUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PostTag
+   */
+  select?: Prisma.PostTagSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the PostTag
+   */
+  omit?: Prisma.PostTagOmit<ExtArgs> | null
+  /**
+   * The data used to update PostTags.
+   */
+  data: Prisma.XOR<Prisma.PostTagUpdateManyMutationInput, Prisma.PostTagUncheckedUpdateManyInput>
+  /**
+   * Filter which PostTags to update
+   */
+  where?: Prisma.PostTagWhereInput
+  /**
+   * Limit how many PostTags to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PostTagIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

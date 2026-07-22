@@ -174,7 +174,6 @@ export type PortfolioImageOrderByWithRelationInput = {
   portfolioId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   portfolio?: Prisma.PortfolioOrderByWithRelationInput
-  _relevance?: Prisma.PortfolioImageOrderByRelevanceInput
 }
 
 export type PortfolioImageWhereUniqueInput = Prisma.AtLeast<{
@@ -256,12 +255,6 @@ export type PortfolioImageOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type PortfolioImageOrderByRelevanceInput = {
-  fields: Prisma.PortfolioImageOrderByRelevanceFieldEnum | Prisma.PortfolioImageOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
-}
-
 export type PortfolioImageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   portfolioId?: Prisma.SortOrder
@@ -339,7 +332,6 @@ export type PortfolioImageCreateOrConnectWithoutPortfolioInput = {
 
 export type PortfolioImageCreateManyPortfolioInputEnvelope = {
   data: Prisma.PortfolioImageCreateManyPortfolioInput | Prisma.PortfolioImageCreateManyPortfolioInput[]
-  skipDuplicates?: boolean
 }
 
 export type PortfolioImageUpsertWithWhereUniqueWithoutPortfolioInput = {
@@ -396,7 +388,19 @@ export type PortfolioImageSelect<ExtArgs extends runtime.Types.Extensions.Intern
   portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["portfolioImage"]>
 
+export type PortfolioImageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  portfolioId?: boolean
+  url?: boolean
+  portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["portfolioImage"]>
 
+export type PortfolioImageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  portfolioId?: boolean
+  url?: boolean
+  portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["portfolioImage"]>
 
 export type PortfolioImageSelectScalar = {
   id?: boolean
@@ -406,6 +410,12 @@ export type PortfolioImageSelectScalar = {
 
 export type PortfolioImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolioId" | "url", ExtArgs["result"]["portfolioImage"]>
 export type PortfolioImageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
+}
+export type PortfolioImageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
+}
+export type PortfolioImageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
 }
 
@@ -536,6 +546,30 @@ export interface PortfolioImageDelegate<ExtArgs extends runtime.Types.Extensions
   createMany<T extends PortfolioImageCreateManyArgs>(args?: Prisma.SelectSubset<T, PortfolioImageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many PortfolioImages and returns the data saved in the database.
+   * @param {PortfolioImageCreateManyAndReturnArgs} args - Arguments to create many PortfolioImages.
+   * @example
+   * // Create many PortfolioImages
+   * const portfolioImage = await prisma.portfolioImage.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many PortfolioImages and only return the `id`
+   * const portfolioImageWithIdOnly = await prisma.portfolioImage.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends PortfolioImageCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, PortfolioImageCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PortfolioImagePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a PortfolioImage.
    * @param {PortfolioImageDeleteArgs} args - Arguments to delete one PortfolioImage.
    * @example
@@ -598,6 +632,36 @@ export interface PortfolioImageDelegate<ExtArgs extends runtime.Types.Extensions
    * 
    */
   updateMany<T extends PortfolioImageUpdateManyArgs>(args: Prisma.SelectSubset<T, PortfolioImageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more PortfolioImages and returns the data updated in the database.
+   * @param {PortfolioImageUpdateManyAndReturnArgs} args - Arguments to update many PortfolioImages.
+   * @example
+   * // Update many PortfolioImages
+   * const portfolioImage = await prisma.portfolioImage.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more PortfolioImages and only return the `id`
+   * const portfolioImageWithIdOnly = await prisma.portfolioImage.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends PortfolioImageUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, PortfolioImageUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PortfolioImagePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one PortfolioImage.
@@ -1020,7 +1084,28 @@ export type PortfolioImageCreateManyArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many PortfolioImages.
    */
   data: Prisma.PortfolioImageCreateManyInput | Prisma.PortfolioImageCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * PortfolioImage createManyAndReturn
+ */
+export type PortfolioImageCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PortfolioImage
+   */
+  select?: Prisma.PortfolioImageSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the PortfolioImage
+   */
+  omit?: Prisma.PortfolioImageOmit<ExtArgs> | null
+  /**
+   * The data used to create many PortfolioImages.
+   */
+  data: Prisma.PortfolioImageCreateManyInput | Prisma.PortfolioImageCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PortfolioImageIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1065,6 +1150,36 @@ export type PortfolioImageUpdateManyArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many PortfolioImages to update.
    */
   limit?: number
+}
+
+/**
+ * PortfolioImage updateManyAndReturn
+ */
+export type PortfolioImageUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PortfolioImage
+   */
+  select?: Prisma.PortfolioImageSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the PortfolioImage
+   */
+  omit?: Prisma.PortfolioImageOmit<ExtArgs> | null
+  /**
+   * The data used to update PortfolioImages.
+   */
+  data: Prisma.XOR<Prisma.PortfolioImageUpdateManyMutationInput, Prisma.PortfolioImageUncheckedUpdateManyInput>
+  /**
+   * Filter which PortfolioImages to update
+   */
+  where?: Prisma.PortfolioImageWhereInput
+  /**
+   * Limit how many PortfolioImages to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PortfolioImageIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

@@ -306,7 +306,6 @@ export type FreeeSyncLogOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   integration?: Prisma.FreeeIntegrationOrderByWithRelationInput
-  _relevance?: Prisma.FreeeSyncLogOrderByRelevanceInput
 }
 
 export type FreeeSyncLogWhereUniqueInput = Prisma.AtLeast<{
@@ -490,12 +489,6 @@ export type FreeeSyncLogOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type FreeeSyncLogOrderByRelevanceInput = {
-  fields: Prisma.FreeeSyncLogOrderByRelevanceFieldEnum | Prisma.FreeeSyncLogOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
-}
-
 export type FreeeSyncLogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   integrationId?: Prisma.SortOrder
@@ -643,7 +636,6 @@ export type FreeeSyncLogCreateOrConnectWithoutIntegrationInput = {
 
 export type FreeeSyncLogCreateManyIntegrationInputEnvelope = {
   data: Prisma.FreeeSyncLogCreateManyIntegrationInput | Prisma.FreeeSyncLogCreateManyIntegrationInput[]
-  skipDuplicates?: boolean
 }
 
 export type FreeeSyncLogUpsertWithWhereUniqueWithoutIntegrationInput = {
@@ -760,7 +752,39 @@ export type FreeeSyncLogSelect<ExtArgs extends runtime.Types.Extensions.Internal
   integration?: boolean | Prisma.FreeeIntegrationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["freeeSyncLog"]>
 
+export type FreeeSyncLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  integrationId?: boolean
+  direction?: boolean
+  status?: boolean
+  entityType?: boolean
+  totalRecords?: boolean
+  successCount?: boolean
+  errorCount?: boolean
+  errorDetails?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  integration?: boolean | Prisma.FreeeIntegrationDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["freeeSyncLog"]>
 
+export type FreeeSyncLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  integrationId?: boolean
+  direction?: boolean
+  status?: boolean
+  entityType?: boolean
+  totalRecords?: boolean
+  successCount?: boolean
+  errorCount?: boolean
+  errorDetails?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  integration?: boolean | Prisma.FreeeIntegrationDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["freeeSyncLog"]>
 
 export type FreeeSyncLogSelectScalar = {
   id?: boolean
@@ -780,6 +804,12 @@ export type FreeeSyncLogSelectScalar = {
 
 export type FreeeSyncLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "integrationId" | "direction" | "status" | "entityType" | "totalRecords" | "successCount" | "errorCount" | "errorDetails" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["freeeSyncLog"]>
 export type FreeeSyncLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  integration?: boolean | Prisma.FreeeIntegrationDefaultArgs<ExtArgs>
+}
+export type FreeeSyncLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  integration?: boolean | Prisma.FreeeIntegrationDefaultArgs<ExtArgs>
+}
+export type FreeeSyncLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   integration?: boolean | Prisma.FreeeIntegrationDefaultArgs<ExtArgs>
 }
 
@@ -920,6 +950,30 @@ export interface FreeeSyncLogDelegate<ExtArgs extends runtime.Types.Extensions.I
   createMany<T extends FreeeSyncLogCreateManyArgs>(args?: Prisma.SelectSubset<T, FreeeSyncLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many FreeeSyncLogs and returns the data saved in the database.
+   * @param {FreeeSyncLogCreateManyAndReturnArgs} args - Arguments to create many FreeeSyncLogs.
+   * @example
+   * // Create many FreeeSyncLogs
+   * const freeeSyncLog = await prisma.freeeSyncLog.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many FreeeSyncLogs and only return the `id`
+   * const freeeSyncLogWithIdOnly = await prisma.freeeSyncLog.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends FreeeSyncLogCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, FreeeSyncLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FreeeSyncLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a FreeeSyncLog.
    * @param {FreeeSyncLogDeleteArgs} args - Arguments to delete one FreeeSyncLog.
    * @example
@@ -982,6 +1036,36 @@ export interface FreeeSyncLogDelegate<ExtArgs extends runtime.Types.Extensions.I
    * 
    */
   updateMany<T extends FreeeSyncLogUpdateManyArgs>(args: Prisma.SelectSubset<T, FreeeSyncLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more FreeeSyncLogs and returns the data updated in the database.
+   * @param {FreeeSyncLogUpdateManyAndReturnArgs} args - Arguments to update many FreeeSyncLogs.
+   * @example
+   * // Update many FreeeSyncLogs
+   * const freeeSyncLog = await prisma.freeeSyncLog.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more FreeeSyncLogs and only return the `id`
+   * const freeeSyncLogWithIdOnly = await prisma.freeeSyncLog.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends FreeeSyncLogUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, FreeeSyncLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FreeeSyncLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one FreeeSyncLog.
@@ -1414,7 +1498,28 @@ export type FreeeSyncLogCreateManyArgs<ExtArgs extends runtime.Types.Extensions.
    * The data used to create many FreeeSyncLogs.
    */
   data: Prisma.FreeeSyncLogCreateManyInput | Prisma.FreeeSyncLogCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * FreeeSyncLog createManyAndReturn
+ */
+export type FreeeSyncLogCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FreeeSyncLog
+   */
+  select?: Prisma.FreeeSyncLogSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the FreeeSyncLog
+   */
+  omit?: Prisma.FreeeSyncLogOmit<ExtArgs> | null
+  /**
+   * The data used to create many FreeeSyncLogs.
+   */
+  data: Prisma.FreeeSyncLogCreateManyInput | Prisma.FreeeSyncLogCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FreeeSyncLogIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1459,6 +1564,36 @@ export type FreeeSyncLogUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many FreeeSyncLogs to update.
    */
   limit?: number
+}
+
+/**
+ * FreeeSyncLog updateManyAndReturn
+ */
+export type FreeeSyncLogUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FreeeSyncLog
+   */
+  select?: Prisma.FreeeSyncLogSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the FreeeSyncLog
+   */
+  omit?: Prisma.FreeeSyncLogOmit<ExtArgs> | null
+  /**
+   * The data used to update FreeeSyncLogs.
+   */
+  data: Prisma.XOR<Prisma.FreeeSyncLogUpdateManyMutationInput, Prisma.FreeeSyncLogUncheckedUpdateManyInput>
+  /**
+   * Filter which FreeeSyncLogs to update
+   */
+  where?: Prisma.FreeeSyncLogWhereInput
+  /**
+   * Limit how many FreeeSyncLogs to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FreeeSyncLogIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

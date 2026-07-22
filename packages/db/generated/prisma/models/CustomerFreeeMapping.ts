@@ -257,7 +257,6 @@ export type CustomerFreeeMappingOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   customer?: Prisma.CustomerOrderByWithRelationInput
-  _relevance?: Prisma.CustomerFreeeMappingOrderByRelevanceInput
 }
 
 export type CustomerFreeeMappingWhereUniqueInput = Prisma.AtLeast<{
@@ -393,12 +392,6 @@ export type CustomerFreeeMappingOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type CustomerFreeeMappingOrderByRelevanceInput = {
-  fields: Prisma.CustomerFreeeMappingOrderByRelevanceFieldEnum | Prisma.CustomerFreeeMappingOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
-}
-
 export type CustomerFreeeMappingCustomerIdFreeeCompanyIdCompoundUniqueInput = {
   customerId: string
   freeeCompanyId: number
@@ -521,7 +514,6 @@ export type CustomerFreeeMappingCreateOrConnectWithoutCustomerInput = {
 
 export type CustomerFreeeMappingCreateManyCustomerInputEnvelope = {
   data: Prisma.CustomerFreeeMappingCreateManyCustomerInput | Prisma.CustomerFreeeMappingCreateManyCustomerInput[]
-  skipDuplicates?: boolean
 }
 
 export type CustomerFreeeMappingUpsertWithWhereUniqueWithoutCustomerInput = {
@@ -608,7 +600,29 @@ export type CustomerFreeeMappingSelect<ExtArgs extends runtime.Types.Extensions.
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["customerFreeeMapping"]>
 
+export type CustomerFreeeMappingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  customerId?: boolean
+  freeePartnerId?: boolean
+  freeeCompanyId?: boolean
+  lastSyncAt?: boolean
+  syncHash?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["customerFreeeMapping"]>
 
+export type CustomerFreeeMappingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  customerId?: boolean
+  freeePartnerId?: boolean
+  freeeCompanyId?: boolean
+  lastSyncAt?: boolean
+  syncHash?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["customerFreeeMapping"]>
 
 export type CustomerFreeeMappingSelectScalar = {
   id?: boolean
@@ -623,6 +637,12 @@ export type CustomerFreeeMappingSelectScalar = {
 
 export type CustomerFreeeMappingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customerId" | "freeePartnerId" | "freeeCompanyId" | "lastSyncAt" | "syncHash" | "createdAt" | "updatedAt", ExtArgs["result"]["customerFreeeMapping"]>
 export type CustomerFreeeMappingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+}
+export type CustomerFreeeMappingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+}
+export type CustomerFreeeMappingIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
 }
 
@@ -758,6 +778,30 @@ export interface CustomerFreeeMappingDelegate<ExtArgs extends runtime.Types.Exte
   createMany<T extends CustomerFreeeMappingCreateManyArgs>(args?: Prisma.SelectSubset<T, CustomerFreeeMappingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many CustomerFreeeMappings and returns the data saved in the database.
+   * @param {CustomerFreeeMappingCreateManyAndReturnArgs} args - Arguments to create many CustomerFreeeMappings.
+   * @example
+   * // Create many CustomerFreeeMappings
+   * const customerFreeeMapping = await prisma.customerFreeeMapping.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many CustomerFreeeMappings and only return the `id`
+   * const customerFreeeMappingWithIdOnly = await prisma.customerFreeeMapping.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends CustomerFreeeMappingCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, CustomerFreeeMappingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerFreeeMappingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a CustomerFreeeMapping.
    * @param {CustomerFreeeMappingDeleteArgs} args - Arguments to delete one CustomerFreeeMapping.
    * @example
@@ -820,6 +864,36 @@ export interface CustomerFreeeMappingDelegate<ExtArgs extends runtime.Types.Exte
    * 
    */
   updateMany<T extends CustomerFreeeMappingUpdateManyArgs>(args: Prisma.SelectSubset<T, CustomerFreeeMappingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more CustomerFreeeMappings and returns the data updated in the database.
+   * @param {CustomerFreeeMappingUpdateManyAndReturnArgs} args - Arguments to update many CustomerFreeeMappings.
+   * @example
+   * // Update many CustomerFreeeMappings
+   * const customerFreeeMapping = await prisma.customerFreeeMapping.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more CustomerFreeeMappings and only return the `id`
+   * const customerFreeeMappingWithIdOnly = await prisma.customerFreeeMapping.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends CustomerFreeeMappingUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, CustomerFreeeMappingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerFreeeMappingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one CustomerFreeeMapping.
@@ -1247,7 +1321,28 @@ export type CustomerFreeeMappingCreateManyArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many CustomerFreeeMappings.
    */
   data: Prisma.CustomerFreeeMappingCreateManyInput | Prisma.CustomerFreeeMappingCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * CustomerFreeeMapping createManyAndReturn
+ */
+export type CustomerFreeeMappingCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomerFreeeMapping
+   */
+  select?: Prisma.CustomerFreeeMappingSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the CustomerFreeeMapping
+   */
+  omit?: Prisma.CustomerFreeeMappingOmit<ExtArgs> | null
+  /**
+   * The data used to create many CustomerFreeeMappings.
+   */
+  data: Prisma.CustomerFreeeMappingCreateManyInput | Prisma.CustomerFreeeMappingCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerFreeeMappingIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1292,6 +1387,36 @@ export type CustomerFreeeMappingUpdateManyArgs<ExtArgs extends runtime.Types.Ext
    * Limit how many CustomerFreeeMappings to update.
    */
   limit?: number
+}
+
+/**
+ * CustomerFreeeMapping updateManyAndReturn
+ */
+export type CustomerFreeeMappingUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomerFreeeMapping
+   */
+  select?: Prisma.CustomerFreeeMappingSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the CustomerFreeeMapping
+   */
+  omit?: Prisma.CustomerFreeeMappingOmit<ExtArgs> | null
+  /**
+   * The data used to update CustomerFreeeMappings.
+   */
+  data: Prisma.XOR<Prisma.CustomerFreeeMappingUpdateManyMutationInput, Prisma.CustomerFreeeMappingUncheckedUpdateManyInput>
+  /**
+   * Filter which CustomerFreeeMappings to update
+   */
+  where?: Prisma.CustomerFreeeMappingWhereInput
+  /**
+   * Limit how many CustomerFreeeMappings to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerFreeeMappingIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

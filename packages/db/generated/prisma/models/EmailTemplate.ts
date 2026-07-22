@@ -255,7 +255,6 @@ export type EmailTemplateOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   emailLogs?: Prisma.EmailLogOrderByRelationAggregateInput
-  _relevance?: Prisma.EmailTemplateOrderByRelevanceInput
 }
 
 export type EmailTemplateWhereUniqueInput = Prisma.AtLeast<{
@@ -425,12 +424,6 @@ export type EmailTemplateUncheckedUpdateManyInput = {
 export type EmailTemplateNullableScalarRelationFilter = {
   is?: Prisma.EmailTemplateWhereInput | null
   isNot?: Prisma.EmailTemplateWhereInput | null
-}
-
-export type EmailTemplateOrderByRelevanceInput = {
-  fields: Prisma.EmailTemplateOrderByRelevanceFieldEnum | Prisma.EmailTemplateOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type EmailTemplateCountOrderByAggregateInput = {
@@ -622,7 +615,35 @@ export type EmailTemplateSelect<ExtArgs extends runtime.Types.Extensions.Interna
   _count?: boolean | Prisma.EmailTemplateCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["emailTemplate"]>
 
+export type EmailTemplateSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  name?: boolean
+  slug?: boolean
+  description?: boolean
+  category?: boolean
+  subject?: boolean
+  htmlContent?: boolean
+  textContent?: boolean
+  variables?: boolean
+  isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+}, ExtArgs["result"]["emailTemplate"]>
 
+export type EmailTemplateSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  name?: boolean
+  slug?: boolean
+  description?: boolean
+  category?: boolean
+  subject?: boolean
+  htmlContent?: boolean
+  textContent?: boolean
+  variables?: boolean
+  isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+}, ExtArgs["result"]["emailTemplate"]>
 
 export type EmailTemplateSelectScalar = {
   id?: boolean
@@ -644,6 +665,8 @@ export type EmailTemplateInclude<ExtArgs extends runtime.Types.Extensions.Intern
   emailLogs?: boolean | Prisma.EmailTemplate$emailLogsArgs<ExtArgs>
   _count?: boolean | Prisma.EmailTemplateCountOutputTypeDefaultArgs<ExtArgs>
 }
+export type EmailTemplateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type EmailTemplateIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $EmailTemplatePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "EmailTemplate"
@@ -781,6 +804,30 @@ export interface EmailTemplateDelegate<ExtArgs extends runtime.Types.Extensions.
   createMany<T extends EmailTemplateCreateManyArgs>(args?: Prisma.SelectSubset<T, EmailTemplateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many EmailTemplates and returns the data saved in the database.
+   * @param {EmailTemplateCreateManyAndReturnArgs} args - Arguments to create many EmailTemplates.
+   * @example
+   * // Create many EmailTemplates
+   * const emailTemplate = await prisma.emailTemplate.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many EmailTemplates and only return the `id`
+   * const emailTemplateWithIdOnly = await prisma.emailTemplate.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends EmailTemplateCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, EmailTemplateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailTemplatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a EmailTemplate.
    * @param {EmailTemplateDeleteArgs} args - Arguments to delete one EmailTemplate.
    * @example
@@ -843,6 +890,36 @@ export interface EmailTemplateDelegate<ExtArgs extends runtime.Types.Extensions.
    * 
    */
   updateMany<T extends EmailTemplateUpdateManyArgs>(args: Prisma.SelectSubset<T, EmailTemplateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more EmailTemplates and returns the data updated in the database.
+   * @param {EmailTemplateUpdateManyAndReturnArgs} args - Arguments to update many EmailTemplates.
+   * @example
+   * // Update many EmailTemplates
+   * const emailTemplate = await prisma.emailTemplate.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more EmailTemplates and only return the `id`
+   * const emailTemplateWithIdOnly = await prisma.emailTemplate.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends EmailTemplateUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, EmailTemplateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailTemplatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one EmailTemplate.
@@ -1274,7 +1351,24 @@ export type EmailTemplateCreateManyArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many EmailTemplates.
    */
   data: Prisma.EmailTemplateCreateManyInput | Prisma.EmailTemplateCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * EmailTemplate createManyAndReturn
+ */
+export type EmailTemplateCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailTemplate
+   */
+  select?: Prisma.EmailTemplateSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailTemplate
+   */
+  omit?: Prisma.EmailTemplateOmit<ExtArgs> | null
+  /**
+   * The data used to create many EmailTemplates.
+   */
+  data: Prisma.EmailTemplateCreateManyInput | Prisma.EmailTemplateCreateManyInput[]
 }
 
 /**
@@ -1307,6 +1401,32 @@ export type EmailTemplateUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
  * EmailTemplate updateMany
  */
 export type EmailTemplateUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * The data used to update EmailTemplates.
+   */
+  data: Prisma.XOR<Prisma.EmailTemplateUpdateManyMutationInput, Prisma.EmailTemplateUncheckedUpdateManyInput>
+  /**
+   * Filter which EmailTemplates to update
+   */
+  where?: Prisma.EmailTemplateWhereInput
+  /**
+   * Limit how many EmailTemplates to update.
+   */
+  limit?: number
+}
+
+/**
+ * EmailTemplate updateManyAndReturn
+ */
+export type EmailTemplateUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailTemplate
+   */
+  select?: Prisma.EmailTemplateSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailTemplate
+   */
+  omit?: Prisma.EmailTemplateOmit<ExtArgs> | null
   /**
    * The data used to update EmailTemplates.
    */

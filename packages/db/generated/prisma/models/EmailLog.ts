@@ -338,7 +338,6 @@ export type EmailLogOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   customer?: Prisma.CustomerOrderByWithRelationInput
   template?: Prisma.EmailTemplateOrderByWithRelationInput
-  _relevance?: Prisma.EmailLogOrderByRelevanceInput
 }
 
 export type EmailLogWhereUniqueInput = Prisma.AtLeast<{
@@ -600,12 +599,6 @@ export type EmailLogOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type EmailLogOrderByRelevanceInput = {
-  fields: Prisma.EmailLogOrderByRelevanceFieldEnum | Prisma.EmailLogOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
-}
-
 export type EmailLogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
@@ -819,7 +812,6 @@ export type EmailLogCreateOrConnectWithoutCustomerInput = {
 
 export type EmailLogCreateManyCustomerInputEnvelope = {
   data: Prisma.EmailLogCreateManyCustomerInput | Prisma.EmailLogCreateManyCustomerInput[]
-  skipDuplicates?: boolean
 }
 
 export type EmailLogUpsertWithWhereUniqueWithoutCustomerInput = {
@@ -918,7 +910,6 @@ export type EmailLogCreateOrConnectWithoutTemplateInput = {
 
 export type EmailLogCreateManyTemplateInputEnvelope = {
   data: Prisma.EmailLogCreateManyTemplateInput | Prisma.EmailLogCreateManyTemplateInput[]
-  skipDuplicates?: boolean
 }
 
 export type EmailLogUpsertWithWhereUniqueWithoutTemplateInput = {
@@ -1149,7 +1140,57 @@ export type EmailLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   template?: boolean | Prisma.EmailLog$templateArgs<ExtArgs>
 }, ExtArgs["result"]["emailLog"]>
 
+export type EmailLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  customerId?: boolean
+  templateId?: boolean
+  resendId?: boolean
+  fromEmail?: boolean
+  toEmail?: boolean
+  ccEmail?: boolean
+  bccEmail?: boolean
+  subject?: boolean
+  htmlContent?: boolean
+  textContent?: boolean
+  status?: boolean
+  errorMessage?: boolean
+  sentAt?: boolean
+  deliveredAt?: boolean
+  openedAt?: boolean
+  clickedAt?: boolean
+  bouncedAt?: boolean
+  metadata?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  customer?: boolean | Prisma.EmailLog$customerArgs<ExtArgs>
+  template?: boolean | Prisma.EmailLog$templateArgs<ExtArgs>
+}, ExtArgs["result"]["emailLog"]>
 
+export type EmailLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  customerId?: boolean
+  templateId?: boolean
+  resendId?: boolean
+  fromEmail?: boolean
+  toEmail?: boolean
+  ccEmail?: boolean
+  bccEmail?: boolean
+  subject?: boolean
+  htmlContent?: boolean
+  textContent?: boolean
+  status?: boolean
+  errorMessage?: boolean
+  sentAt?: boolean
+  deliveredAt?: boolean
+  openedAt?: boolean
+  clickedAt?: boolean
+  bouncedAt?: boolean
+  metadata?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  customer?: boolean | Prisma.EmailLog$customerArgs<ExtArgs>
+  template?: boolean | Prisma.EmailLog$templateArgs<ExtArgs>
+}, ExtArgs["result"]["emailLog"]>
 
 export type EmailLogSelectScalar = {
   id?: boolean
@@ -1177,6 +1218,14 @@ export type EmailLogSelectScalar = {
 
 export type EmailLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customerId" | "templateId" | "resendId" | "fromEmail" | "toEmail" | "ccEmail" | "bccEmail" | "subject" | "htmlContent" | "textContent" | "status" | "errorMessage" | "sentAt" | "deliveredAt" | "openedAt" | "clickedAt" | "bouncedAt" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["emailLog"]>
 export type EmailLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  customer?: boolean | Prisma.EmailLog$customerArgs<ExtArgs>
+  template?: boolean | Prisma.EmailLog$templateArgs<ExtArgs>
+}
+export type EmailLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  customer?: boolean | Prisma.EmailLog$customerArgs<ExtArgs>
+  template?: boolean | Prisma.EmailLog$templateArgs<ExtArgs>
+}
+export type EmailLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.EmailLog$customerArgs<ExtArgs>
   template?: boolean | Prisma.EmailLog$templateArgs<ExtArgs>
 }
@@ -1327,6 +1376,30 @@ export interface EmailLogDelegate<ExtArgs extends runtime.Types.Extensions.Inter
   createMany<T extends EmailLogCreateManyArgs>(args?: Prisma.SelectSubset<T, EmailLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many EmailLogs and returns the data saved in the database.
+   * @param {EmailLogCreateManyAndReturnArgs} args - Arguments to create many EmailLogs.
+   * @example
+   * // Create many EmailLogs
+   * const emailLog = await prisma.emailLog.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many EmailLogs and only return the `id`
+   * const emailLogWithIdOnly = await prisma.emailLog.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends EmailLogCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, EmailLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a EmailLog.
    * @param {EmailLogDeleteArgs} args - Arguments to delete one EmailLog.
    * @example
@@ -1389,6 +1462,36 @@ export interface EmailLogDelegate<ExtArgs extends runtime.Types.Extensions.Inter
    * 
    */
   updateMany<T extends EmailLogUpdateManyArgs>(args: Prisma.SelectSubset<T, EmailLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more EmailLogs and returns the data updated in the database.
+   * @param {EmailLogUpdateManyAndReturnArgs} args - Arguments to update many EmailLogs.
+   * @example
+   * // Update many EmailLogs
+   * const emailLog = await prisma.emailLog.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more EmailLogs and only return the `id`
+   * const emailLogWithIdOnly = await prisma.emailLog.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends EmailLogUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, EmailLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one EmailLog.
@@ -1830,7 +1933,28 @@ export type EmailLogCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data used to create many EmailLogs.
    */
   data: Prisma.EmailLogCreateManyInput | Prisma.EmailLogCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * EmailLog createManyAndReturn
+ */
+export type EmailLogCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailLog
+   */
+  select?: Prisma.EmailLogSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailLog
+   */
+  omit?: Prisma.EmailLogOmit<ExtArgs> | null
+  /**
+   * The data used to create many EmailLogs.
+   */
+  data: Prisma.EmailLogCreateManyInput | Prisma.EmailLogCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailLogIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1875,6 +1999,36 @@ export type EmailLogUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many EmailLogs to update.
    */
   limit?: number
+}
+
+/**
+ * EmailLog updateManyAndReturn
+ */
+export type EmailLogUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailLog
+   */
+  select?: Prisma.EmailLogSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailLog
+   */
+  omit?: Prisma.EmailLogOmit<ExtArgs> | null
+  /**
+   * The data used to update EmailLogs.
+   */
+  data: Prisma.XOR<Prisma.EmailLogUpdateManyMutationInput, Prisma.EmailLogUncheckedUpdateManyInput>
+  /**
+   * Filter which EmailLogs to update
+   */
+  where?: Prisma.EmailLogWhereInput
+  /**
+   * Limit how many EmailLogs to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailLogIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

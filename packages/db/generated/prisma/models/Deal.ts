@@ -313,7 +313,6 @@ export type DealOrderByWithRelationInput = {
   lead?: Prisma.LeadOrderByWithRelationInput
   stage?: Prisma.PipelineStageOrderByWithRelationInput
   freeeMappings?: Prisma.DealFreeeMappingOrderByRelationAggregateInput
-  _relevance?: Prisma.DealOrderByRelevanceInput
 }
 
 export type DealWhereUniqueInput = Prisma.AtLeast<{
@@ -515,12 +514,6 @@ export type DealOrderByRelationAggregateInput = {
 export type DealNullableScalarRelationFilter = {
   is?: Prisma.DealWhereInput | null
   isNot?: Prisma.DealWhereInput | null
-}
-
-export type DealOrderByRelevanceInput = {
-  fields: Prisma.DealOrderByRelevanceFieldEnum | Prisma.DealOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type DealCountOrderByAggregateInput = {
@@ -770,7 +763,6 @@ export type DealCreateOrConnectWithoutCustomerInput = {
 
 export type DealCreateManyCustomerInputEnvelope = {
   data: Prisma.DealCreateManyCustomerInput | Prisma.DealCreateManyCustomerInput[]
-  skipDuplicates?: boolean
 }
 
 export type DealUpsertWithWhereUniqueWithoutCustomerInput = {
@@ -934,7 +926,6 @@ export type DealCreateOrConnectWithoutStageInput = {
 
 export type DealCreateManyStageInputEnvelope = {
   data: Prisma.DealCreateManyStageInput | Prisma.DealCreateManyStageInput[]
-  skipDuplicates?: boolean
 }
 
 export type DealUpsertWithWhereUniqueWithoutStageInput = {
@@ -1222,7 +1213,45 @@ export type DealSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   _count?: boolean | Prisma.DealCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deal"]>
 
+export type DealSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  customerId?: boolean
+  leadId?: boolean
+  stageId?: boolean
+  name?: boolean
+  value?: boolean
+  currency?: boolean
+  expectedCloseDate?: boolean
+  actualCloseDate?: boolean
+  status?: boolean
+  notes?: boolean
+  lostReason?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  customer?: boolean | Prisma.Deal$customerArgs<ExtArgs>
+  lead?: boolean | Prisma.Deal$leadArgs<ExtArgs>
+  stage?: boolean | Prisma.PipelineStageDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["deal"]>
 
+export type DealSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  customerId?: boolean
+  leadId?: boolean
+  stageId?: boolean
+  name?: boolean
+  value?: boolean
+  currency?: boolean
+  expectedCloseDate?: boolean
+  actualCloseDate?: boolean
+  status?: boolean
+  notes?: boolean
+  lostReason?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  customer?: boolean | Prisma.Deal$customerArgs<ExtArgs>
+  lead?: boolean | Prisma.Deal$leadArgs<ExtArgs>
+  stage?: boolean | Prisma.PipelineStageDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["deal"]>
 
 export type DealSelectScalar = {
   id?: boolean
@@ -1248,6 +1277,16 @@ export type DealInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   stage?: boolean | Prisma.PipelineStageDefaultArgs<ExtArgs>
   freeeMappings?: boolean | Prisma.Deal$freeeMappingsArgs<ExtArgs>
   _count?: boolean | Prisma.DealCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type DealIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  customer?: boolean | Prisma.Deal$customerArgs<ExtArgs>
+  lead?: boolean | Prisma.Deal$leadArgs<ExtArgs>
+  stage?: boolean | Prisma.PipelineStageDefaultArgs<ExtArgs>
+}
+export type DealIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  customer?: boolean | Prisma.Deal$customerArgs<ExtArgs>
+  lead?: boolean | Prisma.Deal$leadArgs<ExtArgs>
+  stage?: boolean | Prisma.PipelineStageDefaultArgs<ExtArgs>
 }
 
 export type $DealPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1391,6 +1430,30 @@ export interface DealDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
   createMany<T extends DealCreateManyArgs>(args?: Prisma.SelectSubset<T, DealCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many Deals and returns the data saved in the database.
+   * @param {DealCreateManyAndReturnArgs} args - Arguments to create many Deals.
+   * @example
+   * // Create many Deals
+   * const deal = await prisma.deal.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many Deals and only return the `id`
+   * const dealWithIdOnly = await prisma.deal.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends DealCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, DealCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a Deal.
    * @param {DealDeleteArgs} args - Arguments to delete one Deal.
    * @example
@@ -1453,6 +1516,36 @@ export interface DealDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
    * 
    */
   updateMany<T extends DealUpdateManyArgs>(args: Prisma.SelectSubset<T, DealUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more Deals and returns the data updated in the database.
+   * @param {DealUpdateManyAndReturnArgs} args - Arguments to update many Deals.
+   * @example
+   * // Update many Deals
+   * const deal = await prisma.deal.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more Deals and only return the `id`
+   * const dealWithIdOnly = await prisma.deal.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends DealUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, DealUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one Deal.
@@ -1889,7 +1982,28 @@ export type DealCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data used to create many Deals.
    */
   data: Prisma.DealCreateManyInput | Prisma.DealCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * Deal createManyAndReturn
+ */
+export type DealCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Deal
+   */
+  select?: Prisma.DealSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the Deal
+   */
+  omit?: Prisma.DealOmit<ExtArgs> | null
+  /**
+   * The data used to create many Deals.
+   */
+  data: Prisma.DealCreateManyInput | Prisma.DealCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DealIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1934,6 +2048,36 @@ export type DealUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Deals to update.
    */
   limit?: number
+}
+
+/**
+ * Deal updateManyAndReturn
+ */
+export type DealUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Deal
+   */
+  select?: Prisma.DealSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the Deal
+   */
+  omit?: Prisma.DealOmit<ExtArgs> | null
+  /**
+   * The data used to update Deals.
+   */
+  data: Prisma.XOR<Prisma.DealUpdateManyMutationInput, Prisma.DealUncheckedUpdateManyInput>
+  /**
+   * Filter which Deals to update
+   */
+  where?: Prisma.DealWhereInput
+  /**
+   * Limit how many Deals to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DealIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

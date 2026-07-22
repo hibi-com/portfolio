@@ -210,7 +210,6 @@ export type UserSocialOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
-  _relevance?: Prisma.UserSocialOrderByRelevanceInput
 }
 
 export type UserSocialWhereUniqueInput = Prisma.AtLeast<{
@@ -332,12 +331,6 @@ export type UserSocialOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type UserSocialOrderByRelevanceInput = {
-  fields: Prisma.UserSocialOrderByRelevanceFieldEnum | Prisma.UserSocialOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
-}
-
 export type UserSocialCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -435,7 +428,6 @@ export type UserSocialCreateOrConnectWithoutUserInput = {
 
 export type UserSocialCreateManyUserInputEnvelope = {
   data: Prisma.UserSocialCreateManyUserInput | Prisma.UserSocialCreateManyUserInput[]
-  skipDuplicates?: boolean
 }
 
 export type UserSocialUpsertWithWhereUniqueWithoutUserInput = {
@@ -516,7 +508,27 @@ export type UserSocialSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userSocial"]>
 
+export type UserSocialSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  userId?: boolean
+  icon?: boolean
+  title?: boolean
+  url?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["userSocial"]>
 
+export type UserSocialSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  userId?: boolean
+  icon?: boolean
+  title?: boolean
+  url?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["userSocial"]>
 
 export type UserSocialSelectScalar = {
   id?: boolean
@@ -530,6 +542,12 @@ export type UserSocialSelectScalar = {
 
 export type UserSocialOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "icon" | "title" | "url" | "createdAt" | "updatedAt", ExtArgs["result"]["userSocial"]>
 export type UserSocialInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type UserSocialIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type UserSocialIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
@@ -664,6 +682,30 @@ export interface UserSocialDelegate<ExtArgs extends runtime.Types.Extensions.Int
   createMany<T extends UserSocialCreateManyArgs>(args?: Prisma.SelectSubset<T, UserSocialCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many UserSocials and returns the data saved in the database.
+   * @param {UserSocialCreateManyAndReturnArgs} args - Arguments to create many UserSocials.
+   * @example
+   * // Create many UserSocials
+   * const userSocial = await prisma.userSocial.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many UserSocials and only return the `id`
+   * const userSocialWithIdOnly = await prisma.userSocial.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends UserSocialCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, UserSocialCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserSocialPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a UserSocial.
    * @param {UserSocialDeleteArgs} args - Arguments to delete one UserSocial.
    * @example
@@ -726,6 +768,36 @@ export interface UserSocialDelegate<ExtArgs extends runtime.Types.Extensions.Int
    * 
    */
   updateMany<T extends UserSocialUpdateManyArgs>(args: Prisma.SelectSubset<T, UserSocialUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more UserSocials and returns the data updated in the database.
+   * @param {UserSocialUpdateManyAndReturnArgs} args - Arguments to update many UserSocials.
+   * @example
+   * // Update many UserSocials
+   * const userSocial = await prisma.userSocial.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more UserSocials and only return the `id`
+   * const userSocialWithIdOnly = await prisma.userSocial.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends UserSocialUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, UserSocialUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserSocialPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one UserSocial.
@@ -1152,7 +1224,28 @@ export type UserSocialCreateManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data used to create many UserSocials.
    */
   data: Prisma.UserSocialCreateManyInput | Prisma.UserSocialCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * UserSocial createManyAndReturn
+ */
+export type UserSocialCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserSocial
+   */
+  select?: Prisma.UserSocialSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserSocial
+   */
+  omit?: Prisma.UserSocialOmit<ExtArgs> | null
+  /**
+   * The data used to create many UserSocials.
+   */
+  data: Prisma.UserSocialCreateManyInput | Prisma.UserSocialCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserSocialIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1197,6 +1290,36 @@ export type UserSocialUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Limit how many UserSocials to update.
    */
   limit?: number
+}
+
+/**
+ * UserSocial updateManyAndReturn
+ */
+export type UserSocialUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserSocial
+   */
+  select?: Prisma.UserSocialSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserSocial
+   */
+  omit?: Prisma.UserSocialOmit<ExtArgs> | null
+  /**
+   * The data used to update UserSocials.
+   */
+  data: Prisma.XOR<Prisma.UserSocialUpdateManyMutationInput, Prisma.UserSocialUncheckedUpdateManyInput>
+  /**
+   * Filter which UserSocials to update
+   */
+  where?: Prisma.UserSocialWhereInput
+  /**
+   * Limit how many UserSocials to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserSocialIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

@@ -230,7 +230,6 @@ export type ChatMessageOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   chatRoom?: Prisma.ChatRoomOrderByWithRelationInput
   participant?: Prisma.ChatParticipantOrderByWithRelationInput
-  _relevance?: Prisma.ChatMessageOrderByRelevanceInput
 }
 
 export type ChatMessageWhereUniqueInput = Prisma.AtLeast<{
@@ -370,12 +369,6 @@ export type ChatMessageListRelationFilter = {
 
 export type ChatMessageOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type ChatMessageOrderByRelevanceInput = {
-  fields: Prisma.ChatMessageOrderByRelevanceFieldEnum | Prisma.ChatMessageOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type ChatMessageCountOrderByAggregateInput = {
@@ -531,7 +524,6 @@ export type ChatMessageCreateOrConnectWithoutChatRoomInput = {
 
 export type ChatMessageCreateManyChatRoomInputEnvelope = {
   data: Prisma.ChatMessageCreateManyChatRoomInput | Prisma.ChatMessageCreateManyChatRoomInput[]
-  skipDuplicates?: boolean
 }
 
 export type ChatMessageUpsertWithWhereUniqueWithoutChatRoomInput = {
@@ -594,7 +586,6 @@ export type ChatMessageCreateOrConnectWithoutParticipantInput = {
 
 export type ChatMessageCreateManyParticipantInputEnvelope = {
   data: Prisma.ChatMessageCreateManyParticipantInput | Prisma.ChatMessageCreateManyParticipantInput[]
-  skipDuplicates?: boolean
 }
 
 export type ChatMessageUpsertWithWhereUniqueWithoutParticipantInput = {
@@ -717,7 +708,33 @@ export type ChatMessageSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   participant?: boolean | Prisma.ChatParticipantDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chatMessage"]>
 
+export type ChatMessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  chatRoomId?: boolean
+  participantId?: boolean
+  type?: boolean
+  content?: boolean
+  metadata?: boolean
+  readBy?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  chatRoom?: boolean | Prisma.ChatRoomDefaultArgs<ExtArgs>
+  participant?: boolean | Prisma.ChatParticipantDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["chatMessage"]>
 
+export type ChatMessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  chatRoomId?: boolean
+  participantId?: boolean
+  type?: boolean
+  content?: boolean
+  metadata?: boolean
+  readBy?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  chatRoom?: boolean | Prisma.ChatRoomDefaultArgs<ExtArgs>
+  participant?: boolean | Prisma.ChatParticipantDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["chatMessage"]>
 
 export type ChatMessageSelectScalar = {
   id?: boolean
@@ -733,6 +750,14 @@ export type ChatMessageSelectScalar = {
 
 export type ChatMessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "chatRoomId" | "participantId" | "type" | "content" | "metadata" | "readBy" | "createdAt" | "updatedAt", ExtArgs["result"]["chatMessage"]>
 export type ChatMessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  chatRoom?: boolean | Prisma.ChatRoomDefaultArgs<ExtArgs>
+  participant?: boolean | Prisma.ChatParticipantDefaultArgs<ExtArgs>
+}
+export type ChatMessageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  chatRoom?: boolean | Prisma.ChatRoomDefaultArgs<ExtArgs>
+  participant?: boolean | Prisma.ChatParticipantDefaultArgs<ExtArgs>
+}
+export type ChatMessageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   chatRoom?: boolean | Prisma.ChatRoomDefaultArgs<ExtArgs>
   participant?: boolean | Prisma.ChatParticipantDefaultArgs<ExtArgs>
 }
@@ -871,6 +896,30 @@ export interface ChatMessageDelegate<ExtArgs extends runtime.Types.Extensions.In
   createMany<T extends ChatMessageCreateManyArgs>(args?: Prisma.SelectSubset<T, ChatMessageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many ChatMessages and returns the data saved in the database.
+   * @param {ChatMessageCreateManyAndReturnArgs} args - Arguments to create many ChatMessages.
+   * @example
+   * // Create many ChatMessages
+   * const chatMessage = await prisma.chatMessage.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many ChatMessages and only return the `id`
+   * const chatMessageWithIdOnly = await prisma.chatMessage.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends ChatMessageCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, ChatMessageCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatMessagePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a ChatMessage.
    * @param {ChatMessageDeleteArgs} args - Arguments to delete one ChatMessage.
    * @example
@@ -933,6 +982,36 @@ export interface ChatMessageDelegate<ExtArgs extends runtime.Types.Extensions.In
    * 
    */
   updateMany<T extends ChatMessageUpdateManyArgs>(args: Prisma.SelectSubset<T, ChatMessageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more ChatMessages and returns the data updated in the database.
+   * @param {ChatMessageUpdateManyAndReturnArgs} args - Arguments to update many ChatMessages.
+   * @example
+   * // Update many ChatMessages
+   * const chatMessage = await prisma.chatMessage.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more ChatMessages and only return the `id`
+   * const chatMessageWithIdOnly = await prisma.chatMessage.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends ChatMessageUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, ChatMessageUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatMessagePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one ChatMessage.
@@ -1362,7 +1441,28 @@ export type ChatMessageCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many ChatMessages.
    */
   data: Prisma.ChatMessageCreateManyInput | Prisma.ChatMessageCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * ChatMessage createManyAndReturn
+ */
+export type ChatMessageCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChatMessage
+   */
+  select?: Prisma.ChatMessageSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChatMessage
+   */
+  omit?: Prisma.ChatMessageOmit<ExtArgs> | null
+  /**
+   * The data used to create many ChatMessages.
+   */
+  data: Prisma.ChatMessageCreateManyInput | Prisma.ChatMessageCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChatMessageIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1407,6 +1507,36 @@ export type ChatMessageUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many ChatMessages to update.
    */
   limit?: number
+}
+
+/**
+ * ChatMessage updateManyAndReturn
+ */
+export type ChatMessageUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChatMessage
+   */
+  select?: Prisma.ChatMessageSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChatMessage
+   */
+  omit?: Prisma.ChatMessageOmit<ExtArgs> | null
+  /**
+   * The data used to update ChatMessages.
+   */
+  data: Prisma.XOR<Prisma.ChatMessageUpdateManyMutationInput, Prisma.ChatMessageUncheckedUpdateManyInput>
+  /**
+   * Filter which ChatMessages to update
+   */
+  where?: Prisma.ChatMessageWhereInput
+  /**
+   * Limit how many ChatMessages to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChatMessageIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

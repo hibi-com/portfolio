@@ -221,7 +221,6 @@ export type InquiryResponseOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   inquiry?: Prisma.InquiryOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
-  _relevance?: Prisma.InquiryResponseOrderByRelevanceInput
 }
 
 export type InquiryResponseWhereUniqueInput = Prisma.AtLeast<{
@@ -351,12 +350,6 @@ export type InquiryResponseListRelationFilter = {
 
 export type InquiryResponseOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type InquiryResponseOrderByRelevanceInput = {
-  fields: Prisma.InquiryResponseOrderByRelevanceFieldEnum | Prisma.InquiryResponseOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type InquiryResponseCountOrderByAggregateInput = {
@@ -503,7 +496,6 @@ export type InquiryResponseCreateOrConnectWithoutUserInput = {
 
 export type InquiryResponseCreateManyUserInputEnvelope = {
   data: Prisma.InquiryResponseCreateManyUserInput | Prisma.InquiryResponseCreateManyUserInput[]
-  skipDuplicates?: boolean
 }
 
 export type InquiryResponseUpsertWithWhereUniqueWithoutUserInput = {
@@ -563,7 +555,6 @@ export type InquiryResponseCreateOrConnectWithoutInquiryInput = {
 
 export type InquiryResponseCreateManyInquiryInputEnvelope = {
   data: Prisma.InquiryResponseCreateManyInquiryInput | Prisma.InquiryResponseCreateManyInquiryInput[]
-  skipDuplicates?: boolean
 }
 
 export type InquiryResponseUpsertWithWhereUniqueWithoutInquiryInput = {
@@ -677,7 +668,31 @@ export type InquiryResponseSelect<ExtArgs extends runtime.Types.Extensions.Inter
   user?: boolean | Prisma.InquiryResponse$userArgs<ExtArgs>
 }, ExtArgs["result"]["inquiryResponse"]>
 
+export type InquiryResponseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  inquiryId?: boolean
+  userId?: boolean
+  content?: boolean
+  isInternal?: boolean
+  attachments?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.InquiryResponse$userArgs<ExtArgs>
+}, ExtArgs["result"]["inquiryResponse"]>
 
+export type InquiryResponseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  inquiryId?: boolean
+  userId?: boolean
+  content?: boolean
+  isInternal?: boolean
+  attachments?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.InquiryResponse$userArgs<ExtArgs>
+}, ExtArgs["result"]["inquiryResponse"]>
 
 export type InquiryResponseSelectScalar = {
   id?: boolean
@@ -692,6 +707,14 @@ export type InquiryResponseSelectScalar = {
 
 export type InquiryResponseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "inquiryId" | "userId" | "content" | "isInternal" | "attachments" | "createdAt" | "updatedAt", ExtArgs["result"]["inquiryResponse"]>
 export type InquiryResponseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.InquiryResponse$userArgs<ExtArgs>
+}
+export type InquiryResponseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.InquiryResponse$userArgs<ExtArgs>
+}
+export type InquiryResponseIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
   user?: boolean | Prisma.InquiryResponse$userArgs<ExtArgs>
 }
@@ -829,6 +852,30 @@ export interface InquiryResponseDelegate<ExtArgs extends runtime.Types.Extension
   createMany<T extends InquiryResponseCreateManyArgs>(args?: Prisma.SelectSubset<T, InquiryResponseCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many InquiryResponses and returns the data saved in the database.
+   * @param {InquiryResponseCreateManyAndReturnArgs} args - Arguments to create many InquiryResponses.
+   * @example
+   * // Create many InquiryResponses
+   * const inquiryResponse = await prisma.inquiryResponse.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many InquiryResponses and only return the `id`
+   * const inquiryResponseWithIdOnly = await prisma.inquiryResponse.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends InquiryResponseCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, InquiryResponseCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InquiryResponsePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a InquiryResponse.
    * @param {InquiryResponseDeleteArgs} args - Arguments to delete one InquiryResponse.
    * @example
@@ -891,6 +938,36 @@ export interface InquiryResponseDelegate<ExtArgs extends runtime.Types.Extension
    * 
    */
   updateMany<T extends InquiryResponseUpdateManyArgs>(args: Prisma.SelectSubset<T, InquiryResponseUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more InquiryResponses and returns the data updated in the database.
+   * @param {InquiryResponseUpdateManyAndReturnArgs} args - Arguments to update many InquiryResponses.
+   * @example
+   * // Update many InquiryResponses
+   * const inquiryResponse = await prisma.inquiryResponse.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more InquiryResponses and only return the `id`
+   * const inquiryResponseWithIdOnly = await prisma.inquiryResponse.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends InquiryResponseUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, InquiryResponseUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InquiryResponsePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one InquiryResponse.
@@ -1319,7 +1396,28 @@ export type InquiryResponseCreateManyArgs<ExtArgs extends runtime.Types.Extensio
    * The data used to create many InquiryResponses.
    */
   data: Prisma.InquiryResponseCreateManyInput | Prisma.InquiryResponseCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * InquiryResponse createManyAndReturn
+ */
+export type InquiryResponseCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InquiryResponse
+   */
+  select?: Prisma.InquiryResponseSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the InquiryResponse
+   */
+  omit?: Prisma.InquiryResponseOmit<ExtArgs> | null
+  /**
+   * The data used to create many InquiryResponses.
+   */
+  data: Prisma.InquiryResponseCreateManyInput | Prisma.InquiryResponseCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InquiryResponseIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1364,6 +1462,36 @@ export type InquiryResponseUpdateManyArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many InquiryResponses to update.
    */
   limit?: number
+}
+
+/**
+ * InquiryResponse updateManyAndReturn
+ */
+export type InquiryResponseUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InquiryResponse
+   */
+  select?: Prisma.InquiryResponseSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the InquiryResponse
+   */
+  omit?: Prisma.InquiryResponseOmit<ExtArgs> | null
+  /**
+   * The data used to update InquiryResponses.
+   */
+  data: Prisma.XOR<Prisma.InquiryResponseUpdateManyMutationInput, Prisma.InquiryResponseUncheckedUpdateManyInput>
+  /**
+   * Filter which InquiryResponses to update
+   */
+  where?: Prisma.InquiryResponseWhereInput
+  /**
+   * Limit how many InquiryResponses to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InquiryResponseIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

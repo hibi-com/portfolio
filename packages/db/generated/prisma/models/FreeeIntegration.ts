@@ -291,7 +291,6 @@ export type FreeeIntegrationOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   syncLogs?: Prisma.FreeeSyncLogOrderByRelationAggregateInput
-  _relevance?: Prisma.FreeeIntegrationOrderByRelevanceInput
 }
 
 export type FreeeIntegrationWhereUniqueInput = Prisma.AtLeast<{
@@ -471,12 +470,6 @@ export type FreeeIntegrationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type FreeeIntegrationOrderByRelevanceInput = {
-  fields: Prisma.FreeeIntegrationOrderByRelevanceFieldEnum | Prisma.FreeeIntegrationOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
-}
-
 export type FreeeIntegrationUserIdCompanyIdCompoundUniqueInput = {
   userId: string
   companyId: number
@@ -633,7 +626,6 @@ export type FreeeIntegrationCreateOrConnectWithoutUserInput = {
 
 export type FreeeIntegrationCreateManyUserInputEnvelope = {
   data: Prisma.FreeeIntegrationCreateManyUserInput | Prisma.FreeeIntegrationCreateManyUserInput[]
-  skipDuplicates?: boolean
 }
 
 export type FreeeIntegrationUpsertWithWhereUniqueWithoutUserInput = {
@@ -853,7 +845,37 @@ export type FreeeIntegrationSelect<ExtArgs extends runtime.Types.Extensions.Inte
   _count?: boolean | Prisma.FreeeIntegrationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["freeeIntegration"]>
 
+export type FreeeIntegrationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  userId?: boolean
+  companyId?: boolean
+  companyName?: boolean
+  accessToken?: boolean
+  refreshToken?: boolean
+  tokenExpiresAt?: boolean
+  scopes?: boolean
+  isActive?: boolean
+  lastSyncAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["freeeIntegration"]>
 
+export type FreeeIntegrationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  userId?: boolean
+  companyId?: boolean
+  companyName?: boolean
+  accessToken?: boolean
+  refreshToken?: boolean
+  tokenExpiresAt?: boolean
+  scopes?: boolean
+  isActive?: boolean
+  lastSyncAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["freeeIntegration"]>
 
 export type FreeeIntegrationSelectScalar = {
   id?: boolean
@@ -875,6 +897,12 @@ export type FreeeIntegrationInclude<ExtArgs extends runtime.Types.Extensions.Int
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   syncLogs?: boolean | Prisma.FreeeIntegration$syncLogsArgs<ExtArgs>
   _count?: boolean | Prisma.FreeeIntegrationCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type FreeeIntegrationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type FreeeIntegrationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $FreeeIntegrationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1014,6 +1042,30 @@ export interface FreeeIntegrationDelegate<ExtArgs extends runtime.Types.Extensio
   createMany<T extends FreeeIntegrationCreateManyArgs>(args?: Prisma.SelectSubset<T, FreeeIntegrationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many FreeeIntegrations and returns the data saved in the database.
+   * @param {FreeeIntegrationCreateManyAndReturnArgs} args - Arguments to create many FreeeIntegrations.
+   * @example
+   * // Create many FreeeIntegrations
+   * const freeeIntegration = await prisma.freeeIntegration.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many FreeeIntegrations and only return the `id`
+   * const freeeIntegrationWithIdOnly = await prisma.freeeIntegration.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends FreeeIntegrationCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, FreeeIntegrationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a FreeeIntegration.
    * @param {FreeeIntegrationDeleteArgs} args - Arguments to delete one FreeeIntegration.
    * @example
@@ -1076,6 +1128,36 @@ export interface FreeeIntegrationDelegate<ExtArgs extends runtime.Types.Extensio
    * 
    */
   updateMany<T extends FreeeIntegrationUpdateManyArgs>(args: Prisma.SelectSubset<T, FreeeIntegrationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more FreeeIntegrations and returns the data updated in the database.
+   * @param {FreeeIntegrationUpdateManyAndReturnArgs} args - Arguments to update many FreeeIntegrations.
+   * @example
+   * // Update many FreeeIntegrations
+   * const freeeIntegration = await prisma.freeeIntegration.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more FreeeIntegrations and only return the `id`
+   * const freeeIntegrationWithIdOnly = await prisma.freeeIntegration.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends FreeeIntegrationUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, FreeeIntegrationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FreeeIntegrationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one FreeeIntegration.
@@ -1508,7 +1590,28 @@ export type FreeeIntegrationCreateManyArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many FreeeIntegrations.
    */
   data: Prisma.FreeeIntegrationCreateManyInput | Prisma.FreeeIntegrationCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * FreeeIntegration createManyAndReturn
+ */
+export type FreeeIntegrationCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FreeeIntegration
+   */
+  select?: Prisma.FreeeIntegrationSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the FreeeIntegration
+   */
+  omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null
+  /**
+   * The data used to create many FreeeIntegrations.
+   */
+  data: Prisma.FreeeIntegrationCreateManyInput | Prisma.FreeeIntegrationCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FreeeIntegrationIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1553,6 +1656,36 @@ export type FreeeIntegrationUpdateManyArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many FreeeIntegrations to update.
    */
   limit?: number
+}
+
+/**
+ * FreeeIntegration updateManyAndReturn
+ */
+export type FreeeIntegrationUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FreeeIntegration
+   */
+  select?: Prisma.FreeeIntegrationSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the FreeeIntegration
+   */
+  omit?: Prisma.FreeeIntegrationOmit<ExtArgs> | null
+  /**
+   * The data used to update FreeeIntegrations.
+   */
+  data: Prisma.XOR<Prisma.FreeeIntegrationUpdateManyMutationInput, Prisma.FreeeIntegrationUncheckedUpdateManyInput>
+  /**
+   * Filter which FreeeIntegrations to update
+   */
+  where?: Prisma.FreeeIntegrationWhereInput
+  /**
+   * Limit how many FreeeIntegrations to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FreeeIntegrationIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

@@ -250,7 +250,6 @@ export type ChatParticipantOrderByWithRelationInput = {
   chatRoom?: Prisma.ChatRoomOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
   messages?: Prisma.ChatMessageOrderByRelationAggregateInput
-  _relevance?: Prisma.ChatParticipantOrderByRelevanceInput
 }
 
 export type ChatParticipantWhereUniqueInput = Prisma.AtLeast<{
@@ -416,12 +415,6 @@ export type ChatParticipantListRelationFilter = {
 
 export type ChatParticipantOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type ChatParticipantOrderByRelevanceInput = {
-  fields: Prisma.ChatParticipantOrderByRelevanceFieldEnum | Prisma.ChatParticipantOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type ChatParticipantChatRoomIdUserIdCompoundUniqueInput = {
@@ -613,7 +606,6 @@ export type ChatParticipantCreateOrConnectWithoutUserInput = {
 
 export type ChatParticipantCreateManyUserInputEnvelope = {
   data: Prisma.ChatParticipantCreateManyUserInput | Prisma.ChatParticipantCreateManyUserInput[]
-  skipDuplicates?: boolean
 }
 
 export type ChatParticipantUpsertWithWhereUniqueWithoutUserInput = {
@@ -684,7 +676,6 @@ export type ChatParticipantCreateOrConnectWithoutChatRoomInput = {
 
 export type ChatParticipantCreateManyChatRoomInputEnvelope = {
   data: Prisma.ChatParticipantCreateManyChatRoomInput | Prisma.ChatParticipantCreateManyChatRoomInput[]
-  skipDuplicates?: boolean
 }
 
 export type ChatParticipantUpsertWithWhereUniqueWithoutChatRoomInput = {
@@ -932,7 +923,37 @@ export type ChatParticipantSelect<ExtArgs extends runtime.Types.Extensions.Inter
   _count?: boolean | Prisma.ChatParticipantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chatParticipant"]>
 
+export type ChatParticipantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  chatRoomId?: boolean
+  userId?: boolean
+  name?: boolean
+  role?: boolean
+  isOnline?: boolean
+  lastSeenAt?: boolean
+  joinedAt?: boolean
+  leftAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  chatRoom?: boolean | Prisma.ChatRoomDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.ChatParticipant$userArgs<ExtArgs>
+}, ExtArgs["result"]["chatParticipant"]>
 
+export type ChatParticipantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  chatRoomId?: boolean
+  userId?: boolean
+  name?: boolean
+  role?: boolean
+  isOnline?: boolean
+  lastSeenAt?: boolean
+  joinedAt?: boolean
+  leftAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  chatRoom?: boolean | Prisma.ChatRoomDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.ChatParticipant$userArgs<ExtArgs>
+}, ExtArgs["result"]["chatParticipant"]>
 
 export type ChatParticipantSelectScalar = {
   id?: boolean
@@ -954,6 +975,14 @@ export type ChatParticipantInclude<ExtArgs extends runtime.Types.Extensions.Inte
   user?: boolean | Prisma.ChatParticipant$userArgs<ExtArgs>
   messages?: boolean | Prisma.ChatParticipant$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.ChatParticipantCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type ChatParticipantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  chatRoom?: boolean | Prisma.ChatRoomDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.ChatParticipant$userArgs<ExtArgs>
+}
+export type ChatParticipantIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  chatRoom?: boolean | Prisma.ChatRoomDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.ChatParticipant$userArgs<ExtArgs>
 }
 
 export type $ChatParticipantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1093,6 +1122,30 @@ export interface ChatParticipantDelegate<ExtArgs extends runtime.Types.Extension
   createMany<T extends ChatParticipantCreateManyArgs>(args?: Prisma.SelectSubset<T, ChatParticipantCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many ChatParticipants and returns the data saved in the database.
+   * @param {ChatParticipantCreateManyAndReturnArgs} args - Arguments to create many ChatParticipants.
+   * @example
+   * // Create many ChatParticipants
+   * const chatParticipant = await prisma.chatParticipant.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many ChatParticipants and only return the `id`
+   * const chatParticipantWithIdOnly = await prisma.chatParticipant.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends ChatParticipantCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, ChatParticipantCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatParticipantPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a ChatParticipant.
    * @param {ChatParticipantDeleteArgs} args - Arguments to delete one ChatParticipant.
    * @example
@@ -1155,6 +1208,36 @@ export interface ChatParticipantDelegate<ExtArgs extends runtime.Types.Extension
    * 
    */
   updateMany<T extends ChatParticipantUpdateManyArgs>(args: Prisma.SelectSubset<T, ChatParticipantUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more ChatParticipants and returns the data updated in the database.
+   * @param {ChatParticipantUpdateManyAndReturnArgs} args - Arguments to update many ChatParticipants.
+   * @example
+   * // Update many ChatParticipants
+   * const chatParticipant = await prisma.chatParticipant.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more ChatParticipants and only return the `id`
+   * const chatParticipantWithIdOnly = await prisma.chatParticipant.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends ChatParticipantUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, ChatParticipantUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatParticipantPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one ChatParticipant.
@@ -1587,7 +1670,28 @@ export type ChatParticipantCreateManyArgs<ExtArgs extends runtime.Types.Extensio
    * The data used to create many ChatParticipants.
    */
   data: Prisma.ChatParticipantCreateManyInput | Prisma.ChatParticipantCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * ChatParticipant createManyAndReturn
+ */
+export type ChatParticipantCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChatParticipant
+   */
+  select?: Prisma.ChatParticipantSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChatParticipant
+   */
+  omit?: Prisma.ChatParticipantOmit<ExtArgs> | null
+  /**
+   * The data used to create many ChatParticipants.
+   */
+  data: Prisma.ChatParticipantCreateManyInput | Prisma.ChatParticipantCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChatParticipantIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1632,6 +1736,36 @@ export type ChatParticipantUpdateManyArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many ChatParticipants to update.
    */
   limit?: number
+}
+
+/**
+ * ChatParticipant updateManyAndReturn
+ */
+export type ChatParticipantUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChatParticipant
+   */
+  select?: Prisma.ChatParticipantSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChatParticipant
+   */
+  omit?: Prisma.ChatParticipantOmit<ExtArgs> | null
+  /**
+   * The data used to update ChatParticipants.
+   */
+  data: Prisma.XOR<Prisma.ChatParticipantUpdateManyMutationInput, Prisma.ChatParticipantUncheckedUpdateManyInput>
+  /**
+   * Filter which ChatParticipants to update
+   */
+  where?: Prisma.ChatParticipantWhereInput
+  /**
+   * Limit how many ChatParticipants to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChatParticipantIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

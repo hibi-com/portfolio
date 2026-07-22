@@ -257,7 +257,6 @@ export type DealFreeeMappingOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deal?: Prisma.DealOrderByWithRelationInput
-  _relevance?: Prisma.DealFreeeMappingOrderByRelevanceInput
 }
 
 export type DealFreeeMappingWhereUniqueInput = Prisma.AtLeast<{
@@ -393,12 +392,6 @@ export type DealFreeeMappingOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type DealFreeeMappingOrderByRelevanceInput = {
-  fields: Prisma.DealFreeeMappingOrderByRelevanceFieldEnum | Prisma.DealFreeeMappingOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
-}
-
 export type DealFreeeMappingDealIdFreeeCompanyIdCompoundUniqueInput = {
   dealId: string
   freeeCompanyId: number
@@ -521,7 +514,6 @@ export type DealFreeeMappingCreateOrConnectWithoutDealInput = {
 
 export type DealFreeeMappingCreateManyDealInputEnvelope = {
   data: Prisma.DealFreeeMappingCreateManyDealInput | Prisma.DealFreeeMappingCreateManyDealInput[]
-  skipDuplicates?: boolean
 }
 
 export type DealFreeeMappingUpsertWithWhereUniqueWithoutDealInput = {
@@ -608,7 +600,29 @@ export type DealFreeeMappingSelect<ExtArgs extends runtime.Types.Extensions.Inte
   deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["dealFreeeMapping"]>
 
+export type DealFreeeMappingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  dealId?: boolean
+  freeeDealId?: boolean
+  freeeCompanyId?: boolean
+  lastSyncAt?: boolean
+  syncHash?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["dealFreeeMapping"]>
 
+export type DealFreeeMappingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  dealId?: boolean
+  freeeDealId?: boolean
+  freeeCompanyId?: boolean
+  lastSyncAt?: boolean
+  syncHash?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["dealFreeeMapping"]>
 
 export type DealFreeeMappingSelectScalar = {
   id?: boolean
@@ -623,6 +637,12 @@ export type DealFreeeMappingSelectScalar = {
 
 export type DealFreeeMappingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "dealId" | "freeeDealId" | "freeeCompanyId" | "lastSyncAt" | "syncHash" | "createdAt" | "updatedAt", ExtArgs["result"]["dealFreeeMapping"]>
 export type DealFreeeMappingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
+}
+export type DealFreeeMappingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
+}
+export type DealFreeeMappingIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
 }
 
@@ -758,6 +778,30 @@ export interface DealFreeeMappingDelegate<ExtArgs extends runtime.Types.Extensio
   createMany<T extends DealFreeeMappingCreateManyArgs>(args?: Prisma.SelectSubset<T, DealFreeeMappingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many DealFreeeMappings and returns the data saved in the database.
+   * @param {DealFreeeMappingCreateManyAndReturnArgs} args - Arguments to create many DealFreeeMappings.
+   * @example
+   * // Create many DealFreeeMappings
+   * const dealFreeeMapping = await prisma.dealFreeeMapping.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many DealFreeeMappings and only return the `id`
+   * const dealFreeeMappingWithIdOnly = await prisma.dealFreeeMapping.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends DealFreeeMappingCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, DealFreeeMappingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealFreeeMappingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a DealFreeeMapping.
    * @param {DealFreeeMappingDeleteArgs} args - Arguments to delete one DealFreeeMapping.
    * @example
@@ -820,6 +864,36 @@ export interface DealFreeeMappingDelegate<ExtArgs extends runtime.Types.Extensio
    * 
    */
   updateMany<T extends DealFreeeMappingUpdateManyArgs>(args: Prisma.SelectSubset<T, DealFreeeMappingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more DealFreeeMappings and returns the data updated in the database.
+   * @param {DealFreeeMappingUpdateManyAndReturnArgs} args - Arguments to update many DealFreeeMappings.
+   * @example
+   * // Update many DealFreeeMappings
+   * const dealFreeeMapping = await prisma.dealFreeeMapping.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more DealFreeeMappings and only return the `id`
+   * const dealFreeeMappingWithIdOnly = await prisma.dealFreeeMapping.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends DealFreeeMappingUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, DealFreeeMappingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealFreeeMappingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one DealFreeeMapping.
@@ -1247,7 +1321,28 @@ export type DealFreeeMappingCreateManyArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many DealFreeeMappings.
    */
   data: Prisma.DealFreeeMappingCreateManyInput | Prisma.DealFreeeMappingCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * DealFreeeMapping createManyAndReturn
+ */
+export type DealFreeeMappingCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DealFreeeMapping
+   */
+  select?: Prisma.DealFreeeMappingSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the DealFreeeMapping
+   */
+  omit?: Prisma.DealFreeeMappingOmit<ExtArgs> | null
+  /**
+   * The data used to create many DealFreeeMappings.
+   */
+  data: Prisma.DealFreeeMappingCreateManyInput | Prisma.DealFreeeMappingCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DealFreeeMappingIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1292,6 +1387,36 @@ export type DealFreeeMappingUpdateManyArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many DealFreeeMappings to update.
    */
   limit?: number
+}
+
+/**
+ * DealFreeeMapping updateManyAndReturn
+ */
+export type DealFreeeMappingUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DealFreeeMapping
+   */
+  select?: Prisma.DealFreeeMappingSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the DealFreeeMapping
+   */
+  omit?: Prisma.DealFreeeMappingOmit<ExtArgs> | null
+  /**
+   * The data used to update DealFreeeMappings.
+   */
+  data: Prisma.XOR<Prisma.DealFreeeMappingUpdateManyMutationInput, Prisma.DealFreeeMappingUncheckedUpdateManyInput>
+  /**
+   * Filter which DealFreeeMappings to update
+   */
+  where?: Prisma.DealFreeeMappingWhereInput
+  /**
+   * Limit how many DealFreeeMappings to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DealFreeeMappingIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

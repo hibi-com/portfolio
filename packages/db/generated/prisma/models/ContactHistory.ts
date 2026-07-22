@@ -230,7 +230,6 @@ export type ContactHistoryOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   customer?: Prisma.CustomerOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
-  _relevance?: Prisma.ContactHistoryOrderByRelevanceInput
 }
 
 export type ContactHistoryWhereUniqueInput = Prisma.AtLeast<{
@@ -370,12 +369,6 @@ export type ContactHistoryListRelationFilter = {
 
 export type ContactHistoryOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type ContactHistoryOrderByRelevanceInput = {
-  fields: Prisma.ContactHistoryOrderByRelevanceFieldEnum | Prisma.ContactHistoryOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type ContactHistoryCountOrderByAggregateInput = {
@@ -531,7 +524,6 @@ export type ContactHistoryCreateOrConnectWithoutUserInput = {
 
 export type ContactHistoryCreateManyUserInputEnvelope = {
   data: Prisma.ContactHistoryCreateManyUserInput | Prisma.ContactHistoryCreateManyUserInput[]
-  skipDuplicates?: boolean
 }
 
 export type ContactHistoryUpsertWithWhereUniqueWithoutUserInput = {
@@ -594,7 +586,6 @@ export type ContactHistoryCreateOrConnectWithoutCustomerInput = {
 
 export type ContactHistoryCreateManyCustomerInputEnvelope = {
   data: Prisma.ContactHistoryCreateManyCustomerInput | Prisma.ContactHistoryCreateManyCustomerInput[]
-  skipDuplicates?: boolean
 }
 
 export type ContactHistoryUpsertWithWhereUniqueWithoutCustomerInput = {
@@ -717,7 +708,33 @@ export type ContactHistorySelect<ExtArgs extends runtime.Types.Extensions.Intern
   user?: boolean | Prisma.ContactHistory$userArgs<ExtArgs>
 }, ExtArgs["result"]["contactHistory"]>
 
+export type ContactHistorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  customerId?: boolean
+  userId?: boolean
+  type?: boolean
+  subject?: boolean
+  content?: boolean
+  contactedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.ContactHistory$userArgs<ExtArgs>
+}, ExtArgs["result"]["contactHistory"]>
 
+export type ContactHistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  customerId?: boolean
+  userId?: boolean
+  type?: boolean
+  subject?: boolean
+  content?: boolean
+  contactedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.ContactHistory$userArgs<ExtArgs>
+}, ExtArgs["result"]["contactHistory"]>
 
 export type ContactHistorySelectScalar = {
   id?: boolean
@@ -733,6 +750,14 @@ export type ContactHistorySelectScalar = {
 
 export type ContactHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customerId" | "userId" | "type" | "subject" | "content" | "contactedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contactHistory"]>
 export type ContactHistoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.ContactHistory$userArgs<ExtArgs>
+}
+export type ContactHistoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.ContactHistory$userArgs<ExtArgs>
+}
+export type ContactHistoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
   user?: boolean | Prisma.ContactHistory$userArgs<ExtArgs>
 }
@@ -871,6 +896,30 @@ export interface ContactHistoryDelegate<ExtArgs extends runtime.Types.Extensions
   createMany<T extends ContactHistoryCreateManyArgs>(args?: Prisma.SelectSubset<T, ContactHistoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many ContactHistories and returns the data saved in the database.
+   * @param {ContactHistoryCreateManyAndReturnArgs} args - Arguments to create many ContactHistories.
+   * @example
+   * // Create many ContactHistories
+   * const contactHistory = await prisma.contactHistory.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many ContactHistories and only return the `id`
+   * const contactHistoryWithIdOnly = await prisma.contactHistory.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends ContactHistoryCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, ContactHistoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactHistoryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a ContactHistory.
    * @param {ContactHistoryDeleteArgs} args - Arguments to delete one ContactHistory.
    * @example
@@ -933,6 +982,36 @@ export interface ContactHistoryDelegate<ExtArgs extends runtime.Types.Extensions
    * 
    */
   updateMany<T extends ContactHistoryUpdateManyArgs>(args: Prisma.SelectSubset<T, ContactHistoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more ContactHistories and returns the data updated in the database.
+   * @param {ContactHistoryUpdateManyAndReturnArgs} args - Arguments to update many ContactHistories.
+   * @example
+   * // Update many ContactHistories
+   * const contactHistory = await prisma.contactHistory.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more ContactHistories and only return the `id`
+   * const contactHistoryWithIdOnly = await prisma.contactHistory.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends ContactHistoryUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, ContactHistoryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactHistoryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one ContactHistory.
@@ -1362,7 +1441,28 @@ export type ContactHistoryCreateManyArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many ContactHistories.
    */
   data: Prisma.ContactHistoryCreateManyInput | Prisma.ContactHistoryCreateManyInput[]
-  skipDuplicates?: boolean
+}
+
+/**
+ * ContactHistory createManyAndReturn
+ */
+export type ContactHistoryCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContactHistory
+   */
+  select?: Prisma.ContactHistorySelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContactHistory
+   */
+  omit?: Prisma.ContactHistoryOmit<ExtArgs> | null
+  /**
+   * The data used to create many ContactHistories.
+   */
+  data: Prisma.ContactHistoryCreateManyInput | Prisma.ContactHistoryCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContactHistoryIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1407,6 +1507,36 @@ export type ContactHistoryUpdateManyArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many ContactHistories to update.
    */
   limit?: number
+}
+
+/**
+ * ContactHistory updateManyAndReturn
+ */
+export type ContactHistoryUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContactHistory
+   */
+  select?: Prisma.ContactHistorySelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContactHistory
+   */
+  omit?: Prisma.ContactHistoryOmit<ExtArgs> | null
+  /**
+   * The data used to update ContactHistories.
+   */
+  data: Prisma.XOR<Prisma.ContactHistoryUpdateManyMutationInput, Prisma.ContactHistoryUncheckedUpdateManyInput>
+  /**
+   * Filter which ContactHistories to update
+   */
+  where?: Prisma.ContactHistoryWhereInput
+  /**
+   * Limit how many ContactHistories to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContactHistoryIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
