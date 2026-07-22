@@ -93,7 +93,7 @@ upload_env_var() {
     -H "Circle-Token: ${CIRCLECI_API_TOKEN}" \
     "${api_url}/${var_name}" 2>/dev/null || echo "")
 
-  if echo "${existing}" | grep -q "\"name\":\"${var_name}\""; then
+  if echo "${existing}" | grep -Eq "\"name\"[[:space:]]*:[[:space:]]*\"${var_name}\""; then
     # Update existing variable
     echo "  Updating existing variable..."
     curl -s -X DELETE \
@@ -102,18 +102,20 @@ upload_env_var() {
   fi
 
   # Create new variable
-  local response
-  response=$(curl -s -X POST \
+  local http_code response
+  response=$(curl -s -w "\n%{http_code}" -X POST \
     -H "Circle-Token: ${CIRCLECI_API_TOKEN}" \
     -H "Content-Type: application/json" \
     -d "{\"name\":\"${var_name}\",\"value\":\"${encoded_value}\"}" \
     "${api_url}")
+  http_code=$(echo "${response}" | tail -n1)
+  response=$(echo "${response}" | sed '$d')
 
-  if echo "${response}" | grep -q "\"name\":\"${var_name}\""; then
+  if [[ "${http_code}" =~ ^2 ]] && echo "${response}" | grep -Eq "\"name\"[[:space:]]*:[[:space:]]*\"${var_name}\""; then
     echo -e "${GREEN}✓ ${var_name} uploaded successfully${NC}"
     return 0
   else
-    echo -e "${RED}✗ Failed to upload ${var_name}${NC}"
+    echo -e "${RED}✗ Failed to upload ${var_name} (HTTP ${http_code})${NC}"
     echo "Response: ${response}"
     return 1
   fi
@@ -151,9 +153,9 @@ main() {
   esac
 
   echo ""
-  echo -e "${GREEN}=========================================="
-  echo "✓ Upload completed successfully"
-  echo "==========================================${NC}"
+  echo -e "${GREEN}==========================================${NC}"
+  echo -e "${GREEN}✓ Upload completed successfully${NC}"
+  echo -e "${GREEN}==========================================${NC}"
   echo ""
   echo "Next steps:"
   echo "  1. Verify variables in CircleCI:"
