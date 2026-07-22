@@ -1582,7 +1582,7 @@ workflows:
               only:
                 - master
     jobs:
-      - backup-database:
+      - backup-database
 
   performance:
     triggers:
