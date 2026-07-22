@@ -1,3 +1,7 @@
+---
+title: "API Key Setup"
+---
+
 # API Key Setup
 
 このプロジェクトで必要な各種APIキー・トークンの発行手順をまとめています。
