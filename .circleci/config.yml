@@ -19,15 +19,18 @@ executors:
 
 commands:
   install-bun:
-    description: Install Bun runtime
+    description: Install Bun runtime (version from package.json packageManager)
     steps:
       - run:
           name: Install Bun
           command: |
-            curl -fsSL https://bun.sh/install | bash
+            BUN_VERSION="$(node -p "require('./package.json').packageManager.replace(/^bun@/,'')")"
+            echo "Installing Bun ${BUN_VERSION} (pinned to packageManager)"
+            curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"
             echo 'export BUN_INSTALL="$HOME/.bun"' >> $BASH_ENV
             echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $BASH_ENV
             source $BASH_ENV
+            bun --version
 
 
   load-env-config:
