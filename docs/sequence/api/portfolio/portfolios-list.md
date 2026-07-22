@@ -11,7 +11,7 @@ sequenceDiagram
     participant Container as DIContainer
     participant UseCase as GetPortfoliosUseCase
     participant Repository as PortfolioRepository
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: GET /api/portfolios
     API->>API: リクエスト受信

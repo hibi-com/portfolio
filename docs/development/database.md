@@ -111,9 +111,9 @@ bun run generate --filter=@portfolio/db
 
 ### 接続エラーが発生する
 
-1. 環境変数 `DATABASE_URL` が正しく設定されているか確認
-2. TiDB Cloudのクラスターが起動しているか確認
-3. IPホワイトリストに開発環境が登録されているか確認
+1. ローカル: libSQL（`http://127.0.0.1:8081`）が起動しているか確認（`docker compose up sqlite`）
+2. 本番: Cloudflare D1 バインディング（`DB`）と `wrangler.toml` の database_id / name が一致しているか確認
+3. マイグレーション適用済みか確認（ローカルは `setup-db`、本番は `wrangler d1 migrations apply`）
 
 ## DB仕様書との対応
 

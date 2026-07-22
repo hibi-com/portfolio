@@ -11,7 +11,7 @@ sequenceDiagram
     participant Container as DIContainer
     participant UseCase as GetPostBySlugUseCase
     participant Repository as PostRepository
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: GET /api/post/:slug
     API->>API: リクエスト受信<br/>slugパラメータ取得

@@ -239,7 +239,7 @@ sequenceDiagram
 ### loopの使用ルール（重要）
 
 ```text
-loop は外部システム（DB, API, Redis）への呼び出しにのみ使用する。
+loop は外部システム（DB, API, KV）への呼び出しにのみ使用する。
 内部ロジックのループには loop を使用しない。
 ```
 

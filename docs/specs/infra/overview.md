@@ -223,7 +223,7 @@ bun run generate          # Pulumi stack graph も含めて全て生成（要Pul
 ## 参考資料
 
 - [インフラアーキテクチャ図](../../architecture/infra-architecture.md)（自動生成）
-- [APIキー・トークン発行手順](../../development/api-keys-setup.md)
+- [APIキー・トークン発行手順](../setup/api-keys.md)
 - [Cloudflare Documentation](https://developers.cloudflare.com/)
 - [Pulumi Documentation](https://www.pulumi.com/docs/)
 

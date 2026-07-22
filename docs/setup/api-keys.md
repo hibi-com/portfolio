@@ -6,17 +6,15 @@
 
 - **compose で使う値**: `compose.yaml` の `environment` を正とし、ローカルは `.env` や compose のデフォルト値を使用。
 - **Cloudflare Pages/Workers**: `pulumi up` 実行時に `infra/.env` の値が Pulumi 経由で Cloudflare の環境変数に反映される。デプロイ後は Cloudflare Dashboard または `wrangler secret` で管理。
-- **infra 用シークレット**（Cloudflare, Sentry, Grafana 等）: `infra/.env` または `infra/env.yaml` に設定し、`cd infra && pulumi up` で適用。
+- **infra 用シークレット**（Cloudflare, Sentry 等）: `infra/.env` または `infra/env.yaml` に設定し、`cd infra && pulumi up` で適用。
+- **D1 / KV / R2**: Pulumi（`infra/src/resources/cloudflare-data.ts`）が作成する。Cloudflare アカウント向けの API トークン以外に、これらのリソース専用の API キーは不要。
 
 ## 目次
 
 1. [Cloudflare APIトークン](#cloudflare-apiトークン)
 2. [Sentry認証トークン](#sentry認証トークン)
-3. [Grafana APIキー](#grafana-apiキー)
-4. [Redis Cloud APIキー](#redis-cloud-apiキー)
-5. [Google OAuth認証情報](#google-oauth認証情報)
-6. [Better Auth Secret](#better-auth-secret)
-7. [TiDB Cloud接続情報](#tidb-cloud接続情報)
+3. [Google OAuth認証情報](#google-oauth認証情報)
+4. [Better Auth Secret](#better-auth-secret)
 
 ## Cloudflare APIトークン
 
@@ -40,6 +38,9 @@
      - **Zone** → **Zone** → **Read**
      - **Account** → **Cloudflare Pages** → **Edit**
      - **Account** → **Workers Scripts** → **Edit**
+     - **Account** → **D1** → **Edit**（データベース用）
+     - **Account** → **Workers KV Storage** → **Edit**（キャッシュ用）
+     - **Account** → **Workers R2 Storage** → **Edit**（アプリ画像用）
      - **Account** → **Access: Apps and Policies** → **Edit** (Zero Trust Access用)
    - **Account Resources**: 対象のアカウントを選択
    - **Zone Resources**: 「Include」を選択し、対象のゾーンを選択
@@ -138,110 +139,7 @@ SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
    - ✅ `team:write`
    - ✅ `project:read`
    - ✅ `project:write`
-4. 新しいトークンを`.env`ファイルに設定し、Dopplerに同期
-
-## Grafana APIキー
-
-### Grafana - 必要な情報
-
-- `GRAFANA_API_KEY` - APIキー
-- `GRAFANA_ORG_SLUG` - 組織スラッグ
-
-### Grafana - 発行手順
-
-#### 1. APIキーの作成（Grafana Cloudの場合）
-
-1. [Grafana API Keys](https://grafana.com/orgs/{your-org}/api-keys) にアクセス
-   - `{your-org}` は組織スラッグに置き換え
-2. 「Create API Key」をクリック
-3. 以下の設定を行う：
-   - **Name**: `portfolio-infra` など任意の名前
-   - **Role**: `Admin` を選択
-   - **Time to live**: 必要に応じて設定（無期限の場合は空欄）
-4. 「Add API Key」をクリック
-5. 表示されたAPIキーをコピー（**再表示できないため注意**）
-
-#### Grafana - 2. 組織スラッグの取得
-
-1. [Grafana Organizations](https://grafana.com/orgs/) にアクセス
-2. URLの `/orgs/{your-org-slug}` の部分をコピー
-
-#### セルフホストGrafanaの場合
-
-1. Grafanaにログイン
-2. 「Configuration」→「API Keys」にアクセス
-3. 「New API Key」をクリック
-4. 上記と同様の設定を行う
-
-### Grafana - 必要な権限
-
-**重要**: Grafana APIキーには以下の権限が必要です。権限が不足している場合、リソース作成時に403エラーが発生します。
-
-- **folders:create** - フォルダの作成（必須）
-- **dashboards:write** - ダッシュボードの作成・編集（必須）
-- **datasources:read** - データソースの読み取り（推奨）
-
-**権限の確認方法**:
-
-1. Grafana Cloudの場合: APIキー作成時に「Role」で`Admin`を選択することで、すべての権限が付与されます
-2. セルフホストGrafanaの場合: 「Permissions」セクションで上記の権限を個別に選択してください
-
-**権限不足エラーの解決方法**:
-
-- エラーメッセージ: `[POST /folders][403] createFolderForbidden {"message":"You'll need additional permissions to perform this action. Permissions needed: folders:create"}`
-- 解決方法: 新しいAPIキーを作成し、`Admin`ロール（または`folders:create`権限）を付与してください
-
-### Grafana - 環境変数への設定
-
-```env
-GRAFANA_API_KEY="glsa_xxxxx"
-GRAFANA_ORG_SLUG="your-org-slug"
-```
-
-## Redis Cloud APIキー
-
-（Redis Cloud 以降は [redis-cloud-manual-setup.md](./redis-cloud-manual-setup.md) も参照）
-
-### Redis Cloud - 必要な情報
-
-- `REDISCLOUD_ACCESS_KEY` - Access Key
-- `REDISCLOUD_SECRET_KEY` - Secret Key
-
-### Redis Cloud - 発行手順
-
-1. [Redis Cloud](https://app.redislabs.com/) にログイン
-2. 右上のユーザーアイコンをクリック
-3. 「Account Settings」を選択
-4. 「Access Keys & Security」タブを選択
-5. 「Generate New Access Key」をクリック
-6. 以下の情報をコピー：
-   - **Access Key** → `REDISCLOUD_ACCESS_KEY`
-   - **Secret Key** → `REDISCLOUD_SECRET_KEY`
-   - **注意**: Secret Keyは再表示できないため、必ずコピーしてください
-
-### Redis Cloud - 環境変数への設定
-
-```env
-REDISCLOUD_ACCESS_KEY="your-access-key"
-REDISCLOUD_SECRET_KEY="your-secret-key"
-```
-
-### Redis Cloud - トラブルシューティング
-
-#### エラー: "400 BAD_REQUEST - BAD_REQUEST: Bad request detected"
-
-**原因**: サブスクリプション作成時のパラメータが不正
-
-**解決方法**:
-
-1. Redis CloudのAPIキーが有効か確認（`check infra` を実行）
-2. その他の対処は [redis-cloud-manual-setup.md](./redis-cloud-manual-setup.md) を参照
-
-#### エラー: "Authentication error" (401)
-
-**原因**: APIキーが無効または期限切れ
-
-**解決方法**: [Redis Cloud](https://app.redislabs.com/) でキーを再発行し、`infra/.env` を更新してください。
+4. 新しいトークンを`.env`ファイルに設定する
 
 ## Google OAuth認証情報
 
@@ -289,25 +187,9 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 BETTER_AUTH_SECRET="your-generated-secret-key"
 ```
 
-## TiDB Cloud接続情報
-
-### TiDB Cloud - 必要な情報
-
-- `DATABASE_URL` - データベース接続文字列
-- `TIDB_HOST` - TiDBホスト名（オプション）
-
-### TiDB Cloud - 取得手順・接続文字列
-
-手動作成手順は [tidb-cloud-manual-setup.md](./tidb-cloud-manual-setup.md) を参照。
-
-```env
-DATABASE_URL="mysql://user:password@host:4000/database?sslaccept=strict"
-TIDB_HOST="gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
-```
-
 ## まとめ
 
-すべての認証情報を `infra/.env` に設定し、`check infra` で検証できます。`cd infra && pulumi up` で Cloudflare Pages/Workers に環境変数が反映されます。
+すべての認証情報を `infra/.env` に設定し、`check infra` で検証できます。`cd infra && pulumi up` で Cloudflare Pages/Workers に環境変数が反映され、D1 / KV / R2 も合わせて作成・紐付けされます。
 
 ## check infra コマンド（APIキー・トークン検証）
 
@@ -322,15 +204,13 @@ bun run check -- infra
 
 ### 確認内容
 
-- Cloudflare APIトークン（トークン・アカウント・ゾーン・DNS・Pages・Workers）
+- Cloudflare APIトークン（トークン・アカウント・ゾーン・DNS・Pages・Workers・D1/KV/R2）
 - Sentry認証トークン（トークン・組織・チーム・プロジェクト）
-- Grafana APIキー（Grafana Cloud / セルフホスト）
-- Redis Cloud APIキー
 - Google OAuth（形式チェック）
 - Better Auth Secret（形式チェック）
-- TiDB Cloud 接続情報（形式チェック）
 
 ### 注意事項
 
 - `.env` はリポジトリルートに配置し、未設定の項目は警告のみでエラーにはなりません。
-- 詳細な発行手順は本ドキュメントの各セクションおよび [tidb-cloud-manual-setup.md](./tidb-cloud-manual-setup.md) / [redis-cloud-manual-setup.md](./redis-cloud-manual-setup.md) を参照してください。
+- 詳細な発行手順は本ドキュメントの各セクションを参照してください。
+- D1 / Workers KV / R2 の接続情報は Cloudflare バインディング経由でアプリに渡されるため、別途 `DATABASE_URL` 等の外部 DB 接続文字列は本番では不要です（ローカルは libSQL 用の URL を使用）。

@@ -14,7 +14,7 @@ bunx・wrangler を直接叩かず、必要な操作はルートの `package.jso
 - ~~**Cloudflare Pages シークレット系**~~ → `infra/env.yaml` で Pulumi管理
 - ~~**Cloudflare Pages デプロイ**~~ → CircleCI自動化のみ（ローカルデプロイ禁止）
 - ~~**Wrangler 認証確認**~~ → ローカルデプロイ禁止のため不要
-- ~~**Wrangler ログ監視**~~ → Grafana/Sentry等のSaaSで管理
+- ~~**Wrangler ログ監視**~~ → Sentry等のSaaSで管理
 - ~~**npm audit**~~ → 依存関係の脆弱性チェックは別ツールで管理
 
 ## 方針

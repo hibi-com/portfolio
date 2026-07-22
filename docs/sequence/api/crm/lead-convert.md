@@ -14,7 +14,7 @@ sequenceDiagram
     participant UseCase as ConvertLeadToDealUseCase
     participant LeadRepo as LeadRepository
     participant DealRepo as DealRepository
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: POST /api/crm/leads/:id/convert
     API->>Auth: authenticate()

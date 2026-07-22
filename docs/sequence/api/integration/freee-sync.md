@@ -14,7 +14,7 @@ sequenceDiagram
     participant FreeeAPI as freee API
     participant CustomerRepo as CustomerRepository
     participant SyncLogRepo as SyncLogRepository
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: POST /api/freee/:id/sync/partners/import
     API->>Auth: 認証チェック

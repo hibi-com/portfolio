@@ -20,7 +20,7 @@
 ### 1. 事前確認
 
 - [x] 全テストが通過していることを確認
-- [x] ビルド成果物がBackblaze B2に存在することを確認
+- [x] ビルド成果物が CircleCI Artifacts / workspace に存在することを確認
 - [x] 環境変数がCloudflareに設定されていることを確認
 
 ### 2. デプロイ実行
@@ -67,9 +67,9 @@
 ### デプロイ前
 
 - [ ] `bun run check` で全品質チェックが通過
-- [ ] Backblaze B2にartifactが存在
+- [ ] CircleCI Artifacts に artifact が存在（またはデプロイ workflow で再ビルド）
 - [ ] Cloudflare環境変数が設定済み
-- [ ] データベースマイグレーションが適用済み（必要な場合）
+- [ ] D1 マイグレーションが適用済み（必要な場合）
 
 ### デプロイ中
 
@@ -80,24 +80,24 @@
 
 - [ ] 各アプリのURLにアクセス可能
 - [ ] ヘルスチェックが正常
-- [ ] Sentry/Grafana Cloudでエラーがないことを確認
+- [ ] Sentryでエラーがないことを確認
 
 ## トラブルシューティング
 
-### Backblaze B2からのダウンロード失敗
+### CircleCI Artifacts からの取得失敗
 
-**エラー**: `Failed to download artifacts from B2`
+**エラー**: `Failed to download / restore artifacts`
 
 **原因**:
 
-- B2認証情報が正しくない
-- Artifactが存在しない
+- 上流の build ジョブが失敗している
+- workspace / Artifacts に成果物が無い
 - ネットワークエラー
 
 **解決策**:
 
-1. CircleCIのContext設定を確認
-2. B2バケットにファイルが存在するか確認
+1. CircleCI の build ジョブと `store_artifacts` / `persist_to_workspace` を確認
+2. Artifacts タブにファイルがあるか確認
 3. CircleCIジョブを再実行
 
 ### Cloudflareデプロイ失敗
@@ -121,4 +121,4 @@
 - [デプロイ手順書](../../logs/deployment)
 - [CircleCI設定](.circleci/config.yml)
 - [Cloudflare Dashboard](https://dash.cloudflare.com/)
-- [Backblaze B2 Console](https://secure.backblaze.com/)
+- [Sentry](https://sentry.io/)

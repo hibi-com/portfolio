@@ -28,7 +28,7 @@ title: "環境変数管理"
 
 - 機密（API キー、シークレット、パスワード）は**環境変数のみ**で渡す。コードにハードコードしてはならない。
 - .env.example には**プレースホルダーや説明のみ**を書く。本番の値や実シークレットを書かない。
-- シークレットの生成は OpenSSL 等の安全な方法で行う。手順は [APIキー・トークン発行手順](./api-keys-setup.md) や [セキュリティガイドライン](../security/guidelines.md) を参照する。
+- シークレットの生成は OpenSSL 等の安全な方法で行う。手順は [APIキー・トークン発行手順](../setup/api-keys.md) や [セキュリティガイドライン](../security/guidelines.md) を参照する。
 - ログやエラーレスポンスに環境変数の値を出さない。
 
 ## バリデーション
@@ -38,8 +38,8 @@ title: "環境変数管理"
 
 ## 変数のカテゴリ（一覧は .env.example を参照）
 
-- **データベース**: DATABASE_URL
-- **キャッシュ**: CACHE_URL
+- **データベース**: DATABASE_URL（ローカル libSQL）。本番 Workers は D1 バインディング（`DB`）
+- **キャッシュ**: 本番は Workers KV バインディング（`CACHE`）。ローカル用に CACHE_URL 等がある場合は `.env.example` を参照
 - **認証**: BETTER_AUTH_*, GOOGLE_*, GITHUB_*（OAuth）
 - **Cloudflare**: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN（必要時）
 - **アプリ**: NODE_ENV, API_BASE_URL, VITE_BASE_URL, VITE_API_URL
@@ -68,4 +68,4 @@ freee の開発用 mock（mock-apis）利用時は、FREEE_AUTH_BASE_URL / FREEE
 - [Vite 環境変数とモード](https://vitejs.dev/guide/env-and-mode.html)
 - [Cloudflare Pages 環境変数](https://developers.cloudflare.com/pages/platform/build-configuration/#environment-variables)
 - [Cloudflare Workers 環境変数](https://developers.cloudflare.com/workers/configuration/environment-variables/)
-- プロジェクト内: [APIキー・トークン発行手順](./api-keys-setup.md)、[セキュリティガイドライン](../security/guidelines.md)
+- プロジェクト内: [APIキー・トークン発行手順](../setup/api-keys.md)、[セキュリティガイドライン](../security/guidelines.md)

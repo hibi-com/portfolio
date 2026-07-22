@@ -1099,7 +1099,7 @@ jobs:
           name: Skip legacy database object-store backup
           command: |
             echo "Cloudflare D1 backups use Dashboard / Time Travel."
-            echo "Object-store mysqldump path removed."
+            echo "D1 backup is handled via Cloudflare Time Travel / Dashboard (no CI dump)."
             mkdir -p backup-notes
             echo "D1 backups: Cloudflare dashboard / wrangler d1" > backup-notes/README.md
       - store_artifacts:

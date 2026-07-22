@@ -21,8 +21,10 @@ title: "技術スタック"
 | -------- | -------- |
 | フロント・管理画面・Wiki | Cloudflare Pages |
 | API | Cloudflare Workers |
-| DB（本番） | TiDB Cloud（D1 互換レイヤー利用時は Cloudflare D1） |
-| キャッシュ | Redis Cloud |
+| DB（本番） | Cloudflare D1（SQLite） |
+| DB（ローカル） | libSQL（sqld） |
+| キャッシュ | Cloudflare Workers KV |
+| オブジェクトストレージ | Cloudflare R2（アプリ画像専用） |
 
 ## アプリケーション（`apps/`）
 
@@ -44,11 +46,11 @@ title: "技術スタック"
 
 | パッケージ | 名前 | 用途 |
 | -------- | -------- | -------- |
-| **db** | `@portfolio/db` | Prisma スキーマ・クライアント。D1 / TiDB 対応。マイグレーション含む |
+| **db** | `@portfolio/db` | Prisma スキーマ・クライアント。SQLite / D1 対応。マイグレーション含む |
 | **api** | `@portfolio/api` | API クライアント（Orval 等で生成）。型・Zod スキーマ・エンドポイント定義 |
 | **auth** | `@portfolio/auth` | Better Auth 共通設定・ヘルパー |
-| **cache** | `@portfolio/cache` | Redis クライアント（キャッシュ・セッション等） |
-| **log** | `@portfolio/log` | 構造化ロギング・Sentry・Prometheus 等 |
+| **cache** | `@portfolio/cache` | Cloudflare KV クライアント（キャッシュ・セッション等） |
+| **log** | `@portfolio/log` | 構造化ロギング・Sentry 等 |
 | **ui** | `@portfolio/ui` | 共通 UI コンポーネント（shadcn/ui ベース等） |
 | **validation** | `@portfolio/validation` | Zod バリデーションスキーマ（API 以外の共通スキーマ） |
 
@@ -89,11 +91,12 @@ title: "技術スタック"
 | 種別 | サービス |
 | -------- | -------- |
 | ホスティング・エッジ | Cloudflare（Pages, Workers, DNS） |
-| データベース | TiDB Cloud（Serverless） |
-| キャッシュ | Redis Cloud |
-| オブジェクトストレージ | Backblaze B2（利用時） |
-| 可観測性 | Grafana Cloud, Sentry |
-| シークレット・環境変数 | Cloudflare 環境変数（Doppler 等と連携する場合はその設定を参照） |
+| データベース | Cloudflare D1 |
+| キャッシュ | Cloudflare Workers KV |
+| オブジェクトストレージ | Cloudflare R2（アプリ画像専用。CI 成果物用途ではない） |
+| CI 成果物 | CircleCI Artifacts |
+| 可観測性 | Sentry |
+| シークレット・環境変数 | Cloudflare 環境変数（`infra/.env` / Pulumi 経由） |
 
 ## 更新ルール
 

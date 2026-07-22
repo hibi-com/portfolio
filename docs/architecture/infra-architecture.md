@@ -12,7 +12,7 @@ title: "インフラアーキテクチャ"
 
 ## ランタイム構成図
 
-ユーザーリクエストが DNS を経由して Cloudflare に到達し、Pages（Web/Admin/Wiki）と Workers（API）に振り分けられ、API が TiDB と Redis を利用する流れです。
+ユーザーリクエストが DNS を経由して Cloudflare に到達し、Pages（Web/Admin/Wiki）と Workers（API）に振り分けられ、API が D1・KV・R2 を利用する流れです。可観測性は Sentry、CI 成果物は CircleCI Artifacts です。
 
 ```mermaid
 flowchart TB
@@ -23,16 +23,18 @@ flowchart TB
     subgraph Cloudflare["Cloudflare"]
         DNS["Cloudflare DNS<br/>ゾーン"]
         subgraph Edge["エッジ"]
+            Pages["Pages<br/>(web / admin / wiki / portal)"]
+            Workers["Workers (API)"]
+        end
+        subgraph Data["データストア"]
+            D1["Cloudflare D1<br/>(SQLite)"]
+            KV["Workers KV<br/>(cache)"]
+            R2["R2<br/>(アプリ画像専用)"]
         end
     end
 
-    subgraph Data["データストア"]
-        TiDB["TiDB Cloud<br/>Serverless (AWS ap-northeast-1)"]
-        Redis["Redis Cloud<br/>(AWS ap-northeast-1) または外部"]
-    end
-
-    subgraph Storage["ストレージ"]
-        Backblaze["Backblaze B2"]
+    subgraph CI["CI"]
+        CircleCI["CircleCI Artifacts"]
     end
 
     subgraph Secrets["シークレット管理"]
@@ -40,11 +42,21 @@ flowchart TB
     end
 
     subgraph Observability["可観測性"]
-        Grafana["Grafana Cloud"]
         Sentry["Sentry"]
     end
 
     Browser --> DNS
+    DNS --> Pages
+    DNS --> Workers
+    Workers --> D1
+    Workers --> KV
+    Workers --> R2
+    Workers --> Sentry
+    Pages --> Sentry
+    CircleCI -.-> Pages
+    CircleCI -.-> Workers
+    CFEnv --> Pages
+    CFEnv --> Workers
 ```
 
 ## プロビジョニング構成図
@@ -59,36 +71,31 @@ flowchart LR
 
     subgraph Providers["プロバイダー"]
         CF["Cloudflare"]
-        TiDB["TiDB Cloud"]
-        RedisCloud["Redis Cloud"]
-        Grafana["Grafana"]
         Sentry["Sentry"]
-        Backblaze["Backblaze"]
     end
 
     subgraph Resources["作成リソース"]
         direction TB
-        R1["TiDB Serverless Cluster<br/>（オプション）"]
-        R3["Redis Cloud Subscription/DB<br/>（オプション）"]
+        R1["D1 Database"]
+        R2["Workers KV Namespace"]
+        R3["R2 Bucket（画像）"]
         R4["Cloudflare Workers (API)"]
         R5["Cloudflare Pages (web, admin, wiki, e2e)"]
         R6["Cloudflare DNS (www, admin, wiki, api, portal)"]
         R7["Cloudflare Access (rc/stg)"]
-        R8["Grafana Folder / Dashboards"]
-        R9["Sentry Project / DSN"]
-        R10["Backblaze B2 Bucket"]
+        R8["Sentry Project / DSN"]
     end
 
     Config --> CF
-    Config --> TiDB
-    Config --> RedisCloud
-    Config --> Grafana
     Config --> Sentry
-    Config --> Backblaze
-    TiDB --> R1
-    RedisCloud --> R3
+    CF --> R1
+    CF --> R2
+    CF --> R3
     CF --> R4
     CF --> R5
+    R1 --> R4
+    R2 --> R4
+    R3 --> R4
     R4 --> R5
     CF --> R6
     R5 --> R6
@@ -96,9 +103,7 @@ flowchart LR
     CF --> R7
     R5 --> R7
     R4 --> R7
-    Grafana --> R8
-    Sentry --> R9
-    Backblaze --> R10
+    Sentry --> R8
 ```
 
 ## コンポーネント一覧
@@ -115,4 +120,4 @@ flowchart LR
 
 - [Architecture Overview](./overview.md)
 - [インフラ仕様書](../specs/infra/overview.md) - 手動管理する仕様
-- [APIキー・トークン発行手順](../development/api-keys-setup.md)
+- [APIキー・トークン発行手順](../setup/api-keys.md)

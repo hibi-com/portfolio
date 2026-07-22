@@ -9,17 +9,19 @@
 **実装内容**:
 
 - バージョン管理システム（`{short-sha}-{timestamp}`）
-- RC環境でビルド → STG/PRDで再利用
-- B2での多重バックアップ（バージョン別 + SHA別）
+- RC環境でビルド → STG/PRDで再利用（方針）
+- CircleCI Artifacts（`store_artifacts` / workspace）への保存
 - latest タグ管理
 
 **フロー**:
 
 ```text
-RC:  Build → Upload (v1.2.3)
-STG: Promote (RC→STG) → Download (v1.2.3) → Deploy
-PRD: Promote (STG→PRD) → Download (v1.2.3) → Deploy
+RC:  Build → Upload (CircleCI Artifacts, v1.2.3)
+STG: Promote (RC→STG) → Download / Rebuild → Deploy
+PRD: Promote (STG→PRD) → Download / Rebuild → Deploy
 ```
+
+実際のデプロイ workflow はソース再ビルドしてデプロイする構成です。詳細は `.circleci/config.yml` および [CI/CDツール](../development/ci-cd-tools.md) を参照。
 
 ### ✅ 2. 環境OK判断基準（多層検証システム）
 
@@ -53,12 +55,15 @@ PRD: Promote (STG→PRD) → Download (v1.2.3) → Deploy
 - **infra-plan**: 変更プレビュー
 - **infra-deploy**: 自動適用
 
-**対象リソース**:
+**対象リソース**（`infra/src/resources/`）:
 
-- `databases.ts` - TiDB Cloud設定
-- `workers.ts` - Cloudflare Workers
+- `cloudflare-data.ts` - Cloudflare D1 / Workers KV / R2
+- `workers.ts` - Cloudflare Workers（API）
+- `pages.ts` - Cloudflare Pages
 - `dns.ts` - DNSレコード
-- `observability.ts` - 監視設定
+- `access.ts` - Cloudflare Access（rc/stg）
+- `observability.ts` - Sentry 等の監視設定
+- `secrets.ts` - シークレット連携
 
 **環境変数管理**:
 
@@ -86,30 +91,23 @@ PRD: Promote (STG→PRD) → Download (v1.2.3) → Deploy
 - GitHub Issue自動作成
 - セキュリティレポート保存
 
-### ✅ 5. Dependency Update自動化（Renovate Bot）
+### ✅ 5. Dependency Update自動化
 
-**設定** (`renovate.json`):
+**方針**: Renovate は使用しない。Claude Code（`/update-deps`）で月次またはセキュリティパッチ時に更新。
 
-- 毎週末に依存関係チェック
-- patch/minor → 自動マージ
-- major → 手動レビュー
-- セキュリティパッチ → 即時自動マージ
-
-**グループ化**:
-
-- Biome、Playwright、TanStack、Prisma等をグループ管理
+詳細: [CI/CDツール](../development/ci-cd-tools.md)
 
 ### ✅ 6. Backup自動化
 
 **バックアップ対象**:
 
 - Prismaスキーマ
-- マイグレーション履歴
-- データベースダンプ（TiDB Cloud）
+- マイグレーション履歴（`packages/db/migrations/`）
+- データベース: Cloudflare D1 Time Travel / Dashboard によるポイントインタイム復元
 
-**スケジュール**: 毎日 2:00AM
+**スケジュール**: 毎日 2:00AM（メタデータ・スキーマ系）。DB本体は D1 の Time Travel に依存。
 
-**保存先**: Backblaze B2
+**保存先**: CircleCI Artifacts（ビルド成果物） / D1 Time Travel（DB）
 
 ### ✅ 7. Performance Testing（Lighthouse CI）
 
@@ -141,9 +139,7 @@ PRD: Promote (STG→PRD) → Download (v1.2.3) → Deploy
 
 **監視対象**:
 
-- Cloudflare費用
-- TiDB Cloud費用
-- Backblaze B2費用
+- Cloudflare費用（Pages / Workers / D1 / KV / R2）
 
 **スケジュール**: 毎月1日 9:00AM
 
@@ -182,9 +178,9 @@ graph TD
     H --> I[Upload Artifacts]
 
     I --> J[RC Deploy]
-    J --> K[Download Artifacts]
+    J --> K[Download Artifacts / Rebuild]
     K --> L[Pre-deploy Check]
-    L --> M[DB Migration]
+    L --> M[D1 Migration]
     M --> N[Preview Deploy]
     N --> O[Smoke Test]
     O --> P[Validate Deployment]
@@ -220,13 +216,11 @@ graph TD
 | Context名 | 環境変数 | 説明 |
 | --------- | -------- | ---- |
 | `env-config` | ENV_CONFIG_RC, ENV_CONFIG_STG, ENV_CONFIG_PRD | 環境設定（base64エンコード済み） |
-| `backblaze-b2` | B2_APPLICATION_KEY_ID, B2_APPLICATION_KEY, B2_BUCKET_NAME | Backblaze B2認証情報 |
 | `cloudflare` | CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID | Cloudflare API認証情報 |
 | `sentry` | SENTRY_AUTH_TOKEN, SENTRY_ORG | Sentry監視設定 |
 | `pulumi` | PULUMI_ACCESS_TOKEN | Pulumi IaC認証情報 |
 | `security` | SNYK_TOKEN | Snyk脆弱性スキャン認証情報 |
 | `percy` | PERCY_TOKEN | Percy Visual Regression認証情報 |
-| `tidb` | TIDB_HOST, TIDB_USER, TIDB_PASSWORD | TiDB Cloud接続情報 |
 
 ### 環境設定のアップロード
 
@@ -258,7 +252,7 @@ export CIRCLE_PROJECT_REPONAME="portfolio"
 ### 🔒 セキュリティ
 
 - ✅ 3層スキャン（Snyk/Trivy/Gitleaks）
-- ✅ 依存関係自動更新（セキュリティパッチ即時適用）
+- ✅ 依存関係更新（セキュリティパッチ優先）
 - ✅ シークレット検出
 
 ### 📊 可視性
@@ -266,11 +260,11 @@ export CIRCLE_PROJECT_REPONAME="portfolio"
 - ✅ Lighthouse CIでパフォーマンス追跡
 - ✅ コスト監視（月次レポート）
 - ✅ Visual Regression で UI変更検出
+- ✅ Sentry でエラートラッキング
 
 ### ⚡ 効率化
 
 - ✅ 完全自動デプロイ（手動作業ゼロ）
-- ✅ Renovate Botで依存関係更新自動化
 - ✅ Changelog自動生成
 
 ## 次のステップ
@@ -280,10 +274,9 @@ export CIRCLE_PROJECT_REPONAME="portfolio"
 各Contextに環境変数を設定してください：
 
 ```bash
-# Example: Backblaze B2
-BACKBLAZE_B2_APPLICATION_KEY_ID=xxxxx
-BACKBLAZE_B2_APPLICATION_KEY=xxxxx
-BACKBLAZE_B2_BUCKET_NAME=portfolio-artifacts
+# Example: Cloudflare
+CLOUDFLARE_API_TOKEN=xxxxx
+CLOUDFLARE_ACCOUNT_ID=xxxxx
 ```
 
 ### 初回デプロイ
@@ -309,5 +302,5 @@ git push origin master
 ## 参考資料
 
 - [デプロイメントフロー](./deployment-flow.md)
-- [CircleCI Configuration](./.circleci/config.yml)
-- [Renovate Configuration](./renovate.json)
+- [CircleCI Configuration](../../.circleci/config.yml)
+- [CI/CDツール](../development/ci-cd-tools.md)

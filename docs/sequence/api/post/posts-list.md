@@ -11,7 +11,7 @@ sequenceDiagram
     participant Container as DIContainer
     participant UseCase as GetPostsUseCase
     participant Repository as PostRepository
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: GET /api/posts
     API->>API: リクエスト受信

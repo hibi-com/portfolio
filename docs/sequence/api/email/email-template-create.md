@@ -11,7 +11,7 @@ sequenceDiagram
     participant Auth as Auth Middleware
     participant UseCase as CreateEmailTemplateUseCase
     participant Repository as EmailTemplateRepository
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: POST /api/email/templates
     API->>Auth: 認証チェック

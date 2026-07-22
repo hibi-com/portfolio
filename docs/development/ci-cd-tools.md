@@ -11,7 +11,7 @@ title: "CI/CDツール"
 | ---- | ------ |
 | ワークフロー定義 | `.circleci/config.yml` |
 | 環境変数・Contexts | CircleCI の Project Settings / Contexts |
-| 成果物ストレージ | CircleCI Artifacts（B2 は使用しない） |
+| 成果物ストレージ | CircleCI Artifacts |
 
 ## 概要
 
@@ -68,7 +68,7 @@ CircleCIのデプロイ設定を以下のように改善しました：
 ## トラブルシューティング
 
 - ジョブが失敗する: CircleCI のビルドログと、使用している Contexts / 環境変数が設定されているかを確認する。必要ならキャッシュをクリアして再実行する。
-- 成果物がアップロードされない: B2 用の認証情報（Context）とブランチ条件（例: master/main のみ）を確認する。
+- 成果物がアップロードされない: CircleCI の `store_artifacts` / workspace とブランチ条件（例: master/main のみ）を確認する。
 - デプロイが動かない: RC は承認が必要。STG/PRD はスケジュールとテスト成功を確認する。
 - デプロイが失敗する: [デプロイ手順書のトラブルシューティング](../../logs/deployment/README.md#トラブルシューティング)を参照。
 

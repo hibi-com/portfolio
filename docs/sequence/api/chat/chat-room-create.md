@@ -12,7 +12,7 @@ sequenceDiagram
     participant Container as DIContainer
     participant UseCase as CreateChatRoomUseCase
     participant Repository as ChatRepository
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: POST /api/chat/rooms
     API->>Auth: authenticate()

@@ -145,7 +145,7 @@ export function generateMermaidSection(infraRoot: string): string {
 
     return `## ランタイム構成図
 
-ユーザーリクエストが DNS を経由して Cloudflare に到達し、Pages（Web/Admin/Wiki）と Workers（API）に振り分けられ、API が TiDB と Redis を利用する流れです。
+ユーザーリクエストが DNS を経由して Cloudflare に到達し、Pages（Web/Admin/Wiki）と Workers（API）に振り分けられ、API が D1・KV・R2 を利用する流れです。可観測性は Sentry、CI 成果物は CircleCI Artifacts です。
 
 ${runtimeDiagram}
 

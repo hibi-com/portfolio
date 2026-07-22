@@ -13,7 +13,7 @@ sequenceDiagram
     participant InquiryRepo as InquiryRepository
     participant ResponseRepo as ResponseRepository
     participant EmailService as Email Service<br/>(Resend)
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: POST /api/inquiries/:id/responses
     API->>Auth: 認証チェック

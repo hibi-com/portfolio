@@ -11,7 +11,7 @@ sequenceDiagram
     participant Container as DIContainer
     participant UseCase as GetPortfolioBySlugUseCase
     participant Repository as PortfolioRepository
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: GET /api/portfolio/:slug
     API->>API: リクエスト受信<br/>slugパラメータ取得

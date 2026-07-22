@@ -761,18 +761,18 @@ return c.json({
 
 ##### キャッシュ活用
 
-**✅ 良い例: Redis キャッシュ**
+**✅ 良い例: KV キャッシュ**
 
 ```typescript
 const cacheKey = `posts:recent`;
-const cached = await redis.get(cacheKey);
+const cached = await kv.get(cacheKey);
 
 if (cached) {
   return c.json(JSON.parse(cached));
 }
 
 const posts = await postRepository.findRecent();
-await redis.setex(cacheKey, 300, JSON.stringify(posts)); // 5分キャッシュ
+await kv.put(cacheKey, JSON.stringify(posts), { expirationTtl: 300 }); // 5分キャッシュ
 
 return c.json(posts);
 ```

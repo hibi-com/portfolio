@@ -12,7 +12,7 @@ sequenceDiagram
     participant UseCase as AddParticipantUseCase
     participant Repository as ParticipantRepository
     participant DO as Durable Object<br/>(ChatRoom)
-    participant DB as TiDB Database
+    participant DB as D1 Database
 
     Client->>API: POST /api/chat/rooms/:id/participants
     API->>Auth: 認証チェック
