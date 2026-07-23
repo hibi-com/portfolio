@@ -13,8 +13,6 @@ executors:
       - image: cimg/node:22.12.0-browsers@sha256:6efb5d0b817685f4c28c400a780cec9fccd8059907375305a31725b4b530cdb3
     resource_class: large
     working_directory: ~/project
-  # docker compose（compose.yaml / compose.ci.yaml）を使うジョブ用
-  # machine image は CircleCI の日付タグで固定（digest 指定非対応）
   machine-large:
     machine:
       image: ubuntu-2204:2024.11.1
@@ -22,13 +20,12 @@ executors:
     working_directory: ~/project
 commands:
   install-bun:
-    description: Install Bun runtime (version from package.json packageManager)
+    description: Install Bun runtime (version from package.json's packageManager)
     steps:
       - run:
           name: Install Bun
           command: |
             BUN_VERSION="$(python3 -c "import json; print(json.load(open('package.json'))['packageManager'].removeprefix('bun@'))")"
-            echo "Installing Bun ${BUN_VERSION} (pinned to packageManager)"
             curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"
             echo 'export BUN_INSTALL="$HOME/.bun"' >> $BASH_ENV
             echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $BASH_ENV
@@ -46,9 +43,6 @@ commands:
           command: |
             ENV_VAR_NAME="ENV_CONFIG_<< parameters.environment >>"
             ENV_VAR_NAME="${ENV_VAR_NAME^^}"
-
-            echo "Loading environment configuration: ${ENV_VAR_NAME}"
-
             case "<< parameters.environment >>" in
               rc)
                 ENV_CONFIG="${ENV_CONFIG_RC}"
@@ -60,16 +54,11 @@ commands:
                 ENV_CONFIG="${ENV_CONFIG_PRD}"
                 ;;
             esac
-
             if [ -z "${ENV_CONFIG}" ]; then
-              echo "Error: ${ENV_VAR_NAME} is not set"
               exit 1
             fi
-
             mkdir -p infra
             echo "${ENV_CONFIG}" | base64 -d > infra/env.yaml
-
-            echo "✓ Environment configuration loaded successfully"
   restore-deps:
     description: Restore cached dependencies
     steps:
@@ -106,14 +95,11 @@ commands:
       - run:
           name: Login Pulumi (R2 backend)
           command: |
-            set -euo pipefail
             for v in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY PULUMI_BACKEND_URL PULUMI_CONFIG_PASSPHRASE; do
               if [ -z "${!v:-}" ]; then
-                echo "Error: ${v} is not set (CircleCI Context 'pulumi' を確認)"
                 exit 1
               fi
             done
-            echo "Backend: ${PULUMI_BACKEND_URL}"
             pulumi login "${PULUMI_BACKEND_URL}"
             pulumi whoami -v || true
   prepare-infra-env:
@@ -127,17 +113,14 @@ commands:
           environment: << parameters.environment >>
       - run:
           name: Materialize infra/.env from env.yaml
+          working_directory: infra
           command: |
-            cd infra
             bun run scripts/env-yaml-to-dotenv.mjs
-            # Pulumi / dotenv 用に必須キーが空でないことだけ確認（値は出さない）
             for v in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_ZONE_ID SENTRY_AUTH_TOKEN SENTRY_ORG; do
               if ! grep -q "^${v}=.\+" .env; then
-                echo "Error: ${v} is empty in infra/.env (env.yaml / ENV_CONFIG を確認)"
                 exit 1
               fi
             done
-            echo "✓ infra/.env ready"
 jobs:
   setup:
     executor: default
@@ -148,7 +131,6 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # prepare（workspace setup / 全ビルド）は重いので CI ではスキップし、必要な生成だけ実行
             bun install --frozen-lockfile --ignore-scripts
             bun run generate --filter='!@portfolio/infra'
             bun run build
@@ -222,15 +204,15 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Start libSQL (compose.yaml)
+          name: Setup libSQL
           command: |
             docker compose -f compose.yaml up -d --wait sqlite
             docker compose -f compose.yaml run --rm setup-db
       - run:
-          name: Run integration tests (compose.ci.yaml)
+          name: Run integration tests
           command: docker compose -f compose.ci.yaml run --rm --no-deps integration
       - run:
-          name: Tear down compose.yaml services
+          name: Tear down libSQL
           when: always
           command: docker compose -f compose.yaml stop sqlite || true
       - store_test_results:
@@ -258,63 +240,40 @@ jobs:
       - run:
           name: Secret detection (gitleaks via compose.ci.yaml)
           command: |
-            echo "=== Gitleaks Secret Detection ==="
             set +e
             docker compose -f compose.ci.yaml run --rm gitleaks
             GITLEAKS_EXIT=$?
             set -e
-
             if [ -f "gitleaks-report.json" ]; then
               SECRETS_FOUND=$(python3 -c "import json;from pathlib import Path;d=json.loads(Path('gitleaks-report.json').read_text() or '[]');print(len(d) if isinstance(d,list) else (len(d.get('Findings') or d.get('findings') or []) if isinstance(d,dict) else 0))")
               if [ "${SECRETS_FOUND}" -gt "0" ]; then
-                echo "✗ Found ${SECRETS_FOUND} potential secrets"
                 exit 1
               fi
             elif [ "${GITLEAKS_EXIT}" -ne 0 ]; then
-              echo "✗ gitleaks failed without report"
               exit "${GITLEAKS_EXIT}"
             fi
-            echo "✓ No secrets found"
       - run:
           name: Filesystem vulnerability scan (trivy via compose.ci.yaml)
           command: |
-            echo "=== Trivy Filesystem Scan ==="
             docker compose -f compose.ci.yaml run --rm trivy
-
             HIGH_VULNS=$(python3 -c "import json;from pathlib import Path;p=Path('trivy-report.json');d=json.loads(p.read_text() or '{}') if p.exists() else {};print(sum(1 for r in d.get('Results') or [] for v in r.get('Vulnerabilities') or [] if v.get('Severity') in ('HIGH','CRITICAL')))")
-
             if [ "${HIGH_VULNS}" -gt "0" ]; then
-              echo "✗ Found ${HIGH_VULNS} high/critical vulnerabilities"
               exit 1
             fi
-
-            echo "✓ No high/critical vulnerabilities found"
       - run:
           name: Dependency vulnerability scan (snyk via compose.ci.yaml)
           command: |
-            echo "=== Snyk Dependency Scan ==="
-
             if [ -z "${SNYK_TOKEN}" ]; then
-              echo "⚠ SNYK_TOKEN not set, skipping Snyk scan"
               exit 0
             fi
-
-            # snyk test は脆弱性があると非0終了するため || true でレポートを残す
             docker compose -f compose.ci.yaml run --rm -e SNYK_TOKEN snyk || true
-
             if [ ! -f "snyk-report.json" ]; then
-              echo "⚠ snyk-report.json not produced"
               exit 0
             fi
-
             HIGH_VULNS=$(python3 -c "import json;from pathlib import Path;d=json.loads(Path('snyk-report.json').read_text() or '{}');print(sum(1 for v in d.get('vulnerabilities') or [] if v.get('severity') in ('high','critical')))")
-
             if [ "${HIGH_VULNS}" -gt "0" ]; then
-              echo "✗ Found ${HIGH_VULNS} high/critical vulnerabilities"
               exit 1
             fi
-
-            echo "✓ No high/critical vulnerabilities found"
       - store_artifacts:
           path: snyk-report.json
           destination: security/snyk-report.json
@@ -350,7 +309,7 @@ jobs:
       - run:
           name: Install Playwright browsers
           command: |
-            bun add -g @playwright/test
+            bun add -g @playwright/test@1.57.0
             bunx playwright install --with-deps chromium
       - run:
           name: Run E2E tests
@@ -453,8 +412,6 @@ jobs:
             cp manifest.json "ci-artifacts/${CIRCLE_SHA1}/manifest.json"
             mkdir -p ci-artifacts/latest-rc
             cp manifest.json ci-artifacts/latest-rc/manifest.json
-
-            echo "Artifacts packaged under ci-artifacts/"
       - persist_to_workspace:
           root: .
           paths:
@@ -491,8 +448,6 @@ jobs:
       - run:
           name: Prepare artifacts (rebuild from source)
           command: |
-            echo "=== Preparing artifacts for << parameters.environment >> ==="
-            # prepare はフルビルドするため、install 時はスキップしてから一度だけ build
             bun install --frozen-lockfile --ignore-scripts
             bun run build
 
@@ -520,7 +475,6 @@ jobs:
             EOF
 
             cp manifest.json artifacts/manifest.json
-            echo "Artifacts prepared"
       - persist_to_workspace:
           root: .
           paths:
@@ -568,7 +522,6 @@ jobs:
 
             mkdir -p "ci-artifacts/latest-<< parameters.to_environment >>"
             cp to-manifest.json "ci-artifacts/latest-<< parameters.to_environment >>/manifest.json"
-            echo "Promotion recorded"
             cat to-manifest.json | jq '.'
       - persist_to_workspace:
           root: .
@@ -592,17 +545,11 @@ jobs:
           environment: << parameters.environment >>
       - run:
           name: Apply D1 migrations for << parameters.environment >>
+          working_directory: packages/db
           command: |
-            echo "=== Applying Cloudflare D1 migrations for << parameters.environment >> ==="
-            bun add -g wrangler@latest
-
+            bun add -g wrangler@4.54.0
             DB_NAME="${D1_DATABASE_NAME:-portfolio-<< parameters.environment >>-db}"
-            echo "Database: ${DB_NAME}"
-
-            cd packages/db
             bunx wrangler d1 migrations apply "${DB_NAME}" --remote
-
-            echo "D1 migrations completed"
       - run:
           name: Create GitHub Issue on failure
           when: on_fail
@@ -633,24 +580,12 @@ jobs:
       - run:
           name: Pre-deployment validation
           command: |
-            echo "=== Pre-deployment checks for << parameters.environment >> ==="
-
-            echo "Checking build artifacts..."
             if [ ! -d "artifacts/${CIRCLE_SHA1}" ] && [ ! -f "manifest.json" ]; then
-              echo "✗ Build artifacts not found"
               exit 1
             fi
-            echo "✓ Build artifacts verified"
-
-            echo "Validating environment configuration..."
-            if [ -f "infra/env.yaml" ]; then
-              echo "✓ Environment configuration loaded"
-            else
-              echo "✗ Environment configuration not found"
+            if [ ! -f "infra/env.yaml" ]; then
               exit 1
             fi
-
-            echo "=== All pre-deployment checks passed ==="
   preview-deploy:
     executor: default
     parameters:
@@ -666,18 +601,12 @@ jobs:
       - run:
           name: Install Wrangler CLI
           command: |
-            bun add -g wrangler@latest
+            bun add -g wrangler@4.54.0
             wrangler --version
       - run:
           name: Deploy preview for << parameters.environment >>
           command: |
-            echo "=== Deploying preview to << parameters.environment >> environment ==="
-            echo "Commit: ${CIRCLE_SHA1}"
-            echo "Build: ${CIRCLE_BUILD_NUM}"
-
             bun run deploy -- --env=preview
-
-            echo "✓ Preview deployment completed"
       - persist_to_workspace:
           root: .
           paths:
@@ -697,29 +626,18 @@ jobs:
       - run:
           name: Run smoke tests on preview
           command: |
-            echo "=== Running smoke tests on preview deployment ==="
-
             if [ -f ".preview-url" ]; then
               PREVIEW_URL=$(cat .preview-url)
-              echo "Testing: $PREVIEW_URL"
             else
-              echo "⚠ Preview URL not found, using default"
               case "<< parameters.environment >>" in
                 rc) PREVIEW_URL="https://rc.www.ageha734.jp" ;;
                 stg) PREVIEW_URL="https://stg.www.ageha734.jp" ;;
                 prd) PREVIEW_URL="https://www.ageha734.jp" ;;
               esac
             fi
-
-            echo "Health check: ${PREVIEW_URL}"
-            if curl -sSf "${PREVIEW_URL}/" > /dev/null 2>&1; then
-              echo "✓ Health check passed"
-            else
-              echo "✗ Health check failed"
+            if ! curl -sSf "${PREVIEW_URL}/" > /dev/null 2>&1; then
               exit 1
             fi
-
-            echo "✓ All smoke tests passed"
   validate-deployment:
     executor: default
     parameters:
@@ -738,9 +656,6 @@ jobs:
       - run:
           name: Comprehensive deployment validation for << parameters.environment >>
           command: |
-            echo "=== Deployment Validation for << parameters.environment >> ==="
-            echo "Monitoring duration: << parameters.monitoring_duration >>"
-
             case "<< parameters.environment >>" in
               rc)
                 BASE_URL="https://rc.www.ageha734.jp"
@@ -756,33 +671,22 @@ jobs:
                 ;;
             esac
 
-            echo "=== 1. Health Checks ==="
-            if curl -sSf "${BASE_URL}/" > /dev/null 2>&1; then
-              echo "✓ Web: ${BASE_URL}"
-            else
-              echo "✗ Web health check failed"
+            if ! curl -sSf "${BASE_URL}/" > /dev/null 2>&1; then
               exit 1
             fi
 
-            if curl -sSf "${API_URL}/health" | jq -e '.status == "healthy"' > /dev/null 2>&1; then
-              echo "✓ API: ${API_URL}/health"
-            else
-              echo "✗ API health check failed"
+            if ! curl -sSf "${API_URL}/health" | jq -e '.status == "healthy"' > /dev/null 2>&1; then
               exit 1
             fi
 
-            echo "=== 2. Critical Path E2E Tests ==="
             if [ -d "apps/e2e" ]; then
               bunx playwright test --grep "@critical" --reporter=line || {
-                echo "✗ Critical E2E tests failed"
                 exit 1
               }
-              echo "✓ Critical E2E tests passed"
             else
-              echo "⚠ E2E tests not found, skipping"
+              exit 1
             fi
 
-            echo "=== 3. Error Rate Monitoring ==="
             if [ -n "${SENTRY_AUTH_TOKEN}" ]; then
               CURRENT_ERRORS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=15m&interval=15m&field=sum(quantity)&category=error" \
                 -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."sum(quantity)"[0] // 0')
@@ -793,15 +697,12 @@ jobs:
               THRESHOLD=$(echo "${BASELINE_ERRORS} * 1.5" | bc)
 
               if (( $(echo "${CURRENT_ERRORS} > ${THRESHOLD}" | bc -l) )); then
-                echo "✗ Error rate too high: ${CURRENT_ERRORS} (baseline: ${BASELINE_ERRORS})"
                 exit 1
               fi
-              echo "✓ Error rate within acceptable range: ${CURRENT_ERRORS} (baseline: ${BASELINE_ERRORS})"
             else
-              echo "⚠ SENTRY_AUTH_TOKEN not set, skipping error rate check"
+              exit 1
             fi
 
-            echo "=== 4. Performance Metrics ==="
             if command -v lighthouse > /dev/null 2>&1; then
               lighthouse "${BASE_URL}" \
                 --only-categories=performance \
@@ -812,28 +713,19 @@ jobs:
                 --quiet
 
               PERFORMANCE_SCORE=$(jq '.categories.performance.score * 100' lighthouse-report.json)
-              echo "Performance score: ${PERFORMANCE_SCORE}"
 
               if (( $(echo "${PERFORMANCE_SCORE} < 80" | bc -l) )); then
-                echo "⚠ Performance score below threshold (80)"
-              else
-                echo "✓ Performance score acceptable"
+                exit 1
               fi
             else
-              echo "⚠ Lighthouse not installed, skipping performance check"
+              exit 1
             fi
 
-            echo "=== 5. Resource Monitoring ==="
-            if [ -n "${CLOUDFLARE_API_TOKEN}" ] && command -v wrangler > /dev/null 2>&1; then
-              echo "Checking resource usage..."
-              echo "✓ Resource monitoring check completed"
-            else
-              echo "⚠ Cloudflare credentials not set, skipping resource check"
+            if [ -z "${CLOUDFLARE_API_TOKEN}" ] || ! command -v wrangler > /dev/null 2>&1; then
+              exit 1
             fi
 
             if [ "<< parameters.environment >>" = "prd" ]; then
-              echo "=== 6. Business Metrics (PRD) ==="
-
               if [ -n "${SENTRY_AUTH_TOKEN}" ]; then
                 CURRENT_USERS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=1h&interval=1h&field=count_unique(user)&category=transaction" \
                   -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."count_unique(user)"[0] // 0')
@@ -844,16 +736,12 @@ jobs:
                 MIN_USERS=$(echo "${BASELINE_USERS} * 0.8" | bc)
 
                 if (( $(echo "${CURRENT_USERS} < ${MIN_USERS}" | bc -l) )); then
-                  echo "⚠ Active users dropped significantly: ${CURRENT_USERS} (baseline: ${BASELINE_USERS})"
-                else
-                  echo "✓ Active users within acceptable range: ${CURRENT_USERS}"
+                  exit 1
                 fi
               else
-                echo "⚠ Business metrics check skipped (SENTRY_AUTH_TOKEN not set)"
+                exit 1
               fi
             fi
-
-            echo "=== All validation checks passed ==="
       - store_artifacts:
           path: lighthouse-report.json
           destination: performance/lighthouse-report.json
@@ -874,13 +762,7 @@ jobs:
       - run:
           name: Gradual rollout << parameters.percentage >>% for << parameters.environment >>
           command: |
-            echo "=== Gradual Rollout: << parameters.percentage >>% ==="
-            echo "Environment: << parameters.environment >>"
-            echo "Duration: << parameters.duration_minutes >> minutes"
-
             sleep $(( << parameters.duration_minutes >> * 60 ))
-
-            echo "✓ Gradual rollout phase completed"
   infra-plan:
     executor: default
     parameters:
@@ -899,25 +781,21 @@ jobs:
             pulumi version
       - run:
           name: Install dependencies
-          command: |
-            cd infra
-            bun install --frozen-lockfile --ignore-scripts
+          working_directory: infra
+          command: bun install --frozen-lockfile --ignore-scripts
       - prepare-infra-env:
           environment: << parameters.environment >>
       - login-pulumi-r2
       - run:
           name: Build infrastructure code
-          command: |
-            cd infra
-            bun run build
+          working_directory: infra
+          command: bun run build
       - run:
           name: Pulumi preview for << parameters.environment >>
+          working_directory: infra
           command: |
-            cd infra
             pulumi stack select "<< parameters.environment >>" --create
-            echo "=== Infrastructure Preview for << parameters.environment >> ==="
             pulumi preview --diff --non-interactive
-            echo "✓ Infrastructure preview completed"
       - store_artifacts:
           path: infra/Pulumi.yaml
           destination: infra/Pulumi.yaml
@@ -939,26 +817,21 @@ jobs:
             pulumi version
       - run:
           name: Install dependencies
-          command: |
-            cd infra
-            bun install --frozen-lockfile --ignore-scripts
+          working_directory: infra
+          command: bun install --frozen-lockfile --ignore-scripts
       - prepare-infra-env:
           environment: << parameters.environment >>
       - login-pulumi-r2
       - run:
           name: Build infrastructure code
-          command: |
-            cd infra
-            bun run build
+          working_directory: infra
+          command: bun run build
       - run:
           name: Deploy infrastructure to << parameters.environment >>
+          working_directory: infra
           command: |
-            cd infra
             pulumi stack select "<< parameters.environment >>" --create
-            echo "=== Deploying Infrastructure to << parameters.environment >> ==="
-            echo "Stack: << parameters.environment >>"
             pulumi up --yes --skip-preview --non-interactive
-            echo "✓ Infrastructure deployment completed"
             pulumi stack output --json > stack-outputs.json
             cat stack-outputs.json | jq '.'
       - store_artifacts:
@@ -994,36 +867,26 @@ jobs:
       - run:
           name: Install Wrangler CLI
           command: |
-            bun add -g wrangler@latest
+            bun add -g wrangler@4.54.0
             wrangler --version
       - run:
           name: Setup Cloudflare credentials
           command: |
             export CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN}"
-            echo "Cloudflare credentials configured"
       - run:
           name: Deploy to << parameters.environment >>
           command: |
-            echo "=== Deploying to << parameters.environment >> environment ==="
-            echo "Commit: ${CIRCLE_SHA1}"
-            echo "Build: ${CIRCLE_BUILD_NUM}"
-
             MAX_RETRIES=3
             RETRY_COUNT=0
 
             while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-              echo "Deploy attempt $((RETRY_COUNT + 1))/$MAX_RETRIES"
-
               if bun run deploy; then
-                echo "✓ Deploy succeeded"
                 break
               else
                 RETRY_COUNT=$((RETRY_COUNT + 1))
                 if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-                  echo "Deploy failed, retrying in 10 seconds..."
                   sleep 10
                 else
-                  echo "✗ Deploy failed after $MAX_RETRIES attempts"
                   exit 1
                 fi
               fi
@@ -1032,8 +895,6 @@ jobs:
       - run:
           name: Post-deployment verification with auto-rollback
           command: |
-            echo "=== Post-deployment Verification ==="
-
             sleep 30
 
             case "<< parameters.environment >>" in
@@ -1053,51 +914,28 @@ jobs:
 
             DEPLOYMENT_HEALTHY=true
 
-            echo "Checking Web: ${WEB_URL}"
-            if curl -sSf "${WEB_URL}/" > /dev/null 2>&1; then
-              echo "✓ Web is accessible"
-            else
-              echo "✗ Web health check failed"
+            if ! curl -sSf "${WEB_URL}/" > /dev/null 2>&1; then
               DEPLOYMENT_HEALTHY=false
             fi
 
-            echo "Checking API: ${API_URL}/health"
-            if curl -sSf "${API_URL}/health" | jq -e '.status == "healthy"' > /dev/null 2>&1; then
-              echo "✓ API is healthy"
-            else
-              echo "✗ API health check failed"
+            if ! curl -sSf "${API_URL}/health" | jq -e '.status == "healthy"' > /dev/null 2>&1; then
               DEPLOYMENT_HEALTHY=false
             fi
 
-            echo "Running critical smoke test..."
-            if bunx playwright test --grep "@smoke" --reporter=line; then
-              echo "✓ Smoke tests passed"
-            else
-              echo "✗ Smoke tests failed"
+            if ! bunx playwright test --grep "@smoke" --reporter=line; then
               DEPLOYMENT_HEALTHY=false
             fi
 
             if [ "${DEPLOYMENT_HEALTHY}" = "false" ]; then
-              echo "=== AUTO-ROLLBACK TRIGGERED ==="
-              echo "Deployment validation failed, rolling back..."
-
-              if wrangler pages deployment list --project-name portfolio-web | head -2 | tail -1 | awk '{print $1}' | xargs -I {} wrangler pages deployment rollback --deployment-id {}; then
-                echo "✓ Web rollback successful"
-              else
-                echo "✗ Web rollback failed"
+              if ! wrangler pages deployment list --project-name portfolio-web | head -2 | tail -1 | awk '{print $1}' | xargs -I {} wrangler pages deployment rollback --deployment-id {}; then
+                exit 1
               fi
 
-              if wrangler rollback --name api; then
-                echo "✓ API rollback successful"
-              else
-                echo "✗ API rollback failed"
+              if ! wrangler rollback --name api; then
+                exit 1
               fi
-
-              echo "Rollback completed. Manual intervention required."
               exit 1
             fi
-
-            echo "✓ Deployment verification successful"
       - run:
           name: Create GitHub Issue on failure
           when: on_fail
@@ -1119,10 +957,7 @@ jobs:
       - run:
           name: Skip legacy database object-store backup
           command: |
-            echo "Cloudflare D1 backups use Dashboard / Time Travel."
-            echo "D1 backup is handled via Cloudflare Time Travel / Dashboard (no CI dump)."
             mkdir -p backup-notes
-            echo "D1 backups: Cloudflare dashboard / wrangler d1" > backup-notes/README.md
       - store_artifacts:
           path: backup-notes
           destination: backup-notes
@@ -1134,13 +969,11 @@ jobs:
       - run:
           name: Install Lighthouse CLI
           command: |
-            bun add -g lighthouse
+            bun add -g lighthouse@12.8.2
             lighthouse --version
       - run:
           name: Run Lighthouse performance tests
           command: |
-            echo "=== Performance Testing ==="
-
             URLS=(
               "https://www.ageha734.jp"
               "https://www.ageha734.jp/blog"
@@ -1150,8 +983,6 @@ jobs:
             mkdir -p performance-reports
 
             for url in "${URLS[@]}"; do
-              echo "Testing: ${url}"
-
               SANITIZED_URL=$(echo "${url}" | sed 's/[^a-zA-Z0-9]/-/g')
 
               lighthouse "${url}" \
@@ -1164,14 +995,11 @@ jobs:
                 --quiet
 
               PERFORMANCE_SCORE=$(jq '.categories.performance.score * 100' "./performance-reports/${SANITIZED_URL}.report.json")
-              echo "Performance score for ${url}: ${PERFORMANCE_SCORE}"
 
               if (( $(echo "${PERFORMANCE_SCORE} < 80" | bc -l) )); then
-                echo "⚠ Performance score below threshold (80) for ${url}"
+                exit 1
               fi
             done
-
-            echo "✓ Performance testing completed"
       - store_artifacts:
           path: performance-reports
           destination: performance-reports
@@ -1183,8 +1011,6 @@ jobs:
       - run:
           name: Generate monthly cost report
           command: |
-            echo "=== Monthly Cost Report ==="
-
             MONTH=$(date +%Y-%m)
             REPORT_FILE="cost-report-${MONTH}.md"
 
@@ -1210,10 +1036,6 @@ jobs:
             - Trend: [Up/Down/Stable]
 
             EOF
-
-            cat "${REPORT_FILE}"
-
-            echo "✓ Cost report generated"
       - store_artifacts:
           path: cost-report-*.md
           destination: cost-reports
@@ -1226,23 +1048,18 @@ jobs:
       - run:
           name: Install Percy CLI
           command: |
-            bun add -g @percy/cli
+            bun add -g @percy/cli@1.32.4
             percy --version
       - run:
           name: Run visual regression tests
           command: |
-            echo "=== Visual Regression Testing ==="
-
             if [ -n "${PERCY_TOKEN}" ]; then
               export PERCY_TOKEN="${PERCY_TOKEN}"
 
-              bun add -g @percy/playwright
-
+              bun add -g @percy/playwright@1.1.1
               bunx playwright test --grep "@visual" --reporter=line
-
-              echo "✓ Visual regression tests completed"
             else
-              echo "⚠ PERCY_TOKEN not set, skipping visual regression tests"
+              exit 1
             fi
   load-test:
     executor: default
@@ -1252,10 +1069,12 @@ jobs:
       - run:
           name: Install k6
           command: |
-            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-            echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-            sudo apt-get update
-            sudo apt-get install k6
+            K6_VERSION="v2.1.0"
+            K6_SHA256="295d961ebfca306f295f1133068dcd403a8171c87f387928f5f30b0fbcff858a"
+            curl -fsSL "https://github.com/grafana/k6/releases/download/${K6_VERSION}/k6-${K6_VERSION}-linux-amd64.tar.gz" -o /tmp/k6.tar.gz
+            echo "${K6_SHA256}  /tmp/k6.tar.gz" | sha256sum -c -
+            tar -xzf /tmp/k6.tar.gz -C /tmp
+            sudo mv "/tmp/k6-${K6_VERSION}-linux-amd64/k6" /usr/local/bin/k6
             k6 version
       - run:
           name: Run load tests
@@ -1299,7 +1118,7 @@ jobs:
           path: load-test-results.json
           destination: load-test-results.json
 workflows:
-  # CI 成功後にのみ RC デプロイ / infra を起動（同一 workflow で requires 接続）
+  # CI 成功後に RC →（承認）STG →（承認）PRD、および Infra を同一 workflow で接続
   ci-cd:
     jobs:
       - setup:
@@ -1471,158 +1290,300 @@ workflows:
               only:
                 - master
                 - main
-  deploy-stg:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
+      # --- CD (STG): RC デプロイ成功後、手動承認で開始 ---
+      - hold-approval:
+          name: hold-approval-stg
+          type: approval
+          requires:
+            - deploy-rc
           filters:
             branches:
               only:
                 - master
-    jobs:
+                - main
       - artifact-promotion:
+          name: artifact-promotion-stg
           from_environment: rc
           to_environment: stg
+          requires:
+            - hold-approval-stg
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - download-artifacts:
+          name: download-artifacts-stg
           environment: stg
           requires:
-            - artifact-promotion
+            - artifact-promotion-stg
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - pre-deploy-check:
+          name: pre-deploy-check-stg
           environment: stg
           requires:
-            - download-artifacts
+            - download-artifacts-stg
           context: env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - db-migrate:
+          name: db-migrate-stg
           environment: stg
           requires:
-            - pre-deploy-check
+            - pre-deploy-check-stg
           context: env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - preview-deploy:
+          name: preview-deploy-stg
           environment: stg
           requires:
-            - db-migrate
+            - db-migrate-stg
           context:
             - cloudflare
             - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - smoke-test:
+          name: smoke-test-stg
           environment: stg
           requires:
-            - preview-deploy
+            - preview-deploy-stg
           context: env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - validate-deployment:
+          name: validate-deployment-stg
           environment: stg
           monitoring_duration: "30m"
           requires:
-            - smoke-test
+            - smoke-test-stg
           context:
             - env-config
             - sentry
-      - deploy:
-          environment: stg
-          requires:
-            - validate-deployment
-          context:
-            - cloudflare
-            - env-config
-  deploy-prd:
-    triggers:
-      - schedule:
-          cron: "0 12 * * *"
           filters:
             branches:
               only:
                 - master
-    jobs:
-      - artifact-promotion:
-          from_environment: stg
-          to_environment: prd
-      - download-artifacts:
-          environment: prd
+                - main
+      - deploy:
+          name: deploy-stg
+          environment: stg
           requires:
-            - artifact-promotion
-      - pre-deploy-check:
-          environment: prd
-          requires:
-            - download-artifacts
-          context: env-config
-      - db-migrate:
-          environment: prd
-          requires:
-            - pre-deploy-check
-          context: env-config
-      - preview-deploy:
-          environment: prd
-          requires:
-            - db-migrate
+            - validate-deployment-stg
           context:
             - cloudflare
             - env-config
-      - smoke-test:
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      # --- CD (PRD): STG デプロイ成功後、手動承認で開始 ---
+      - hold-approval:
+          name: hold-approval-prd
+          type: approval
+          requires:
+            - deploy-stg
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - artifact-promotion:
+          name: artifact-promotion-prd
+          from_environment: stg
+          to_environment: prd
+          requires:
+            - hold-approval-prd
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - download-artifacts:
+          name: download-artifacts-prd
           environment: prd
           requires:
-            - preview-deploy
+            - artifact-promotion-prd
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - pre-deploy-check:
+          name: pre-deploy-check-prd
+          environment: prd
+          requires:
+            - download-artifacts-prd
           context: env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - db-migrate:
+          name: db-migrate-prd
+          environment: prd
+          requires:
+            - pre-deploy-check-prd
+          context: env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - preview-deploy:
+          name: preview-deploy-prd
+          environment: prd
+          requires:
+            - db-migrate-prd
+          context:
+            - cloudflare
+            - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - smoke-test:
+          name: smoke-test-prd
+          environment: prd
+          requires:
+            - preview-deploy-prd
+          context: env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - validate-deployment:
+          name: validate-deployment-prd
           environment: prd
           monitoring_duration: "1h"
           requires:
-            - smoke-test
+            - smoke-test-prd
           context:
             - env-config
             - sentry
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - deploy:
+          name: deploy-prd
           environment: prd
           requires:
-            - validate-deployment
+            - validate-deployment-prd
           context:
             - cloudflare
             - env-config
-  infra-stg:
-    triggers:
-      - schedule:
-          cron: "0 1 * * 0"
           filters:
             branches:
               only:
                 - master
-    jobs:
-      - infra-plan:
-          environment: stg
-          context:
-            - pulumi
-            - env-config
-      - infra-deploy:
-          environment: stg
-          requires:
-            - infra-plan
-          context:
-            - pulumi
-            - env-config
-  infra-prd:
-    triggers:
-      - schedule:
-          cron: "0 2 1 * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - infra-plan:
-          environment: prd
-          context:
-            - pulumi
-            - env-config
+                - main
+      # --- Infra (STG): RC infra 成功後、手動承認で開始 ---
       - hold-infra-approval:
+          name: hold-infra-approval-stg
           type: approval
           requires:
-            - infra-plan
-      - infra-deploy:
-          environment: prd
+            - infra-deploy-rc
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - infra-plan:
+          name: infra-plan-stg
+          environment: stg
           requires:
-            - hold-infra-approval
+            - hold-infra-approval-stg
           context:
             - pulumi
             - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - infra-deploy:
+          name: infra-deploy-stg
+          environment: stg
+          requires:
+            - infra-plan-stg
+          context:
+            - pulumi
+            - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      # --- Infra (PRD): STG infra 成功後、手動承認で開始（plan 後にも再承認） ---
+      - hold-infra-approval:
+          name: hold-infra-approval-prd
+          type: approval
+          requires:
+            - infra-deploy-stg
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - infra-plan:
+          name: infra-plan-prd
+          environment: prd
+          requires:
+            - hold-infra-approval-prd
+          context:
+            - pulumi
+            - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - hold-infra-approval:
+          name: hold-infra-deploy-prd
+          type: approval
+          requires:
+            - infra-plan-prd
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - infra-deploy:
+          name: infra-deploy-prd
+          environment: prd
+          requires:
+            - hold-infra-deploy-prd
+          context:
+            - pulumi
+            - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
   backup:
     triggers:
       - schedule:

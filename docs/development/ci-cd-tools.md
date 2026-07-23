@@ -15,9 +15,9 @@ title: "CI/CDツール"
 
 ## 概要
 
-- **CI → CD**: master/main では単一 workflow `ci-cd`。`upload-artifacts` 成功後にのみ RC デプロイ（`download-artifacts-rc` …）と `infra-plan-rc` が起動する。feature ブランチは CI のみ。
-- **CD（RC）**: CI 通過後にソース再ビルドしてデプロイ。DB は Cloudflare D1（`wrangler d1 migrations apply`）。
-- **STG/PRD**: スケジュール workflow（`deploy-stg` / `deploy-prd` / `infra-stg` / `infra-prd`）で別実行。
+- **CI → CD**: master/main では単一 workflow `ci-cd`。`upload-artifacts` 成功後に RC →（承認）STG →（承認）PRD と進む。feature ブランチは CI のみ。
+- **CD（RC）**: CI 通過後にソース再ビルドしてデプロイ。DB は Cloudflare D1（`wrangler d1 migrations apply`）。最終デプロイ前に手動承認。
+- **CD（STG/PRD）**: cron なし。RC / 前段環境のデプロイ成功後、CircleCI の Approval ジョブで開始。
 - **失敗時**: テスト・E2E・ビルド・デプロイの失敗で GitHub Issue を自動作成（ジョブ名・ブランチ・コミット・ログリンク・ラベル付与）。詳細な条件は `.circleci/config.yml` を参照。
 - **デプロイ**: **ローカルからのデプロイは禁止**。すべて CircleCI 経由で実行。デプロイログは `logs/deployment/` に記録。
 

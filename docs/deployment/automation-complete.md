@@ -75,11 +75,11 @@ PRD: Promote (STG→PRD) → Download / Rebuild → Deploy
 - `infra/scripts/upload-env-to-circleci.sh` - 自動アップロードスクリプト
 - CircleCI側で自動デコードして使用
 
-**実行スケジュール**:
+**実行トリガー**:
 
-- RC: 手動承認（Git Push時）
-- STG: 毎週日曜 1:00AM
-- PRD: 毎月1日 2:00AM（手動承認）
+- RC: Git Push 後、手動承認
+- STG: RC 成功後、手動承認
+- PRD: STG 成功後、手動承認（plan 後にも再承認）
 
 ### ✅ 4. Security Scanning（3層スキャン）
 
@@ -209,11 +209,9 @@ graph TD
 | Performance Test | 毎週月曜 | 3:00AM | PRD |
 | Visual Regression | 毎週日曜 | 4:00AM | PRD |
 | Load Test | 毎週日曜 | 5:00AM | PRD |
-| STG Deploy | 毎日 | 0:00AM | STG |
-| PRD Deploy | 毎日 | 12:00PM | PRD |
-| Infra (STG) | 毎週日曜 | 1:00AM | STG |
-| Infra (PRD) | 毎月1日 | 2:00AM | PRD |
 | Cost Report | 毎月1日 | 9:00AM | - |
+
+STG/PRD のアプリ・Infra デプロイは cron ではなく、`ci-cd` workflow 内の Approval で起動する。
 
 ## 必要なCircleCI Contexts
 
