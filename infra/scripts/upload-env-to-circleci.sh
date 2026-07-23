@@ -91,7 +91,7 @@ upload_env_var() {
   local existing
   existing=$(curl -s \
     -H "Circle-Token: ${CIRCLECI_API_TOKEN}" \
-    "${api_url}/${var_name}" 2>/dev/null || echo "")
+    "${api_url}/${var_name}" 2> /dev/null || echo "")
 
   if echo "${existing}" | grep -Eq "\"name\"[[:space:]]*:[[:space:]]*\"${var_name}\""; then
     # Update existing variable
@@ -137,7 +137,7 @@ main() {
   echo ""
 
   case "${target_env}" in
-    rc|stg|prd)
+    rc | stg | prd)
       upload_env_var "${target_env}"
       ;;
     all)

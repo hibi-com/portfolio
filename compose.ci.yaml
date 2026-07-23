@@ -10,10 +10,12 @@
 #
 #   docker compose -f compose.ci.yaml run --rm gitleaks
 #   docker compose -f compose.ci.yaml run --rm trivy
-#   SNYK_TOKEN=... docker compose -f compose.ci.yaml run --rm snyk
+#   docker compose -f compose.ci.yaml run --rm snyk
 #   docker compose -f compose.ci.yaml run --rm shellcheck
 #   docker compose -f compose.ci.yaml run --rm shfmt
+#   docker compose -f compose.ci.yaml run --rm shfmt -- --fix
 #   docker compose -f compose.ci.yaml run --rm yamlfmt
+#   docker compose -f compose.ci.yaml run --rm yamlfmt -- --fix
 #   docker compose -f compose.ci.yaml run --rm circleci
 
 networks:
@@ -75,20 +77,38 @@ services:
     image: mvdan/shfmt:v3.12.0-alpine@sha256:204a4d2d876123342ad394bd9a28fb91e165abc03868790d4b39cfa73233f150
     working_dir: /workspace
     volumes:
-      - ./:/workspace:ro
-    entrypoint: ["/bin/sh", "-c"]
-    command:
+      - ./:/workspace
+    entrypoint:
+      - /bin/sh
+      - -ec
       - |
+        mode="-d"
+        for a in "$$@"; do
+          case "$$a" in --fix) mode="-w" ;; esac
+        done
         find . \
           \( -path './.git' -o -path './vendor' -o -path './node_modules' \) -prune \
-          -o -type f -name '*.sh' -exec shfmt -d -i 2 -ci -sr {} +
+          -o -type f -name '*.sh' -exec shfmt "$$mode" -i 2 -ci -sr {} +
+      - "--"
+    command: []
 
   yamlfmt:
     image: ghcr.io/google/yamlfmt:0.20.0@sha256:cd11483ba1119371593a7d55386d082da518e27dd932ee00db32e5fb6f3a58c0
     working_dir: /workspace
     volumes:
-      - ./:/workspace:ro
-    command: -lint .circleci/
+      - ./:/workspace
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        args="-lint .circleci/"
+        for a in "$$@"; do
+          case "$$a" in --fix) args=".circleci/" ;; esac
+        done
+        # shellcheck disable=SC2086
+        exec yamlfmt $$args
+      - "--"
+    command: []
 
   circleci:
     image: circleci/circleci-cli:0.1.33494@sha256:3faae7626bf817acb157ce552668c82d31a76182dcfd45766165da38a26baad2

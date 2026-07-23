@@ -1,22 +1,18 @@
 version: 2.1
-
 orbs:
   node: circleci/node@7.1.0
   browser-tools: circleci/browser-tools@1.5.0
-
 executors:
   default:
     docker:
       - image: cimg/node:22.12.0@sha256:0dae71c56fb15a93a8223b5bfe2e93395b97efbf5509a48fe75b890bf1ad0b4e
     resource_class: large
     working_directory: ~/project
-
   large:
     docker:
       - image: cimg/node:22.12.0-browsers@sha256:6efb5d0b817685f4c28c400a780cec9fccd8059907375305a31725b4b530cdb3
     resource_class: large
     working_directory: ~/project
-
   # docker compose（compose.yaml / compose.ci.yaml）を使うジョブ用
   # machine image は CircleCI の日付タグで固定（digest 指定非対応）
   machine-large:
@@ -24,7 +20,6 @@ executors:
       image: ubuntu-2204:2024.11.1
     resource_class: large
     working_directory: ~/project
-
 commands:
   install-bun:
     description: Install Bun runtime (version from package.json packageManager)
@@ -39,8 +34,6 @@ commands:
             echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $BASH_ENV
             source $BASH_ENV
             bun --version
-
-
   load-env-config:
     description: Load and decode environment configuration from CircleCI variables
     parameters:
@@ -77,7 +70,6 @@ commands:
             echo "${ENV_CONFIG}" | base64 -d > infra/env.yaml
 
             echo "✓ Environment configuration loaded successfully"
-
   restore-deps:
     description: Restore cached dependencies
     steps:
@@ -85,7 +77,6 @@ commands:
           keys:
             - bun-deps-v1-{{ checksum "bun.lock" }}
             - bun-deps-v1-
-
   save-deps:
     description: Save dependencies to cache
     steps:
@@ -94,7 +85,6 @@ commands:
           paths:
             - node_modules
             - ~/.bun
-
   restore-turbo:
     description: Restore Turborepo cache
     steps:
@@ -103,7 +93,6 @@ commands:
             - turbo-cache-v1-{{ .Branch }}-{{ .Revision }}
             - turbo-cache-v1-{{ .Branch }}-
             - turbo-cache-v1-
-
   save-turbo:
     description: Save Turborepo cache
     steps:
@@ -111,7 +100,6 @@ commands:
           key: turbo-cache-v1-{{ .Branch }}-{{ .Revision }}
           paths:
             - .turbo
-
   login-pulumi-r2:
     description: Login to Pulumi DIY backend on Cloudflare R2
     steps:
@@ -128,7 +116,6 @@ commands:
             echo "Backend: ${PULUMI_BACKEND_URL}"
             pulumi login "${PULUMI_BACKEND_URL}"
             pulumi whoami -v || true
-
   prepare-infra-env:
     description: Decode ENV_CONFIG and materialize infra/.env for Pulumi
     parameters:
@@ -151,7 +138,6 @@ commands:
               fi
             done
             echo "✓ infra/.env ready"
-
 jobs:
   setup:
     executor: default
@@ -177,7 +163,6 @@ jobs:
             - node_modules
             - packages/*/node_modules
             - apps/*/node_modules
-
   format:
     executor: machine-large
     steps:
@@ -187,7 +172,6 @@ jobs:
       - run:
           name: Format check
           command: bun run fmt:check
-
   lint:
     executor: machine-large
     steps:
@@ -197,7 +181,6 @@ jobs:
       - run:
           name: Lint
           command: bun run lint
-
   typecheck:
     executor: default
     steps:
@@ -207,7 +190,6 @@ jobs:
       - run:
           name: Typecheck
           command: bun run typecheck
-
   test:
     executor: default
     steps:
@@ -234,7 +216,6 @@ jobs:
                   \"labels\": [\"ci-failure\", \"automated\"]
                 }"
             fi
-
   integration:
     executor: machine-large
     steps:
@@ -269,7 +250,6 @@ jobs:
                   \"labels\": [\"ci-failure\", \"automated\"]
                 }"
             fi
-
   security-scan:
     executor: machine-large
     steps:
@@ -359,7 +339,6 @@ jobs:
                   \"labels\": [\"security\", \"vulnerability\", \"automated\"]
                 }"
             fi
-
   e2e:
     executor: large
     steps:
@@ -397,7 +376,6 @@ jobs:
                   \"labels\": [\"ci-failure\", \"e2e\", \"automated\"]
                 }"
             fi
-
   build:
     executor: default
     steps:
@@ -430,7 +408,6 @@ jobs:
                   \"labels\": [\"ci-failure\", \"build\", \"automated\"]
                 }"
             fi
-
   upload-artifacts:
     executor: default
     steps:
@@ -495,7 +472,6 @@ jobs:
       - store_artifacts:
           path: ci-artifacts
           destination: build-artifacts
-
   download-artifacts:
     executor: default
     parameters:
@@ -560,7 +536,6 @@ jobs:
       - store_artifacts:
           path: artifacts
           destination: deploy-artifacts-<< parameters.environment >>
-
   artifact-promotion:
     executor: default
     parameters:
@@ -603,7 +578,6 @@ jobs:
       - store_artifacts:
           path: to-manifest.json
           destination: promotion-<< parameters.to_environment >>
-
   db-migrate:
     executor: default
     parameters:
@@ -644,7 +618,6 @@ jobs:
                   \"labels\": [\"migration-failure\", \"<< parameters.environment >>\", \"automated\"]
                 }"
             fi
-
   pre-deploy-check:
     executor: default
     parameters:
@@ -678,7 +651,6 @@ jobs:
             fi
 
             echo "=== All pre-deployment checks passed ==="
-
   preview-deploy:
     executor: default
     parameters:
@@ -710,7 +682,6 @@ jobs:
           root: .
           paths:
             - .preview-url
-
   smoke-test:
     executor: default
     parameters:
@@ -749,7 +720,6 @@ jobs:
             fi
 
             echo "✓ All smoke tests passed"
-
   validate-deployment:
     executor: default
     parameters:
@@ -887,7 +857,6 @@ jobs:
       - store_artifacts:
           path: lighthouse-report.json
           destination: performance/lighthouse-report.json
-
   gradual-rollout:
     executor: default
     parameters:
@@ -912,7 +881,6 @@ jobs:
             sleep $(( << parameters.duration_minutes >> * 60 ))
 
             echo "✓ Gradual rollout phase completed"
-
   infra-plan:
     executor: default
     parameters:
@@ -953,7 +921,6 @@ jobs:
       - store_artifacts:
           path: infra/Pulumi.yaml
           destination: infra/Pulumi.yaml
-
   infra-deploy:
     executor: default
     parameters:
@@ -1012,7 +979,6 @@ jobs:
                   \"labels\": [\"infra-failure\", \"<< parameters.environment >>\", \"automated\"]
                 }"
             fi
-
   deploy:
     executor: default
     parameters:
@@ -1147,7 +1113,6 @@ jobs:
                   \"labels\": [\"deployment-failure\", \"<< parameters.environment >>\", \"automated\"]
                 }"
             fi
-
   backup-database:
     executor: default
     steps:
@@ -1161,7 +1126,6 @@ jobs:
       - store_artifacts:
           path: backup-notes
           destination: backup-notes
-
   performance-test:
     executor: large
     steps:
@@ -1211,7 +1175,6 @@ jobs:
       - store_artifacts:
           path: performance-reports
           destination: performance-reports
-
   cost-report:
     executor: default
     steps:
@@ -1254,7 +1217,6 @@ jobs:
       - store_artifacts:
           path: cost-report-*.md
           destination: cost-reports
-
   visual-regression-test:
     executor: large
     steps:
@@ -1282,7 +1244,6 @@ jobs:
             else
               echo "⚠ PERCY_TOKEN not set, skipping visual regression tests"
             fi
-
   load-test:
     executor: default
     steps:
@@ -1337,7 +1298,6 @@ jobs:
       - store_artifacts:
           path: load-test-results.json
           destination: load-test-results.json
-
 workflows:
   # CI 成功後にのみ RC デプロイ / infra を起動（同一 workflow で requires 接続）
   ci-cd:
@@ -1347,39 +1307,31 @@ workflows:
             branches:
               ignore:
                 - /^copilot\/.*/
-
       - format:
           requires:
             - setup
-
       - lint:
           requires:
             - setup
-
       - typecheck:
           requires:
             - setup
-
       - test:
           requires:
             - format
             - lint
             - typecheck
-
       - security-scan:
           requires:
             - setup
           context: security
-
       - e2e:
           requires:
             - test
             - security-scan
-
       - build:
           requires:
             - e2e
-
       - upload-artifacts:
           requires:
             - build
@@ -1388,7 +1340,6 @@ workflows:
               only:
                 - master
                 - main
-
       # --- CD (RC): CI の upload-artifacts 成功後 ---
       - download-artifacts:
           name: download-artifacts-rc
@@ -1400,7 +1351,6 @@ workflows:
               only:
                 - master
                 - main
-
       - pre-deploy-check:
           name: pre-deploy-check-rc
           environment: rc
@@ -1412,7 +1362,6 @@ workflows:
               only:
                 - master
                 - main
-
       - db-migrate:
           name: db-migrate-rc
           environment: rc
@@ -1424,7 +1373,6 @@ workflows:
               only:
                 - master
                 - main
-
       - preview-deploy:
           name: preview-deploy-rc
           environment: rc
@@ -1438,7 +1386,6 @@ workflows:
               only:
                 - master
                 - main
-
       - smoke-test:
           name: smoke-test-rc
           environment: rc
@@ -1450,7 +1397,6 @@ workflows:
               only:
                 - master
                 - main
-
       - validate-deployment:
           name: validate-deployment-rc
           environment: rc
@@ -1465,7 +1411,6 @@ workflows:
               only:
                 - master
                 - main
-
       - hold-approval:
           name: hold-approval-rc
           type: approval
@@ -1476,7 +1421,6 @@ workflows:
               only:
                 - master
                 - main
-
       - deploy:
           name: deploy-rc
           environment: rc
@@ -1490,7 +1434,6 @@ workflows:
               only:
                 - master
                 - main
-
       # --- Infra (RC): CI 成功後 ---
       - infra-plan:
           name: infra-plan-rc
@@ -1505,7 +1448,6 @@ workflows:
               only:
                 - master
                 - main
-
       - hold-infra-approval:
           name: hold-infra-approval-rc
           type: approval
@@ -1516,7 +1458,6 @@ workflows:
               only:
                 - master
                 - main
-
       - infra-deploy:
           name: infra-deploy-rc
           environment: rc
@@ -1530,7 +1471,6 @@ workflows:
               only:
                 - master
                 - main
-
   deploy-stg:
     triggers:
       - schedule:
@@ -1543,24 +1483,20 @@ workflows:
       - artifact-promotion:
           from_environment: rc
           to_environment: stg
-
       - download-artifacts:
           environment: stg
           requires:
             - artifact-promotion
-
       - pre-deploy-check:
           environment: stg
           requires:
             - download-artifacts
           context: env-config
-
       - db-migrate:
           environment: stg
           requires:
             - pre-deploy-check
           context: env-config
-
       - preview-deploy:
           environment: stg
           requires:
@@ -1568,13 +1504,11 @@ workflows:
           context:
             - cloudflare
             - env-config
-
       - smoke-test:
           environment: stg
           requires:
             - preview-deploy
           context: env-config
-
       - validate-deployment:
           environment: stg
           monitoring_duration: "30m"
@@ -1583,7 +1517,6 @@ workflows:
           context:
             - env-config
             - sentry
-
       - deploy:
           environment: stg
           requires:
@@ -1591,7 +1524,6 @@ workflows:
           context:
             - cloudflare
             - env-config
-
   deploy-prd:
     triggers:
       - schedule:
@@ -1604,24 +1536,20 @@ workflows:
       - artifact-promotion:
           from_environment: stg
           to_environment: prd
-
       - download-artifacts:
           environment: prd
           requires:
             - artifact-promotion
-
       - pre-deploy-check:
           environment: prd
           requires:
             - download-artifacts
           context: env-config
-
       - db-migrate:
           environment: prd
           requires:
             - pre-deploy-check
           context: env-config
-
       - preview-deploy:
           environment: prd
           requires:
@@ -1629,13 +1557,11 @@ workflows:
           context:
             - cloudflare
             - env-config
-
       - smoke-test:
           environment: prd
           requires:
             - preview-deploy
           context: env-config
-
       - validate-deployment:
           environment: prd
           monitoring_duration: "1h"
@@ -1644,7 +1570,6 @@ workflows:
           context:
             - env-config
             - sentry
-
       - deploy:
           environment: prd
           requires:
@@ -1652,7 +1577,6 @@ workflows:
           context:
             - cloudflare
             - env-config
-
   infra-stg:
     triggers:
       - schedule:
@@ -1667,7 +1591,6 @@ workflows:
           context:
             - pulumi
             - env-config
-
       - infra-deploy:
           environment: stg
           requires:
@@ -1675,7 +1598,6 @@ workflows:
           context:
             - pulumi
             - env-config
-
   infra-prd:
     triggers:
       - schedule:
@@ -1690,12 +1612,10 @@ workflows:
           context:
             - pulumi
             - env-config
-
       - hold-infra-approval:
           type: approval
           requires:
             - infra-plan
-
       - infra-deploy:
           environment: prd
           requires:
@@ -1703,7 +1623,6 @@ workflows:
           context:
             - pulumi
             - env-config
-
   backup:
     triggers:
       - schedule:
@@ -1714,7 +1633,6 @@ workflows:
                 - master
     jobs:
       - backup-database
-
   performance:
     triggers:
       - schedule:
@@ -1725,7 +1643,6 @@ workflows:
                 - master
     jobs:
       - performance-test
-
   monthly-reports:
     triggers:
       - schedule:
@@ -1738,7 +1655,6 @@ workflows:
       - cost-report:
           context:
             - cloudflare
-
   visual-regression:
     triggers:
       - schedule:
@@ -1750,7 +1666,6 @@ workflows:
     jobs:
       - visual-regression-test:
           context: percy
-
   load-testing:
     triggers:
       - schedule:

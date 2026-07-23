@@ -1,10 +1,10 @@
 #!/bin/bash
 # load-project-context.sh - セッション開始時にプロジェクトコンテキストを読み込み
 
-cd "$CLAUDE_PROJECT_DIR" 2>/dev/null || exit 0
+cd "$CLAUDE_PROJECT_DIR" 2> /dev/null || exit 0
 
-BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
-UNCOMMITTED=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+BRANCH=$(git branch --show-current 2> /dev/null || echo "unknown")
+UNCOMMITTED=$(git status --porcelain 2> /dev/null | wc -l | tr -d ' ')
 
 cat << EOF
 ## プロジェクト状態

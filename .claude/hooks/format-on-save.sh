@@ -12,7 +12,7 @@ if [[ "$FILE_PATH" =~ (node_modules|dist|build|\.cache) ]]; then
   exit 0
 fi
 
-cd "$CLAUDE_PROJECT_DIR" 2>/dev/null || exit 0
-bun run biome format --write "$FILE_PATH" 2>/dev/null || true
+cd "$CLAUDE_PROJECT_DIR" 2> /dev/null || exit 0
+bun run biome format --write "$FILE_PATH" 2> /dev/null || true
 
 exit 0
