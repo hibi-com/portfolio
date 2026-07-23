@@ -1,11 +1,10 @@
 target: stg
 mode: load
 
-# ピーク時のクラスタ全体の並列数（同時 in-flight リクエスト）
+# ピーク時のクラスタ全体の並列数（同時 in-flight シナリオ）
 peakParallelism: 150
 
-# 1Pod あたりの OPS
-# 0 = 制限なし
+# 1 Pod あたりの OPS（リクエスト数/秒相当の目安）。0 = 制限なし
 opsPerWorker: 0
 
 # 試験開始時の Pod 数
@@ -14,18 +13,64 @@ initialWorkers: 1
 # スケール時の最大 Pod 数（上限 300）
 maxWorkers: 20
 
-# 並列数の増加速度（並列数/秒）
-# 0 = 開始から一定
+# 並列数の増加速度（並列数/秒）。0 = 開始から一定
 rampParallelismPerSec: 0
 
 # 試験実行時間
 duration: 5m
 
-# 正常系のみ
-endpoints:
-  - method: GET
-    url: https://stg.www.ageha734.jp/
-    expectStatus: 200
-  - method: GET
-    url: https://stg.api.ageha734.jp/health
-    expectStatus: 200
+# 正常系シナリオのみ（途中で非 2xx が出たら負荷試験失敗）
+# e2e / Playwright は使わない。Worker から fetch でステップを辿る。
+# weight でシナリオ選択比率を調整できる。
+scenarios:
+  - name: browse-site
+    weight: 3
+    steps:
+      - name: home
+        method: GET
+        url: https://stg.www.ageha734.jp/
+        expectStatus: 200
+      - name: blog-index
+        method: GET
+        url: https://stg.www.ageha734.jp/blog
+        expectStatus: 200
+      - name: portfolio-index
+        method: GET
+        url: https://stg.www.ageha734.jp/portfolio
+        expectStatus: 200
+
+  - name: api-read-posts
+    weight: 2
+    steps:
+      - name: health
+        method: GET
+        url: https://stg.api.ageha734.jp/health
+        expectStatus: 200
+      - name: list-posts
+        method: GET
+        url: https://stg.api.ageha734.jp/api/posts
+        expectStatus: 200
+        capture:
+          - from: json
+            path: data.0.id
+            as: postId
+      - name: get-post
+        method: GET
+        url: https://stg.api.ageha734.jp/api/posts/{{postId}}
+        expectStatus: 200
+
+  - name: api-read-portfolios
+    weight: 2
+    steps:
+      - name: list-portfolios
+        method: GET
+        url: https://stg.api.ageha734.jp/api/portfolios
+        expectStatus: 200
+        capture:
+          - from: json
+            path: data.0.id
+            as: portfolioId
+      - name: get-portfolio
+        method: GET
+        url: https://stg.api.ageha734.jp/api/portfolios/{{portfolioId}}
+        expectStatus: 200

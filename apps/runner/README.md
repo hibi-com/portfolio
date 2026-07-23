@@ -2,7 +2,7 @@
 
 Cloudflare Workers + Queues で **Pod 相当の消費者**を増減させ、STG のみにアクセスする。
 
-- 負荷試験: 正常系 GET/HEAD のみ。非 2xx が出た時点で失敗（e2e シナリオは使わない）
+- 負荷試験: 正常系 **シナリオ**（マルチステップ fetch）。非 2xx が出た時点で失敗（e2e / Playwright は使わない）
 - DAST: Worker から SQLi / XSS 等のプローブを送信（ZAP/Nuclei バイナリは使わない）
 
 ## 設定

@@ -1,5 +1,35 @@
 export type RunMode = "load" | "dast";
 
+export type HttpMethod = "GET" | "HEAD" | "POST" | "PUT";
+
+/** ステップ間で値を引き継ぐための簡易キャプチャ（JSON のドットパス） */
+export type StepCapture = {
+  from: "json";
+  /** 例: data.0.id / items.0.slug */
+  path: string;
+  as: string;
+};
+
+export type ScenarioStep = {
+  name: string;
+  method: HttpMethod;
+  /** {{var}} を前ステップの capture で置換可能 */
+  url: string;
+  headers?: Record<string, string>;
+  /** JSON 文字列またはオブジェクト。{{var}} 置換可 */
+  body?: string | Record<string, unknown>;
+  expectStatus: number;
+  capture?: StepCapture[];
+};
+
+export type LoadScenario = {
+  name: string;
+  /** 選択重み（省略時 1） */
+  weight?: number;
+  steps: ScenarioStep[];
+};
+
+/** @deprecated scenarios へ移行。単発 endpoint 互換用 */
 export type LoadEndpoint = {
   method: "GET" | "HEAD";
   url: string;
@@ -15,6 +45,9 @@ export type RunnerConfig = {
   maxWorkers: number;
   rampParallelismPerSec: number;
   duration: string;
+  /** 負荷試験シナリオ（正常系マルチステップ） */
+  scenarios?: LoadScenario[];
+  /** @deprecated scenarios を使う */
   endpoints?: LoadEndpoint[];
   targets?: string[];
   categories?: string[];
@@ -83,6 +116,33 @@ export function assertStgUrl(url: string): void {
   }
 }
 
+export function normalizeScenarios(config: RunnerConfig): LoadScenario[] {
+  if (config.scenarios?.length) {
+    return config.scenarios;
+  }
+  if (config.endpoints?.length) {
+    return [
+      {
+        name: "legacy-endpoints",
+        weight: 1,
+        steps: config.endpoints.map((endpoint, index) => ({
+          name: `step-${index + 1}`,
+          method: endpoint.method,
+          url: endpoint.url,
+          expectStatus: endpoint.expectStatus,
+        })),
+      },
+    ];
+  }
+  return [];
+}
+
+function assertHappyStatus(status: number): void {
+  if (status < 200 || status > 299) {
+    throw new Error(`expectStatus must be 2xx for load scenarios, got ${status}`);
+  }
+}
+
 export function validateConfig(config: RunnerConfig): void {
   if (config.target !== "stg") {
     throw new Error("target must be stg");
@@ -97,13 +157,20 @@ export function validateConfig(config: RunnerConfig): void {
     throw new Error("peakParallelism must be >= 1");
   }
   if (config.mode === "load") {
-    if (!config.endpoints?.length) {
-      throw new Error("load mode requires endpoints");
+    const scenarios = normalizeScenarios(config);
+    if (scenarios.length === 0) {
+      throw new Error("load mode requires scenarios (or legacy endpoints)");
     }
-    for (const endpoint of config.endpoints) {
-      assertStgUrl(endpoint.url);
-      if (endpoint.method !== "GET" && endpoint.method !== "HEAD") {
-        throw new Error("load endpoints must be GET/HEAD (happy path only)");
+    for (const scenario of scenarios) {
+      if (!scenario.name || !scenario.steps?.length) {
+        throw new Error(`scenario "${scenario.name ?? "?"}" needs steps`);
+      }
+      for (const step of scenario.steps) {
+        assertHappyStatus(step.expectStatus);
+        // テンプレ URL は実行時に解決するため、プレースホルダ無しのものだけ事前検証
+        if (!step.url.includes("{{")) {
+          assertStgUrl(step.url);
+        }
       }
     }
   }

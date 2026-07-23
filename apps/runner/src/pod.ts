@@ -1,4 +1,11 @@
-import type { DastFinding, LoadEndpoint, RunnerConfig, RunRecord } from "./types";
+import type {
+  DastFinding,
+  LoadScenario,
+  RunnerConfig,
+  RunRecord,
+  ScenarioStep,
+} from "./types";
+import { assertStgUrl, normalizeScenarios } from "./types";
 import { buildProbes } from "./probes";
 
 const BATCH_MS = 12_000;
@@ -18,12 +25,118 @@ function concurrencyForPod(run: RunRecord): number {
   return Math.max(1, Math.floor(run.config.peakParallelism / pods));
 }
 
-async function hitLoadEndpoint(endpoint: LoadEndpoint): Promise<boolean> {
-  const res = await fetch(endpoint.url, {
-    method: endpoint.method,
+function pickScenario(scenarios: LoadScenario[]): LoadScenario {
+  const total = scenarios.reduce((sum, s) => sum + (s.weight ?? 1), 0);
+  let cursor = Math.random() * total;
+  for (const scenario of scenarios) {
+    cursor -= scenario.weight ?? 1;
+    if (cursor <= 0) return scenario;
+  }
+  return scenarios[scenarios.length - 1]!;
+}
+
+function applyVars(input: string, vars: Record<string, string>): string {
+  return input.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, key: string) => {
+    const value = vars[key];
+    if (value === undefined) {
+      throw new Error(`missing scenario variable: ${key}`);
+    }
+    return encodeURIComponent(value);
+  });
+}
+
+function readJsonPath(data: unknown, path: string): unknown {
+  const parts = path.split(".").filter(Boolean);
+  let current: unknown = data;
+  for (const part of parts) {
+    if (current === null || current === undefined) return undefined;
+    if (Array.isArray(current)) {
+      const index = Number(part);
+      if (!Number.isInteger(index)) return undefined;
+      current = current[index];
+      continue;
+    }
+    if (typeof current === "object") {
+      current = (current as Record<string, unknown>)[part];
+      continue;
+    }
+    return undefined;
+  }
+  return current;
+}
+
+async function runStep(
+  step: ScenarioStep,
+  vars: Record<string, string>,
+): Promise<{ ok: boolean; status: number }> {
+  const url = applyVars(step.url, vars);
+  assertStgUrl(url);
+
+  const headers: Record<string, string> = { ...(step.headers ?? {}) };
+  let body: string | undefined;
+  if (step.body !== undefined && step.method !== "GET" && step.method !== "HEAD") {
+    const raw =
+      typeof step.body === "string" ? applyVars(step.body, vars) : JSON.stringify(step.body);
+    body = raw.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, key: string) => {
+      const value = vars[key];
+      if (value === undefined) throw new Error(`missing scenario variable: ${key}`);
+      return value;
+    });
+    headers["content-type"] ??= "application/json";
+  }
+
+  const res = await fetch(url, {
+    method: step.method,
+    headers,
+    body,
     redirect: "follow",
   });
-  return res.status === endpoint.expectStatus;
+
+  if (step.capture?.length) {
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+      return { ok: false, status: res.status };
+    }
+    const json = (await res.clone().json()) as unknown;
+    for (const capture of step.capture) {
+      const value = readJsonPath(json, capture.path);
+      if (value === undefined || value === null) {
+        return { ok: false, status: res.status };
+      }
+      vars[capture.as] = String(value);
+    }
+  }
+
+  return { ok: res.status === step.expectStatus, status: res.status };
+}
+
+/** 1 シナリオを最初から最後まで実行。途中失敗で false */
+async function runScenario(scenario: LoadScenario): Promise<{
+  requests: number;
+  successes: number;
+  failures: number;
+}> {
+  const vars: Record<string, string> = {};
+  let requests = 0;
+  let successes = 0;
+  let failures = 0;
+
+  for (const step of scenario.steps) {
+    requests += 1;
+    try {
+      const result = await runStep(step, vars);
+      if (result.ok) successes += 1;
+      else {
+        failures += 1;
+        break;
+      }
+    } catch {
+      failures += 1;
+      break;
+    }
+  }
+
+  return { requests, successes, failures };
 }
 
 export async function runLoadBatch(run: RunRecord): Promise<{
@@ -31,8 +144,8 @@ export async function runLoadBatch(run: RunRecord): Promise<{
   successes: number;
   failures: number;
 }> {
-  const endpoints = run.config.endpoints ?? [];
-  if (endpoints.length === 0) {
+  const scenarios = normalizeScenarios(run.config);
+  if (scenarios.length === 0) {
     return { requests: 0, successes: 0, failures: 0 };
   }
 
@@ -42,24 +155,20 @@ export async function runLoadBatch(run: RunRecord): Promise<{
   let requests = 0;
   let successes = 0;
   let failures = 0;
-  let cursor = 0;
 
   while (Date.now() - started < BATCH_MS && Date.now() < run.endAt) {
+    // OPS は「シナリオ完了数」ではなくリクエスト数でカウント
     if (opsLimit > 0 && requests >= opsLimit * (BATCH_MS / 1000)) {
       break;
     }
 
-    const batch = Array.from({ length: concurrency }, () => {
-      const endpoint = endpoints[cursor % endpoints.length]!;
-      cursor += 1;
-      return hitLoadEndpoint(endpoint);
-    });
-
+    const batch = Array.from({ length: concurrency }, () => runScenario(pickScenario(scenarios)));
     const results = await Promise.all(batch);
-    requests += results.length;
-    for (const ok of results) {
-      if (ok) successes += 1;
-      else failures += 1;
+
+    for (const result of results) {
+      requests += result.requests;
+      successes += result.successes;
+      failures += result.failures;
     }
 
     if (failures > 0) {
