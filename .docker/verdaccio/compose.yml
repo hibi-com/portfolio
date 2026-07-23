@@ -1,6 +1,6 @@
 services:
   verdaccio:
-    image: verdaccio/verdaccio:5
+    image: verdaccio/verdaccio:5.4.0@sha256:c3dbc13f31fe14da7ade2595cf283fe5af674056a89d9bf419faf0058b859da9
     networks:
       - registry
     ports:

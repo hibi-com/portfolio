@@ -1,6 +1,8 @@
 # CI で利用するツール類用の compose ファイル
 # renovate の対象に含めるため、アプリ用 compose.yaml と分離する
 #
+# イメージは tag + digest で固定する（浮動タグ禁止）
+#
 # 使い方（例）:
 #   docker compose -f compose.yaml up -d --wait sqlite
 #   docker compose -f compose.yaml run --rm setup-db
@@ -28,7 +30,7 @@ services:
     command: dir -v --redact --report-format json --report-path gitleaks-report.json .
 
   trivy:
-    image: aquasec/trivy:0.72.0
+    image: aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f
     working_dir: /workspace
     volumes:
       - ./:/workspace:ro
@@ -38,7 +40,7 @@ services:
     command: fs --severity HIGH,CRITICAL --scanners vuln --format json --output /workspace/trivy-report.json --exit-code 0 .
 
   snyk:
-    image: snyk/snyk:node
+    image: snyk/snyk:node-22@sha256:f3315cb7a4fe95c1886fcc61d0654a099efe06a10695f4b341458906963d9bd9
     working_dir: /workspace
     volumes:
       - ./:/workspace:ro
@@ -46,14 +48,58 @@ services:
       SNYK_TOKEN: ${SNYK_TOKEN:-}
     command: test --severity-threshold=high --json-file-output=/workspace/snyk-report.json
 
-  integration:
-    image: oven/bun:1.1.43
+  roast:
+    image: ghcr.io/immanuwell/droast:1.4.8@sha256:c1a31d9961a8d2db61805984b725361b0f55837f14b046980d5bc9c034712128
     working_dir: /workspace
     volumes:
-      - ./:/workspace:ro
+      - .:/workspace:ro
+    entrypoint: ["--no-roast", "."]
+
+  shellcheck:
+    image: koalaman/shellcheck-alpine:v0.11.0@sha256:9955be09ea7f0dbf7ae942ac1f2094355bb30d96fffba0ec09f5432207544002
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        find . \
+          \( -path './.git' -o -path './vendor' -o -path './node_modules' \) -prune \
+          -o -type f -name '*.sh' -exec shellcheck -f gcc {} +
+
+  shfmt:
+    image: mvdan/shfmt:v3.12.0-alpine@sha256:204a4d2d876123342ad394bd9a28fb91e165abc03868790d4b39cfa73233f150
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        find . \
+          \( -path './.git' -o -path './vendor' -o -path './node_modules' \) -prune \
+          -o -type f -name '*.sh' -exec shfmt -d -i 2 -ci -sr {} +
+
+  actionlint:
+    image: rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:ro
+
+  zizmor:
+    image: ghcr.io/zizmorcore/zizmor:1.26.1@sha256:d1117e5dbd9ee4970644067b534ab6ab50371f3c6f7f4d05446eb603a6e78f48
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:ro
+    command: --format=sarif --color=never --no-progress --no-exit-codes .github/workflows
+
+  integration:
+    image: oven/bun:1.1.43@sha256:10cda3ac52b7ddfb3dda2fd1f0ed2147dcb8d5b7ed7baeffbfcaf6e15c1c00df
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
     networks:
       - db
     environment:
       CI: "true"
       TEST_DATABASE_URL: http://sqlite:8080
-    command: bun run integration
+    command: ["bun", "run", "integration"]

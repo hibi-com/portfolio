@@ -1,4 +1,4 @@
-FROM oven/bun:1.1.43 AS builder
+FROM oven/bun:1.1.43@sha256:10cda3ac52b7ddfb3dda2fd1f0ed2147dcb8d5b7ed7baeffbfcaf6e15c1c00df AS builder
 
 ARG REGISTRY_URL
 
@@ -33,7 +33,7 @@ RUN jq 'del(.dependencies["@portfolio/cms"]) | '\
   && bun install --ignore-scripts \
   && bun x remix vite:build
 
-FROM nginx:alpine-slim
+FROM nginx:1.27.4-alpine-slim@sha256:b05aceb5ec1844435cae920267ff9949887df5b88f70e11d8b2871651a596612
 
 COPY --from=builder /app/build /usr/share/nginx/html
 

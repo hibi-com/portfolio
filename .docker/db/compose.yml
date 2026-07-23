@@ -10,7 +10,7 @@ volumes:
 
 services:
   sqlite:
-    image: ghcr.io/tursodatabase/libsql-server:v0.24.31
+    image: ghcr.io/tursodatabase/libsql-server:v0.24.31@sha256:98cfed33d8a670efdb9663217c84cdf24e37a87584c2a594ab1241a1f83eaba9
     platform: linux/amd64
     networks:
       - db
@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
 
   setup-db:
-    image: oven/bun:1.1.43
+    image: oven/bun:1.1.43@sha256:10cda3ac52b7ddfb3dda2fd1f0ed2147dcb8d5b7ed7baeffbfcaf6e15c1c00df
     networks:
       - db
     environment:

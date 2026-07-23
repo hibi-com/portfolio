@@ -7,17 +7,18 @@ orbs:
 executors:
   default:
     docker:
-      - image: cimg/node:22.12
+      - image: cimg/node:22.12.0@sha256:0dae71c56fb15a93a8223b5bfe2e93395b97efbf5509a48fe75b890bf1ad0b4e
     resource_class: large
     working_directory: ~/project
 
   large:
     docker:
-      - image: cimg/node:22.12-browsers
+      - image: cimg/node:22.12.0-browsers@sha256:6efb5d0b817685f4c28c400a780cec9fccd8059907375305a31725b4b530cdb3
     resource_class: large
     working_directory: ~/project
 
   # docker compose（compose.yaml / compose.ci.yaml）を使うジョブ用
+  # machine image は CircleCI の日付タグで固定（digest 指定非対応）
   machine-large:
     machine:
       image: ubuntu-2204:2024.11.1

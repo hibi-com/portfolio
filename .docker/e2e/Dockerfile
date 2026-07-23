@@ -1,6 +1,7 @@
-FROM mcr.microsoft.com/playwright:v1.57.0-noble AS builder
+FROM mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd AS builder
 
 ARG BUN_VERSION=1.1.43
+ARG TRIVY_VERSION=0.72.0
 ARG DEBIAN_FRONTEND=noninteractive
 ARG USERNAME=e2e
 ARG USER_UID=1000
@@ -17,8 +18,9 @@ RUN groupadd --gid "${USER_GID}" "${USERNAME}" || true; \
       unzip=6.0-28ubuntu4.1 \
       && apt-get clean \
       && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apt/archives/*; \
-    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin || true; \
-    chmod +x /usr/local/bin/trivy || true; \
+    curl -sfL "https://raw.githubusercontent.com/aquasecurity/trivy/v${TRIVY_VERSION}/contrib/install.sh" \
+      | sh -s -- -b /usr/local/bin "v${TRIVY_VERSION}"; \
+    chmod +x /usr/local/bin/trivy; \
     arch="$(dpkg --print-architecture)"; \
     case "${arch##*-}" in \
       amd64) build="x64-baseline";; \
@@ -39,7 +41,7 @@ RUN groupadd --gid "${USER_GID}" "${USERNAME}" || true; \
     chown root:root /usr/local/bin/bun; \
     bun --version
 
-FROM mcr.microsoft.com/playwright:v1.57.0-noble
+FROM mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
 
 LABEL maintainer="e2e"
 LABEL description="Playwright E2E testing container for Portfolio project"
