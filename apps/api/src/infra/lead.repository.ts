@@ -119,6 +119,14 @@ export class LeadRepositoryImpl implements LeadRepository {
 
     async convertToDeal(id: string): Promise<Lead> {
         const prisma = createPrismaClient(this.options ?? {});
+        const existing = await prisma.lead.findUnique({ where: { id } });
+        if (!existing) {
+            throw new Error("Lead not found");
+        }
+        if (existing.status === "CONVERTED") {
+            throw new Error("Lead already converted");
+        }
+
         const lead = await prisma.lead.update({
             where: { id },
             data: {

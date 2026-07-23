@@ -136,6 +136,7 @@ describe("CustomerRepositoryImpl", () => {
     describe("update", () => {
         it("should update an existing customer", async () => {
             const updateData = { name: "Updated Customer" };
+            mockPrismaClient.customer.findUnique.mockResolvedValue(mockCustomerData);
             mockPrismaClient.customer.update.mockResolvedValue({
                 ...mockCustomerData,
                 ...updateData,
@@ -143,7 +144,7 @@ describe("CustomerRepositoryImpl", () => {
 
             const result = await repository.update("customer-uuid-1", updateData);
 
-            expect(result.name).toBe("Updated Customer");
+            expect(result?.name).toBe("Updated Customer");
             expect(mockPrismaClient.customer.update).toHaveBeenCalledWith({
                 where: { id: "customer-uuid-1" },
                 data: {

@@ -133,6 +133,14 @@ export class DealRepositoryImpl implements DealRepository {
 
     async moveToStage(id: string, stageId: string): Promise<Deal> {
         const prisma = createPrismaClient(this.options ?? {});
+        const existing = await prisma.deal.findUnique({ where: { id } });
+        if (!existing) {
+            throw new Error("Deal not found");
+        }
+        if (existing.status === "WON" || existing.status === "LOST") {
+            throw new Error("Cannot move closed deal");
+        }
+
         const deal = await prisma.deal.update({
             where: { id },
             data: { stageId },

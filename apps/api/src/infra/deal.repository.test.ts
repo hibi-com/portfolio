@@ -171,6 +171,7 @@ describe("DealRepositoryImpl", () => {
     describe("moveToStage", () => {
         describe("正常系", () => {
             test("ディールを別のステージに移動できる", async () => {
+                mockPrismaClient.deal.findUnique.mockResolvedValue(mockDealData);
                 mockPrismaClient.deal.update.mockResolvedValue({
                     ...mockDealData,
                     stageId: "stage-uuid-2",

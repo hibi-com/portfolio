@@ -40,7 +40,7 @@ describe("Chat Flow Integration", () => {
             const result = await useCase.execute({});
 
             expect(result).toBeDefined();
-            expect(result.customerId).toBeNull();
+            expect(result.customerId).toBeUndefined();
         });
     });
 

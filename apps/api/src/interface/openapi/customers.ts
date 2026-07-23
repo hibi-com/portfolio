@@ -270,6 +270,15 @@ const updateCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
         const useCase = container.getUpdateCustomerUseCase();
         const customer = await useCase.execute(id, body);
 
+        if (!customer) {
+            const duration = (Date.now() - startTime) / 1000;
+            metrics.httpRequestDuration.observe(
+                { method: "PUT", route: "/api/crm/customers/:id", status: "404" },
+                duration,
+            );
+            return c.json({ error: "Customer not found" }, 404);
+        }
+
         const duration = (Date.now() - startTime) / 1000;
         metrics.httpRequestDuration.observe(
             { method: "PUT", route: "/api/crm/customers/:id", status: "200" },

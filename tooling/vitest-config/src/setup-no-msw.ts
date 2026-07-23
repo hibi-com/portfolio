@@ -9,6 +9,7 @@ import { afterEach, vi } from "vitest";
 afterEach(() => {
     cleanup();
     vi.clearAllMocks();
+    vi.unstubAllGlobals();
 });
 
 interface LinkProps {

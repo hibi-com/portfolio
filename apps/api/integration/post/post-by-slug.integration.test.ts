@@ -40,7 +40,7 @@ describe("GET /api/post/:slug - 投稿詳細取得", () => {
             expect(result).not.toBeNull();
             expect(result?.title).toBe("Test Post");
             expect(result?.slug).toBe("test-post");
-            expect(result?.content).toBe(testContent);
+            expect(result?.content).toEqual({ html: testContent, raw: undefined });
         });
 
         test("異常系: 存在しないslugの場合はnullを返す", async () => {

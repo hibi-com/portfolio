@@ -204,6 +204,7 @@ describe("LeadRepositoryImpl", () => {
     describe("convertToDeal", () => {
         describe("正常系", () => {
             test("リードをディールに変換できる", async () => {
+                mockPrismaClient.lead.findUnique.mockResolvedValue(mockLeadData);
                 mockPrismaClient.lead.update.mockResolvedValue({
                     ...mockLeadData,
                     status: "CONVERTED",

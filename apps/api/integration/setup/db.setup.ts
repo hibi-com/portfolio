@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
     createPrismaClient,
     type InquiryCategory,
@@ -8,8 +11,49 @@ import {
 
 let prisma: PrismaClient | null = null;
 
+/** Host URL for Docker Compose libSQL (`sqlite` published on 8081). */
+const DEFAULT_DOCKER_LIBSQL_URL = "http://127.0.0.1:8081";
+
 function getTestDatabaseUrl(): string {
-    return process.env.TEST_DATABASE_URL || "file::memory:?cache=shared";
+    return process.env.TEST_DATABASE_URL || process.env.DATABASE_URL || DEFAULT_DOCKER_LIBSQL_URL;
+}
+
+function getInitMigrationPath(): string {
+    return path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        "../../../../packages/db/migration/20260723000000_init_sqlite/migration.sql",
+    );
+}
+
+async function hasSchema(client: PrismaClient): Promise<boolean> {
+    try {
+        await client.$queryRawUnsafe(`SELECT 1 FROM posts LIMIT 1`);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function applySchema(client: PrismaClient): Promise<void> {
+    if (await hasSchema(client)) {
+        return;
+    }
+
+    const migrationPath = getInitMigrationPath();
+    if (!fs.existsSync(migrationPath)) {
+        throw new Error(`SQLite init migration not found: ${migrationPath}`);
+    }
+
+    const sql = fs.readFileSync(migrationPath, "utf8");
+    const statements = sql
+        .replace(/--[^\n]*/g, "")
+        .split(";")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+    for (const statement of statements) {
+        await client.$executeRawUnsafe(statement);
+    }
 }
 
 export async function setupTestDb(): Promise<PrismaClient> {
@@ -17,6 +61,7 @@ export async function setupTestDb(): Promise<PrismaClient> {
 
     prisma = createPrismaClient({ databaseUrl });
     await prisma.$connect();
+    await applySchema(prisma);
 
     return prisma;
 }

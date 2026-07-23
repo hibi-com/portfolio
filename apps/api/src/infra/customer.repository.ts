@@ -98,8 +98,13 @@ export class CustomerRepositoryImpl implements CustomerRepository {
         return this.mapToCustomer(customer);
     }
 
-    async update(id: string, input: UpdateCustomerInput): Promise<Customer> {
+    async update(id: string, input: UpdateCustomerInput): Promise<Customer | null> {
         const prisma = createPrismaClient(this.options ?? {});
+        const existing = await prisma.customer.findUnique({ where: { id } });
+        if (!existing) {
+            return null;
+        }
+
         const customer = await prisma.customer.update({
             where: { id },
             data: {

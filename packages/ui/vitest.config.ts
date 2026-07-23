@@ -8,7 +8,7 @@ export default defineConfig(
             setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup-no-msw.ts")],
             test: {
                 fileParallelism: false,
-                isolate: false,
+                isolate: true,
                 coverage: {
                     include: ["src/**/*.ts", "src/**/*.tsx"],
                     exclude: [

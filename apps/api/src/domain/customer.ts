@@ -12,6 +12,6 @@ export interface CustomerRepository {
     findById(id: string): Promise<Customer | null>;
     findByEmail(email: string): Promise<Customer | null>;
     create(input: CreateCustomerInput): Promise<Customer>;
-    update(id: string, input: UpdateCustomerInput): Promise<Customer>;
+    update(id: string, input: UpdateCustomerInput): Promise<Customer | null>;
     delete(id: string): Promise<void>;
 }
