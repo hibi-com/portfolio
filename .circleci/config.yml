@@ -1062,63 +1062,39 @@ jobs:
               exit 1
             fi
   load-test:
-    executor: default
+    executor: machine-large
     steps:
       - checkout
-      - install-bun
-      - run:
-          name: Install k6
-          command: |
-            K6_VERSION="v2.1.0"
-            K6_SHA256="295d961ebfca306f295f1133068dcd403a8171c87f387928f5f30b0fbcff858a"
-            curl -fsSL "https://github.com/grafana/k6/releases/download/${K6_VERSION}/k6-${K6_VERSION}-linux-amd64.tar.gz" -o /tmp/k6.tar.gz
-            echo "${K6_SHA256}  /tmp/k6.tar.gz" | sha256sum -c -
-            tar -xzf /tmp/k6.tar.gz -C /tmp
-            sudo mv "/tmp/k6-${K6_VERSION}-linux-amd64/k6" /usr/local/bin/k6
-            k6 version
       - run:
           name: Run load tests
-          command: |
-            echo "=== Load Testing ==="
-
-            cat > load-test.js \<<'EOF'
-            import http from 'k6/http';
-            import { check, sleep } from 'k6';
-
-            export const options = {
-              stages: [
-                { duration: '2m', target: 10 },
-                { duration: '5m', target: 10 },
-                { duration: '2m', target: 50 },
-                { duration: '5m', target: 50 },
-                { duration: '2m', target: 100 },
-                { duration: '5m', target: 100 },
-                { duration: '5m', target: 0 },
-              ],
-              thresholds: {
-                http_req_duration: ['p(95)<500'],
-                http_req_failed: ['rate<0.01'],
-              },
-            };
-
-            export default function () {
-              const res = http.get('https://www.ageha734.jp');
-              check(res, {
-                'status is 200': (r) => r.status === 200,
-                'response time < 500ms': (r) => r.timings.duration < 500,
-              });
-              sleep(1);
-            }
-            EOF
-
-            k6 run --out json=load-test-results.json load-test.js
-
-            echo "✓ Load testing completed"
+          command: docker compose -f compose.ci.yaml run --rm k6
+          no_output_timeout: 40m
       - store_artifacts:
           path: load-test-results.json
           destination: load-test-results.json
+
+  dast:
+    executor: machine-large
+    steps:
+      - checkout
+      - run:
+          name: OWASP ZAP baseline
+          command: docker compose -f compose.ci.yaml run --rm zap
+          no_output_timeout: 30m
+      - run:
+          name: Nuclei scan
+          command: docker compose -f compose.ci.yaml run --rm nuclei
+          no_output_timeout: 30m
+      - store_artifacts:
+          path: zap-report.json
+          destination: dast/zap-report.json
+      - store_artifacts:
+          path: zap-report.html
+          destination: dast/zap-report.html
+      - store_artifacts:
+          path: nuclei-report.jsonl
+          destination: dast/nuclei-report.jsonl
 workflows:
-  # CI 成功後に RC →（承認）STG →（承認）PRD、および Infra を同一 workflow で接続
   ci-cd:
     jobs:
       - setup:
@@ -1159,7 +1135,6 @@ workflows:
               only:
                 - master
                 - main
-      # --- CD (RC): CI の upload-artifacts 成功後 ---
       - download-artifacts:
           name: download-artifacts-rc
           environment: rc
@@ -1253,7 +1228,6 @@ workflows:
               only:
                 - master
                 - main
-      # --- Infra (RC): CI 成功後 ---
       - infra-plan:
           name: infra-plan-rc
           environment: rc
@@ -1290,7 +1264,6 @@ workflows:
               only:
                 - master
                 - main
-      # --- CD (STG): RC デプロイ成功後、手動承認で開始 ---
       - hold-approval:
           name: hold-approval-stg
           type: approval
@@ -1395,7 +1368,6 @@ workflows:
               only:
                 - master
                 - main
-      # --- CD (PRD): STG デプロイ成功後、手動承認で開始 ---
       - hold-approval:
           name: hold-approval-prd
           type: approval
@@ -1500,7 +1472,6 @@ workflows:
               only:
                 - master
                 - main
-      # --- Infra (STG): RC infra 成功後、手動承認で開始 ---
       - hold-infra-approval:
           name: hold-infra-approval-stg
           type: approval
@@ -1537,7 +1508,6 @@ workflows:
               only:
                 - master
                 - main
-      # --- Infra (PRD): STG infra 成功後、手動承認で開始（plan 後にも再承認） ---
       - hold-infra-approval:
           name: hold-infra-approval-prd
           type: approval
@@ -1637,3 +1607,13 @@ workflows:
                 - master
     jobs:
       - load-test
+  dast-stg:
+    triggers:
+      - schedule:
+          cron: "0 6 * * 0"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - dast

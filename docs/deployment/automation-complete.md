@@ -155,11 +155,7 @@ PRD: Promote (STG→PRD) → Download / Rebuild → Deploy
 
 ### ✅ 11. Load Testing（k6）
 
-**テストシナリオ**:
-
-- 2分: 0 → 100ユーザー
-- 5分: 100ユーザー維持
-- 2分: 100 → 0ユーザー
+**対象**: STG のみ（PRD / RC 禁止）
 
 **閾値**:
 
@@ -167,6 +163,15 @@ PRD: Promote (STG→PRD) → Download / Rebuild → Deploy
 - Error Rate < 1%
 
 **スケジュール**: 毎週日曜 5:00AM
+
+### ✅ 12. DAST（OWASP ZAP + Nuclei）
+
+**対象**: STG のみ（PRD / RC 禁止）
+
+- ZAP: baseline（`stg.www`）
+- Nuclei: Web + API（`testing/dast/targets-stg.txt`）
+
+**スケジュール**: 毎週日曜 6:00AM
 
 ## デプロイフロー全体図
 
@@ -208,7 +213,8 @@ graph TD
 | Backup | 毎日 | 2:00AM | 全環境 |
 | Performance Test | 毎週月曜 | 3:00AM | PRD |
 | Visual Regression | 毎週日曜 | 4:00AM | PRD |
-| Load Test | 毎週日曜 | 5:00AM | PRD |
+| Load Test (k6) | 毎週日曜 | 5:00AM | STG のみ |
+| DAST (ZAP + Nuclei) | 毎週日曜 | 6:00AM | STG のみ |
 | Cost Report | 毎月1日 | 9:00AM | - |
 
 STG/PRD のアプリ・Infra デプロイは cron ではなく、`ci-cd` workflow 内の Approval で起動する。

@@ -1,0 +1,31 @@
+target: stg
+mode: load
+
+# ピーク時のクラスタ全体の並列数（同時 in-flight リクエスト）
+peakParallelism: 150
+
+# 1Pod あたりの OPS
+# 0 = 制限なし
+opsPerWorker: 0
+
+# 試験開始時の Pod 数
+initialWorkers: 1
+
+# スケール時の最大 Pod 数（上限 300）
+maxWorkers: 20
+
+# 並列数の増加速度（並列数/秒）
+# 0 = 開始から一定
+rampParallelismPerSec: 0
+
+# 試験実行時間
+duration: 5m
+
+# 正常系のみ
+endpoints:
+  - method: GET
+    url: https://stg.www.ageha734.jp/
+    expectStatus: 200
+  - method: GET
+    url: https://stg.api.ageha734.jp/health
+    expectStatus: 200

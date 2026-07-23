@@ -1,0 +1,19 @@
+target: stg
+mode: dast
+
+peakParallelism: 40
+opsPerWorker: 5
+initialWorkers: 2
+maxWorkers: 20
+rampParallelismPerSec: 2
+duration: 10m
+
+targets:
+  - https://stg.www.ageha734.jp
+  - https://stg.api.ageha734.jp
+
+categories:
+  - sqli
+  - xss
+  - path-traversal
+  - header-injection

@@ -17,6 +17,12 @@
 #   docker compose -f compose.ci.yaml run --rm yamlfmt
 #   docker compose -f compose.ci.yaml run --rm yamlfmt -- --fix
 #   docker compose -f compose.ci.yaml run --rm circleci
+#   docker compose -f compose.ci.yaml run --rm k6
+#   docker compose -f compose.ci.yaml run --rm zap
+#   docker compose -f compose.ci.yaml run --rm nuclei
+#
+# 負荷試験: testing/k6/ （STG 専用）
+# 脆弱性診断: testing/dast/ （STG 専用・ZAP + Nuclei）
 
 networks:
   db:
@@ -117,6 +123,53 @@ services:
       - ./:/workspace:ro
     entrypoint: ["circleci"]
     command: config validate .circleci/config.yml
+
+  k6:
+    image: grafana/k6:1.4.2@sha256:3656673de3f30424e8ebcfa46acd9558d83b6a43612d0f668ffeac953950c6c7
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    environment:
+      BASE_URL: ${BASE_URL:-https://stg.www.ageha734.jp}
+    command:
+      - run
+      - --out
+      - json=/workspace/load-test-results.json
+      - /workspace/testing/k6/load-test.js
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:2.16.1@sha256:7840969c7c9fead565bf9734b12f49f6886db90b1d35b1f74d79710bbd081dab
+    working_dir: /zap/wrk
+    volumes:
+      - ./:/zap/wrk
+    environment:
+      TARGET_URL: ${TARGET_URL:-https://stg.www.ageha734.jp}
+      TARGETS_FILE: /zap/wrk/testing/dast/targets-stg.txt
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        TARGET_URL="$${TARGET_URL:-https://stg.www.ageha734.jp}"
+        export TARGET_URL
+        sh /zap/wrk/testing/dast/assert-stg-only.sh
+        zap-baseline.py -t "$$TARGET_URL" -J zap-report.json -r zap-report.html
+
+  nuclei:
+    image: projectdiscovery/nuclei:v3.11.0@sha256:e677842fb1f50f29747565ba274a1d35dcf8c684132a42b0cb406e71fccae9fc
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    environment:
+      TARGETS_FILE: /workspace/testing/dast/targets-stg.txt
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        sh /workspace/testing/dast/assert-stg-only.sh
+        nuclei \
+          -l /workspace/testing/dast/targets-stg.txt \
+          -severity critical,high,medium \
+          -jsonl-export /workspace/nuclei-report.jsonl \
+          -update-templates \
+          -silent
 
   integration:
     image: oven/bun:1.1.43@sha256:10cda3ac52b7ddfb3dda2fd1f0ed2147dcb8d5b7ed7baeffbfcaf6e15c1c00df

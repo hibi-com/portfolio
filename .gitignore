@@ -56,6 +56,10 @@ functions/[[path]].js.map
 infra/env.yaml
 infra/graph.dot
 lerna-debug.log*
+load-test-results.json
+nuclei-report.jsonl
+zap-report.html
+zap-report.json
 node_modules
 npm-debug.log*
 pnpm-debug.log*
