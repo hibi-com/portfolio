@@ -155,8 +155,10 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # monorepo の prepare（generate+build）込みのため no_output_timeout を延長
-            bun install --frozen-lockfile
+            # prepare（workspace setup / 全ビルド）は重いので CI ではスキップし、必要な生成だけ実行
+            bun install --frozen-lockfile --ignore-scripts
+            bun run generate --filter='!@portfolio/infra'
+            bun run build
           no_output_timeout: 20m
       - save-deps
       - restore-turbo
@@ -1330,7 +1332,8 @@ jobs:
           destination: load-test-results.json
 
 workflows:
-  ci:
+  # CI 成功後にのみ RC デプロイ / infra を起動（同一 workflow で requires 接続）
+  ci-cd:
     jobs:
       - setup:
           filters:
@@ -1379,61 +1382,147 @@ workflows:
                 - master
                 - main
 
-  deploy-rc:
-    when:
-      and:
-        - equal: [ master, << pipeline.git.branch >> ]
-    jobs:
+      # --- CD (RC): CI の upload-artifacts 成功後 ---
       - download-artifacts:
+          name: download-artifacts-rc
           environment: rc
+          requires:
+            - upload-artifacts
+          filters:
+            branches:
+              only:
+                - master
+                - main
 
       - pre-deploy-check:
+          name: pre-deploy-check-rc
           environment: rc
           requires:
-            - download-artifacts
+            - download-artifacts-rc
           context: env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
 
       - db-migrate:
+          name: db-migrate-rc
           environment: rc
           requires:
-            - pre-deploy-check
+            - pre-deploy-check-rc
           context: env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
 
       - preview-deploy:
+          name: preview-deploy-rc
           environment: rc
           requires:
-            - db-migrate
+            - db-migrate-rc
           context:
             - cloudflare
             - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
 
       - smoke-test:
+          name: smoke-test-rc
           environment: rc
           requires:
-            - preview-deploy
+            - preview-deploy-rc
           context: env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
 
       - validate-deployment:
+          name: validate-deployment-rc
           environment: rc
           monitoring_duration: "15m"
           requires:
-            - smoke-test
+            - smoke-test-rc
           context:
             - env-config
             - sentry
+          filters:
+            branches:
+              only:
+                - master
+                - main
 
       - hold-approval:
+          name: hold-approval-rc
           type: approval
           requires:
-            - validate-deployment
+            - validate-deployment-rc
+          filters:
+            branches:
+              only:
+                - master
+                - main
 
       - deploy:
+          name: deploy-rc
           environment: rc
           requires:
-            - hold-approval
+            - hold-approval-rc
           context:
             - cloudflare
             - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
+
+      # --- Infra (RC): CI 成功後 ---
+      - infra-plan:
+          name: infra-plan-rc
+          environment: rc
+          requires:
+            - upload-artifacts
+          context:
+            - pulumi
+            - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
+
+      - hold-infra-approval:
+          name: hold-infra-approval-rc
+          type: approval
+          requires:
+            - infra-plan-rc
+          filters:
+            branches:
+              only:
+                - master
+                - main
+
+      - infra-deploy:
+          name: infra-deploy-rc
+          environment: rc
+          requires:
+            - hold-infra-approval-rc
+          context:
+            - pulumi
+            - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
 
   deploy-stg:
     triggers:
@@ -1555,30 +1644,6 @@ workflows:
             - validate-deployment
           context:
             - cloudflare
-            - env-config
-
-  infra-rc:
-    when:
-      and:
-        - equal: [ master, << pipeline.git.branch >> ]
-    jobs:
-      - infra-plan:
-          environment: rc
-          context:
-            - pulumi
-            - env-config
-
-      - hold-infra-approval:
-          type: approval
-          requires:
-            - infra-plan
-
-      - infra-deploy:
-          environment: rc
-          requires:
-            - hold-infra-approval
-          context:
-            - pulumi
             - env-config
 
   infra-stg:

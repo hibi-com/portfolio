@@ -22,7 +22,7 @@
     "dev": "bun run build:js --watch",
     "fmt": "biome format --write .",
     "fmt:check": "biome format .",
-    "generate": "bun run with-env prisma generate",
+    "generate": "bun run with-env sh -c 'export PATH=\"$PWD/../../node_modules/.bin:$PATH\"; prisma generate'",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "migrate": "prisma-migration",

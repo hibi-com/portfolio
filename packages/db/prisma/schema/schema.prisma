@@ -1,5 +1,6 @@
 generator markdown {
-  provider = "prisma-markdown"
+  // Prisma は provider パスをパッケージルート（packages/db）基準で解決する
+  provider = "../../node_modules/@portfolio/prisma-markdown/dist/cmd/main.js"
   output   = "../../../../docs/database/erd.md"
   title    = "データベース設計書"
 }
