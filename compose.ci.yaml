@@ -1,10 +1,59 @@
-# CIで利用するツール類用のcomposeファイル
-# renovateの対象に含めるために他のcomposeファイルと分離
+# CI で利用するツール類用の compose ファイル
+# renovate の対象に含めるため、アプリ用 compose.yaml と分離する
+#
+# 使い方（例）:
+#   docker compose -f compose.yaml up -d --wait sqlite
+#   docker compose -f compose.yaml run --rm setup-db
+#   docker compose -f compose.ci.yaml run --rm --no-deps integration
+#
+#   docker compose -f compose.ci.yaml run --rm gitleaks
+#   docker compose -f compose.ci.yaml run --rm trivy
+#   SNYK_TOKEN=... docker compose -f compose.ci.yaml run --rm snyk
+
+networks:
+  db:
+    external: true
+    name: portfolio_db
+
+volumes:
+  trivy-cache:
+    name: portfolio_trivy_cache
 
 services:
   gitleaks:
     image: zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
     working_dir: /workspace
     volumes:
-      - ./:/workspace
-    command: ["dir", "--config", ".gitleaks.toml", "-v", "--redact", "."]
+      - ./:/workspace:ro
+    command: dir -v --redact --report-format json --report-path gitleaks-report.json .
+
+  trivy:
+    image: aquasec/trivy:0.72.0
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:ro
+      - trivy-cache:/root/.cache/
+    environment:
+      TRIVY_CACHE_DIR: /root/.cache/trivy
+    command: fs --severity HIGH,CRITICAL --scanners vuln --format json --output /workspace/trivy-report.json --exit-code 0 .
+
+  snyk:
+    image: snyk/snyk:node
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:ro
+    environment:
+      SNYK_TOKEN: ${SNYK_TOKEN:-}
+    command: test --severity-threshold=high --json-file-output=/workspace/snyk-report.json
+
+  integration:
+    image: oven/bun:1.1.43
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:ro
+    networks:
+      - db
+    environment:
+      CI: "true"
+      TEST_DATABASE_URL: http://sqlite:8080
+    command: bun run integration

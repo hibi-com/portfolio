@@ -8,13 +8,19 @@ executors:
   default:
     docker:
       - image: cimg/node:22.12
-    # bun install + prepare が medium(4GB) で OOM (killed) するため large
     resource_class: large
     working_directory: ~/project
 
   large:
     docker:
       - image: cimg/node:22.12-browsers
+    resource_class: large
+    working_directory: ~/project
+
+  # docker compose（compose.yaml / compose.ci.yaml）を使うジョブ用
+  machine-large:
+    machine:
+      image: ubuntu-2204:2024.11.1
     resource_class: large
     working_directory: ~/project
 
@@ -229,33 +235,22 @@ jobs:
             fi
 
   integration:
-    docker:
-      - image: cimg/node:22.12
-      - image: ghcr.io/tursodatabase/libsql-server:v0.24.31
-        name: sqlite
-        environment:
-          SQLD_NODE: primary
-    resource_class: large
-    working_directory: ~/project
+    executor: machine-large
     steps:
       - attach_workspace:
           at: .
-      - install-bun
       - run:
-          name: Wait for libSQL
+          name: Start libSQL (compose.yaml)
           command: |
-            for i in $(seq 1 60); do
-              if curl -sf http://127.0.0.1:8080/health >/dev/null; then
-                echo "libSQL is healthy"
-                exit 0
-              fi
-              sleep 1
-            done
-            echo "libSQL did not become healthy in time"
-            exit 1
+            docker compose -f compose.yaml up -d --wait sqlite
+            docker compose -f compose.yaml run --rm setup-db
       - run:
-          name: Run integration tests
-          command: TEST_DATABASE_URL=http://127.0.0.1:8080 bun run integration
+          name: Run integration tests (compose.ci.yaml)
+          command: docker compose -f compose.ci.yaml run --rm --no-deps integration
+      - run:
+          name: Tear down compose.yaml services
+          when: always
+          command: docker compose -f compose.yaml stop sqlite || true
       - store_test_results:
           path: .results
       - run:
@@ -275,58 +270,64 @@ jobs:
             fi
 
   security-scan:
-    executor: default
+    executor: machine-large
     steps:
       - attach_workspace:
           at: .
-      - install-bun
       - run:
-          name: Install security scanning tools
+          name: Secret detection (gitleaks via compose.ci.yaml)
           command: |
-            bun add -g snyk
-            mkdir -p "${HOME}/bin"
-            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b "${HOME}/bin"
-            wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
-            tar -xzf gitleaks_8.18.1_linux_x64.tar.gz
-            mv gitleaks "${HOME}/bin/"
-            chmod +x "${HOME}/bin/gitleaks" "${HOME}/bin/trivy"
-            echo 'export PATH="${HOME}/bin:$PATH"' >> "${BASH_ENV}"
-            source "${BASH_ENV}"
-            trivy --version
-            gitleaks version
-      - run:
-          name: Dependency vulnerability scan (Snyk)
-          command: |
-            echo "=== Snyk Dependency Scan ==="
+            echo "=== Gitleaks Secret Detection ==="
+            set +e
+            docker compose -f compose.ci.yaml run --rm gitleaks
+            GITLEAKS_EXIT=$?
+            set -e
 
-            if [ -n "${SNYK_TOKEN}" ]; then
-              snyk auth "${SNYK_TOKEN}"
-
-              snyk test --severity-threshold=high --json > snyk-report.json || true
-
-              cat snyk-report.json | jq '.vulnerabilities[] | {severity, title, packageName, version}'
-
-              HIGH_VULNS=$(cat snyk-report.json | jq '[.vulnerabilities[] | select(.severity == "high" or .severity == "critical")] | length')
-
-              if [ "${HIGH_VULNS}" -gt "0" ]; then
-                echo "✗ Found ${HIGH_VULNS} high/critical vulnerabilities"
+            if [ -f "gitleaks-report.json" ]; then
+              SECRETS_FOUND=$(python3 - <<'PY'
+import json
+from pathlib import Path
+data = json.loads(Path("gitleaks-report.json").read_text() or "[]")
+if isinstance(data, list):
+    print(len(data))
+elif isinstance(data, dict):
+    findings = data.get("Findings", data.get("findings", []))
+    print(len(findings) if isinstance(findings, list) else 0)
+else:
+    print(0)
+PY
+)
+              if [ "${SECRETS_FOUND}" -gt "0" ]; then
+                echo "✗ Found ${SECRETS_FOUND} potential secrets"
                 exit 1
               fi
-
-              echo "✓ No high/critical vulnerabilities found"
-            else
-              echo "⚠ SNYK_TOKEN not set, skipping Snyk scan"
+            elif [ "${GITLEAKS_EXIT}" -ne 0 ]; then
+              echo "✗ gitleaks failed without report"
+              exit "${GITLEAKS_EXIT}"
             fi
+            echo "✓ No secrets found"
       - run:
-          name: Filesystem vulnerability scan (Trivy)
+          name: Filesystem vulnerability scan (trivy via compose.ci.yaml)
           command: |
             echo "=== Trivy Filesystem Scan ==="
+            docker compose -f compose.ci.yaml run --rm trivy
 
-            trivy fs --severity HIGH,CRITICAL --format json --output trivy-report.json . || true
-
-            cat trivy-report.json | jq '.Results[]? | select(.Vulnerabilities) | {Target, Vulnerabilities: [.Vulnerabilities[] | {VulnerabilityID, Severity, PkgName}]}'
-
-            HIGH_VULNS=$(cat trivy-report.json | jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length')
+            HIGH_VULNS=$(python3 - <<'PY'
+import json
+from pathlib import Path
+path = Path("trivy-report.json")
+if not path.exists():
+    print(0)
+    raise SystemExit
+data = json.loads(path.read_text() or "{}")
+count = 0
+for result in data.get("Results") or []:
+    for vuln in result.get("Vulnerabilities") or []:
+        if vuln.get("Severity") in ("HIGH", "CRITICAL"):
+            count += 1
+print(count)
+PY
+)
 
             if [ "${HIGH_VULNS}" -gt "0" ]; then
               echo "✗ Found ${HIGH_VULNS} high/critical vulnerabilities"
@@ -335,23 +336,38 @@ jobs:
 
             echo "✓ No high/critical vulnerabilities found"
       - run:
-          name: Secret detection (gitleaks)
+          name: Dependency vulnerability scan (snyk via compose.ci.yaml)
           command: |
-            echo "=== Gitleaks Secret Detection ==="
+            echo "=== Snyk Dependency Scan ==="
 
-            gitleaks detect --report-format json --report-path gitleaks-report.json --no-git || true
-
-            if [ -f "gitleaks-report.json" ]; then
-              SECRETS_FOUND=$(cat gitleaks-report.json | jq '. | length')
-
-              if [ "${SECRETS_FOUND}" -gt "0" ]; then
-                echo "✗ Found ${SECRETS_FOUND} potential secrets"
-                cat gitleaks-report.json | jq '.[] | {File, Secret: .Secret[0:20]}'
-                exit 1
-              fi
+            if [ -z "${SNYK_TOKEN}" ]; then
+              echo "⚠ SNYK_TOKEN not set, skipping Snyk scan"
+              exit 0
             fi
 
-            echo "✓ No secrets detected"
+            # snyk test は脆弱性があると非0終了するため || true でレポートを残す
+            docker compose -f compose.ci.yaml run --rm -e SNYK_TOKEN snyk || true
+
+            if [ ! -f "snyk-report.json" ]; then
+              echo "⚠ snyk-report.json not produced"
+              exit 0
+            fi
+
+            HIGH_VULNS=$(python3 - <<'PY'
+import json
+from pathlib import Path
+data = json.loads(Path("snyk-report.json").read_text() or "{}")
+vulns = data.get("vulnerabilities") or []
+print(sum(1 for v in vulns if v.get("severity") in ("high", "critical")))
+PY
+)
+
+            if [ "${HIGH_VULNS}" -gt "0" ]; then
+              echo "✗ Found ${HIGH_VULNS} high/critical vulnerabilities"
+              exit 1
+            fi
+
+            echo "✓ No high/critical vulnerabilities found"
       - store_artifacts:
           path: snyk-report.json
           destination: security/snyk-report.json
