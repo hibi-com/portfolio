@@ -34,8 +34,9 @@ bun run lint:ts:check -- --filter=@portfolio/{package-name}
 - **Biome**: TypeScript/JavaScript のリント・フォーマット
 - **Sherif**: Monorepo の依存関係チェック
 - **Syncpack**: パッケージバージョン整合性チェック
-- **ShellCheck**: シェルスクリプトのリント
-- **actionlint**: GitHub Actions のリント
+- **ShellCheck**: シェルスクリプトのリント（compose.ci.yaml）
+- **circleci-cli**: CircleCI config の検証（compose.ci.yaml）
+- **yamlfmt**: CircleCI YAML のフォーマット（compose.ci.yaml）
 
 ## 参考ドキュメント
 

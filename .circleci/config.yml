@@ -32,7 +32,7 @@ commands:
       - run:
           name: Install Bun
           command: |
-            BUN_VERSION="$(node -p "require('./package.json').packageManager.replace(/^bun@/,'')")"
+            BUN_VERSION="$(python3 -c "import json; print(json.load(open('package.json'))['packageManager'].removeprefix('bun@'))")"
             echo "Installing Bun ${BUN_VERSION} (pinned to packageManager)"
             curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"
             echo 'export BUN_INSTALL="$HOME/.bun"' >> $BASH_ENV
@@ -179,23 +179,23 @@ jobs:
             - apps/*/node_modules
 
   format:
-    executor: default
+    executor: machine-large
     steps:
       - attach_workspace:
           at: .
       - install-bun
       - run:
-          name: Format check TypeScript
+          name: Format check
           command: bun run fmt:check
 
   lint:
-    executor: default
+    executor: machine-large
     steps:
       - attach_workspace:
           at: .
       - install-bun
       - run:
-          name: Lint TypeScript
+          name: Lint
           command: bun run lint
 
   typecheck:
@@ -285,19 +285,7 @@ jobs:
             set -e
 
             if [ -f "gitleaks-report.json" ]; then
-              SECRETS_FOUND=$(python3 - <<'PY'
-import json
-from pathlib import Path
-data = json.loads(Path("gitleaks-report.json").read_text() or "[]")
-if isinstance(data, list):
-    print(len(data))
-elif isinstance(data, dict):
-    findings = data.get("Findings", data.get("findings", []))
-    print(len(findings) if isinstance(findings, list) else 0)
-else:
-    print(0)
-PY
-)
+              SECRETS_FOUND=$(python3 -c "import json;from pathlib import Path;d=json.loads(Path('gitleaks-report.json').read_text() or '[]');print(len(d) if isinstance(d,list) else (len(d.get('Findings') or d.get('findings') or []) if isinstance(d,dict) else 0))")
               if [ "${SECRETS_FOUND}" -gt "0" ]; then
                 echo "✗ Found ${SECRETS_FOUND} potential secrets"
                 exit 1
@@ -313,22 +301,7 @@ PY
             echo "=== Trivy Filesystem Scan ==="
             docker compose -f compose.ci.yaml run --rm trivy
 
-            HIGH_VULNS=$(python3 - <<'PY'
-import json
-from pathlib import Path
-path = Path("trivy-report.json")
-if not path.exists():
-    print(0)
-    raise SystemExit
-data = json.loads(path.read_text() or "{}")
-count = 0
-for result in data.get("Results") or []:
-    for vuln in result.get("Vulnerabilities") or []:
-        if vuln.get("Severity") in ("HIGH", "CRITICAL"):
-            count += 1
-print(count)
-PY
-)
+            HIGH_VULNS=$(python3 -c "import json;from pathlib import Path;p=Path('trivy-report.json');d=json.loads(p.read_text() or '{}') if p.exists() else {};print(sum(1 for r in d.get('Results') or [] for v in r.get('Vulnerabilities') or [] if v.get('Severity') in ('HIGH','CRITICAL')))")
 
             if [ "${HIGH_VULNS}" -gt "0" ]; then
               echo "✗ Found ${HIGH_VULNS} high/critical vulnerabilities"
@@ -354,14 +327,7 @@ PY
               exit 0
             fi
 
-            HIGH_VULNS=$(python3 - <<'PY'
-import json
-from pathlib import Path
-data = json.loads(Path("snyk-report.json").read_text() or "{}")
-vulns = data.get("vulnerabilities") or []
-print(sum(1 for v in vulns if v.get("severity") in ("high", "critical")))
-PY
-)
+            HIGH_VULNS=$(python3 -c "import json;from pathlib import Path;d=json.loads(Path('snyk-report.json').read_text() or '{}');print(sum(1 for v in d.get('vulnerabilities') or [] if v.get('severity') in ('high','critical')))")
 
             if [ "${HIGH_VULNS}" -gt "0" ]; then
               echo "✗ Found ${HIGH_VULNS} high/critical vulnerabilities"

@@ -11,6 +11,10 @@
 #   docker compose -f compose.ci.yaml run --rm gitleaks
 #   docker compose -f compose.ci.yaml run --rm trivy
 #   SNYK_TOKEN=... docker compose -f compose.ci.yaml run --rm snyk
+#   docker compose -f compose.ci.yaml run --rm shellcheck
+#   docker compose -f compose.ci.yaml run --rm shfmt
+#   docker compose -f compose.ci.yaml run --rm yamlfmt
+#   docker compose -f compose.ci.yaml run --rm circleci
 
 networks:
   db:
@@ -52,14 +56,14 @@ services:
     image: ghcr.io/immanuwell/droast:1.4.8@sha256:c1a31d9961a8d2db61805984b725361b0f55837f14b046980d5bc9c034712128
     working_dir: /workspace
     volumes:
-      - .:/workspace:ro
+      - ./:/workspace:ro
     entrypoint: ["--no-roast", "."]
 
   shellcheck:
     image: koalaman/shellcheck-alpine:v0.11.0@sha256:9955be09ea7f0dbf7ae942ac1f2094355bb30d96fffba0ec09f5432207544002
     working_dir: /workspace
     volumes:
-      - .:/workspace:ro
+      - ./:/workspace:ro
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -71,7 +75,7 @@ services:
     image: mvdan/shfmt:v3.12.0-alpine@sha256:204a4d2d876123342ad394bd9a28fb91e165abc03868790d4b39cfa73233f150
     working_dir: /workspace
     volumes:
-      - .:/workspace:ro
+      - ./:/workspace:ro
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -79,18 +83,20 @@ services:
           \( -path './.git' -o -path './vendor' -o -path './node_modules' \) -prune \
           -o -type f -name '*.sh' -exec shfmt -d -i 2 -ci -sr {} +
 
-  actionlint:
-    image: rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+  yamlfmt:
+    image: ghcr.io/google/yamlfmt:0.20.0@sha256:cd11483ba1119371593a7d55386d082da518e27dd932ee00db32e5fb6f3a58c0
     working_dir: /workspace
     volumes:
-      - .:/workspace:ro
+      - ./:/workspace:ro
+    command: -lint .circleci/
 
-  zizmor:
-    image: ghcr.io/zizmorcore/zizmor:1.26.1@sha256:d1117e5dbd9ee4970644067b534ab6ab50371f3c6f7f4d05446eb603a6e78f48
+  circleci:
+    image: circleci/circleci-cli:0.1.33494@sha256:3faae7626bf817acb157ce552668c82d31a76182dcfd45766165da38a26baad2
     working_dir: /workspace
     volumes:
-      - .:/workspace:ro
-    command: --format=sarif --color=never --no-progress --no-exit-codes .github/workflows
+      - ./:/workspace:ro
+    entrypoint: ["circleci"]
+    command: config validate .circleci/config.yml
 
   integration:
     image: oven/bun:1.1.43@sha256:10cda3ac52b7ddfb3dda2fd1f0ed2147dcb8d5b7ed7baeffbfcaf6e15c1c00df

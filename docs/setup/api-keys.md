@@ -127,7 +127,7 @@ SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
 
 1. `infra/.env` の `SENTRY_AUTH_TOKEN` が正しく設定されているか確認
 2. トークンが有効で、必要なスコープ（`org:read`, `org:write`, `team:read`, `team:write`, `project:read`, `project:write`）が付与されているか確認
-3. `check infra` を実行して、トークンの有効性を確認
+3. `bun run infra:verify` を実行して、トークンの有効性を確認
 
 #### エラー: "You do not have permission to perform this action" (403)
 
@@ -194,17 +194,17 @@ BETTER_AUTH_SECRET="your-generated-secret-key"
 
 ## まとめ
 
-すべての認証情報を `infra/.env` に設定し、`check infra` で検証できます。`cd infra && pulumi up` で Cloudflare Pages/Workers に環境変数が反映され、D1 / KV / R2 も合わせて作成・紐付けされます。
+すべての認証情報を `infra/.env` に設定し、`bun run infra:verify` で検証できます。`cd infra && pulumi up` で Cloudflare Pages/Workers に環境変数が反映され、D1 / KV / R2 も合わせて作成・紐付けされます。
 
-## check infra コマンド（APIキー・トークン検証）
+## infra:verify コマンド（APIキー・トークン検証）
 
-`scripts/check` の `infra` サブコマンドで、`.env` から読み込んだ API キー・トークンの有効性を一括検証できます。
+`infra/scripts/verify.ts` で、`.env` から読み込んだ API キー・トークンの有効性を一括検証できます。
 
 ### 使用方法
 
 ```bash
-# リポジトリルートから（check は fmt/lint/type/test/knip を実行。infra は -- で渡す）
-bun run check -- infra
+# リポジトリルートから
+bun run infra:verify
 ```
 
 ### 確認内容
