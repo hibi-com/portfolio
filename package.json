@@ -20,7 +20,7 @@
     "fmt:actions:check": "check --check-type=fmt --lint-type=actions",
     "fmt:actions:fix": "check --check-type=fmt --lint-type=actions --fix",
     "fmt:check": "concurrently -n turbo,shell,actions,pkg -c \"blue,green,yellow,magenta\" \"bun run fmt:ts:check\" \"bun run fmt:shell:check\" \"bun run fmt:actions:check\" \"bun run fmt:pkg:check\"",
-    "fmt:pkg:check": "syncpack format --check",
+    "fmt:pkg:check": "syncpack format && git diff --exit-code -- package.json apps/*/package.json packages/*/package.json testing/*/package.json tooling/*/package.json scripts/*/package.json generators/package.json infra/package.json",
     "fmt:pkg:fix": "syncpack format",
     "fmt:shell:check": "check --check-type=fmt --lint-type=shell",
     "fmt:shell:fix": "check --check-type=fmt --lint-type=shell --fix",
