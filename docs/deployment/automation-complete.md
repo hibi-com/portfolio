@@ -153,23 +153,18 @@ PRD: Promote (STG→PRD) → Download / Rebuild → Deploy
 
 **スケジュール**: 毎週日曜 4:00AM
 
-### ✅ 11. Load Testing（k6）
+### ✅ 11. Load Testing（Cloudflare Workers）
 
-**対象**: STG のみ（PRD / RC 禁止）
-
-**閾値**:
-
-- p95 < 500ms
-- Error Rate < 1%
+**対象**: STG のみ（PRD / RC 禁止）  
+**方式**: `apps/runner` + Queues（Pod 相当を YAML で増減）  
+**制約**: 正常系 GET/HEAD のみ。非 2xx で失敗（e2e シナリオは使わない）
 
 **スケジュール**: 毎週日曜 5:00AM
 
-### ✅ 12. DAST（OWASP ZAP + Nuclei）
+### ✅ 12. DAST（Cloudflare Workers）
 
-**対象**: STG のみ（PRD / RC 禁止）
-
-- ZAP: baseline（`stg.www`）
-- Nuclei: Web + API（`testing/dast/targets-stg.txt`）
+**対象**: STG のみ  
+**方式**: Worker から SQLi / XSS 等プローブ（設定: `testing/dast/stg.yaml`）
 
 **スケジュール**: 毎週日曜 6:00AM
 
@@ -213,8 +208,8 @@ graph TD
 | Backup | 毎日 | 2:00AM | 全環境 |
 | Performance Test | 毎週月曜 | 3:00AM | PRD |
 | Visual Regression | 毎週日曜 | 4:00AM | PRD |
-| Load Test (k6) | 毎週日曜 | 5:00AM | STG のみ |
-| DAST (ZAP + Nuclei) | 毎週日曜 | 6:00AM | STG のみ |
+| Load Test (Workers) | 毎週日曜 | 5:00AM | STG のみ |
+| DAST (Workers) | 毎週日曜 | 6:00AM | STG のみ |
 | Cost Report | 毎月1日 | 9:00AM | - |
 
 STG/PRD のアプリ・Infra デプロイは cron ではなく、`ci-cd` workflow 内の Approval で起動する。
@@ -227,6 +222,7 @@ STG/PRD のアプリ・Infra デプロイは cron ではなく、`ci-cd` workflo
 | `cloudflare` | CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID | Cloudflare API認証情報 |
 | `sentry` | SENTRY_AUTH_TOKEN, SENTRY_ORG | Sentry監視設定 |
 | `pulumi` | AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, PULUMI_BACKEND_URL, PULUMI_CONFIG_PASSPHRASE | Pulumi DIY backend（Cloudflare R2）。詳細は [circleci-pulumi-r2.md](../setup/circleci-pulumi-r2.md) |
+| `runner` | RUNNER_BASE_URL, RUNNER_TOKEN | STG 負荷試験 / DAST 用 Workers オーケストレーション |
 | `security` | SNYK_TOKEN | Snyk脆弱性スキャン認証情報 |
 | `percy` | PERCY_TOKEN | Percy Visual Regression認証情報 |
 

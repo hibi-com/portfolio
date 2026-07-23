@@ -1,3 +1,0 @@
-# STG のみを対象にする
-https://stg.www.ageha734.jp
-https://stg.api.ageha734.jp

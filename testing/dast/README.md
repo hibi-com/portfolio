@@ -1,29 +1,12 @@
-# DAST / 脆弱性診断（STG 専用）
+# DAST / 脆弱性診断（STG / Workers）
 
-稼働中エンドポイントに対する動的脆弱性診断。**対象は STG のみ**（PRD / RC 禁止）。
-
-| ツール | 用途 |
-| ------ | ---- |
-| OWASP ZAP | baseline スキャン（Web） |
-| Nuclei | 既知脆弱性テンプレートスキャン（Web / API） |
-
-負荷試験は `testing/k6/`。依存関係スキャンは `compose.ci.yaml` の Trivy / Snyk / Gitleaks。
-
-## 実行
+実体は Cloudflare Workers（`apps/runner`）からのプローブ送信。  
+ZAP/Nuclei バイナリは使わず、Worker 内蔵ペイロード（SQLi / XSS 等）で診断する。
 
 ```bash
-# 対象ホスト検証
-docker compose -f compose.ci.yaml run --rm dast-guard
-
-# ZAP baseline
-docker compose -f compose.ci.yaml run --rm zap
-
-# Nuclei
-docker compose -f compose.ci.yaml run --rm nuclei
+bun run dast
+# または
+bun run --filter=@portfolio/runner orchestrate -- --config testing/dast/stg.yaml
 ```
 
-レポートはリポジトリルートに出力される（gitignore 済み）。
-
-## 注意
-
-STG が Cloudflare Access で保護されている場合、バイパス用認証情報の設定が必要になることがある。
+設定は `testing/dast/stg.yaml`（Pod スケール項目は負荷試験と同じキー）。

@@ -1062,38 +1062,32 @@ jobs:
               exit 1
             fi
   load-test:
-    executor: machine-large
+    executor: default
     steps:
       - checkout
+      - install-bun
+      - restore-deps
       - run:
-          name: Run load tests
-          command: docker compose -f compose.ci.yaml run --rm k6
+          name: Install dependencies
+          command: bun install --frozen-lockfile --ignore-scripts
+      - run:
+          name: STG load test via Cloudflare Workers
+          command: bun run --filter=@portfolio/runner orchestrate -- --config testing/load/stg.yaml
           no_output_timeout: 40m
-      - store_artifacts:
-          path: load-test-results.json
-          destination: load-test-results.json
 
   dast:
-    executor: machine-large
+    executor: default
     steps:
       - checkout
+      - install-bun
+      - restore-deps
       - run:
-          name: OWASP ZAP baseline
-          command: docker compose -f compose.ci.yaml run --rm zap
-          no_output_timeout: 30m
+          name: Install dependencies
+          command: bun install --frozen-lockfile --ignore-scripts
       - run:
-          name: Nuclei scan
-          command: docker compose -f compose.ci.yaml run --rm nuclei
-          no_output_timeout: 30m
-      - store_artifacts:
-          path: zap-report.json
-          destination: dast/zap-report.json
-      - store_artifacts:
-          path: zap-report.html
-          destination: dast/zap-report.html
-      - store_artifacts:
-          path: nuclei-report.jsonl
-          destination: dast/nuclei-report.jsonl
+          name: STG DAST via Cloudflare Workers
+          command: bun run --filter=@portfolio/runner orchestrate -- --config testing/dast/stg.yaml
+          no_output_timeout: 40m
 workflows:
   ci-cd:
     jobs:
@@ -1606,7 +1600,8 @@ workflows:
               only:
                 - master
     jobs:
-      - load-test
+      - load-test:
+          context: runner
   dast-stg:
     triggers:
       - schedule:
@@ -1616,4 +1611,5 @@ workflows:
               only:
                 - master
     jobs:
-      - dast
+      - dast:
+          context: runner
