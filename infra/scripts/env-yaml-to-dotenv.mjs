@@ -11,42 +11,31 @@ const infraDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const envYamlPath = join(infraDir, "env.yaml");
 const envPath = join(infraDir, ".env");
 
-const doc = parse(readFileSync(envYamlPath, "utf8")) as {
-    infra?: {
-        cloudflare?: { accountId?: string; apiToken?: string; zoneId?: string };
-        sentry?: { authToken?: string; org?: string };
-    };
-    secrets?: {
-        auth?: {
-            betterAuthSecret?: string;
-            googleClientId?: string;
-            googleClientSecret?: string;
-        };
-        sentry?: { dsn?: string };
-    };
-    apps?: {
-        api?: { baseUrl?: string };
-        admin?: { betterAuthUrl?: string };
-        web?: { vite?: { baseUrl?: string } };
-    };
-    general?: { appVersion?: string };
-};
+const doc = parse(readFileSync(envYamlPath, "utf8")) ?? {};
+const infra = doc.infra ?? {};
+const cloudflare = infra.cloudflare ?? {};
+const sentryInfra = infra.sentry ?? {};
+const secrets = doc.secrets ?? {};
+const auth = secrets.auth ?? {};
+const sentrySecrets = secrets.sentry ?? {};
+const apps = doc.apps ?? {};
+const general = doc.general ?? {};
 
-const lines: string[] = [
+const lines = [
     `# Generated from env.yaml — do not commit`,
-    `CLOUDFLARE_API_TOKEN=${doc.infra?.cloudflare?.apiToken ?? ""}`,
-    `CLOUDFLARE_ACCOUNT_ID=${doc.infra?.cloudflare?.accountId ?? ""}`,
-    `CLOUDFLARE_ZONE_ID=${doc.infra?.cloudflare?.zoneId ?? ""}`,
-    `SENTRY_AUTH_TOKEN=${doc.infra?.sentry?.authToken ?? ""}`,
-    `SENTRY_ORG=${doc.infra?.sentry?.org ?? ""}`,
-    `SENTRY_DSN=${doc.secrets?.sentry?.dsn ?? ""}`,
-    `BETTER_AUTH_SECRET=${doc.secrets?.auth?.betterAuthSecret ?? ""}`,
-    `GOOGLE_CLIENT_ID=${doc.secrets?.auth?.googleClientId ?? ""}`,
-    `GOOGLE_CLIENT_SECRET=${doc.secrets?.auth?.googleClientSecret ?? ""}`,
-    `API_BASE_URL=${doc.apps?.api?.baseUrl ?? ""}`,
-    `BETTER_AUTH_URL=${doc.apps?.admin?.betterAuthUrl ?? ""}`,
-    `VITE_BASE_URL=${doc.apps?.web?.vite?.baseUrl ?? ""}`,
-    `APP_VERSION=${doc.general?.appVersion ?? ""}`,
+    `CLOUDFLARE_API_TOKEN=${cloudflare.apiToken ?? ""}`,
+    `CLOUDFLARE_ACCOUNT_ID=${cloudflare.accountId ?? ""}`,
+    `CLOUDFLARE_ZONE_ID=${cloudflare.zoneId ?? ""}`,
+    `SENTRY_AUTH_TOKEN=${sentryInfra.authToken ?? ""}`,
+    `SENTRY_ORG=${sentryInfra.org ?? ""}`,
+    `SENTRY_DSN=${sentrySecrets.dsn ?? ""}`,
+    `BETTER_AUTH_SECRET=${auth.betterAuthSecret ?? ""}`,
+    `GOOGLE_CLIENT_ID=${auth.googleClientId ?? ""}`,
+    `GOOGLE_CLIENT_SECRET=${auth.googleClientSecret ?? ""}`,
+    `API_BASE_URL=${apps.api?.baseUrl ?? ""}`,
+    `BETTER_AUTH_URL=${apps.admin?.betterAuthUrl ?? ""}`,
+    `VITE_BASE_URL=${apps.web?.vite?.baseUrl ?? ""}`,
+    `APP_VERSION=${general.appVersion ?? ""}`,
 ];
 
 writeFileSync(envPath, `${lines.join("\n")}\n`, "utf8");

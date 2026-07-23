@@ -15,8 +15,9 @@ title: "CI/CDツール"
 
 ## 概要
 
-- **CI**: push 時に品質チェック（format / lint / typecheck）→ test → e2e → build → 成果物を CircleCI Artifacts へ保存。`copilot/` で始まるブランチは除外。
-- **CD**: デプロイ workflow はソースから再ビルドしてデプロイ。DB は Cloudflare D1（`wrangler d1 migrations apply`）。
+- **CI → CD**: master/main では単一 workflow `ci-cd`。`upload-artifacts` 成功後にのみ RC デプロイ（`download-artifacts-rc` …）と `infra-plan-rc` が起動する。feature ブランチは CI のみ。
+- **CD（RC）**: CI 通過後にソース再ビルドしてデプロイ。DB は Cloudflare D1（`wrangler d1 migrations apply`）。
+- **STG/PRD**: スケジュール workflow（`deploy-stg` / `deploy-prd` / `infra-stg` / `infra-prd`）で別実行。
 - **失敗時**: テスト・E2E・ビルド・デプロイの失敗で GitHub Issue を自動作成（ジョブ名・ブランチ・コミット・ログリンク・ラベル付与）。詳細な条件は `.circleci/config.yml` を参照。
 - **デプロイ**: **ローカルからのデプロイは禁止**。すべて CircleCI 経由で実行。デプロイログは `logs/deployment/` に記録。
 
