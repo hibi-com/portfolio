@@ -105,6 +105,46 @@ commands:
           paths:
             - .turbo
 
+  login-pulumi-r2:
+    description: Login to Pulumi DIY backend on Cloudflare R2
+    steps:
+      - run:
+          name: Login Pulumi (R2 backend)
+          command: |
+            set -euo pipefail
+            for v in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY PULUMI_BACKEND_URL PULUMI_CONFIG_PASSPHRASE; do
+              if [ -z "${!v:-}" ]; then
+                echo "Error: ${v} is not set (CircleCI Context 'pulumi' を確認)"
+                exit 1
+              fi
+            done
+            echo "Backend: ${PULUMI_BACKEND_URL}"
+            pulumi login "${PULUMI_BACKEND_URL}"
+            pulumi whoami -v || true
+
+  prepare-infra-env:
+    description: Decode ENV_CONFIG and materialize infra/.env for Pulumi
+    parameters:
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+    steps:
+      - load-env-config:
+          environment: << parameters.environment >>
+      - run:
+          name: Materialize infra/.env from env.yaml
+          command: |
+            cd infra
+            bun run scripts/env-yaml-to-dotenv.mjs
+            # Pulumi / dotenv 用に必須キーが空でないことだけ確認（値は出さない）
+            for v in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_ZONE_ID SENTRY_AUTH_TOKEN SENTRY_ORG; do
+              if ! grep -q "^${v}=.\+" .env; then
+                echo "Error: ${v} is empty in infra/.env (env.yaml / ENV_CONFIG を確認)"
+                exit 1
+              fi
+            done
+            echo "✓ infra/.env ready"
+
 jobs:
   setup:
     executor: default
@@ -885,18 +925,21 @@ jobs:
           command: |
             cd infra
             bun install --frozen-lockfile --ignore-scripts
+      - prepare-infra-env:
+          environment: << parameters.environment >>
+      - login-pulumi-r2
+      - run:
+          name: Build infrastructure code
+          command: |
+            cd infra
+            bun run build
       - run:
           name: Pulumi preview for << parameters.environment >>
           command: |
             cd infra
-
-            pulumi login
-
-            pulumi stack select << parameters.environment >>
-
+            pulumi stack select "<< parameters.environment >>" --create
             echo "=== Infrastructure Preview for << parameters.environment >> ==="
             pulumi preview --diff --non-interactive
-
             echo "✓ Infrastructure preview completed"
       - store_artifacts:
           path: infra/Pulumi.yaml
@@ -923,6 +966,9 @@ jobs:
           command: |
             cd infra
             bun install --frozen-lockfile --ignore-scripts
+      - prepare-infra-env:
+          environment: << parameters.environment >>
+      - login-pulumi-r2
       - run:
           name: Build infrastructure code
           command: |
@@ -932,18 +978,11 @@ jobs:
           name: Deploy infrastructure to << parameters.environment >>
           command: |
             cd infra
-
-            pulumi login
-
-            pulumi stack select << parameters.environment >>
-
+            pulumi stack select "<< parameters.environment >>" --create
             echo "=== Deploying Infrastructure to << parameters.environment >> ==="
             echo "Stack: << parameters.environment >>"
-
             pulumi up --yes --skip-preview --non-interactive
-
             echo "✓ Infrastructure deployment completed"
-
             pulumi stack output --json > stack-outputs.json
             cat stack-outputs.json | jq '.'
       - store_artifacts:
@@ -960,7 +999,7 @@ jobs:
                 https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
                 -d "{
                   \"title\": \"[Infra Failure] Infrastructure deployment failed on << parameters.environment >>\",
-                  \"body\": \"## Infrastructure Deployment Failure\n\n**Environment:** << parameters.environment >>\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the Pulumi logs\n- [ ] Check infra/src code changes\n- [ ] Verify Pulumi backend state\n- [ ] Manual rollback if necessary\n\n### Manual Commands\n\n\`\`\`bash\ncd infra\npulumi stack select << parameters.environment >>\npulumi preview --diff\npulumi up\n\`\`\`\",
+                  \"body\": \"## Infrastructure Deployment Failure\n\n**Environment:** << parameters.environment >>\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the Pulumi logs\n- [ ] Check infra/src code changes\n- [ ] Verify Pulumi R2 backend state\n- [ ] Manual rollback if necessary\n\n### Manual Commands\n\n\`\`\`bash\ncd infra\npulumi login \\\"\\\$PULUMI_BACKEND_URL\\\"\npulumi stack select << parameters.environment >>\npulumi preview --diff\npulumi up\n\`\`\`\",
                   \"labels\": [\"infra-failure\", \"<< parameters.environment >>\", \"automated\"]
                 }"
             fi
@@ -1525,7 +1564,9 @@ workflows:
     jobs:
       - infra-plan:
           environment: rc
-          context: pulumi
+          context:
+            - pulumi
+            - env-config
 
       - hold-infra-approval:
           type: approval
@@ -1536,7 +1577,9 @@ workflows:
           environment: rc
           requires:
             - hold-infra-approval
-          context: pulumi
+          context:
+            - pulumi
+            - env-config
 
   infra-stg:
     triggers:
@@ -1549,13 +1592,17 @@ workflows:
     jobs:
       - infra-plan:
           environment: stg
-          context: pulumi
+          context:
+            - pulumi
+            - env-config
 
       - infra-deploy:
           environment: stg
           requires:
             - infra-plan
-          context: pulumi
+          context:
+            - pulumi
+            - env-config
 
   infra-prd:
     triggers:
@@ -1568,7 +1615,9 @@ workflows:
     jobs:
       - infra-plan:
           environment: prd
-          context: pulumi
+          context:
+            - pulumi
+            - env-config
 
       - hold-infra-approval:
           type: approval
@@ -1579,7 +1628,9 @@ workflows:
           environment: prd
           requires:
             - hold-infra-approval
-          context: pulumi
+          context:
+            - pulumi
+            - env-config
 
   backup:
     triggers:

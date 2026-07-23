@@ -24,7 +24,7 @@
     "generate:mermaid": "bun run dist/generators/generateMermaidDiagrams.js",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
-    "login": "pulumi login",
+    "login": "pulumi login \"$PULUMI_BACKEND_URL\"",
     "preview": "pulumi preview",
     "refresh": "pulumi refresh",
     "select": "pulumi stack select",

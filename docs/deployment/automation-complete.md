@@ -222,7 +222,7 @@ graph TD
 | `env-config` | ENV_CONFIG_RC, ENV_CONFIG_STG, ENV_CONFIG_PRD | 環境設定（base64エンコード済み） |
 | `cloudflare` | CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID | Cloudflare API認証情報 |
 | `sentry` | SENTRY_AUTH_TOKEN, SENTRY_ORG | Sentry監視設定 |
-| `pulumi` | PULUMI_ACCESS_TOKEN | Pulumi IaC認証情報 |
+| `pulumi` | AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, PULUMI_BACKEND_URL, PULUMI_CONFIG_PASSPHRASE | Pulumi DIY backend（Cloudflare R2）。詳細は [circleci-pulumi-r2.md](../setup/circleci-pulumi-r2.md) |
 | `security` | SNYK_TOKEN | Snyk脆弱性スキャン認証情報 |
 | `percy` | PERCY_TOKEN | Percy Visual Regression認証情報 |
 

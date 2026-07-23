@@ -5,6 +5,8 @@ runtime:
     typescript: false
     main: "./dist/index.js"
 description: Infrastructure as Code for Portfolio
+backend:
+  url: s3://portfolio-pulumi-state?endpoint=b9674389841acb96481df74f4ce796fb.r2.cloudflarestorage.com&region=auto
 config:
   pulumi:tags:
     value:

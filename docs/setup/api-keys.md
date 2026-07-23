@@ -19,6 +19,7 @@ title: "API Key Setup"
 2. [Sentry認証トークン](#sentry認証トークン)
 3. [Google OAuth認証情報](#google-oauth認証情報)
 4. [Better Auth Secret](#better-auth-secret)
+5. [CircleCI（Pulumi × R2）](./circleci-pulumi-r2.md)
 
 ## Cloudflare APIトークン
 
