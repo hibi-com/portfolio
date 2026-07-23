@@ -7,10 +7,10 @@ vi.mock("@portfolio/db", () => ({
 }));
 
 describe("PostRepositoryImpl", () => {
-    const testDatabaseUrl = "mysql://user:password@localhost:3306/portfolio";
+    const prismaOptions = { databaseUrl: "http://127.0.0.1:8081" };
 
     test("should create repository instance", () => {
-        const repository = new PostRepositoryImpl(testDatabaseUrl);
+        const repository = new PostRepositoryImpl(prismaOptions);
 
         expect(repository).toBeDefined();
     });
@@ -24,7 +24,7 @@ describe("PostRepositoryImpl", () => {
             },
         } as any);
 
-        const repository = new PostRepositoryImpl(testDatabaseUrl);
+        const repository = new PostRepositoryImpl(prismaOptions);
         const result = await repository.findAll();
 
         expect(result).toEqual(mockPosts);
@@ -37,7 +37,7 @@ describe("PostRepositoryImpl", () => {
             },
         } as any);
 
-        const repository = new PostRepositoryImpl(testDatabaseUrl);
+        const repository = new PostRepositoryImpl(prismaOptions);
         const result = await repository.findBySlug("test-slug");
 
         expect(result).toBeNull();

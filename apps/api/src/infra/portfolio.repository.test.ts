@@ -8,10 +8,10 @@ vi.mock("@portfolio/db", () => ({
 }));
 
 describe("PortfolioRepositoryImpl", () => {
-    const testDatabaseUrl = "mysql://user:password@localhost:3306/portfolio";
+    const prismaOptions = { databaseUrl: "http://127.0.0.1:8081" };
 
     test("should create repository instance", () => {
-        const repository = new PortfolioRepositoryImpl(testDatabaseUrl);
+        const repository = new PortfolioRepositoryImpl(prismaOptions);
 
         expect(repository).toBeDefined();
     });
@@ -25,7 +25,7 @@ describe("PortfolioRepositoryImpl", () => {
             },
         } as unknown as PrismaClient);
 
-        const repository = new PortfolioRepositoryImpl(testDatabaseUrl);
+        const repository = new PortfolioRepositoryImpl(prismaOptions);
         const result = await repository.findAll();
 
         expect(result).toEqual(mockPortfolios);
@@ -38,7 +38,7 @@ describe("PortfolioRepositoryImpl", () => {
             },
         } as unknown as PrismaClient);
 
-        const repository = new PortfolioRepositoryImpl(testDatabaseUrl);
+        const repository = new PortfolioRepositoryImpl(prismaOptions);
         const result = await repository.findBySlug("test-slug");
 
         expect(result).toBeNull();

@@ -19,7 +19,7 @@ describe("authenticate", () => {
     test("should return null when BETTER_AUTH_SECRET is not set", async () => {
         const mockContext = {
             env: {
-                DATABASE_URL: "mysql://localhost:3306/test",
+                DATABASE_URL: "http://127.0.0.1:8081",
             },
             req: {
                 raw: {
@@ -39,7 +39,7 @@ describe("authenticate", () => {
 
         const mockContext = {
             env: {
-                DATABASE_URL: "mysql://localhost:3306/test",
+                DATABASE_URL: "http://127.0.0.1:8081",
                 BETTER_AUTH_SECRET: "test-secret",
                 BETTER_AUTH_URL: "http://localhost:8787",
                 GOOGLE_CLIENT_ID: "test-client-id",
@@ -73,7 +73,7 @@ describe("authenticate", () => {
 
         const mockContext = {
             env: {
-                DATABASE_URL: "mysql://localhost:3306/test",
+                DATABASE_URL: "http://127.0.0.1:8081",
                 BETTER_AUTH_SECRET: "test-secret",
                 BETTER_AUTH_URL: "http://localhost:8787",
                 GOOGLE_CLIENT_ID: "test-client-id",
@@ -99,7 +99,7 @@ describe("authenticate", () => {
 
         const mockContext = {
             env: {
-                DATABASE_URL: "mysql://localhost:3306/test",
+                DATABASE_URL: "http://127.0.0.1:8081",
                 BETTER_AUTH_SECRET: "test-secret",
                 GOOGLE_CLIENT_ID: "test-client-id",
                 GOOGLE_CLIENT_SECRET: "test-client-secret",

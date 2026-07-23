@@ -49,7 +49,7 @@ describe("CachedPostRepository", () => {
 
         test("should create instance with prismaOptions and kv", () => {
             const mockKv = {} as KVNamespace;
-            const prismaOptions = { databaseUrl: "mysql://localhost:3306/db" };
+            const prismaOptions = { databaseUrl: "http://127.0.0.1:8081" };
             const repository = new CachedPostRepository(prismaOptions, mockKv);
 
             expect(CacheService).toHaveBeenCalledWith(mockKv);
