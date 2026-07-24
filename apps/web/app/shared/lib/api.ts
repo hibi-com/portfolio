@@ -2,13 +2,16 @@ import { getPortfolios } from "@portfolio/api/generated/portfolios/portfolios";
 import { getPosts } from "@portfolio/api/generated/posts/posts";
 
 const getBaseUrl = (apiUrl?: string) => {
+    if (apiUrl) {
+        return apiUrl;
+    }
     if (typeof globalThis !== "undefined" && "window" in globalThis) {
         const win = globalThis.window;
         if (win !== undefined) {
             return win.location.origin;
         }
     }
-    return apiUrl ?? process.env.VITE_API_URL ?? "http://localhost:8787";
+    return process.env.VITE_API_URL ?? "http://localhost:8787";
 };
 
 export const createApiClient = (apiUrl?: string) => {

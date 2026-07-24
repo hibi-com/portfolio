@@ -7,7 +7,7 @@ const mockLogger = {
     error: vi.fn(),
 };
 
-vi.mock("~/lib/logger", () => ({
+vi.mock("~/shared/lib/logger", () => ({
     getLogger: () => mockLogger,
 }));
 
