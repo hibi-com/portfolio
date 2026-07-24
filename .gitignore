@@ -53,11 +53,14 @@ ehthumbs.db
 ehthumbs_vista.db
 functions/[[path]].js
 functions/[[path]].js.map
+gitleaks-report.json
 infra/env.yaml
 infra/graph.dot
 lerna-debug.log*
 load-test-results.json
 nuclei-report.jsonl
+snyk-report.json
+trivy-report.json
 zap-report.html
 zap-report.json
 node_modules
