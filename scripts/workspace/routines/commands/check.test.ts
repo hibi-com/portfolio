@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
@@ -271,6 +272,22 @@ function shouldSkipTest(name: string): boolean {
             console.log(
                 `${name}はインストールされていないため、テストをスキップします（${defaultPulumiBin}が存在しません）`,
             );
+            return true;
+        }
+    }
+
+    if (name === "claude") {
+        const homeDir = process.env.HOME || process.env.USERPROFILE || "~";
+        const candidates = [`${homeDir}/.local/bin/claude`, `${homeDir}/.claude/bin/claude`];
+        let onPath = false;
+        try {
+            execSync("which claude", { stdio: "ignore" });
+            onPath = true;
+        } catch {
+            onPath = false;
+        }
+        if (!onPath && !candidates.some((path) => existsSync(path))) {
+            console.log(`${name}はインストールされていないため、テストをスキップします（オプション）`);
             return true;
         }
     }
