@@ -52,7 +52,7 @@
   "devDependencies": {
     "@portfolio/biome-config": "workspace:*",
     "@portfolio/tsconfig": "workspace:*",
-    "storybook": "8.6.14",
+    "storybook": "8.6.17",
     "typescript": "5.9.3"
   }
 }
