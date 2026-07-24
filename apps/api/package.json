@@ -35,7 +35,7 @@
     "@portfolio/db": "workspace:*",
     "@portfolio/log": "workspace:*",
     "@portfolio/validation": "workspace:*",
-    "hono": "4.6.14",
+    "hono": "4.12.27",
     "zod": "4.3.4"
   },
   "devDependencies": {
