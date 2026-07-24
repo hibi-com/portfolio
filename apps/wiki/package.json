@@ -29,7 +29,7 @@
     "@astrojs/starlight": "0.31.1",
     "@portfolio/ui": "workspace:*",
     "@portfolio/validation": "workspace:*",
-    "astro": "5.18.2",
+    "astro": "7.1.0",
     "astro-mermaid": "1.0.0",
     "hast-util-to-string": "3.0.1",
     "mermaid": "11.0.0",
