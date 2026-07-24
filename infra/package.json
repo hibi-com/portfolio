@@ -38,7 +38,7 @@
     "@pulumi/random": "4.16.7",
     "@pulumiverse/sentry": "0.0.9",
     "dotenv": "17.2.3",
-    "yaml": "2.8.0"
+    "yaml": "2.8.3"
   },
   "devDependencies": {
     "@portfolio/biome-config": "workspace:*",
