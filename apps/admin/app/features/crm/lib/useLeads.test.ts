@@ -1,6 +1,6 @@
 import type { Lead } from "@portfolio/api";
 import { leads as leadsApi } from "@portfolio/api";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { useLeads } from "./useLeads";
 
 vi.mock("@portfolio/api", () => ({
@@ -142,14 +142,19 @@ describe("useLeads", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                const created = await result.current.createLead({
+                let created: Awaited<ReturnType<typeof result.current.createLead>> | null = null;
+                await act(async () => {
+                    created = await result.current.createLead({
                     name: "New Lead",
                     email: "new@example.com",
                     source: "REFERRAL",
                 });
 
                 expect(created).toEqual(newLead);
-                expect(result.current.leads).toEqual([newLead, existingLead]);
+                });
+                await waitFor(() => {
+                    expect(result.current.leads).toEqual([newLead, existingLead]);
+                });
             });
         });
 
@@ -205,13 +210,18 @@ describe("useLeads", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                const updated = await result.current.updateLead("1", {
+                let updated: Awaited<ReturnType<typeof result.current.updateLead>> | null = null;
+                await act(async () => {
+                    updated = await result.current.updateLead("1", {
                     name: "Updated",
                     status: "CONTACTED",
                 });
 
                 expect(updated).toEqual(updatedLead);
-                expect(result.current.leads).toEqual([updatedLead]);
+                });
+                await waitFor(() => {
+                    expect(result.current.leads).toEqual([updatedLead]);
+                });
             });
         });
 
@@ -237,7 +247,9 @@ describe("useLeads", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.updateLead("1", { name: "Updated" })).rejects.toThrow("Update failed");
+                await act(async () => {
+                    await expect(result.current.updateLead("1", { name: "Updated" })).rejects.toThrow("Update failed");
+                });
             });
         });
     });
@@ -274,9 +286,13 @@ describe("useLeads", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await result.current.deleteLead("1");
+                await act(async () => {
+                    await result.current.deleteLead("1");
+                });
 
-                expect(result.current.leads).toEqual([lead2]);
+                await waitFor(() => {
+                    expect(result.current.leads).toEqual([lead2]);
+                });
             });
         });
 
@@ -302,7 +318,9 @@ describe("useLeads", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.deleteLead("1")).rejects.toThrow("Delete failed");
+                await act(async () => {
+                    await expect(result.current.deleteLead("1")).rejects.toThrow("Delete failed");
+                });
             });
         });
     });
@@ -339,9 +357,13 @@ describe("useLeads", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await result.current.convertLead("1");
+                await act(async () => {
+                    await result.current.convertLead("1");
+                });
 
-                expect(result.current.leads).toEqual([lead2]);
+                await waitFor(() => {
+                    expect(result.current.leads).toEqual([lead2]);
+                });
                 expect(leadsApi.convert).toHaveBeenCalledWith("1");
             });
         });
@@ -368,7 +390,9 @@ describe("useLeads", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.convertLead("1")).rejects.toThrow("Convert failed");
+                await act(async () => {
+                    await expect(result.current.convertLead("1")).rejects.toThrow("Convert failed");
+                });
             });
         });
     });

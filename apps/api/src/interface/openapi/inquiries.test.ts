@@ -242,6 +242,7 @@ describe("inquiriesRouter", () => {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
+                        inquiryId: "123e4567-e89b-12d3-a456-426614174000",
                         content: "New response",
                         isInternal: false,
                     }),

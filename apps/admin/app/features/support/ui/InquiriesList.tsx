@@ -114,7 +114,7 @@ export function InquiriesList() {
                                                 {inquiry.subject}
                                             </Link>
                                         </TableCell>
-                                        <TableCell>{inquiry.type.replace("_", " ")}</TableCell>
+                                        <TableCell>{inquiry.category?.replace("_", " ") ?? "-"}</TableCell>
                                         <TableCell>
                                             <Badge className={priorityColors[inquiry.priority]} variant="secondary">
                                                 {inquiry.priority}

@@ -28,6 +28,25 @@ const MockWebSocketPair = class {
 
 (globalThis as unknown as { WebSocketPair: typeof MockWebSocketPair }).WebSocketPair = MockWebSocketPair;
 
+const OriginalResponse = globalThis.Response;
+class WorkersCompatibleResponse extends OriginalResponse {
+    constructor(body?: BodyInit | null, init?: ResponseInit & { webSocket?: unknown }) {
+        if (init?.status === 101) {
+            // Node/undici rejects 101; Workers runtime accepts it for WebSocket upgrade.
+            super(body, { ...init, status: 200 });
+            Object.defineProperty(this, "status", { get: () => 101 });
+            if (init.webSocket !== undefined) {
+                Object.defineProperty(this, "webSocket", {
+                    get: () => init.webSocket,
+                });
+            }
+        } else {
+            super(body, init);
+        }
+    }
+}
+(globalThis as unknown as { Response: typeof Response }).Response = WorkersCompatibleResponse as typeof Response;
+
 import { ChatRoomDO } from "./ChatRoomDO";
 
 /** Test-only: cast to access private sessions for assertions */

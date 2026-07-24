@@ -1,6 +1,6 @@
 import type { Inquiry, InquiryResponse } from "@portfolio/api";
 import { inquiries as inquiriesApi } from "@portfolio/api";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { useInquiries, useInquiryDetail } from "./useInquiries";
 
 vi.mock("@portfolio/api", () => ({
@@ -156,7 +156,9 @@ describe("useInquiries", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                const created = await result.current.createInquiry({
+                let created: Awaited<ReturnType<typeof result.current.createInquiry>> | null = null;
+                await act(async () => {
+                    created = await result.current.createInquiry({
                     subject: "New Inquiry",
                     content: "New content",
                     type: "BUG_REPORT",
@@ -165,7 +167,10 @@ describe("useInquiries", () => {
                 });
 
                 expect(created).toEqual(newInquiry);
-                expect(result.current.inquiries).toEqual([newInquiry, existingInquiry]);
+                });
+                await waitFor(() => {
+                    expect(result.current.inquiries).toEqual([newInquiry, existingInquiry]);
+                });
             });
         });
 
@@ -226,13 +231,18 @@ describe("useInquiries", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                const updated = await result.current.updateInquiry("1", {
+                let updated: Awaited<ReturnType<typeof result.current.updateInquiry>> | null = null;
+                await act(async () => {
+                    updated = await result.current.updateInquiry("1", {
                     subject: "Updated",
                     status: "IN_PROGRESS",
                 });
 
                 expect(updated).toEqual(updatedInquiry);
-                expect(result.current.inquiries).toEqual([updatedInquiry]);
+                });
+                await waitFor(() => {
+                    expect(result.current.inquiries).toEqual([updatedInquiry]);
+                });
             });
         });
 
@@ -261,9 +271,11 @@ describe("useInquiries", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.updateInquiry("1", { subject: "Updated" })).rejects.toThrow(
+                await act(async () => {
+                    await expect(result.current.updateInquiry("1", { subject: "Updated" })).rejects.toThrow(
                     "Update failed",
                 );
+                });
             });
         });
     });
@@ -299,9 +311,13 @@ describe("useInquiries", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await result.current.closeInquiry("1");
+                await act(async () => {
+                    await result.current.closeInquiry("1");
+                });
 
-                expect(result.current.inquiries).toEqual([closedInquiry]);
+                await waitFor(() => {
+                    expect(result.current.inquiries).toEqual([closedInquiry]);
+                });
                 expect(inquiriesApi.close).toHaveBeenCalledWith("1");
             });
         });
@@ -331,7 +347,9 @@ describe("useInquiries", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.closeInquiry("1")).rejects.toThrow("Close failed");
+                await act(async () => {
+                    await expect(result.current.closeInquiry("1")).rejects.toThrow("Close failed");
+                });
             });
         });
     });
@@ -462,13 +480,18 @@ describe("useInquiryDetail", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                const added = await result.current.respond({
-                    message: "New response",
-                    isInternal: false,
+                let added: Awaited<ReturnType<typeof result.current.respond>> | null = null;
+                await act(async () => {
+                    added = await result.current.respond({
+                        message: "New response",
+                        isInternal: false,
+                    });
                 });
 
                 expect(added).toEqual(newResponse);
-                expect(result.current.inquiry?.responses).toEqual([existingResponse, newResponse]);
+                await waitFor(() => {
+                    expect(result.current.inquiry?.responses).toEqual([existingResponse, newResponse]);
+                });
             });
         });
 

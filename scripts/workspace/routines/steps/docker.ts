@@ -18,6 +18,25 @@ async function checkImageExists(imageName: string): Promise<boolean> {
     }
 }
 
+async function migrateLegacyE2eImage(imageName: string): Promise<boolean> {
+    if (imageName !== "scenario") {
+        return false;
+    }
+    if (await checkImageExists("scenario")) {
+        return true;
+    }
+    if (!(await checkImageExists("e2e"))) {
+        return false;
+    }
+    try {
+        await $`docker tag e2e:latest scenario:latest`.quiet();
+        logSubStep("旧 e2e イメージを scenario としてタグ付けしました", "success");
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 async function buildImageWithLoadingBar(
     rootDir: string,
     target: DockerBuildTarget,
@@ -56,7 +75,7 @@ async function buildTarget(rootDir: string, target: DockerBuildTarget, useLoadin
         return;
     }
 
-    const imageExists = await checkImageExists(target.imageName);
+    const imageExists = (await checkImageExists(target.imageName)) || (await migrateLegacyE2eImage(target.imageName));
     if (imageExists) {
         logSubStep(`${target.displayName}Dockerイメージは既に存在します`, "success");
         return;

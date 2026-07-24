@@ -99,7 +99,7 @@ describe("CachedPortfolioRepository", () => {
             const result = await repository.findAll();
 
             expect(result).toEqual(dbPortfolios);
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redis書き込みエラー（findAll）"));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("KV書き込みエラー（findAll）"));
 
             consoleWarnSpy.mockRestore();
         });
@@ -165,7 +165,7 @@ describe("CachedPortfolioRepository", () => {
             const result = await repository.findBySlug("test-portfolio");
 
             expect(result).toEqual(mockPortfolio);
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redis書き込みエラー（findBySlug）"));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("KV書き込みエラー（findBySlug）"));
 
             consoleWarnSpy.mockRestore();
         });
@@ -219,7 +219,7 @@ describe("CachedPortfolioRepository", () => {
             const result = await repository.findById("1");
 
             expect(result).toEqual(mockPortfolio);
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Redis書き込みエラー（findById）"));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("KV書き込みエラー（findById）"));
 
             consoleWarnSpy.mockRestore();
         });

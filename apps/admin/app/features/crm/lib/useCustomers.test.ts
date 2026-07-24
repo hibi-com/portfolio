@@ -1,6 +1,6 @@
 import type { Customer } from "@portfolio/api";
 import { customers as customersApi } from "@portfolio/api";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { useCustomers } from "./useCustomers";
 
 vi.mock("@portfolio/api", () => ({
@@ -137,14 +137,19 @@ describe("useCustomers", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                const created = await result.current.createCustomer({
-                    name: "New Customer",
-                    email: "new@example.com",
-                    status: "PROSPECT",
+                let created: Customer | null = null;
+                await act(async () => {
+                    created = await result.current.createCustomer({
+                        name: "New Customer",
+                        email: "new@example.com",
+                        status: "PROSPECT",
+                    });
                 });
 
                 expect(created).toEqual(newCustomer);
-                expect(result.current.customers).toEqual([newCustomer, existingCustomer]);
+                await waitFor(() => {
+                    expect(result.current.customers).toEqual([newCustomer, existingCustomer]);
+                });
             });
         });
 
@@ -160,13 +165,15 @@ describe("useCustomers", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(
-                    result.current.createCustomer({
-                        name: "Test",
-                        email: "test@example.com",
-                        status: "PROSPECT",
-                    }),
-                ).rejects.toThrow("Create failed");
+                await act(async () => {
+                    await expect(
+                        result.current.createCustomer({
+                            name: "Test",
+                            email: "test@example.com",
+                            status: "PROSPECT",
+                        }),
+                    ).rejects.toThrow("Create failed");
+                });
             });
         });
     });
@@ -199,13 +206,18 @@ describe("useCustomers", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                const updated = await result.current.updateCustomer("1", {
-                    name: "Updated",
-                    status: "ACTIVE",
+                let updated: Customer | null = null;
+                await act(async () => {
+                    updated = await result.current.updateCustomer("1", {
+                        name: "Updated",
+                        status: "ACTIVE",
+                    });
                 });
 
                 expect(updated).toEqual(updatedCustomer);
-                expect(result.current.customers).toEqual([updatedCustomer]);
+                await waitFor(() => {
+                    expect(result.current.customers).toEqual([updatedCustomer]);
+                });
             });
         });
 
@@ -230,7 +242,9 @@ describe("useCustomers", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.updateCustomer("1", { name: "Updated" })).rejects.toThrow("Update failed");
+                await act(async () => {
+                    await expect(result.current.updateCustomer("1", { name: "Updated" })).rejects.toThrow("Update failed");
+                });
             });
         });
     });
@@ -265,9 +279,13 @@ describe("useCustomers", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await result.current.deleteCustomer("1");
+                await act(async () => {
+                    await result.current.deleteCustomer("1");
+                });
 
-                expect(result.current.customers).toEqual([customer2]);
+                await waitFor(() => {
+                    expect(result.current.customers).toEqual([customer2]);
+                });
             });
         });
 
@@ -292,7 +310,9 @@ describe("useCustomers", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.deleteCustomer("1")).rejects.toThrow("Delete failed");
+                await act(async () => {
+                    await expect(result.current.deleteCustomer("1")).rejects.toThrow("Delete failed");
+                });
             });
         });
     });

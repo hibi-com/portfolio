@@ -11,7 +11,7 @@ vi.mock("~/di/create-container", () => ({
         getHandleFreeeCallbackUseCase: vi.fn(() => ({
             execute: vi.fn().mockResolvedValue({
                 id: "123e4567-e89b-12d3-a456-426614174000",
-                userId: "user-123",
+                userId: "123e4567-e89b-12d3-a456-426614174020",
                 companyId: 12345,
                 companyName: "Test Company",
                 isActive: true,
@@ -22,7 +22,7 @@ vi.mock("~/di/create-container", () => ({
         getGetFreeeIntegrationUseCase: vi.fn(() => ({
             execute: vi.fn().mockResolvedValue({
                 id: "123e4567-e89b-12d3-a456-426614174000",
-                userId: "user-123",
+                userId: "123e4567-e89b-12d3-a456-426614174020",
                 companyId: 12345,
                 companyName: "Test Company",
                 isActive: true,
@@ -143,7 +143,7 @@ describe("freeeRouter", () => {
                     body: JSON.stringify({
                         code: "auth-code",
                         redirectUri: "http://localhost:3000/callback",
-                        userId: "user-123",
+                        userId: "123e4567-e89b-12d3-a456-426614174020",
                     }),
                 });
 
@@ -160,7 +160,7 @@ describe("freeeRouter", () => {
     describe("GET /integration", () => {
         describe("正常系", () => {
             test("連携状態を200で返す", async () => {
-                const req = new Request("http://localhost/integration?userId=user-123", {
+                const req = new Request("http://localhost/integration?userId=123e4567-e89b-12d3-a456-426614174020", {
                     method: "GET",
                 });
 
@@ -184,7 +184,7 @@ describe("freeeRouter", () => {
                         }) as never,
                 );
 
-                const req = new Request("http://localhost/integration?userId=user-123", {
+                const req = new Request("http://localhost/integration?userId=123e4567-e89b-12d3-a456-426614174020", {
                     method: "GET",
                 });
 

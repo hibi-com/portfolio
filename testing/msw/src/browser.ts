@@ -8,19 +8,21 @@ function createWorker() {
 }
 
 function isBrowserEnvironment(): boolean {
-    return "window" in globalThis;
+    return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
-const worker = createWorker();
-
-if (isBrowserEnvironment()) {
-    worker.start({
-        onUnhandledRequest: UNHANDLED_REQUEST_STRATEGY,
-        serviceWorker: {
-            url: SERVICE_WORKER_PATH,
-        },
-    });
-}
+const worker = isBrowserEnvironment()
+    ? (() => {
+          const instance = createWorker();
+          void instance.start({
+              onUnhandledRequest: UNHANDLED_REQUEST_STRATEGY,
+              serviceWorker: {
+                  url: SERVICE_WORKER_PATH,
+              },
+          });
+          return instance;
+      })()
+    : (undefined as unknown as ReturnType<typeof createWorker>);
 
 export { worker };
 export default worker;

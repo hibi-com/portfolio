@@ -20,7 +20,7 @@
     "lighthouse": "lhci autorun",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
-    "scenario": "docker run --rm -e CI=true -e APP_DIR=apps/web -v $(git rev-parse --show-toplevel):/work -w /work -v $(git rev-parse --show-toplevel)/node_modules:/work/node_modules -v $(git rev-parse --show-toplevel)/docs/playwright/report:/work/docs/playwright/report -v $(git rev-parse --show-toplevel)/docs/security/e2e:/work/docs/security/e2e scenario",
+    "scenario": "docker run --rm -e CI=true -e SKIP_BUILD=true -e APP_DIR=apps/web -v $(git rev-parse --show-toplevel):/work -w /work -v $(git rev-parse --show-toplevel)/node_modules:/work/node_modules -v $(git rev-parse --show-toplevel)/docs/playwright/report:/work/docs/playwright/report -v $(git rev-parse --show-toplevel)/docs/security/e2e:/work/docs/security/e2e scenario",
     "snapshot": "docker run --rm -e CI=true -e APP_DIR=apps/web -v $(git rev-parse --show-toplevel):/work -w /work/apps/web -v $(git rev-parse --show-toplevel)/node_modules:/work/node_modules -v $(git rev-parse --show-toplevel)/docs/playwright/report:/work/docs/playwright/report scenario bun x playwright test --project=chromium --update-snapshots",
     "studio": "storybook dev -p 16011 --no-open",
     "test": "vitest run",

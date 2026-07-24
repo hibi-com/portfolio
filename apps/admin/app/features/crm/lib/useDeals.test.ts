@@ -1,6 +1,6 @@
 import type { Deal, Pipeline } from "@portfolio/api";
 import { deals as dealsApi, pipelines as pipelinesApi } from "@portfolio/api";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { useDeals } from "./useDeals";
 
 vi.mock("@portfolio/api", () => ({
@@ -175,7 +175,9 @@ describe("useDeals", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                const created = await result.current.createDeal({
+                let created: Awaited<ReturnType<typeof result.current.createDeal>> | null = null;
+                await act(async () => {
+                    created = await result.current.createDeal({
                     title: "New Deal",
                     value: 10000,
                     customerId: "customer-2",
@@ -184,7 +186,10 @@ describe("useDeals", () => {
                 });
 
                 expect(created).toEqual(newDeal);
-                expect(result.current.deals).toEqual([newDeal, existingDeal]);
+                });
+                await waitFor(() => {
+                    expect(result.current.deals).toEqual([newDeal, existingDeal]);
+                });
             });
         });
 
@@ -246,13 +251,18 @@ describe("useDeals", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                const updated = await result.current.updateDeal("1", {
+                let updated: Awaited<ReturnType<typeof result.current.updateDeal>> | null = null;
+                await act(async () => {
+                    updated = await result.current.updateDeal("1", {
                     title: "Updated",
                     value: 10000,
                 });
 
                 expect(updated).toEqual(updatedDeal);
-                expect(result.current.deals).toEqual([updatedDeal]);
+                });
+                await waitFor(() => {
+                    expect(result.current.deals).toEqual([updatedDeal]);
+                });
             });
         });
 
@@ -281,7 +291,9 @@ describe("useDeals", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.updateDeal("1", { title: "Updated" })).rejects.toThrow("Update failed");
+                await act(async () => {
+                    await expect(result.current.updateDeal("1", { title: "Updated" })).rejects.toThrow("Update failed");
+                });
             });
         });
     });
@@ -323,9 +335,13 @@ describe("useDeals", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await result.current.deleteDeal("1");
+                await act(async () => {
+                    await result.current.deleteDeal("1");
+                });
 
-                expect(result.current.deals).toEqual([deal2]);
+                await waitFor(() => {
+                    expect(result.current.deals).toEqual([deal2]);
+                });
             });
         });
 
@@ -354,7 +370,9 @@ describe("useDeals", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.deleteDeal("1")).rejects.toThrow("Delete failed");
+                await act(async () => {
+                    await expect(result.current.deleteDeal("1")).rejects.toThrow("Delete failed");
+                });
             });
         });
     });
@@ -390,9 +408,13 @@ describe("useDeals", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await result.current.moveToStage("1", "stage-2");
+                await act(async () => {
+                    await result.current.moveToStage("1", "stage-2");
+                });
 
-                expect(result.current.deals).toEqual([movedDeal]);
+                await waitFor(() => {
+                    expect(result.current.deals).toEqual([movedDeal]);
+                });
                 expect(dealsApi.moveToStage).toHaveBeenCalledWith("1", "stage-2");
             });
         });
@@ -422,7 +444,9 @@ describe("useDeals", () => {
                     expect(result.current.loading).toBe(false);
                 });
 
-                await expect(result.current.moveToStage("1", "stage-2")).rejects.toThrow("Move failed");
+                await act(async () => {
+                    await expect(result.current.moveToStage("1", "stage-2")).rejects.toThrow("Move failed");
+                });
             });
         });
     });

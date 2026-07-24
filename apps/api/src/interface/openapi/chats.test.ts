@@ -39,7 +39,7 @@ vi.mock("~/di/create-container", () => ({
         })),
         getAddChatParticipantUseCase: vi.fn(() => ({
             execute: vi.fn().mockResolvedValue({
-                id: "participant-123",
+                id: "123e4567-e89b-12d3-a456-426614174010",
                 chatRoomId: "123e4567-e89b-12d3-a456-426614174000",
                 name: "Test User",
                 role: "MEMBER",
@@ -51,7 +51,7 @@ vi.mock("~/di/create-container", () => ({
                 {
                     id: "message-123",
                     chatRoomId: "123e4567-e89b-12d3-a456-426614174000",
-                    participantId: "participant-123",
+                    participantId: "123e4567-e89b-12d3-a456-426614174010",
                     type: "TEXT",
                     content: "Test message",
                     createdAt: "2024-01-01T00:00:00.000Z",
@@ -63,7 +63,7 @@ vi.mock("~/di/create-container", () => ({
             execute: vi.fn().mockResolvedValue({
                 id: "message-123",
                 chatRoomId: "123e4567-e89b-12d3-a456-426614174000",
-                participantId: "participant-123",
+                participantId: "123e4567-e89b-12d3-a456-426614174010",
                 type: "TEXT",
                 content: "New message",
                 createdAt: "2024-01-01T00:00:00.000Z",
@@ -225,7 +225,7 @@ describe("chatsRouter", () => {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        participantId: "participant-123",
+                        participantId: "123e4567-e89b-12d3-a456-426614174010",
                         content: "New message",
                     }),
                 });

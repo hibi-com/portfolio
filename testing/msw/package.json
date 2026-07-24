@@ -14,11 +14,21 @@
       "types": "./dist/setup.d.ts",
       "import": "./dist/setup.js",
       "require": "./dist/setup.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser.js",
+      "require": "./dist/browser.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server.js"
     }
   },
   "scripts": {
     "build": "bun run build:js && bun run build:types",
-    "build:js": "bun build ./src/index.ts ./src/setup.ts ./src/server.ts ./src/browser.ts ./src/handlers/*.ts ./src/lib/*.ts --outdir dist --target node --format esm --splitting --external msw --external @testing-library/jest-dom --external vitest",
+    "build:js": "bun build ./src/index.ts ./src/setup.ts ./src/server.ts ./src/browser.ts ./src/handlers/index.ts ./src/handlers/rest.ts ./src/lib/constants.ts ./src/lib/mocks.ts ./src/lib/types.ts --outdir dist --target node --format esm --external msw --external @testing-library/jest-dom --external vitest && bun run ./scripts/flatten-dist.ts",
     "build:types": "git clean -xdf .cache/tsbuildinfo.json && tsc --emitDeclarationOnly --declaration --outDir dist",
     "clean:cache": "git clean -xdf .cache .turbo",
     "clean:pkg": "git clean -xdf node_modules dist",

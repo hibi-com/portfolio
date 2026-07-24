@@ -38,7 +38,7 @@ if [ "${SKIP_BUILD}" != "true" ]; then
   done
 
   echo "Installing dependencies at monorepo root..."
-  if ! bun install --frozen-lockfile; then
+  if ! bun install --frozen-lockfile --ignore-scripts; then
     echo "❌ Error: Failed to install dependencies" >&2
     echo "Debug information:" >&2
     echo "Current directory: $(pwd)" >&2
@@ -94,8 +94,9 @@ if [ "${SKIP_SECURITY_SCAN}" != "true" ]; then
   bun audit > "${REPORT_DIR}/bun-audit-report.txt" 2>&1 || true
 
   if [ -f "${REPORT_DIR}/bun-audit-report.json" ]; then
-    CRITICAL_COUNT=$(grep -ic "critical" "${REPORT_DIR}/bun-audit-report.json" || echo "0")
-    if [ "${CRITICAL_COUNT}" -gt 0 ]; then
+    CRITICAL_COUNT=$(grep -ic "critical" "${REPORT_DIR}/bun-audit-report.json" 2> /dev/null | head -1 || true)
+    CRITICAL_COUNT="${CRITICAL_COUNT:-0}"
+    if [ "${CRITICAL_COUNT}" -gt 0 ] 2> /dev/null; then
       echo "⚠️  WARNING: Found ${CRITICAL_COUNT} CRITICAL vulnerabilities in dependencies"
       echo "   Review the report at: ${REPORT_DIR}/bun-audit-report.txt"
     fi

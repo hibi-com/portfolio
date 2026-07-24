@@ -203,7 +203,7 @@ describe("DealsKanban", () => {
 
         await waitFor(() => {
             expect(screen.getByText("Test Deal")).toBeInTheDocument();
-            expect(screen.getByText(/10,000/)).toBeInTheDocument();
+            expect(screen.getAllByText(/10,000/).length).toBeGreaterThan(0);
         });
     });
 });

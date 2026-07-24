@@ -19,9 +19,8 @@ const reportOutputDir = process.env.REPORT_OUTPUT_DIR || "../scenario/public/rep
 let webServerCommand: string | undefined;
 if (isRemoteEnv) {
     webServerCommand = undefined;
-} else if (process.env.CI) {
-    webServerCommand = "bun run start";
 } else {
+    // cms は Pages の start ではなく wrangler dev で待ち受ける
     webServerCommand = "bun run dev";
 }
 export default createPlaywrightConfig({

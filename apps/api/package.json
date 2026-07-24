@@ -21,7 +21,7 @@
     "integration": "vitest run -c vitest.integration.config.ts",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
-    "scenario": "docker run --rm -e CI=true -e APP_DIR=apps/api -v $(git rev-parse --show-toplevel):/work -w /work -v $(git rev-parse --show-toplevel)/node_modules:/work/node_modules -v $(git rev-parse --show-toplevel)/docs/playwright/report:/work/docs/playwright/report -v $(git rev-parse --show-toplevel)/docs/security/e2e:/work/docs/security/e2e scenario",
+    "scenario": "docker run --rm -e CI=true -e SKIP_BUILD=true -e APP_DIR=apps/api -v $(git rev-parse --show-toplevel):/work -w /work -v $(git rev-parse --show-toplevel)/node_modules:/work/node_modules -v $(git rev-parse --show-toplevel)/docs/playwright/report:/work/docs/playwright/report -v $(git rev-parse --show-toplevel)/docs/security/e2e:/work/docs/security/e2e scenario",
     "test": "vitest run",
     "test:integration": "vitest run -c vitest.integration.config.ts",
     "typecheck": "tsc --noEmit",

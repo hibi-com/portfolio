@@ -2,7 +2,7 @@ import { navigation } from "./config";
 
 describe("navigation config", () => {
     test("should have all navigation items", () => {
-        expect(navigation).toHaveLength(3);
+        expect(navigation).toHaveLength(6);
     });
 
     test("should have Dashboard navigation item", () => {
@@ -24,6 +24,28 @@ describe("navigation config", () => {
         expect(portfolios).toBeDefined();
         expect(portfolios?.href).toBe("/portfolios");
         expect(portfolios?.icon).toBeDefined();
+    });
+
+    
+    test("should have CRM navigation item", () => {
+        const crm = navigation.find((item) => item.name === "CRM");
+        expect(crm).toBeDefined();
+        expect(crm?.href).toBe("/crm");
+        expect(crm?.icon).toBeDefined();
+    });
+
+    test("should have Support navigation item", () => {
+        const support = navigation.find((item) => item.name === "Support");
+        expect(support).toBeDefined();
+        expect(support?.href).toBe("/support");
+        expect(support?.icon).toBeDefined();
+    });
+
+    test("should have Chat navigation item", () => {
+        const chat = navigation.find((item) => item.name === "Chat");
+        expect(chat).toBeDefined();
+        expect(chat?.href).toBe("/chat");
+        expect(chat?.icon).toBeDefined();
     });
 
     test("should have unique names for all items", () => {

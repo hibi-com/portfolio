@@ -7,7 +7,7 @@ vi.mock("~/di/create-container", () => ({
                 {
                     id: "123e4567-e89b-12d3-a456-426614174000",
                     name: "Test Deal",
-                    stageId: "stage-123",
+                    stageId: "123e4567-e89b-12d3-a456-426614174001",
                     status: "OPEN",
                     createdAt: "2024-01-01T00:00:00.000Z",
                     updatedAt: "2024-01-01T00:00:00.000Z",
@@ -18,7 +18,7 @@ vi.mock("~/di/create-container", () => ({
             execute: vi.fn().mockResolvedValue({
                 id: "123e4567-e89b-12d3-a456-426614174000",
                 name: "Test Deal",
-                stageId: "stage-123",
+                stageId: "123e4567-e89b-12d3-a456-426614174001",
                 status: "OPEN",
                 createdAt: "2024-01-01T00:00:00.000Z",
                 updatedAt: "2024-01-01T00:00:00.000Z",
@@ -28,7 +28,7 @@ vi.mock("~/di/create-container", () => ({
             execute: vi.fn().mockResolvedValue({
                 id: "123e4567-e89b-12d3-a456-426614174000",
                 name: "New Deal",
-                stageId: "stage-123",
+                stageId: "123e4567-e89b-12d3-a456-426614174001",
                 status: "OPEN",
                 createdAt: "2024-01-01T00:00:00.000Z",
                 updatedAt: "2024-01-01T00:00:00.000Z",
@@ -38,7 +38,7 @@ vi.mock("~/di/create-container", () => ({
             execute: vi.fn().mockResolvedValue({
                 id: "123e4567-e89b-12d3-a456-426614174000",
                 name: "Updated Deal",
-                stageId: "stage-123",
+                stageId: "123e4567-e89b-12d3-a456-426614174001",
                 status: "WON",
                 createdAt: "2024-01-01T00:00:00.000Z",
                 updatedAt: "2024-01-01T00:00:00.000Z",
@@ -51,7 +51,7 @@ vi.mock("~/di/create-container", () => ({
             execute: vi.fn().mockResolvedValue({
                 id: "123e4567-e89b-12d3-a456-426614174000",
                 name: "Test Deal",
-                stageId: "stage-456",
+                stageId: "123e4567-e89b-12d3-a456-426614174002",
                 status: "OPEN",
                 createdAt: "2024-01-01T00:00:00.000Z",
                 updatedAt: "2024-01-01T00:00:00.000Z",
@@ -144,7 +144,7 @@ describe("dealsRouter", () => {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         name: "New Deal",
-                        stageId: "stage-123",
+                        stageId: "123e4567-e89b-12d3-a456-426614174001",
                     }),
                 });
 
@@ -162,7 +162,7 @@ describe("dealsRouter", () => {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        stageId: "stage-456",
+                        stageId: "123e4567-e89b-12d3-a456-426614174002",
                     }),
                 });
 
@@ -170,7 +170,7 @@ describe("dealsRouter", () => {
 
                 expect(res.status).toBe(200);
                 const json = await res.json();
-                expect(json).toHaveProperty("stageId", "stage-456");
+                expect(json).toHaveProperty("stageId", "123e4567-e89b-12d3-a456-426614174002");
             });
         });
     });
