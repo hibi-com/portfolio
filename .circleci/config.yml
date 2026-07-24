@@ -298,7 +298,7 @@ jobs:
                   \"labels\": [\"security\", \"vulnerability\", \"automated\"]
                 }"
             fi
-  e2e:
+  scenario:
     executor: large
     steps:
       - attach_workspace:
@@ -312,8 +312,8 @@ jobs:
             bun add -g @playwright/test@1.57.0
             bunx playwright install --with-deps chromium
       - run:
-          name: Run E2E tests
-          command: bun run e2e
+          name: Run scenario tests
+          command: bun run scenario
           no_output_timeout: 20m
       - store_artifacts:
           path: docs/playwright/report
@@ -330,9 +330,55 @@ jobs:
                 -H "Accept: application/vnd.github.v3+json" \
                 https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
                 -d "{
-                  \"title\": \"[CI Failure] E2E tests failed on ${CIRCLE_BRANCH}\",
-                  \"body\": \"## CI Failure Report\n\n**Job:** e2e\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the Playwright report\n- [ ] Fix the failing E2E tests\n- [ ] Re-run the CI pipeline\",
-                  \"labels\": [\"ci-failure\", \"e2e\", \"automated\"]
+                  \"title\": \"[CI Failure] Scenario tests failed on ${CIRCLE_BRANCH}\",
+                  \"body\": \"## CI Failure Report\n\n**Job:** scenario\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review the Playwright report\n- [ ] Fix the failing scenario tests\n- [ ] Re-run the CI pipeline\",
+                  \"labels\": [\"ci-failure\", \"scenario\", \"automated\"]
+                }"
+            fi
+  e2e:
+    executor: default
+    parameters:
+      environment:
+        type: enum
+        enum: [rc, stg, prd]
+    steps:
+      - attach_workspace:
+          at: .
+      - install-bun
+      - run:
+          name: Run Browser Run E2E on << parameters.environment >>
+          command: |
+            case "<< parameters.environment >>" in
+              rc)
+                WEB_BASE_URL="https://rc.www.ageha734.jp"
+                API_BASE_URL="https://rc.api.ageha734.jp"
+                ;;
+              stg)
+                WEB_BASE_URL="https://stg.www.ageha734.jp"
+                API_BASE_URL="https://stg.api.ageha734.jp"
+                ;;
+              prd)
+                WEB_BASE_URL="https://www.ageha734.jp"
+                API_BASE_URL="https://api.ageha734.jp"
+                ;;
+            esac
+            bun run e2e -- \
+              --web-base-url "${WEB_BASE_URL}" \
+              --api-base-url "${API_BASE_URL}"
+          no_output_timeout: 20m
+      - run:
+          name: Create GitHub Issue on failure
+          when: on_fail
+          command: |
+            if [ -n "${GITHUB_TOKEN}" ]; then
+              curl -X POST \
+                -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues \
+                -d "{
+                  \"title\": \"[CI Failure] Browser Run E2E failed on << parameters.environment >> (${CIRCLE_BRANCH})\",
+                  \"body\": \"## CI Failure Report\n\n**Job:** e2e-<< parameters.environment >>\n**Environment:** << parameters.environment >>\n**Branch:** ${CIRCLE_BRANCH}\n**Commit:** ${CIRCLE_SHA1}\n**Build:** [#${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})\n\n### Actions Required\n\n- [ ] Review Browser Run Worker logs\n- [ ] Fix failing critical scenarios against the released app\n- [ ] Re-run the CI pipeline\",
+                  \"labels\": [\"ci-failure\", \"e2e\", \"<< parameters.environment >>\", \"automated\"]
                 }"
             fi
   build:
@@ -679,14 +725,6 @@ jobs:
               exit 1
             fi
 
-            if [ -d "apps/e2e" ]; then
-              bunx playwright test --grep "@critical" --reporter=line || {
-                exit 1
-              }
-            else
-              exit 1
-            fi
-
             if [ -n "${SENTRY_AUTH_TOKEN}" ]; then
               CURRENT_ERRORS=$(curl -s "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?statsPeriod=15m&interval=15m&field=sum(quantity)&category=error" \
                 -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq '.[0].series."sum(quantity)"[0] // 0')
@@ -922,10 +960,6 @@ jobs:
               DEPLOYMENT_HEALTHY=false
             fi
 
-            if ! bunx playwright test --grep "@smoke" --reporter=line; then
-              DEPLOYMENT_HEALTHY=false
-            fi
-
             if [ "${DEPLOYMENT_HEALTHY}" = "false" ]; then
               if ! wrangler pages deployment list --project-name portfolio-web | head -2 | tail -1 | awk '{print $1}' | xargs -I {} wrangler pages deployment rollback --deployment-id {}; then
                 exit 1
@@ -1114,13 +1148,13 @@ workflows:
           requires:
             - setup
           context: security
-      - e2e:
+      - scenario:
           requires:
             - test
             - security-scan
       - build:
           requires:
-            - e2e
+            - scenario
       - upload-artifacts:
           requires:
             - build
@@ -1222,6 +1256,17 @@ workflows:
               only:
                 - master
                 - main
+      - e2e:
+          name: e2e-rc
+          environment: rc
+          requires:
+            - deploy-rc
+          context: e2e
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - infra-plan:
           name: infra-plan-rc
           environment: rc
@@ -1262,7 +1307,7 @@ workflows:
           name: hold-approval-stg
           type: approval
           requires:
-            - deploy-rc
+            - e2e-rc
           filters:
             branches:
               only:
@@ -1362,11 +1407,22 @@ workflows:
               only:
                 - master
                 - main
+      - e2e:
+          name: e2e-stg
+          environment: stg
+          requires:
+            - deploy-stg
+          context: e2e
+          filters:
+            branches:
+              only:
+                - master
+                - main
       - hold-approval:
           name: hold-approval-prd
           type: approval
           requires:
-            - deploy-stg
+            - e2e-stg
           filters:
             branches:
               only:
@@ -1461,6 +1517,17 @@ workflows:
           context:
             - cloudflare
             - env-config
+          filters:
+            branches:
+              only:
+                - master
+                - main
+      - e2e:
+          name: e2e-prd
+          environment: prd
+          requires:
+            - deploy-prd
+          context: e2e
           filters:
             branches:
               only:

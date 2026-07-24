@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba
 ARG BUN_VERSION=1.1.43
 ARG TRIVY_VERSION=0.72.0
 ARG DEBIAN_FRONTEND=noninteractive
-ARG USERNAME=e2e
+ARG USERNAME=scenario
 ARG USER_UID=1000
 ARG USER_GID=1000
 
@@ -50,7 +50,7 @@ LABEL org.opencontainers.image.title="Portfolio E2E Test Container"
 LABEL org.opencontainers.image.description="Container for running Playwright E2E tests with Bun runtime"
 LABEL org.opencontainers.image.version="1.0.0"
 
-ARG USERNAME=e2e
+ARG USERNAME=scenario
 ARG USER_UID=1000
 ARG USER_GID=1000
 ARG DEBIAN_FRONTEND=noninteractive
@@ -76,7 +76,7 @@ WORKDIR /work
 COPY --from=builder --chown=root:root /usr/local/bin/bun /usr/local/bin/bun
 COPY --from=builder --chown=root:root /usr/local/bin/trivy /usr/local/bin/trivy
 
-COPY --chown=${USER_UID}:${USER_GID} .docker/e2e/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --chown=${USER_UID}:${USER_GID} .docker/scenario/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENV CI=true \

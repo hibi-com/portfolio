@@ -53,9 +53,13 @@
             "dependsOn": ["^build"],
             "env": ["NODE_ENV", "CI"]
         },
-        "e2e": {
+        "scenario": {
             "dependsOn": ["^build"],
             "env": ["NODE_ENV", "CI"]
+        },
+        "e2e": {
+            "dependsOn": ["^build"],
+            "env": ["NODE_ENV", "CI", "E2E_BASE_URL", "E2E_TOKEN", "E2E_WEB_BASE_URL", "E2E_API_BASE_URL"]
         },
         "fmt": {
             "cache": true

@@ -127,6 +127,9 @@ bun run typecheck --filter=@portfolio/{package}
 - apps/api: {size}
 - apps/web: {size}
 - apps/admin: {size}
+- apps/scenario: {size}
+- apps/scenario: {size}
+- apps/scenario: {size}
 - apps/e2e: {size}
 - apps/wiki: {size}
 

@@ -1,0 +1,36 @@
+{
+  "private": true,
+  "version": "0.1.0",
+  "name": "@portfolio/e2e",
+  "type": "module",
+  "scripts": {
+    "build": "bun run with-env wrangler deploy --dry-run",
+    "clean:build": "git clean -xdf .wrangler",
+    "clean:cache": "git clean -xdf .cache .turbo",
+    "clean:pkg": "git clean -xdf node_modules dist",
+    "dev": "bun run with-env wrangler dev",
+    "fmt": "biome format --write .",
+    "fmt:check": "biome format .",
+    "generate": "wrangler types",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "orchestrate": "bun run ./scripts/orchestrate.ts",
+    "typecheck": "tsc --noEmit",
+    "with-env": "env"
+  },
+  "dependencies": {
+    "@cloudflare/playwright": "1.3.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20260101.0",
+    "@portfolio/biome-config": "workspace:*",
+    "@portfolio/tsconfig": "workspace:*",
+    "@types/bun": "1.3.5",
+    "@types/node": "25.0.3",
+    "typescript": "5.9.3",
+    "wrangler": "4.54.0"
+  },
+  "peerDependencies": {
+    "wrangler": "4.54.0"
+  }
+}

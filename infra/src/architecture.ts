@@ -67,8 +67,8 @@ export const PROVISIONING_NODES: ProvisioningNode[] = [
     { id: "R2", label: "Cloudflare Workers KV", kind: "resource" },
     { id: "R3", label: "Cloudflare R2 Bucket（画像）", kind: "resource" },
     { id: "R4", label: "Cloudflare Workers (API)", kind: "resource" },
-    { id: "R5", label: "Cloudflare Pages (web, admin, wiki, e2e)", kind: "resource" },
-    { id: "R6", label: "Cloudflare DNS (www, admin, wiki, api, portal)", kind: "resource" },
+    { id: "R5", label: "Cloudflare Pages (web, admin, wiki)", kind: "resource" },
+    { id: "R6", label: "Cloudflare DNS (www, admin, wiki, api)", kind: "resource" },
     { id: "R7", label: "Cloudflare Access (rc/stg)", kind: "resource" },
     { id: "R9", label: "Sentry Project / DSN", kind: "resource" },
 ];

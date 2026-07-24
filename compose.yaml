@@ -94,14 +94,14 @@ services:
       VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: 0
     restart: unless-stopped
 
-  e2e:
+  scenario:
     build:
-      context: apps/e2e
+      context: apps/scenario
       dockerfile: Dockerfile
       args:
         REGISTRY_URL: http://127.0.0.1:4873
       network: host
-    image: portfolio-e2e:local
+    image: portfolio-scenario:local
     networks:
       - api
     ports:

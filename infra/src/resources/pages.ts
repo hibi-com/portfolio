@@ -5,7 +5,7 @@ import * as random from "@pulumi/random";
 import type { InfraConfig } from "../config.js";
 import { getProjectName } from "../config.js";
 import { dnsRecordName } from "../hostname.js";
-import { getAdminEnvVars, getE2eEnvVars, getWebEnvVars, getWikiEnvVars } from "./secrets.js";
+import { getAdminEnvVars, getWebEnvVars, getWikiEnvVars } from "./secrets.js";
 
 type EnvVarConfig = cloudflare.types.input.PagesProjectDeploymentConfigsProductionEnvVars;
 
@@ -221,12 +221,10 @@ export function createPortfolioPagesProjects(
     const webRandomSuffix = generateRandomSuffix(`${projectName}-web-random`);
     const adminRandomSuffix = generateRandomSuffix(`${projectName}-admin-random`);
     const wikiRandomSuffix = generateRandomSuffix(`${projectName}-wiki-random`);
-    const e2eRandomSuffix = generateRandomSuffix(`${projectName}-e2e-random`);
 
     const webConfig = getWebEnvVars();
     const adminConfig = getAdminEnvVars();
     const wikiConfig = getWikiEnvVars();
-    const e2eConfig = getE2eEnvVars();
 
     if (!apiWorkerScriptName) {
         throw new Error(
@@ -278,16 +276,6 @@ export function createPortfolioPagesProjects(
             environmentVariables: adminConfig.envVars,
             secrets: adminConfig.secrets,
             serviceBinding: adminServiceBinding,
-        },
-        {
-            name: pulumi.all([projectName, e2eRandomSuffix.result]).apply(([name, suffix]) => `${name}-e2e-${suffix}`),
-            productionBranch: "master",
-            buildCommand: "bun run build",
-            destinationDir: "build/client",
-            rootDir: "apps/e2e",
-            customDomain: dnsRecordName(environment, "portal"),
-            environmentVariables: e2eConfig.envVars,
-            secrets: e2eConfig.secrets,
         },
         {
             name: pulumi

@@ -140,9 +140,9 @@ description: テストで担保している品質保証項目一覧
 | パイプライン | `pipelines.spec.ts` | - | ✅ 実装済 |
 | 問い合わせ | `inquiries.spec.ts` | - | ✅ 実装済 |
 
-### E2E Tests（独立プロジェクト）- apps/e2e
+### シナリオテスト（apps/scenario）
 
-> **配置**: `apps/e2e/e2e/**/*.spec.ts`
+> **配置**: `apps/scenario/pkg/**/*.spec.ts`（および各アプリの Playwright スイート）
 > **用途**: 本番環境に対する独立したE2Eテスト
 
 | カテゴリ | テストファイル | 目的 | 状態 |
@@ -252,7 +252,7 @@ description: テストで担保している品質保証項目一覧
 
 ## アクセシビリティテスト
 
-> **配置**: `apps/e2e/e2e/accessibility/*.spec.ts`
+> **配置**: `apps/scenario/pkg/accessibility/*.spec.ts`
 
 ### WCAG 2.1 AA準拠チェック
 

@@ -185,7 +185,7 @@ circleci trigger deploy --param commit_sha=<previous-commit-sha>
 
 ### デプロイ前
 
-1. ローカルで全テスト実行: `bun run test && bun run e2e`
+1. ローカルで全テスト実行: `bun run test && bun run scenario`
 2. 型チェック: `bun run typecheck`
 3. リント: `bun run lint`
 

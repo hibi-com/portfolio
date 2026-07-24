@@ -41,7 +41,8 @@ bun run build        # ⑤ ビルド - 本番ビルドが成功すること
 bun install          # 依存関係インストール
 bun run dev          # 開発サーバー起動（全アプリ）
 bun run db:generate  # Prisma型生成
-bun run e2e          # E2Eテスト（Playwright）
+bun run scenario     # シナリオテスト（リポジトリ内 Playwright）
+bun run e2e          # E2E（Cloudflare Browser Run → デプロイ済みアプリ）
 ```
 
 ## 重要な規約

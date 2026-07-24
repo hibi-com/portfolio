@@ -36,7 +36,8 @@ title: "技術スタック"
 | **web** | `@portfolio/web` | Remix + Vite, Cloudflare Pages, FSD | ポートフォリオ・ブログ公開サイト |
 | **admin** | `@portfolio/admin` | Vite + TanStack Router, Cloudflare Pages, FSD | 管理ダッシュボード（投稿・問い合わせ・CRM 等） |
 | **api** | `@portfolio/cms` | Hono, Cloudflare Workers, DDD | バックエンド API（CMS・問い合わせ・CRM） |
-| **e2e** | `@portfolio/e2e` | Remix + Vite, Cloudflare Pages | Test Portal（認証付き）。E2E・カバレッジレポート表示 |
+| **scenario** | `@portfolio/scenario` | Remix + Vite（ローカル） | シナリオテスト用ポータル・レポート。Worker/Pages デプロイ不要 |
+| **e2e** | `@portfolio/e2e` | Cloudflare Workers + Browser Run | デプロイ済みアプリ向け真の E2E（`@cloudflare/playwright`） |
 | **wiki** | `@portfolio/wiki` | Astro + Starlight | ドキュメント・Wiki サイト |
 
 ## 共有パッケージ（`packages/`）

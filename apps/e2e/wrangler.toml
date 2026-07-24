@@ -1,0 +1,18 @@
+name = "portfolio-e2e"
+compatibility_date = "2026-07-23"
+compatibility_flags = ["nodejs_compat"]
+main = "src/index.ts"
+upload_source_maps = true
+
+# Secrets (wrangler secret put E2E_TOKEN):
+#   E2E_TOKEN
+
+[vars]
+NODE_ENV = "production"
+
+[browser]
+binding = "BROWSER"
+
+[[kv_namespaces]]
+binding = "RUNS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"

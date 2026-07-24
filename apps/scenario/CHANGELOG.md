@@ -1,4 +1,4 @@
-# @portfolio/e2e
+# @portfolio/scenario
 
 ## 2.0.0
 

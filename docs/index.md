@@ -41,7 +41,8 @@ bun run dev
 | `bun run lint` | リント実行 |
 | `bun run typecheck` | 型チェック実行 |
 | `bun run integration` | E2Eテスト実行 |
-| `bun run e2e` | E2Eテスト実行 |
+| `bun run scenario` | シナリオテスト（リポジトリ内 Playwright） |
+| `bun run e2e` | E2E（Browser Run → デプロイ済みアプリ） |
 | `bun run build` | プロダクションビルド |
 
 ## Tech Stack

@@ -5,7 +5,7 @@ import { LoadingBar, logSection, logSubStep } from "../lib/env";
 import type { DockerBuildTarget, StepContext } from "../lib/types";
 
 export const DEFAULT_DOCKER_TARGETS: readonly DockerBuildTarget[] = [
-    { imageName: "e2e", dockerfilePath: ".docker/e2e/Dockerfile", displayName: "E2E用" },
+    { imageName: "scenario", dockerfilePath: ".docker/scenario/Dockerfile", displayName: "シナリオテスト用" },
 ];
 
 async function checkImageExists(imageName: string): Promise<boolean> {

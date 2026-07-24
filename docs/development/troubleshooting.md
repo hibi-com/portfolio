@@ -202,10 +202,10 @@ bun run coverage
 bun run dev
 
 # テストをヘッドモードで実行（ブラウザを表示。-- でオプションを渡す）
-bun run e2e -- --headed
+bun run scenario -- --headed
 
 # デバッグモードで実行
-bun run e2e -- --debug
+bun run scenario -- --debug
 
 # スクリーンショットを確認
 open .results/playwright/
@@ -501,7 +501,7 @@ docker restart container-name
 docker logs container-name
 
 # イメージを再ビルド
-docker build -t e2e .
+docker build -t scenario -f .docker/scenario/Dockerfile .
 ```
 
 ## エッジケースとレアな問題
