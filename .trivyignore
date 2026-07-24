@@ -1,0 +1,8 @@
+# Trivy ignore file（CVE / シークレットルール単位）
+# パス除外は trivy.yaml の skip-dirs / skip-files を使う（.gitleaks.toml と対応）。
+#
+# 例:
+# CVE-2024-XXXX
+#   └── 理由: 影響なし / パッチ待ち / 許容リスク
+#
+# 書式: https://aquasecurity.github.io/trivy/latest/docs/configuration/filtering/#trivyignore

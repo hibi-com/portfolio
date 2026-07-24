@@ -160,7 +160,9 @@ X-Content-Type-Options（nosniff）、X-Frame-Options（DENY）、X-XSS-Protecti
 ## 脆弱性管理
 
 週次で `bun audit`、デプロイ前に `trivy fs --severity HIGH,CRITICAL .`、コミット前に `gitleaks detect` を実行する。  
-詳細は package.json および CI を参照。
+詳細は package.json および CI（`compose.ci.yaml`）を参照。
+
+パス除外は `trivy.yaml` の `skip-dirs` / `skip-files` を Source of Truth とし、`.gitleaks.toml` の allowlist と対応させる。CVE 単位の無視は `.trivyignore`。
 
 ### 脆弱性対応フロー
 

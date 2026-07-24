@@ -1,0 +1,33 @@
+severity:
+  - HIGH
+  - CRITICAL
+
+scan:
+  scanners:
+    - vuln
+  skip-dirs:
+    - "**/build"
+    - "**/dist"
+    - "**/coverage"
+    - "**/.turbo"
+    - "**/.cache"
+    - "**/.wrangler"
+    - "**/.astro"
+    - "**/.tanstack"
+    - "**/.vite"
+    - "**/docs/api-reference"
+    - "**/docs/security/e2e"
+    - "**/apps/wiki/build"
+    - "**/apps/wiki/design"
+    - "**/apps/wiki/reference"
+    - "**/node_modules"
+    - "**/.git"
+  skip-files:
+    - "**/*.map"
+    - "**/gitleaks-report.json"
+    - "**/trivy-report.json"
+    - "**/snyk-report.json"
+    - "**/.env"
+    - "**/.env.local"
+    - "**/.env.*.local"
+    - "**/infra/env.yaml"

@@ -33,7 +33,7 @@ services:
     working_dir: /workspace
     volumes:
       - ./:/workspace
-    command: dir -v --redact --report-format json --report-path gitleaks-report.json .
+    command: dir -v --redact -c .gitleaks.toml --report-format json --report-path gitleaks-report.json .
 
   trivy:
     image: aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f
@@ -43,7 +43,7 @@ services:
       - trivy-cache:/root/.cache/
     environment:
       TRIVY_CACHE_DIR: /root/.cache/trivy
-    command: fs --severity HIGH,CRITICAL --scanners vuln --format json --output /workspace/trivy-report.json --exit-code 0 .
+    command: fs --config trivy.yaml --ignorefile .trivyignore --severity HIGH,CRITICAL --scanners vuln --format json --output /workspace/trivy-report.json --exit-code 0 .
 
   snyk:
     image: snyk/snyk:node-22@sha256:f3315cb7a4fe95c1886fcc61d0654a099efe06a10695f4b341458906963d9bd9

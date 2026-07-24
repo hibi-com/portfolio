@@ -1,0 +1,35 @@
+# Gitleaks 設定
+# パス除外は trivy.yaml の skip-dirs / skip-files と対応させること。
+
+title = "portfolio"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Paths/regexes aligned with trivy.yaml skip-dirs/skip-files (+ doc placeholders)"
+paths = [
+    '''(?:^|/)build(?:/.*)?$''',
+    '''(?:^|/)dist(?:/.*)?$''',
+    '''(?:^|/)coverage(?:/.*)?$''',
+    '''(?:^|/)\.turbo(?:/.*)?$''',
+    '''(?:^|/)\.cache(?:/.*)?$''',
+    '''(?:^|/)\.wrangler(?:/.*)?$''',
+    '''(?:^|/)\.astro(?:/.*)?$''',
+    '''(?:^|/)\.tanstack(?:/.*)?$''',
+    '''(?:^|/)\.vite(?:/.*)?$''',
+    '''(?:^|/)docs/api-reference(?:/.*)?$''',
+    '''(?:^|/)docs/security/e2e(?:/.*)?$''',
+    '''(?:^|/)apps/wiki/build(?:/.*)?$''',
+    '''(?:^|/)apps/wiki/design(?:/.*)?$''',
+    '''(?:^|/)apps/wiki/reference(?:/.*)?$''',
+    '''(?:^|/)gitleaks-report\.json$''',
+    '''(?:^|/)trivy-report\.json$''',
+    '''(?:^|/)snyk-report\.json$''',
+    '''(?i)\.map$''',
+    '''(?:^|/)\.env$''',
+    '''(?:^|/)\.env\.local$''',
+    '''(?:^|/)\.env\.[^/]+\.local$''',
+    '''(?:^|/)infra/env\.yaml$''',
+]
+regexes = ['''sk_live_1234567890''', '''sk_live_abcdef123456''']
