@@ -15,7 +15,7 @@ const isRemoteEnv = !!process.env.BASE_URL;
 const baseUrl = process.env.BASE_URL ?? process.env.VITE_BASE_URL ?? "http://localhost:3000";
 const PORT = getPortFromBaseUrl(baseUrl);
 
-const reportOutputDir = process.env.REPORT_OUTPUT_DIR || "../e2e/public/reports/e2e/admin";
+const reportOutputDir = process.env.REPORT_OUTPUT_DIR || "../scenario/public/reports/e2e/admin";
 
 let webServerCommand: string | undefined;
 if (isRemoteEnv) {

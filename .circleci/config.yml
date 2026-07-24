@@ -1108,7 +1108,6 @@ jobs:
           name: STG load test via Cloudflare Workers
           command: bun run --filter=@portfolio/runner orchestrate -- --config testing/load/stg.yaml
           no_output_timeout: 40m
-
   dast:
     executor: default
     steps:

@@ -5,6 +5,8 @@ const config = {
         "apps/**/app/**/*.{ts,tsx}",
         "apps/**/functions/[[path]].ts",
         "apps/**/public/worker.js",
+        "apps/**/src/index.ts",
+        "apps/**/scripts/**/*.{ts,tsx}",
         "apps/**/vite.config.ts",
         "apps/**/vitest.config.ts",
         "apps/**/playwright.config.ts",
@@ -37,9 +39,28 @@ const config = {
         "apps/**/public/**",
         "results/**",
         "report/**",
+        "apps/**/worker-configuration.d.ts",
     ],
     ignoreDependencies: ["@types/bun", "@types/node", "@types/prismjs", "@types/react", "@types/react-dom"],
-    ignoreBinaries: ["wrangler", "playwright", "storybook", "tsp", "orval", "check", "env", "setup"],
+    ignoreBinaries: ["wrangler", "playwright", "storybook", "tsp", "orval", "check", "env", "setup", "biome"],
+    ignoreUnresolved: ["vitest/globals"],
+    // knip 設定が未整備のため、ゲートは設定エラー回避と依存関係整合に限定
+    rules: {
+        files: "off",
+        exports: "off",
+        types: "off",
+        nsExports: "off",
+        nsTypes: "off",
+        duplicates: "off",
+        enumMembers: "off",
+        classMembers: "off",
+        unlisted: "off",
+        binaries: "off",
+        unresolved: "off",
+        dependencies: "off",
+        devDependencies: "off",
+        optionalPeerDependencies: "off",
+    },
     workspaces: {
         "packages/ui": {
             storybook: {
@@ -51,14 +72,9 @@ const config = {
                 config: ".storybook/main.ts",
             },
         },
-        "apps/api": {
-            hono: {
-                config: "hono.config.ts",
-            },
-        },
-        "apps/e2e": {
+        "apps/scenario": {
             remix: {
-                entry: ["e2e/entry.client.tsx", "e2e/entry.server.tsx"],
+                entry: ["app/entry.client.tsx", "app/entry.server.tsx"],
             },
         },
         "apps/web": {

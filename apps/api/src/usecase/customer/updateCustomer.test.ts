@@ -42,8 +42,9 @@ describe("UpdateCustomerUseCase", () => {
         const useCase = new UpdateCustomerUseCase(mockRepository);
         const result = await useCase.execute("customer-1", input);
 
-        expect(result.name).toBe("Updated Customer");
-        expect(result.email).toBe("updated@example.com");
+        expect(result).not.toBeNull();
+        expect(result?.name).toBe("Updated Customer");
+        expect(result?.email).toBe("updated@example.com");
         expect(mockRepository.update).toHaveBeenCalledWith("customer-1", input);
     });
 
@@ -64,6 +65,7 @@ describe("UpdateCustomerUseCase", () => {
         const useCase = new UpdateCustomerUseCase(mockRepository);
         const result = await useCase.execute("customer-1", input);
 
-        expect(result.status).toBe("CHURNED");
+        expect(result).not.toBeNull();
+        expect(result?.status).toBe("CHURNED");
     });
 });

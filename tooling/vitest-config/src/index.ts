@@ -66,7 +66,7 @@ export function createVitestConfig(options: VitestConfigOptions = {}): VitestCon
               [
                   "@portfolio/vitest-reporter",
                   {
-                      outputDir: "../e2e/public/reports/test",
+                      outputDir: "../scenario/public/reports/test",
                       projectName: options.projectName,
                       coverageDir,
                   },

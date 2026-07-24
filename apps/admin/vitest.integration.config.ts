@@ -40,9 +40,9 @@ export default defineConfig({
             [
                 "@portfolio/vitest-reporter",
                 {
-                    outputDir: "../e2e/public/reports/integration",
+                    outputDir: "../scenario/public/reports/integration",
                     projectName: "admin",
-                    coverageDir: "../e2e/public/reports/coverage/admin-integration",
+                    coverageDir: "../scenario/public/reports/coverage/admin-integration",
                 },
             ],
         ],

@@ -5,7 +5,7 @@ export default createVitestConfig({
     root: __dirname,
     tsconfigPath: "./tsconfig.json",
     testDir: "./app",
-    coverageDir: "../e2e/public/reports/coverage/admin",
+    coverageDir: "../scenario/public/reports/coverage/admin",
     projectName: "admin",
     setupFiles: [resolve(__dirname, "../../tooling/vitest-config/src/setup.ts")],
     additionalAliases: {
