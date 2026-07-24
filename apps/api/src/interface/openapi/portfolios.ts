@@ -4,6 +4,7 @@ import type { Handler } from "hono";
 import { createContainer } from "~/di/create-container";
 import type { Env } from "~/env";
 import { getLogger, getMetrics } from "~/lib/logger";
+import { isValidSlug } from "~/lib/validation";
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -114,6 +115,10 @@ const listPortfoliosHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const getPortfolioBySlugHandler: Handler<{ Bindings: Env }> = async (c) => {
     const slug = c.req.param("slug");
+    if (!isValidSlug(slug)) {
+        return c.json({ error: "Invalid portfolio slug format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 

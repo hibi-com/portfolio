@@ -264,6 +264,10 @@ const createLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const updateLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid lead ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -294,6 +298,10 @@ const updateLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const deleteLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid lead ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -323,6 +331,10 @@ const deleteLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const convertLeadHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid lead ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 

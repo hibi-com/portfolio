@@ -92,7 +92,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "axios": "1.7.9"
+    "axios": "1.18.1"
   },
   "devDependencies": {
     "@portfolio/biome-config": "workspace:*",
@@ -106,7 +106,7 @@
     "orval": "7.17.2",
     "redoc-cli": "0.13.21",
     "typescript": "5.9.3",
-    "vitest": "3.2.4"
+    "vitest": "3.2.7"
   },
   "peerDependencies": {
     "zod": "4.3.4"

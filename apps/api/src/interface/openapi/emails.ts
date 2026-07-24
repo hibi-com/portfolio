@@ -316,6 +316,10 @@ const createTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const updateTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid template ID format" }, 400);
+    }
+
     try {
         const body = await c.req.json();
         const container = createContainer(c.env);
@@ -337,6 +341,10 @@ const updateTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const deleteTemplateHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid template ID format" }, 400);
+    }
+
     try {
         const container = createContainer(c.env);
         const useCase = container.getDeleteEmailTemplateUseCase();

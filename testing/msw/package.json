@@ -42,7 +42,7 @@
   "dependencies": {
     "@testing-library/jest-dom": "6.9.1",
     "msw": "2.12.7",
-    "vitest": "3.2.4"
+    "vitest": "3.2.7"
   },
   "devDependencies": {
     "@portfolio/biome-config": "workspace:*",

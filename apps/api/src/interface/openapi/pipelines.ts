@@ -245,6 +245,10 @@ const createPipelineHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const updatePipelineHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid pipeline ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -278,6 +282,10 @@ const updatePipelineHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const deletePipelineHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid pipeline ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 

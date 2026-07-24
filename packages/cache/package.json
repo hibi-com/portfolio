@@ -34,7 +34,7 @@
     "@portfolio/tsconfig": "workspace:*",
     "@portfolio/vitest-config": "workspace:*",
     "typescript": "5.9.3",
-    "vitest": "3.2.4",
+    "vitest": "3.2.7",
     "vitest-environment-miniflare": "2.14.4"
   }
 }

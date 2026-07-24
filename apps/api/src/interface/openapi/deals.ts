@@ -271,6 +271,10 @@ const createDealHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const updateDealHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid deal ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -301,6 +305,10 @@ const updateDealHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const deleteDealHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid deal ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -330,6 +338,10 @@ const deleteDealHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const moveDealToStageHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid deal ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 

@@ -1,4 +1,4 @@
-export function isValidSlug(slug: string): boolean {
+export function isValidSlug(slug: string | undefined): slug is string {
     if (!slug || slug.length === 0) {
         return false;
     }
@@ -6,7 +6,7 @@ export function isValidSlug(slug: string): boolean {
     return slugPattern.test(slug);
 }
 
-export function isValidUuid(uuid: string): boolean {
+export function isValidUuid(uuid: string | undefined): uuid is string {
     if (!uuid || uuid.length === 0) {
         return false;
     }

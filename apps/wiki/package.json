@@ -24,18 +24,18 @@
   },
   "dependencies": {
     "@astrojs/check": "0.9.4",
-    "@astrojs/cloudflare": "12.2.1",
+    "@astrojs/cloudflare": "12.6.13",
     "@astrojs/react": "3.6.2",
     "@astrojs/starlight": "0.31.1",
     "@portfolio/ui": "workspace:*",
     "@portfolio/validation": "workspace:*",
-    "astro": "5.1.5",
+    "astro": "5.18.2",
     "astro-mermaid": "1.0.0",
     "hast-util-to-string": "3.0.1",
     "mermaid": "11.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "sharp": "0.33.5",
+    "sharp": "0.35.3",
     "unist-util-visit": "5.0.0",
     "zod": "4.3.4"
   },
@@ -62,6 +62,6 @@
     "textlint-rule-preset-jtf-style": "3.0.3",
     "textlint-rule-spellcheck-tech-word": "5.0.0",
     "typescript": "5.9.3",
-    "wrangler": "4.54.0"
+    "wrangler": "4.114.0"
   }
 }

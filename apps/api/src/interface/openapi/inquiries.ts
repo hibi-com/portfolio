@@ -365,6 +365,10 @@ const createInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const updateInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid inquiry ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -398,6 +402,10 @@ const updateInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const deleteInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid inquiry ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -430,6 +438,10 @@ const deleteInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const resolveInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid inquiry ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -462,6 +474,10 @@ const resolveInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const closeInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid inquiry ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -494,6 +510,10 @@ const closeInquiryHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const getResponsesHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid inquiry ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -526,6 +546,10 @@ const getResponsesHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const addResponseHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid inquiry ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 

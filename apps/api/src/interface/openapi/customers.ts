@@ -4,6 +4,7 @@ import type { Handler } from "hono";
 import { createContainer } from "~/di/create-container";
 import type { Env } from "~/env";
 import { getLogger, getMetrics } from "~/lib/logger";
+import { isValidUuid } from "~/lib/validation";
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -196,6 +197,10 @@ const listCustomersHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const getCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid customer ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -261,6 +266,10 @@ const createCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const updateCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid customer ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 
@@ -303,6 +312,10 @@ const updateCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
 
 const deleteCustomerHandler: Handler<{ Bindings: Env }> = async (c) => {
     const id = c.req.param("id");
+    if (!isValidUuid(id)) {
+        return c.json({ error: "Invalid customer ID format" }, 400);
+    }
+
     const metrics = getMetrics();
     const startTime = Date.now();
 

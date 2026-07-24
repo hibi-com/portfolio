@@ -16,9 +16,7 @@ export interface InitAuthOptions<TExtraPlugins extends BetterAuthPlugin[] = []> 
     extraPlugins?: TExtraPlugins;
 }
 
-export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
-    options: InitAuthOptions<TExtraPlugins>,
-): ReturnType<typeof betterAuth> {
+export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(options: InitAuthOptions<TExtraPlugins>) {
     const prisma = createPrismaClient({
         d1: options.d1,
         databaseUrl: options.databaseUrl,

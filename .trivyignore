@@ -1,8 +1,12 @@
 # Trivy ignore file（CVE / シークレットルール単位）
 # パス除外は trivy.yaml の skip-dirs / skip-files を使う（.gitleaks.toml と対応）。
 #
-# 例:
-# CVE-2024-XXXX
-#   └── 理由: 影響なし / パッチ待ち / 許容リスク
-#
 # 書式: https://aquasecurity.github.io/trivy/latest/docs/configuration/filtering/#trivyignore
+
+# Astro 5.x（Cloudflare Pages + Starlight）では修正版なし。
+# 修正は Astro 6.3.3+ / 6.4.6+ だが、@astrojs/cloudflare v13 は Pages 非対応で
+# Workers 移行が必要なため、別タスクで対応する。
+# - CVE-2026-50146: client:* slot 名の reflected XSS（SSR）
+# - CVE-2026-54299: prerender エラーページの Host ヘッダ SSRF
+CVE-2026-50146
+CVE-2026-54299
